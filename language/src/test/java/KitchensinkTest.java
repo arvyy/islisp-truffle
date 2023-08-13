@@ -12,7 +12,8 @@ public class KitchensinkTest {
 
     @BeforeEach
     public void setUp() {
-        this.context = Context.create();
+        this.context = Context.newBuilder()
+                .build();
     }
 
     @Test

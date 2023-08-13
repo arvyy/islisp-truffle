@@ -4,8 +4,17 @@ import com.github.arvyy.islisp.parser.Parser;
 import com.github.arvyy.islisp.parser.Reader;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
+import com.oracle.truffle.api.instrumentation.ProvidedTags;
+import com.oracle.truffle.api.instrumentation.StandardTags;
+import com.oracle.truffle.api.debug.DebuggerTags;
 
 @TruffleLanguage.Registration(id = "islisp", name = "ISLISP")
+@ProvidedTags({
+    StandardTags.RootTag.class,
+    StandardTags.StatementTag.class,
+    StandardTags.ReadVariableTag.class,
+    StandardTags.WriteVariableTag.class,
+})
 public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
 
     @Override
