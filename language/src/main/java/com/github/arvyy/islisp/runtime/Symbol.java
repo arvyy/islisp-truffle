@@ -1,9 +1,25 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
+import com.oracle.truffle.api.library.ExportLibrary;
+import com.oracle.truffle.api.source.SourceSection;
 
-public record Symbol(String name) implements Value, TruffleObject {
+@ExportLibrary(InteropLibrary.class)
+public record Symbol(String name, SymbolReference identityReference, SourceSection sourceSection) implements Value, TruffleObject {
 
-    public final static Symbol NIL = new Symbol("NIL");
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        Symbol symbol = (Symbol) o;
+
+        return identityReference == symbol.identityReference;
+    }
+
+    @Override
+    public int hashCode() {
+        return identityReference.hashCode();
+    }
 }

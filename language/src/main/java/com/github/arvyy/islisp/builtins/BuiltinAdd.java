@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp.builtins;
 
+import com.github.arvyy.islisp.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispInteger;
 import com.github.arvyy.islisp.runtime.Value;
@@ -22,7 +23,7 @@ public abstract class BuiltinAdd extends RootNode {
     @Override
     @ExplodeLoop
     public final Value execute(VirtualFrame frame) {
-        Value sum = new LispInteger(0);
+        Value sum = new LispInteger(0, null);
         for (int i = 1; i < frame.getArguments().length; i++) {
             sum = executeGeneric(sum, (Value) frame.getArguments()[i]);
         }
@@ -30,14 +31,13 @@ public abstract class BuiltinAdd extends RootNode {
     }
 
     @Specialization
-    @ExplodeLoop
     Value executeInts(LispInteger a, LispInteger b) {
-        return new LispInteger(a.value() + b.value());
+        return new LispInteger(a.value() + b.value(), null);
     }
 
     @Fallback
     Value notNumbers(Value a, Value b) {
-        throw new RuntimeException("Not numbers");
+        throw new ISLISPError("Not numbers", this);
     }
 
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {

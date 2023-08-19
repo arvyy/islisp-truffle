@@ -14,6 +14,10 @@ import java.io.IOException;
 %type Token
 %apiprivate
 
+%line
+%column
+%unicode
+
 %{
     StringBuilder sb;
     int commentNesting = 0;
@@ -34,6 +38,18 @@ import java.io.IOException;
         } catch (Exception e) {
             throw new RuntimeException(e); //TODO
         }
+    }
+
+    public int getLine() {
+        return yyline + 1;
+    }
+
+    public int getColumn() {
+        return yycolumn + 1;
+    }
+
+    public int getLength() {
+        return yylength();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.github.arvyy.islisp;
+package com.github.arvyy.islisp.launcher;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
@@ -19,19 +19,11 @@ public class Main {
         var context = Context.newBuilder()
                 .in(System.in)
                 .out(System.out)
-                /*
                 .option("inspect", port)
-                .option("inspect.Suspend", "true")
-                .option("inspect.Path", path)
-                 */
+                //.option("inspect.Path", path)
+                //.option("inspect.Suspend", "true")
+                //.option("dap", "4747")
                 .build();
-
-
-        String hostAdress = "localhost";
-        String url = String.format(
-                "chrome-devtools://devtools/bundled/js_app.html?ws=%s:%s/%s",
-                hostAdress, port, path);
-        System.out.println("Debugger at: " + url);
 
         var result = context.eval(source);
         System.out.println(result);

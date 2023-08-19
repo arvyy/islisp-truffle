@@ -1,9 +1,11 @@
 package com.github.arvyy.islisp.nodes;
 
+import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.profiles.ConditionProfile;
+import com.oracle.truffle.api.source.SourceSection;
 
 public class ISLISPIfNode extends ISLISPExpressionNode {
 
@@ -18,7 +20,8 @@ public class ISLISPIfNode extends ISLISPExpressionNode {
     @Child
     private ISLISPExpressionNode falsyExpr;
 
-    public ISLISPIfNode(ISLISPExpressionNode testExpr, ISLISPExpressionNode truthyExpr, ISLISPExpressionNode falsyExpr) {
+    public ISLISPIfNode(ISLISPExpressionNode testExpr, ISLISPExpressionNode truthyExpr, ISLISPExpressionNode falsyExpr, SourceSection sourceSection) {
+        super(sourceSection);
         conditionProfile = ConditionProfile.createCountingProfile();
         this.testExpr = testExpr;
         this.truthyExpr = truthyExpr;
@@ -28,7 +31,7 @@ public class ISLISPIfNode extends ISLISPExpressionNode {
     @Override
     public Value executeGeneric(VirtualFrame frame) {
         var test = testExpr.executeGeneric(frame);
-        if (conditionProfile.profile(test == Symbol.NIL)) {
+        if (conditionProfile.profile(test == ISLISPContext.get(this).getNIL())) {
             return falsyExpr.executeGeneric(frame);
         } else {
             return truthyExpr.executeGeneric(frame);

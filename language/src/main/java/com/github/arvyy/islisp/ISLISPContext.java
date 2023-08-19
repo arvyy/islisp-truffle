@@ -2,6 +2,9 @@ package com.github.arvyy.islisp;
 
 import com.github.arvyy.islisp.builtins.*;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.github.arvyy.islisp.runtime.Symbol;
+import com.github.arvyy.islisp.runtime.SymbolReference;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.nodes.Node;
@@ -17,24 +20,27 @@ public class ISLISPContext {
      }
     private final ISLISPTruffleLanguage language;
     private final Env env;
+    private Symbol NIL, T;
 
-    private final Map<String, LispFunction> globalFunctions;
-    private final Map<String, LispFunction> macros;
+    private final Map<SymbolReference, LispFunction> globalFunctions;
+    private final Map<SymbolReference, LispFunction> macros;
+    private final Map<String, SymbolReference> symbols;
 
     public ISLISPContext(ISLISPTruffleLanguage language, Env env) {
         this.language = language;
         this.env = env;
         globalFunctions = new HashMap<>();
         macros = new HashMap<>();
+        symbols = new HashMap<>();
         initGlobalFunctions();
     }
 
     void initGlobalFunctions() {
-        globalFunctions.put("+", BuiltinAdd.makeLispFunction(language));
-        globalFunctions.put("-", BuiltinSubtract.makeLispFunction(language));
-        globalFunctions.put("=", BuiltinNumericEqual.makeLispFunction(language));
-        globalFunctions.put(">", BuiltinNumericGt.makeLispFunction(language));
-        globalFunctions.put("print", BuiltinPrint.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("+").identityReference(), BuiltinAdd.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("-").identityReference(), BuiltinSubtract.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("=").identityReference(), BuiltinNumericEqual.makeLispFunction(language));
+        globalFunctions.put(namedSymbol(">").identityReference(), BuiltinNumericGt.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("print").identityReference(), BuiltinPrint.makeLispFunction(language));
     }
 
     public void reset() {
@@ -43,19 +49,23 @@ public class ISLISPContext {
         initGlobalFunctions();
     }
 
-    public void registerFunction(String name, LispFunction function) {
-        globalFunctions.put(name, function);
+    @CompilerDirectives.TruffleBoundary
+    public void registerFunction(SymbolReference symbolReference, LispFunction function) {
+        globalFunctions.put(symbolReference, function);
     }
-    public LispFunction lookupFunction(String name) {
-        return globalFunctions.get(name);
-    }
-
-    public void registerMacro(String name, LispFunction function) {
-        macros.put(name, function);
+    @CompilerDirectives.TruffleBoundary
+    public LispFunction lookupFunction(SymbolReference symbolReference) {
+        return globalFunctions.get(symbolReference);
     }
 
-    public LispFunction lookupMacro(String name) {
-        return macros.get(name);
+    @CompilerDirectives.TruffleBoundary
+    public void registerMacro(SymbolReference symbolReference, LispFunction function) {
+        macros.put(symbolReference, function);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public LispFunction lookupMacro(SymbolReference symbolReference) {
+        return macros.get(symbolReference);
     }
 
     public ISLISPTruffleLanguage getLanguage() {
@@ -65,4 +75,25 @@ public class ISLISPContext {
     public Env getEnv() {
         return env;
     }
+
+    @CompilerDirectives.TruffleBoundary
+    public Symbol namedSymbol(String name) {
+        var v = symbols.computeIfAbsent(name, k -> new SymbolReference());
+        return new Symbol(name, v, null);
+    }
+
+    public Symbol getNIL() {
+        if (NIL == null) {
+            NIL = namedSymbol("NIL");
+        }
+        return NIL;
+    }
+
+    public Symbol getT() {
+        if (T == null) {
+            T = namedSymbol("T");
+        }
+        return T;
+    }
+
 }

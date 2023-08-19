@@ -16,16 +16,15 @@ public class ISLISPDefMacro extends ISLISPExpressionNode {
     ISLISPDefunNode defun;
 
     public ISLISPDefMacro(ISLISPDefunNode defun) {
-        super(true);
+        super(true, null);
         this.defun = defun;
     }
 
     @Override
     public Value executeGeneric(VirtualFrame frame) {
-        CompilerAsserts.neverPartOfCompilation();
+        //CompilerDirectives.transferToInterpreter();
         var ctx = ISLISPContext.get(this);
-        var fun = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), defun.frameDescriptor, defun.body, defun.namedArgumentSlots);
-        ctx.registerMacro(defun.name, new LispFunction(null, fun.getCallTarget()));
-        return new Symbol(defun.name);
+        ctx.registerMacro(defun.name.identityReference(), new LispFunction(null, defun.functionNode.getCallTarget()));
+        return defun.name;
     }
 }

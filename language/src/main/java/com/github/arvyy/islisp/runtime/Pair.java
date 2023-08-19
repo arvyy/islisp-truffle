@@ -1,10 +1,14 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
+import com.oracle.truffle.api.library.ExportLibrary;
+import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.Iterator;
 
-public record Pair(Value car, Value cdr) implements Value, TruffleObject, Iterable<Value> {
+@ExportLibrary(InteropLibrary.class)
+public record Pair(Value car, Value cdr, SourceSection sourceSection) implements Value, TruffleObject, Iterable<Value> {
 
     @Override
     public Iterator<Value> iterator() {

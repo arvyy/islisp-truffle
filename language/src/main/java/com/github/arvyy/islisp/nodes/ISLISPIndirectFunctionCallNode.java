@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.source.SourceSection;
 
 public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
 
@@ -11,7 +12,8 @@ public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
     @Child
     private ISLISPFunctionDispatchNode dispatchNode;
 
-    public ISLISPIndirectFunctionCallNode(ISLISPExpressionNode[] arguments) {
+    public ISLISPIndirectFunctionCallNode(ISLISPExpressionNode[] arguments, SourceSection sourceSection) {
+        super(sourceSection);
         this.arguments = arguments;
         dispatchNode = ISLISPFunctionDispatchNodeGen.create();
     }

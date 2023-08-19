@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
+import com.github.arvyy.islisp.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.dsl.Cached;
@@ -41,6 +42,6 @@ public abstract class ISLISPFunctionDispatchNode extends Node {
 
     @Fallback
     public Value notAFunction(Object notAFunction, Object[] args) {
-        throw new RuntimeException();
+        throw new ISLISPError("Not a function", this);
     }
 }
