@@ -19,7 +19,7 @@ public class ISLISPLambdaNode extends ISLISPExpressionNode {
     }
 
     @Override
-    public Value executeGeneric(VirtualFrame frame) {
+    public LispFunction executeGeneric(VirtualFrame frame) {
         return new LispFunction(frame.materialize(), functionNode.getCallTarget());
     }
 }

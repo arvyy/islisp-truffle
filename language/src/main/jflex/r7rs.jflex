@@ -102,8 +102,6 @@ PeculiarIdentifier =
 DotSubsequent = {SignSubsequent} | "."
 SignSubsequent = {Initial} | {ExplicitSign} | "@"
 SymbolElement = [^|\\] | {InlineHexEscape} | {MnemonicEscape} | \|
-BooleanTrue = #t | #true
-BooleanFalse = #f | #false
 Character = "#\". | "#\x" {HexScalarValue} | "#\" {CharacterName}
 CharacterName = alarm | backspace | delete | escape | newline | null | return | space | tab
 
@@ -120,7 +118,7 @@ CharacterName = alarm | backspace | delete | escape | newline | null | return | 
 <YYINITIAL> {
     {Identifier} {
         String text = yytext();
-        return new Token.IdentifierToken(yytext());
+        return new Token.IdentifierToken(yytext().toLowerCase());
     }
 
   "#(" {
@@ -143,12 +141,8 @@ CharacterName = alarm | backspace | delete | escape | newline | null | return | 
     return new Token.BracketCloseToken();
   }
 
-  {BooleanFalse} {
-    return new Token.BooleanToken(false);
-  }
-
-  {BooleanTrue} {
-    return new Token.BooleanToken(true);
+  "#'" {
+    return new Token.FunctionRefToken();
   }
 
   "'" {

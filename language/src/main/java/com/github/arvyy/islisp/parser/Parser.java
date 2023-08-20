@@ -95,6 +95,12 @@ public class Parser {
                     return parseIfNode(parserContext, sexpr.sourceSection(), rest);
                 case "debugger":
                     return parseDebuggerNode(parserContext, sexpr.sourceSection(), rest);
+                case "quote":
+                    return parseQuote(parserContext, sexpr.sourceSection(), rest);
+                case "quasiquote":
+                    return parseQuasiquote(parserContext, sexpr.sourceSection(), sexpr);
+                case "class":
+                    return parseClassRef(parserContext, sexpr.sourceSection(), rest);
             }
             // macros
             var symbol = ISLISPContext.get(null).namedSymbol(carName);
@@ -110,6 +116,18 @@ public class Parser {
                 return parseExpressionNode(parserContext, transformedSexpr, topLevel);
             }
             return parseDirectFunctionCall(parserContext, sexpr.sourceSection(), symbol, ((Pair) sexpr).cdr());
+        }
+        //a list pattern, but car isn't a symbol: it might be immediate lambda call
+        if (sexpr instanceof Pair) {
+            var car = ((Pair) sexpr).car();
+            if (car instanceof Pair firstPos) {
+                if (firstPos.car() instanceof Symbol maybeLambda) {
+                    if (maybeLambda.name().equals("lambda")) {
+                        var lambda = parseLambda(parserContext, firstPos.sourceSection(), firstPos.cdr());
+                        return parseDirectLambdaCall(parserContext, sexpr.sourceSection(), lambda, ((Pair) sexpr).cdr());
+                    }
+                }
+            }
         }
         if (sexpr instanceof LispInteger) {
             return new ISLISPLiteralNode(sexpr, sexpr.sourceSection());
@@ -128,6 +146,11 @@ public class Parser {
         }
         //TODO
         throw new RuntimeException();
+    }
+
+    private ISLISPLiteralNode parseQuote(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var car = ((Pair) rest).car();
+        return new ISLISPLiteralNode(car, sourceSection);
     }
 
     private ISLISPExpressionNode parseDebuggerNode(ParserContext parserContext, SourceSection sourceSection, Value rest) {
@@ -155,6 +178,15 @@ public class Parser {
         return new ISLISPDirectFunctionCallNode(name, argNodes.toArray(ISLISPExpressionNode[]::new), sourceSection);
     }
 
+    ISLISPDirectLambdaCallNode parseDirectLambdaCall(ParserContext parserContext, SourceSection sourceSection, ISLISPLambdaNode lambdaNode, Value rest) {
+        Iterable<Value> args = rest instanceof Pair? (Pair) rest : List.of();
+        var argNodes = new ArrayList<ISLISPExpressionNode>();
+        for (Value arg : args) {
+            argNodes.add(parseExpressionNode(parserContext, arg));
+        }
+        return new ISLISPDirectLambdaCallNode(lambdaNode, argNodes.toArray(ISLISPExpressionNode[]::new), sourceSection);
+    }
+
     ISLISPLambdaNode parseLambda(ParserContext parserContext, SourceSection sourceSection, Value rest) {
         var restList = new ArrayList<Value>();
         for (var e: (Pair) rest) {
@@ -162,7 +194,7 @@ public class Parser {
         }
         var newParserContext = parserContext.pushClosureScope();
         var positionalArgumentSlots = new ArrayList<Integer>();
-        Iterable<Value> args = restList.get(0).equals(ISLISPContext.get(null).getNIL())? List.of() : (Pair) restList.get(1);
+        Iterable<Value> args = restList.get(0).equals(ISLISPContext.get(null).getNIL())? List.of() : (Pair) restList.get(0);
         var frameDescriptorBuilder = FrameDescriptor.newBuilder();
         //TODO factor out to reduce repeat with parseDefun
         for (var v: args) {
@@ -233,6 +265,13 @@ public class Parser {
         return new ISLISPFunctionRef(symbol, sourceSection);
     }
 
+    ISLISPClassRef parseClassRef(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var pair = (Pair) rest;
+        var name = ((Symbol) pair.car()).name();
+        var symbol = ISLISPContext.get(null).namedSymbol(name);
+        return new ISLISPClassRef(symbol, sourceSection);
+    }
+
     ISLISPIfNode parseIfNode(ParserContext parserContext, SourceSection sourceSection, Value rest) {
         var body = new ArrayList<ISLISPExpressionNode>();
         for (var e: (Pair) rest) {
@@ -246,6 +285,15 @@ public class Parser {
 
     ISLISPDefMacro parseDefMacro(ParserContext parserContext, SourceSection sourceSection, Value rest) {
         return new ISLISPDefMacro(parseDefun(parserContext, sourceSection, rest));
+    }
+
+    ISLISPQuasiquoteNode parseQuasiquote(ParserContext parserContext, SourceSection sourceSection, Value me) {
+        var qq = QuasiquoteTree.parseQuasiquoteTree(me);
+        var childNodes = new ISLISPExpressionNode[qq.expressions().length];
+        for (var i = 0; i < childNodes.length; i++) {
+            childNodes[i] = parseExpressionNode(parserContext, qq.expressions()[i]);
+        }
+        return new ISLISPQuasiquoteNode(sourceSection, qq.tree(), childNodes);
     }
 
 }

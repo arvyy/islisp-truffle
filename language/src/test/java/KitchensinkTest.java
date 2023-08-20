@@ -19,11 +19,9 @@ public class KitchensinkTest {
     @Test
     public void test() {
         var sourceCode = """
-                (defun fib (n)
-                    (if (> 2 n)
-                        1
-                        (+ (fib (- n 1)) (fib (- n 2)))))
-                (print (fib 6))
+                (defun foo (a)
+                    `(1 ,@a))
+                (print (foo '(2)))
                 """;
         context.eval("islisp", sourceCode);
     }

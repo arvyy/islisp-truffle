@@ -52,6 +52,31 @@ public class Reader {
             var lispInt = new LispInteger(value, section());
             return Optional.of(lispInt);
         }
+        if (t instanceof Token.QuasiquoteToken ||
+                t instanceof Token.QuoteToken ||
+                t instanceof Token.UnquoteSpliceToken ||
+                t instanceof Token.UnquoteToken ||
+                t instanceof Token.FunctionRefToken
+        ) {
+            String symbolName;
+            if (t instanceof Token.QuasiquoteToken) {
+                symbolName = "quasiquote";
+            } else if (t instanceof Token.QuoteToken) {
+                symbolName = "quote";
+            } else if (t instanceof Token.UnquoteSpliceToken) {
+                symbolName = "unquote-splicing";
+            } else if (t instanceof Token.FunctionRefToken) {
+                symbolName = "function";
+            } else {
+                symbolName = "unquote";
+            }
+            var quoteSection = section();
+            var value = readSingle().orElseThrow(); //TODO
+            var normalizedSyntaxSymbol = ISLISPContext.get(null).namedSymbol(symbolName);
+            var nil = ISLISPContext.get(null).getNIL();
+            var fullSection = source.createSection(quoteSection.getStartLine(), quoteSection.getStartColumn(), value.sourceSection().getEndLine(), value.sourceSection().getEndColumn());
+            return Optional.of(new Pair(normalizedSyntaxSymbol, new Pair(value, nil, value.sourceSection()), fullSection));
+        }
         /*
         if (t instanceof Token.VectorBracketOpenToken) {
             Optional<Token> next;

@@ -1,16 +1,16 @@
 package com.github.arvyy.islisp;
 
 import com.github.arvyy.islisp.builtins.*;
-import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.Symbol;
-import com.github.arvyy.islisp.runtime.SymbolReference;
+import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.nodes.Node;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ISLISPContext {
 
@@ -25,6 +25,7 @@ public class ISLISPContext {
     private final Map<SymbolReference, LispFunction> globalFunctions;
     private final Map<SymbolReference, LispFunction> macros;
     private final Map<String, SymbolReference> symbols;
+    private final Map<SymbolReference, LispClass> classes;
 
     public ISLISPContext(ISLISPTruffleLanguage language, Env env) {
         this.language = language;
@@ -32,15 +33,40 @@ public class ISLISPContext {
         globalFunctions = new HashMap<>();
         macros = new HashMap<>();
         symbols = new HashMap<>();
+        classes = new HashMap<>();
         initGlobalFunctions();
+        initBuiltinClasses();
     }
 
     void initGlobalFunctions() {
         globalFunctions.put(namedSymbol("+").identityReference(), BuiltinAdd.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("eq").identityReference(), BuiltinEq.makeLispFunction(language));
         globalFunctions.put(namedSymbol("-").identityReference(), BuiltinSubtract.makeLispFunction(language));
         globalFunctions.put(namedSymbol("=").identityReference(), BuiltinNumericEqual.makeLispFunction(language));
         globalFunctions.put(namedSymbol(">").identityReference(), BuiltinNumericGt.makeLispFunction(language));
         globalFunctions.put(namedSymbol("print").identityReference(), BuiltinPrint.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("class-of").identityReference(), BuiltinClassOf.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("gensym").identityReference(), BuiltinGensym.makeLispFunction(language));
+    }
+
+    void initBuiltin(String name, String... parents) {
+        var symbol = namedSymbol(name);
+        var parentClasses = Arrays.stream(parents)
+                .map(pname -> classes.get(namedSymbol(pname).identityReference()))
+                .toList();
+        classes.put(symbol.identityReference(), new BuiltinClass(parentClasses, symbol));
+    }
+
+    void initBuiltinClasses() {
+        initBuiltin("<object>");
+        initBuiltin("<function>", "<object>");
+        initBuiltin("<number>", "<object>");
+        initBuiltin("<symbol>", "<object>");
+        initBuiltin("<list>", "<object>");
+        initBuiltin("<null>", "<symbol>", "<list>");
+        initBuiltin("<integer>", "<number>");
+        initBuiltin("<float>", "<number>");
+        initBuiltin("<built-in-class>", "<object>");
     }
 
     public void reset() {
@@ -68,6 +94,16 @@ public class ISLISPContext {
         return macros.get(symbolReference);
     }
 
+    @CompilerDirectives.TruffleBoundary
+    public void registerClass(SymbolReference symbolReference, LispClass clazz) {
+        classes.put(symbolReference, clazz);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public LispClass lookupClass(SymbolReference symbolReference) {
+        return classes.get(symbolReference);
+    }
+
     public ISLISPTruffleLanguage getLanguage() {
         return language;
     }
@@ -84,16 +120,20 @@ public class ISLISPContext {
 
     public Symbol getNIL() {
         if (NIL == null) {
-            NIL = namedSymbol("NIL");
+            NIL = namedSymbol("nil");
         }
         return NIL;
     }
 
     public Symbol getT() {
         if (T == null) {
-            T = namedSymbol("T");
+            T = namedSymbol("t");
         }
         return T;
     }
 
+    private int gensymIndex = 1;
+    public int gensymIndex() {
+        return gensymIndex++;
+    }
 }

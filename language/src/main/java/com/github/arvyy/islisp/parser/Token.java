@@ -4,6 +4,8 @@ public sealed interface Token {
 
     record ExactNumberToken(int value) implements Token {}
     record InexactNumberToken(double value) implements Token {}
+
+    record FunctionRefToken() implements Token {}
     record StringToken(String value) implements Token {}
     record CharToken(Integer value) implements Token {}
     record BooleanToken(Boolean value) implements Token {}
