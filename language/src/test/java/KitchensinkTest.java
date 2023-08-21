@@ -19,8 +19,8 @@ public class KitchensinkTest {
     @Test
     public void test() {
         var sourceCode = """
-                (defun foo (a)
-                    `(1 ,@a))
+                (block a
+                    (return-from b 1))
                 (print (foo '(2)))
                 """;
         context.eval("islisp", sourceCode);

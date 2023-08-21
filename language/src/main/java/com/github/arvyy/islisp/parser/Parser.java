@@ -17,7 +17,7 @@ public class Parser {
     @CompilerDirectives.TruffleBoundary
     public ISLISPRootNode parseRootNode(ISLISPTruffleLanguage language, List<Value> content) {
         var expressionNodes = new ArrayList<ISLISPExpressionNode>();
-        var parserContext = new ParserContext(0, new LexicalScope<>());
+        var parserContext = new ParserContext(0, new LexicalScope<>(), new IdGen(), new LexicalScope<>());
         for (var v: content) {
             var expression = parseExpressionNode(parserContext, v, true);
             executeDefinitions(expression); // execute definitions to be available for macro procedure runs
@@ -101,6 +101,10 @@ public class Parser {
                     return parseQuasiquote(parserContext, sexpr.sourceSection(), sexpr);
                 case "class":
                     return parseClassRef(parserContext, sexpr.sourceSection(), rest);
+                case "block":
+                    return parseBlock(parserContext, sexpr.sourceSection(), rest);
+                case "return-from":
+                    return parseReturnFrom(parserContext, sexpr.sourceSection(), rest);
             }
             // macros
             var symbol = ISLISPContext.get(null).namedSymbol(carName);
@@ -146,6 +150,33 @@ public class Parser {
         }
         //TODO
         throw new RuntimeException();
+    }
+
+    private ISLISPReturnFromNode parseReturnFrom(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var args = new ArrayList<Value>();
+        for (var v: (Pair) rest) {
+            args.add(v);
+        }
+        var name = (Symbol) args.get(0);
+        var blockId = parserContext.blocks.get(name.identityReference())
+                .orElseThrow(() -> new RuntimeException("Bogus return-from"));
+        var expression = parseExpressionNode(parserContext, args.get(1));
+        return new ISLISPReturnFromNode(blockId, expression, sourceSection);
+    }
+
+    private ISLISPBlockNode parseBlock(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var args = new ArrayList<Value>();
+        for (var v: (Pair) rest) {
+            args.add(v);
+        }
+        var name = (Symbol) args.get(0);
+        var newContext = parserContext.pushBlockScope(name.identityReference());
+        var blockId = newContext.blocks.get(name.identityReference()).get();
+        ISLISPExpressionNode expressions[] = new ISLISPExpressionNode[args.size() - 1];
+        for (int i = 1; i < args.size(); i++) {
+            expressions[i - 1] = parseExpressionNode(newContext, args.get(i));
+        }
+        return new ISLISPBlockNode(blockId, expressions, sourceSection);
     }
 
     private ISLISPLiteralNode parseQuote(ParserContext parserContext, SourceSection sourceSection, Value rest) {
@@ -298,6 +329,13 @@ public class Parser {
 
 }
 
+class IdGen {
+    private int curr = 0;
+    int next() {
+        return curr++;
+    }
+}
+
 class VariableContext {
     int frameDepth;
     int slot;
@@ -306,14 +344,24 @@ class VariableContext {
 class ParserContext {
     final int frameDepth;
     final LexicalScope<SymbolReference, VariableContext> variables;
+    final IdGen blocksIdGen;
+    final LexicalScope<SymbolReference, Integer> blocks;
 
-    ParserContext(int frameDepth, LexicalScope<SymbolReference, VariableContext> variables) {
+    ParserContext(int frameDepth, LexicalScope<SymbolReference, VariableContext> variables, IdGen blocksIdGen, LexicalScope<SymbolReference, Integer> blocks) {
         this.frameDepth = frameDepth;
         this.variables = variables;
+        this.blocksIdGen = blocksIdGen;
+        this.blocks = blocks;
     }
 
     ParserContext pushClosureScope() {
-        return new ParserContext(frameDepth + 1, new LexicalScope<>(variables));
+        return new ParserContext(frameDepth + 1, new LexicalScope<>(variables), blocksIdGen, blocks);
+    }
+
+    ParserContext pushBlockScope(SymbolReference blockName) {
+        var newBlocks = new LexicalScope<>(blocks);
+        newBlocks.put(blockName, blocksIdGen.next());
+        return new ParserContext(frameDepth, variables, blocksIdGen, newBlocks);
     }
 
 }
