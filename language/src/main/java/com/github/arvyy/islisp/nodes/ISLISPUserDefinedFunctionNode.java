@@ -1,8 +1,13 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPTruffleLanguage;
+import com.github.arvyy.islisp.builtins.BuiltinCallNextMethod;
+import com.github.arvyy.islisp.builtins.BuiltinHasNextMethod;
+import com.github.arvyy.islisp.runtime.Closure;
+import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.FrameDescriptor;
+import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.*;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
@@ -17,32 +22,60 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
     @Child
     private ISLISPExpressionNode body;
 
+    @Child
+    private BuiltinCallNextMethod callNextMethod;
+
+    @Child
+    private BuiltinHasNextMethod hasNextMethod;
+
     private final int[] namedArgumentSlots;
+
+    private final int callNextMethodSlot;
+    private final int hasNextMethodSlot;
 
     public ISLISPUserDefinedFunctionNode(
             TruffleLanguage<?> language,
             FrameDescriptor frameDescriptor,
             ISLISPExpressionNode body,
             int[] namedArgumentSlots,
+            int callNextMethodSlot,
+            int hasNextMethodSlot,
             SourceSection sourceSection
     ) {
         super(language, frameDescriptor);
         this.body = body;
         this.namedArgumentSlots = namedArgumentSlots;
+        this.callNextMethodSlot = callNextMethodSlot;
+        this.hasNextMethodSlot = hasNextMethodSlot;
         this.sourceSection = sourceSection;
         body.markRootBody();
+        if (hasNextMethodSlot >= 0) {
+            hasNextMethod = new BuiltinHasNextMethod(language);
+        }
+        if (callNextMethodSlot >= 0) {
+            callNextMethod = new BuiltinCallNextMethod(language);
+        }
     }
 
-    protected ISLISPUserDefinedFunctionNode(ISLISPUserDefinedFunctionNode other) {
-        super(other.getLanguage(ISLISPTruffleLanguage.class), other.getFrameDescriptor());
-        this.body = other.body;
-        this.namedArgumentSlots = other.namedArgumentSlots;
-        this.sourceSection = other.sourceSection;
+    protected ISLISPUserDefinedFunctionNode() {
+        super(null);
+        sourceSection = null;
+        namedArgumentSlots = null;
+        callNextMethodSlot = -1;
+        hasNextMethodSlot = -1;
     }
 
     @Override
     @ExplodeLoop
     public Object execute(VirtualFrame frame) {
+        if (callNextMethodSlot >= 0) {
+            var closure = (Closure) frame.getArguments()[0];
+            frame.setObject(callNextMethodSlot, new LispFunction(closure, callNextMethod.getCallTarget()));
+        }
+        if (hasNextMethodSlot >= 0) {
+            var closure = (Closure) frame.getArguments()[0];
+            frame.setObject(hasNextMethodSlot, new LispFunction(closure, hasNextMethod.getCallTarget()));
+        }
         for (var i = 0; i < namedArgumentSlots.length; i++) {
             int slot = namedArgumentSlots[i];
             frame.setObject(slot, frame.getArguments()[i + 1]);
@@ -52,7 +85,7 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
 
     @Override
     public boolean isInstrumentable() {
-        return false;
+        return true;
     }
 
     @Override
@@ -64,7 +97,7 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
 
     @Override
     public WrapperNode createWrapper(ProbeNode probe) {
-        return new ISLISPUserDefinedFunctionNodeWrapper(this, this, probe);
+        return new ISLISPUserDefinedFunctionNodeWrapper(this, probe);
     }
 
     @Override

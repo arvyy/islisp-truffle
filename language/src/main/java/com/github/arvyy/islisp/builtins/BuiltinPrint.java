@@ -30,7 +30,7 @@ public class BuiltinPrint extends RootNode {
 
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         var add = new BuiltinPrint(lang);
-        return new LispFunction(null, add.getCallTarget());
+        return new LispFunction(add.getCallTarget());
     }
 
 }

@@ -1,10 +1,14 @@
 package com.github.arvyy.islisp.nodes;
 
+import com.github.arvyy.islisp.ISLISPError;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.source.SourceSection;
 
 public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
+
+    @Child
+    private ISLISPExpressionNode fn;
 
     @Children
     private ISLISPExpressionNode[] arguments;
@@ -12,8 +16,9 @@ public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
     @Child
     private ISLISPFunctionDispatchNode dispatchNode;
 
-    public ISLISPIndirectFunctionCallNode(ISLISPExpressionNode[] arguments, SourceSection sourceSection) {
+    public ISLISPIndirectFunctionCallNode(ISLISPExpressionNode fn, ISLISPExpressionNode[] arguments, SourceSection sourceSection) {
         super(sourceSection);
+        this.fn = fn;
         this.arguments = arguments;
         dispatchNode = ISLISPFunctionDispatchNodeGen.create();
     }
@@ -24,9 +29,7 @@ public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
         for (int i = 0; i < argValues.length; i++) {
             argValues[i] = arguments[i].executeGeneric(frame);
         }
-        var function = argValues[0];
-        var functionArgs = new Value[arguments.length - 1];
-        System.arraycopy(argValues, 1, functionArgs, 0, functionArgs.length);
-        return dispatchNode.executeDispatch(function, functionArgs);
+        var functionValue = fn.executeGeneric(frame);
+        return dispatchNode.executeDispatch(functionValue, argValues);
     }
 }

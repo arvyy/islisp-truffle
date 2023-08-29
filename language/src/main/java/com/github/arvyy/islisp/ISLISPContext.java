@@ -23,6 +23,7 @@ public class ISLISPContext {
     private Symbol NIL, T;
 
     private final Map<SymbolReference, LispFunction> globalFunctions;
+    private final Map<SymbolReference, GenericFunctionDescriptor> genericFunctions;
     private final Map<SymbolReference, LispFunction> macros;
     private final Map<String, SymbolReference> symbols;
     private final Map<SymbolReference, LispClass> classes;
@@ -31,6 +32,7 @@ public class ISLISPContext {
         this.language = language;
         this.env = env;
         globalFunctions = new HashMap<>();
+        genericFunctions = new HashMap<>();
         macros = new HashMap<>();
         symbols = new HashMap<>();
         classes = new HashMap<>();
@@ -71,6 +73,7 @@ public class ISLISPContext {
 
     public void reset() {
         globalFunctions.clear();
+        genericFunctions.clear();
         macros.clear();
         initGlobalFunctions();
     }
@@ -82,6 +85,17 @@ public class ISLISPContext {
     @CompilerDirectives.TruffleBoundary
     public LispFunction lookupFunction(SymbolReference symbolReference) {
         return globalFunctions.get(symbolReference);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public void registerGenericFunction(SymbolReference symbolReference, LispFunction function, GenericFunctionDescriptor descriptor) {
+        globalFunctions.put(symbolReference, function);
+        genericFunctions.put(symbolReference, descriptor);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public GenericFunctionDescriptor lookupGenericFunctionDispatchTree(SymbolReference symbolReference) {
+        return genericFunctions.get(symbolReference);
     }
 
     @CompilerDirectives.TruffleBoundary

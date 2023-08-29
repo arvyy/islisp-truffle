@@ -42,7 +42,7 @@ public abstract class BuiltinNumericGt extends RootNode {
     }
 
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(null, BuiltinNumericGtNodeGen.create(lang).getCallTarget());
+        return new LispFunction(BuiltinNumericGtNodeGen.create(lang).getCallTarget());
     }
 
 }

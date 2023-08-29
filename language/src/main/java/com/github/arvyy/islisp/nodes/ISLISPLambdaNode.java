@@ -15,7 +15,7 @@ public class ISLISPLambdaNode extends ISLISPExpressionNode {
     public ISLISPLambdaNode(FrameDescriptor frameDescriptor, int[] namedArgumentSlots, ISLISPExpressionNode body, SourceSection sourceSection) {
         super(sourceSection);
         var ctx = ISLISPContext.get(this);
-        functionNode = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), frameDescriptor, body, namedArgumentSlots, sourceSection);
+        functionNode = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), frameDescriptor, body, namedArgumentSlots, -1, -1, sourceSection);
     }
 
     @Override

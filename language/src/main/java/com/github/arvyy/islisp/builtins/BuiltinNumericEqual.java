@@ -43,7 +43,7 @@ public abstract class BuiltinNumericEqual extends RootNode {
     }
 
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(null, BuiltinNumericEqualNodeGen.create(lang).getCallTarget());
+        return new LispFunction(BuiltinNumericEqualNodeGen.create(lang).getCallTarget());
     }
 
 }

@@ -21,7 +21,7 @@ public class BuiltinGensym extends RootNode {
 
 
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(null, new BuiltinGensym(lang).getCallTarget());
+        return new LispFunction(new BuiltinGensym(lang).getCallTarget());
     }
 
 }

@@ -22,7 +22,7 @@ public class BuiltinEq extends RootNode {
     }
 
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(null, new BuiltinEq(lang).getCallTarget());
+        return new LispFunction(new BuiltinEq(lang).getCallTarget());
     }
 
 }

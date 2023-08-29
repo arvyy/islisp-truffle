@@ -6,15 +6,16 @@ import java.util.Optional;
 
 public class LexicalScope<Key, Value> {
 
-    private final Map<Key, Value> myValues = new HashMap<>();
+    private final Map<Key, Value> myValues;
     private final LexicalScope<Key, Value> parent;
 
-    public LexicalScope(LexicalScope<Key, Value> parent) {
+    public LexicalScope(LexicalScope<Key, Value> parent, Map<Key, Value> entries) {
         this.parent = parent;
+        myValues = new HashMap<>(entries);
     }
 
     public LexicalScope() {
-        this(null);
+        this(null, Map.of());
     }
 
     public Optional<Value> get(Key key) {
@@ -23,10 +24,6 @@ public class LexicalScope<Key, Value> {
         if (parent != null)
             return parent.get(key);
         return Optional.empty();
-    }
-
-    public void put(Key key, Value value) {
-        myValues.put(key, value);
     }
 
 }

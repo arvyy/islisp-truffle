@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPError;
+import com.github.arvyy.islisp.runtime.Closure;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.dsl.Cached;

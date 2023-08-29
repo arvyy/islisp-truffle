@@ -41,7 +41,7 @@ public abstract class BuiltinAdd extends RootNode {
     }
 
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(null, BuiltinAddNodeGen.create(lang).getCallTarget());
+        return new LispFunction(BuiltinAddNodeGen.create(lang).getCallTarget());
     }
 
 }

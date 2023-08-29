@@ -19,9 +19,16 @@ public class KitchensinkTest {
     @Test
     public void test() {
         var sourceCode = """
-                (block a
-                    (return-from b 1))
-                (print (foo '(2)))
+(defgeneric foo (arg))
+
+(defmethod foo (arg)
+  'default)
+
+(defmethod foo ((arg <number>))
+  #'call-next-method)
+
+((lambda (result)
+    (print (funcall result))) (foo 1))
                 """;
         context.eval("islisp", sourceCode);
     }

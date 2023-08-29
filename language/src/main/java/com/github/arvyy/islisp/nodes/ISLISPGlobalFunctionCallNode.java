@@ -5,12 +5,11 @@ import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.CompilerDirectives;
-import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
-public class ISLISPDirectFunctionCallNode extends ISLISPExpressionNode {
+public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
 
     private Symbol name;
 
@@ -23,7 +22,7 @@ public class ISLISPDirectFunctionCallNode extends ISLISPExpressionNode {
     @Child
     private ISLISPFunctionDispatchNode dispatchNode;
 
-    public ISLISPDirectFunctionCallNode(Symbol name, ISLISPExpressionNode[] arguments, SourceSection sourceSection) {
+    public ISLISPGlobalFunctionCallNode(Symbol name, ISLISPExpressionNode[] arguments, SourceSection sourceSection) {
         super(sourceSection);
         this.name = name;
         this.arguments = arguments;

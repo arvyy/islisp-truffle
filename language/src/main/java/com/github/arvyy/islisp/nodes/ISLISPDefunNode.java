@@ -15,8 +15,6 @@ import com.oracle.truffle.api.source.SourceSection;
 public class ISLISPDefunNode extends ISLISPExpressionNode {
 
     final Symbol name;
-    final FrameDescriptor frameDescriptor;
-    final int[] namedArgumentSlots;
 
     @Child
     ISLISPUserDefinedFunctionNode functionNode;
@@ -24,16 +22,14 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
     public ISLISPDefunNode(Symbol name, FrameDescriptor frameDescriptor, int[] namedArgumentSlots, ISLISPExpressionNode body, SourceSection sourceSection) {
         super(true, sourceSection);
         this.name = name;
-        this.frameDescriptor = frameDescriptor;
-        this.namedArgumentSlots = namedArgumentSlots;
         var ctx = ISLISPContext.get(this);
-        functionNode = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), frameDescriptor, body, namedArgumentSlots, sourceSection);
+        functionNode = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), frameDescriptor, body, namedArgumentSlots, -1, -1, sourceSection);
     }
 
     @Override
     public Value executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
-        ctx.registerFunction(name.identityReference(), new LispFunction(null, functionNode.getCallTarget()));
+        ctx.registerFunction(name.identityReference(), new LispFunction(functionNode.getCallTarget()));
         return name;
     }
 

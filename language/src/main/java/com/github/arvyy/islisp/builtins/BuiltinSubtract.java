@@ -44,7 +44,7 @@ public abstract class BuiltinSubtract extends RootNode {
     }
 
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(null, BuiltinSubtractNodeGen.create(lang).getCallTarget());
+        return new LispFunction(BuiltinSubtractNodeGen.create(lang).getCallTarget());
     }
 
 }
