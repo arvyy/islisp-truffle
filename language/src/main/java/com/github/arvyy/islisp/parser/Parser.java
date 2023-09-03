@@ -83,6 +83,14 @@ public class Parser {
                     if (!topLevel)
                         throw new RuntimeException();
                     return parseDefun(parserContext, sexpr.sourceSection(), rest);
+                case "defgeneric":
+                    if (!topLevel)
+                        throw new RuntimeException();
+                    return parseDefGeneric(parserContext, sexpr.sourceSection(), rest);
+                case "defmethod":
+                    if (!topLevel)
+                        throw new RuntimeException();
+                    return parseDefMethod(parserContext, sexpr.sourceSection(), rest);
                 case "progn":
                     return parseProgn(parserContext, sexpr.sourceSection(), rest, topLevel);
                 case "funcall":
@@ -109,14 +117,8 @@ public class Parser {
                     return parseLetNode(parserContext, sexpr.sourceSection(), rest);
                 case "let*":
                     return parseLetStarNode(parserContext, sexpr.sourceSection(), rest);
-                case "defgeneric":
-                    if (!topLevel)
-                        throw new RuntimeException();
-                    return parseDefGeneric(parserContext, sexpr.sourceSection(), rest);
-                case "defmethod":
-                    if (!topLevel)
-                        throw new RuntimeException();
-                    return parseDefMethod(parserContext, sexpr.sourceSection(), rest);
+                case "unwind-protect":
+                    return parseUnwindProtectNode(parserContext, sexpr.sourceSection(), rest);
             }
             // macros
             var symbol = ISLISPContext.get(null).namedSymbol(carName);
@@ -456,6 +458,16 @@ public class Parser {
             body[i] = parseExpressionNode(parserContext, bodyExpressions.get(i));
         }
         return new ISLISPLetNode(variableSlots, variableInitializers, body, sourceSection);
+    }
+
+    ISLISPUnwindProtectNode parseUnwindProtectNode(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var lst = readList(rest);
+        var body = parseExpressionNode(parserContext, lst.get(0));
+        var cleanups = new ISLISPExpressionNode[lst.size() - 1];
+        for (int i = 0; i < cleanups.length; i++) {
+            cleanups[i] = parseExpressionNode(parserContext, lst.get(i + 1));
+        }
+        return new ISLISPUnwindProtectNode(body, cleanups, sourceSection);
     }
 
     List<Value> readList(Value v) {
