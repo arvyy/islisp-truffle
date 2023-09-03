@@ -4,6 +4,7 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPTruffleLanguage;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.TruffleLanguage;
+import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
@@ -16,8 +17,8 @@ public class ISLISPRootNode extends RootNode {
     @Children
     private ISLISPExpressionNode[] expressionNodes;
 
-    public ISLISPRootNode(TruffleLanguage<?> language, ISLISPExpressionNode[] expressionNodes, SourceSection sourceSection) {
-        super(language);
+    public ISLISPRootNode(TruffleLanguage<?> language, ISLISPExpressionNode[] expressionNodes, FrameDescriptor frameDescriptor, SourceSection sourceSection) {
+        super(language, frameDescriptor);
         this.expressionNodes = expressionNodes;
         this.sourceSection = sourceSection;
     }

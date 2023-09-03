@@ -46,9 +46,12 @@ public class ISLISPContext {
         globalFunctions.put(namedSymbol("-").identityReference(), BuiltinSubtract.makeLispFunction(language));
         globalFunctions.put(namedSymbol("=").identityReference(), BuiltinNumericEqual.makeLispFunction(language));
         globalFunctions.put(namedSymbol(">").identityReference(), BuiltinNumericGt.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("print").identityReference(), BuiltinPrint.makeLispFunction(language));
+        //globalFunctions.put(namedSymbol("print").identityReference(), BuiltinPrint.makeLispFunction(language));
         globalFunctions.put(namedSymbol("class-of").identityReference(), BuiltinClassOf.makeLispFunction(language));
         globalFunctions.put(namedSymbol("gensym").identityReference(), BuiltinGensym.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("format-integer").identityReference(), BuiltinFormatInteger.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("format-char").identityReference(), BuiltinFormatChar.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("standard-output").identityReference(), BuiltinStandardOutputStream.makeLispFunction(language));
     }
 
     void initBuiltin(String name, String... parents) {

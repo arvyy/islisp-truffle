@@ -11,6 +11,8 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
 
+import java.io.PrintStream;
+
 public class BuiltinPrint extends RootNode {
 
     public BuiltinPrint(TruffleLanguage<?> language) {
@@ -25,7 +27,8 @@ public class BuiltinPrint extends RootNode {
 
     @CompilerDirectives.TruffleBoundary
     void println(Object value) {
-        System.out.println(value);
+        var out = new PrintStream(ISLISPContext.get(this).getEnv().out());
+        out.println(value);
     }
 
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {

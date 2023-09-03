@@ -1,0 +1,16 @@
+(defun print (int)
+    (format-integer (standard-output) int 10)
+    (format-char (standard-output) #\newline))
+
+(defun foo (a)
+    (let ((a (+ 1 2))
+          (b a))
+      (print (+ a b))))
+(foo 0)
+
+(defun bar (a)
+    (let* ((a (+ 1 2))
+           (a (+ 1 a))
+           (b a))
+      (print (+ a b))))
+(bar 0)

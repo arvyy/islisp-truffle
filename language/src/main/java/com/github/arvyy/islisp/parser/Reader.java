@@ -1,10 +1,7 @@
 package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.runtime.LispInteger;
-import com.github.arvyy.islisp.runtime.Pair;
-import com.github.arvyy.islisp.runtime.Symbol;
-import com.github.arvyy.islisp.runtime.Value;
+import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
 
@@ -125,6 +122,9 @@ public class Reader {
                 }
                 lst.add(readSingle().orElseThrow()); //TODO
             }
+        }
+        if (t instanceof Token.CharToken c) {
+            return Optional.of(new LispChar(c.value(), section()));
         }
         return Optional.empty();
     }

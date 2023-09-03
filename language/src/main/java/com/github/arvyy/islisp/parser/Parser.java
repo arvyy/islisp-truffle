@@ -16,7 +16,7 @@ public class Parser {
     @CompilerDirectives.TruffleBoundary
     public ISLISPRootNode parseRootNode(ISLISPTruffleLanguage language, List<Value> content) {
         var expressionNodes = new ArrayList<ISLISPExpressionNode>();
-        var parserContext = new ParserContext(0, new LexicalScope<>(), new LexicalScope<>(), new IdGen(), new LexicalScope<>());
+        var parserContext = new ParserContext(0, new LexicalScope<>(), new LexicalScope<>(), new IdGen(), new LexicalScope<>(), FrameDescriptor.newBuilder());
         for (var v: content) {
             var expression = parseExpressionNode(parserContext, v, true);
             executeDefinitions(expression); // execute definitions to be available for macro procedure runs
@@ -27,6 +27,7 @@ public class Parser {
         var root = new ISLISPRootNode(
                 language,
                 expressionNodes.toArray(ISLISPExpressionNode[]::new),
+                parserContext.frameBuilder.build(),
                 span(expressionNodes.get(0).getSourceSection(), expressionNodes.get(expressionNodes.size() - 1).getSourceSection())
         );
         return root;
@@ -41,7 +42,7 @@ public class Parser {
 
     void executeDefinitions(ISLISPExpressionNode expression) {
         if (expression.isDefinitionNode()) {
-            var root = new ISLISPRootNode(null, new ISLISPExpressionNode[]{ expression }, expression.getSourceSection());
+            var root = new ISLISPRootNode(null, new ISLISPExpressionNode[]{ expression }, null, expression.getSourceSection());
             root.getCallTarget().call();
         }
         if (expression instanceof ISLISPProgn) {
@@ -104,6 +105,10 @@ public class Parser {
                     return parseBlock(parserContext, sexpr.sourceSection(), rest);
                 case "return-from":
                     return parseReturnFrom(parserContext, sexpr.sourceSection(), rest);
+                case "let":
+                    return parseLetNode(parserContext, sexpr.sourceSection(), rest);
+                case "let*":
+                    return parseLetStarNode(parserContext, sexpr.sourceSection(), rest);
                 case "defgeneric":
                     if (!topLevel)
                         throw new RuntimeException();
@@ -140,7 +145,7 @@ public class Parser {
                 }
             }
         }
-        if (sexpr instanceof LispInteger) {
+        if (sexpr instanceof LispInteger || sexpr instanceof LispChar) {
             return new ISLISPLiteralNode(sexpr, sexpr.sourceSection());
         }
         if (sexpr instanceof Symbol) {
@@ -186,13 +191,13 @@ public class Parser {
                 }
             }
         }
-        var frameDescriptorBuilder = FrameDescriptor.newBuilder();
-        var slotsAndNewContext = processFrameDescriptorsForFunctionArguments(parserContext, plainParamList, frameDescriptorBuilder);
+        parserContext = parserContext.pushFrameDescriptor();
+        var slotsAndNewContext = processFrameDescriptorsForFunctionArguments(parserContext, plainParamList);
         var callNextMethodVar = new VariableContext();
-        callNextMethodVar.slot = frameDescriptorBuilder.addSlot(FrameSlotKind.Object, null, null);
+        callNextMethodVar.slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
         callNextMethodVar.frameDepth = 0;
         var nextMethodPVar = new VariableContext();
-        nextMethodPVar.slot = frameDescriptorBuilder.addSlot(FrameSlotKind.Object, null, null);
+        nextMethodPVar.slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
         nextMethodPVar.frameDepth = 0;
         var newContext = slotsAndNewContext.context.pushLexicalFunctionScope(Map.of(
                 ISLISPContext.get(null).namedSymbol("next-method-p").identityReference(), nextMethodPVar,
@@ -203,7 +208,7 @@ public class Parser {
                 .map(v -> parseExpressionNode(newContext, v))
                 .toArray(ISLISPExpressionNode[]::new);
         var body = new ISLISPProgn(bodyStatements, null);
-        return new ISLISPDefMethodNode(name, paramTypes, frameDescriptorBuilder.build(), slotsAndNewContext.slots, callNextMethodVar.slot, nextMethodPVar.slot, body, sourceSection);
+        return new ISLISPDefMethodNode(name, paramTypes, parserContext.frameBuilder.build(), slotsAndNewContext.slots, callNextMethodVar.slot, nextMethodPVar.slot, body, sourceSection);
     }
 
     private ISLISPDefGeneric parseDefGeneric(ParserContext parserContext, SourceSection sourceSection, Value rest) {
@@ -283,34 +288,33 @@ public class Parser {
 
     ISLISPLambdaNode parseLambda(ParserContext parserContext, SourceSection sourceSection, Value rest) {
         var restList = readList(rest);
-        var frameDescriptorBuilder = FrameDescriptor.newBuilder();
-        var slotsAndNewContext = processFrameDescriptorsForFunctionArguments(parserContext.pushClosureScope(), restList.get(0), frameDescriptorBuilder);
+        parserContext = parserContext.pushFrameDescriptor();
+        var slotsAndNewContext = processFrameDescriptorsForFunctionArguments(parserContext.pushClosureScope(), restList.get(0));
         var bodyStatements = restList.stream()
                 .skip(1)
                 .map(v -> parseExpressionNode(slotsAndNewContext.context, v))
                 .toArray(ISLISPExpressionNode[]::new);
         var body = new ISLISPProgn(bodyStatements, null);
-        return new ISLISPLambdaNode(frameDescriptorBuilder.build(), slotsAndNewContext.slots, body, sourceSection);
+        return new ISLISPLambdaNode(parserContext.frameBuilder.build(), slotsAndNewContext.slots, body, sourceSection);
     }
 
     ISLISPDefunNode parseDefun(ParserContext parserContext, SourceSection sourceSection, Value rest) {
         var restList = readList(rest);
         var name = ((Symbol) restList.get(0)).name();
-        var frameDescriptorBuilder = FrameDescriptor.newBuilder();
-        var slotsAndNewContext = processFrameDescriptorsForFunctionArguments(parserContext, restList.get(1), frameDescriptorBuilder);
+        parserContext = parserContext.pushFrameDescriptor();
+        var slotsAndNewContext = processFrameDescriptorsForFunctionArguments(parserContext, restList.get(1));
         var bodyStatements = restList.stream()
                 .skip(2)
                 .map(v -> parseExpressionNode(slotsAndNewContext.context, v))
                 .toArray(ISLISPExpressionNode[]::new);
         var body = new ISLISPProgn(bodyStatements, null);
         var symbol = ISLISPContext.get(null).namedSymbol(name);
-        return new ISLISPDefunNode(symbol, frameDescriptorBuilder.build(), slotsAndNewContext.slots, body, sourceSection);
+        return new ISLISPDefunNode(symbol, parserContext.frameBuilder.build(), slotsAndNewContext.slots, body, sourceSection);
     }
 
     SlotsAndNewContext processFrameDescriptorsForFunctionArguments(
             ParserContext parserContext,
-            Value parameterList,
-            FrameDescriptor.Builder frameDescriptorBuilder
+            Value parameterList
     ) {
         var args = readList(parameterList)
                 .stream()
@@ -321,18 +325,17 @@ public class Parser {
                 })
                 .map(v -> (Symbol) v)
                 .collect(Collectors.toList());
-        return processFrameDescriptorsForFunctionArguments(parserContext, args, frameDescriptorBuilder);
+        return processFrameDescriptorsForFunctionArguments(parserContext, args);
     }
 
     SlotsAndNewContext processFrameDescriptorsForFunctionArguments(
             ParserContext parserContext,
-            List<Symbol> parameterList,
-            FrameDescriptor.Builder frameDescriptorBuilder
+            List<Symbol> parameterList
     ) {
         var positionalArgumentSlots = new ArrayList<Integer>();
         var variables = new HashMap<SymbolReference, VariableContext>();
         for (var arg: parameterList) {
-            var slot = frameDescriptorBuilder.addSlot(FrameSlotKind.Object, null, null);
+            var slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
             positionalArgumentSlots.add(slot);
             var variableContext = new VariableContext();
             variableContext.frameDepth = parserContext.frameDepth;
@@ -402,6 +405,59 @@ public class Parser {
         return new ISLISPQuasiquoteNode(sourceSection, qq.tree(), childNodes);
     }
 
+    ISLISPLetNode parseLetNode(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var lst = readList(rest);
+        var variablesList = readList(lst.get(0));
+        var bodyExpressions = lst.subList(1, lst.size());
+        var variableSlots = new int[variablesList.size()];
+        var variableInitializers = new ISLISPExpressionNode[variablesList.size()];
+        var variableNameMap = new HashMap<SymbolReference, VariableContext>();
+        for (var i = 0; i < variablesList.size(); i++) {
+            var variable = readList(variablesList.get(i));
+            var variableName = (Symbol) variable.get(0);
+            var variableInitializer = variable.get(1);
+            variableSlots[i] = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
+            variableInitializers[i] = parseExpressionNode(parserContext, variableInitializer);
+            if (variableNameMap.containsKey(variableName.identityReference())) {
+                throw new RuntimeException();
+            }
+            var variableContext = new VariableContext();
+            variableContext.slot = variableSlots[i];
+            variableContext.frameDepth = parserContext.frameDepth;
+            variableNameMap.put(variableName.identityReference(), variableContext);
+        }
+        parserContext = parserContext.pushLexicalScope(variableNameMap);
+        var body = new ISLISPExpressionNode[bodyExpressions.size()];
+        for (int i = 0; i < bodyExpressions.size(); i++) {
+            body[i] = parseExpressionNode(parserContext, bodyExpressions.get(i));
+        }
+        return new ISLISPLetNode(variableSlots, variableInitializers, body, sourceSection);
+    }
+
+    ISLISPLetNode parseLetStarNode(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var lst = readList(rest);
+        var variablesList = readList(lst.get(0));
+        var bodyExpressions = lst.subList(1, lst.size());
+        var variableSlots = new int[variablesList.size()];
+        var variableInitializers = new ISLISPExpressionNode[variablesList.size()];
+        for (var i = 0; i < variablesList.size(); i++) {
+            var variable = readList(variablesList.get(i));
+            var variableName = (Symbol) variable.get(0);
+            var variableInitializer = variable.get(1);
+            variableSlots[i] = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
+            variableInitializers[i] = parseExpressionNode(parserContext, variableInitializer);
+            var variableContext = new VariableContext();
+            variableContext.slot = variableSlots[i];
+            variableContext.frameDepth = parserContext.frameDepth;
+            parserContext = parserContext.pushLexicalScope(Map.of(variableName.identityReference(), variableContext));
+        }
+        var body = new ISLISPExpressionNode[bodyExpressions.size()];
+        for (int i = 0; i < bodyExpressions.size(); i++) {
+            body[i] = parseExpressionNode(parserContext, bodyExpressions.get(i));
+        }
+        return new ISLISPLetNode(variableSlots, variableInitializers, body, sourceSection);
+    }
+
     List<Value> readList(Value v) {
         if (v instanceof Pair p) {
             var lst = new ArrayList<Value>();
@@ -442,35 +498,42 @@ class ParserContext {
     final IdGen blocksIdGen;
     final LexicalScope<SymbolReference, Integer> blocks;
 
+    final FrameDescriptor.Builder frameBuilder;
+
     ParserContext(
             int frameDepth,
             LexicalScope<SymbolReference, VariableContext> variables,
             LexicalScope<SymbolReference, VariableContext> localFunctions,
             IdGen blocksIdGen,
-            LexicalScope<SymbolReference, Integer> blocks
-    ) {
+            LexicalScope<SymbolReference, Integer> blocks,
+            FrameDescriptor.Builder frameBuilder) {
         this.frameDepth = frameDepth;
         this.variables = variables;
         this.localFunctions = localFunctions;
         this.blocksIdGen = blocksIdGen;
         this.blocks = blocks;
+        this.frameBuilder = frameBuilder;
     }
 
     ParserContext pushClosureScope() {
-        return new ParserContext(frameDepth + 1, variables, localFunctions, blocksIdGen, blocks);
+        return new ParserContext(frameDepth + 1, variables, localFunctions, blocksIdGen, blocks, frameBuilder);
     }
 
     ParserContext pushLexicalScope(Map<SymbolReference, VariableContext> vars) {
-        return new ParserContext(frameDepth, new LexicalScope<>(variables, vars), localFunctions, blocksIdGen, blocks);
+        return new ParserContext(frameDepth, new LexicalScope<>(variables, vars), localFunctions, blocksIdGen, blocks, frameBuilder);
     }
 
     ParserContext pushLexicalFunctionScope(Map<SymbolReference, VariableContext> vars) {
-        return new ParserContext(frameDepth, variables, new LexicalScope<>(localFunctions, vars), blocksIdGen, blocks);
+        return new ParserContext(frameDepth, variables, new LexicalScope<>(localFunctions, vars), blocksIdGen, blocks, frameBuilder);
     }
 
     ParserContext pushBlockScope(SymbolReference blockName) {
         var newBlocks = new LexicalScope<>(blocks, Map.of(blockName, blocksIdGen.next()));
-        return new ParserContext(frameDepth, variables, localFunctions, blocksIdGen, newBlocks);
+        return new ParserContext(frameDepth, variables, localFunctions, blocksIdGen, newBlocks, frameBuilder);
+    }
+
+    ParserContext pushFrameDescriptor() {
+        return new ParserContext(frameDepth, variables, localFunctions, blocksIdGen, blocks, FrameDescriptor.newBuilder());
     }
 
 }
