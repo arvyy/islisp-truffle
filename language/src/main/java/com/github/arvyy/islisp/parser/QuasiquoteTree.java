@@ -1,10 +1,12 @@
 package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.ISLISPContext;
+import com.github.arvyy.islisp.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispInteger;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.Value;
+import com.oracle.truffle.api.nodes.Node;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,7 +77,7 @@ public sealed interface QuasiquoteTree {
         throw new RuntimeException();
     }
 
-    public static Value evalQuasiquoteTree(QuasiquoteTree tree, Value[] substitutionValues) {
+    public static Value evalQuasiquoteTree(QuasiquoteTree tree, Value[] substitutionValues, Node node) {
         if (tree instanceof Atom a) {
             return a.value;
         }
@@ -83,12 +85,12 @@ public sealed interface QuasiquoteTree {
             if (u.value instanceof Hole h) {
                 return substitutionValues[h.index];
             } else {
-                var value = evalQuasiquoteTree(u.value, substitutionValues);
+                var value = evalQuasiquoteTree(u.value, substitutionValues, node);
                 return new Pair(ISLISPContext.get(null).namedSymbol("unquote"), value, null);
             }
         }
         if (tree instanceof UnquoteSplicing) {
-            throw new RuntimeException("Bad unquotesplicing use");
+            throw new ISLISPError("Bad unquotesplicing use", node);
         }
         if (tree instanceof List l) {
             var values = new ArrayList<Value>();
@@ -101,17 +103,17 @@ public sealed interface QuasiquoteTree {
                             }
                         } else if(substitutionValues[h.index] instanceof Symbol s) {
                             if (s != ISLISPContext.get(null).getNIL()) {
-                                throw new RuntimeException("Unquote splicing not list");
+                                throw new ISLISPError("Unquote splicing not list", node);
                             }
                         } else {
-                            throw new RuntimeException("Unquote splicing not list");
+                            throw new ISLISPError("Unquote splicing not list", node);
                         }
                     } else {
-                        var value = evalQuasiquoteTree(child, substitutionValues);
+                        var value = evalQuasiquoteTree(child, substitutionValues, node);
                         values.add(new Pair(ISLISPContext.get(null).namedSymbol("unquote-splicing"), value, null));
                     }
                 } else {
-                    values.add(evalQuasiquoteTree(child, substitutionValues));
+                    values.add(evalQuasiquoteTree(child, substitutionValues, node));
                 }
             }
             Value lispList = ISLISPContext.get(null).getNIL();
@@ -120,7 +122,7 @@ public sealed interface QuasiquoteTree {
             }
             return lispList;
         }
-        throw new RuntimeException();
+        throw new ISLISPError("?", node);
     }
 
 }

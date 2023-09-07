@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.builtins;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPError;
 import com.github.arvyy.islisp.runtime.*;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -52,6 +53,7 @@ public abstract class BuiltinClassOf extends RootNode {
     }
 
     @Fallback
+    @CompilerDirectives.TruffleBoundary
     protected LispClass doFallback(Object value) {
         throw new ISLISPError("Unknown class for value: " + value, this);
     }

@@ -24,7 +24,7 @@ public class ISLISPRootNode extends RootNode {
     }
 
     protected ISLISPRootNode(ISLISPRootNode copy) {
-        super(copy.getLanguage(ISLISPTruffleLanguage.class));
+        super(copy.getLanguage(ISLISPTruffleLanguage.class), copy.getFrameDescriptor());
         sourceSection = copy.sourceSection;
     }
 

@@ -6,6 +6,7 @@ public class GenericFunctionDescriptor {
     private final boolean hasRest;
     private final GenericDispatchTree dispatchTree;
 
+
     public GenericFunctionDescriptor(int requiredArgCount, boolean hasRest) {
         this.requiredArgCount = requiredArgCount;
         this.hasRest = hasRest;

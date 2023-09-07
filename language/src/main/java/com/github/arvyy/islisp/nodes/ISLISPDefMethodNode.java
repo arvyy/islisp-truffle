@@ -17,14 +17,14 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
 
     private final Symbol name;
 
-    private final List<Symbol> argsClassNames;
+    private final Symbol[] argsClassNames;
 
     private final int[] namedArgumentSlots;
 
     @Child
     private ISLISPUserDefinedFunctionNode userDefinedFunctionNode;
 
-    public ISLISPDefMethodNode(Symbol name, List<Symbol> argsClassNames, FrameDescriptor frameDescriptor, int[] namedArgumentSlots, int callNextMethodSlot, int hasNextMethodSlot, ISLISPExpressionNode body, SourceSection sourceSection) {
+    public ISLISPDefMethodNode(Symbol name, Symbol[] argsClassNames, FrameDescriptor frameDescriptor, int[] namedArgumentSlots, int callNextMethodSlot, int hasNextMethodSlot, ISLISPExpressionNode body, SourceSection sourceSection) {
         super(sourceSection);
         this.namedArgumentSlots = namedArgumentSlots;
         this.name = name;
@@ -40,11 +40,11 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
         if (namedArgumentSlots.length < genericFunctionDescriptor.getRequiredArgCount()) {
             throw new ISLISPError("defmethod signature doesn't match defgeneric", this);
         }
-        var classList = new ArrayList<LispClass>(argsClassNames.size());
-        for (var argClassName: argsClassNames) {
-            classList.add(ctx.lookupClass(argClassName.identityReference()));
+        var classes = new LispClass[argsClassNames.length];
+        for (int i = 0; i < argsClassNames.length; i++) {
+            classes[i] = ctx.lookupClass(argsClassNames[i].identityReference());
         }
-        ctx.lookupGenericFunctionDispatchTree(name.identityReference()).getDispatchTree().addMethod(classList, userDefinedFunctionNode.getCallTarget());
+        ctx.lookupGenericFunctionDispatchTree(name.identityReference()).getDispatchTree().addMethod(classes, userDefinedFunctionNode.getCallTarget(), this);
         return name;
     }
 

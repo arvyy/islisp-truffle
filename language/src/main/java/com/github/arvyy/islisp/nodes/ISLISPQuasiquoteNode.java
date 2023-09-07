@@ -26,6 +26,6 @@ public class ISLISPQuasiquoteNode extends ISLISPExpressionNode {
         for (var i = 0; i < values.length; i++) {
             values[i] = expressionNodes[i].executeGeneric(frame);
         }
-        return QuasiquoteTree.evalQuasiquoteTree(tree, values);
+        return QuasiquoteTree.evalQuasiquoteTree(tree, values, this);
     }
 }

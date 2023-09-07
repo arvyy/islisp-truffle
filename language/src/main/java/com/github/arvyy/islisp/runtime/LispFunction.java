@@ -19,7 +19,7 @@ public record LispFunction(Closure closure, CallTarget callTarget, boolean isGen
         this(new Closure(frame, null, null), callTarget, false);
     }
 
-    public LispFunction(List<CallTarget> nextMethods, Object[] args, CallTarget callTarget) {
+    public LispFunction(ArraySlice<CallTarget> nextMethods, Object[] args, CallTarget callTarget) {
         this(new Closure(null, nextMethods, args), callTarget, true);
     }
     public LispFunction(Closure closure, CallTarget callTarget) {

@@ -24,7 +24,7 @@ public class ISLISPDefGeneric extends ISLISPExpressionNode {
         this.requiredArgsCount = requiredArgsCount;
         this.hasRest = hasRest;
         var ctx = ISLISPContext.get(this);
-        executionNode = new ISLISPDefGenericExecutionNode(name, ctx.getLanguage(), sourceSection);
+        executionNode = ISLISPDefGenericExecutionNodeGen.create(name, ctx.getLanguage(), sourceSection);
     }
 
     @Override

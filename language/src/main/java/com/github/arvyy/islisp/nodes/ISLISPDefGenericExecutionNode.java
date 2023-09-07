@@ -6,9 +6,12 @@ import com.github.arvyy.islisp.ISLISPTruffleLanguage;
 import com.github.arvyy.islisp.builtins.BuiltinClassOf;
 import com.github.arvyy.islisp.builtins.BuiltinClassOfNodeGen;
 import com.github.arvyy.islisp.runtime.*;
+import com.oracle.truffle.api.Assumption;
+import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.GenerateWrapper;
 import com.oracle.truffle.api.instrumentation.InstrumentableNode;
@@ -18,16 +21,17 @@ import com.oracle.truffle.api.nodes.IndirectCallNode;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.SourceSection;
 
+import java.sql.Array;
 import java.util.ArrayList;
 
 @GenerateWrapper
-public class ISLISPDefGenericExecutionNode extends RootNode implements InstrumentableNode {
+public abstract class ISLISPDefGenericExecutionNode extends RootNode implements InstrumentableNode {
 
     private final Symbol name;
     private final SourceSection sourceSection;
 
     @CompilerDirectives.CompilationFinal
-    private GenericFunctionDescriptor genericFunctionDescriptor;
+    GenericFunctionDescriptor genericFunctionDescriptor;
 
     @Child
     BuiltinClassOf classOf;
@@ -56,25 +60,47 @@ public class ISLISPDefGenericExecutionNode extends RootNode implements Instrumen
     }
 
     @Override
-    public Object execute(VirtualFrame frame) {
+    public final Object execute(VirtualFrame frame) {
         if (genericFunctionDescriptor == null) {
             genericFunctionDescriptor = ISLISPContext.get(this).lookupGenericFunctionDispatchTree(name.identityReference());
         }
         if (frame.getArguments().length - 1 < genericFunctionDescriptor.getRequiredArgCount()) {
-            //TODO not enough args
             throw new ISLISPError("Not enough args", this);
         }
-        var argumentTypes = new ArrayList<LispClass>();
+        var argumentTypes = new LispClass[genericFunctionDescriptor.getRequiredArgCount()];
         for (int i = 1; i <= genericFunctionDescriptor.getRequiredArgCount(); i++) {
             var value = (Value) frame.getArguments()[i];
-            argumentTypes.add((LispClass) classOfCall.call(null, value));
+            argumentTypes[i - 1] = (LispClass) classOfCall.call(null, value);
         }
-        //TODO use assumptions
-        var dispatchTree = genericFunctionDescriptor.getDispatchTree();
-        var methods = dispatchTree.getApplicableMethods(argumentTypes);
-        return dispatchNode.executeDispatch(methods, frame.getArguments());
+        return executeGeneric(frame, argumentTypes);
     }
 
+    abstract Object executeGeneric(VirtualFrame frame, LispClass[] classes);
+
+    @Specialization(
+            guards = "classesEqual(classes, lastClasses)",
+            assumptions = "genericFunctionDescriptor.getDispatchTree().getAssumption()")
+    Object executeSpecial(
+            VirtualFrame frame,
+            LispClass[] classes,
+            @Cached("classes") LispClass[] lastClasses,
+            @Cached("getApplicableMethods(classes)") ArraySlice<CallTarget> applicableMethods
+    ) {
+        return dispatchNode.executeDispatch(applicableMethods, frame.getArguments());
+    }
+
+    ArraySlice<CallTarget> getApplicableMethods(LispClass[] classes) {
+        var dispatchTree = genericFunctionDescriptor.getDispatchTree();
+        return dispatchTree.getApplicableMethods(classes);
+    }
+
+    boolean classesEqual(LispClass[] classes1, LispClass[] classes2) {
+        for (int i = 0; i < classes1.length; i++) {
+            if (classes1[i] != classes2[i])
+                return false;
+        }
+        return true;
+    }
 
     @Override
     public boolean isInstrumentable() {

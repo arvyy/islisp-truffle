@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPError;
+import com.github.arvyy.islisp.runtime.ArraySlice;
 import com.github.arvyy.islisp.runtime.Closure;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Value;
@@ -17,16 +18,16 @@ import java.util.List;
 
 public abstract class ISLISPGenericFunctionDispatchNode extends Node {
 
-    public abstract Value executeDispatch(List<CallTarget> applicableMethods, Object[] arguments);
+    public abstract Value executeDispatch(ArraySlice<CallTarget> applicableMethods, Object[] arguments);
 
     @ExplodeLoop
     @Specialization
     public Value executeIndirect(
-            List<CallTarget> applicableMethods,
+            ArraySlice<CallTarget> applicableMethods,
             Object[] args,
             @Cached IndirectCallNode callNode) {
         var realArgs = new Object[args.length + 1];
-        realArgs[0] = new Closure(null, applicableMethods.subList(1, applicableMethods.size()), args);
+        realArgs[0] = new Closure(null, applicableMethods.drop(1), args);
         System.arraycopy(args, 0, realArgs, 1, args.length);
         return (Value) callNode.call(applicableMethods.get(0), realArgs);
     }

@@ -210,7 +210,7 @@ public class Parser {
                 .map(v -> parseExpressionNode(newContext, v))
                 .toArray(ISLISPExpressionNode[]::new);
         var body = new ISLISPProgn(bodyStatements, null);
-        return new ISLISPDefMethodNode(name, paramTypes, parserContext.frameBuilder.build(), slotsAndNewContext.slots, callNextMethodVar.slot, nextMethodPVar.slot, body, sourceSection);
+        return new ISLISPDefMethodNode(name, paramTypes.toArray(Symbol[]::new), parserContext.frameBuilder.build(), slotsAndNewContext.slots, callNextMethodVar.slot, nextMethodPVar.slot, body, sourceSection);
     }
 
     private ISLISPDefGeneric parseDefGeneric(ParserContext parserContext, SourceSection sourceSection, Value rest) {

@@ -14,19 +14,14 @@ public class Main {
                 .build();
 
         var port = "4242";
-        var path = java.util.UUID.randomUUID().toString();
 
         var context = Context.newBuilder()
                 .in(System.in)
                 .out(System.out)
-                .option("inspect", port)
-                //.option("inspect.Path", path)
-                //.option("inspect.Suspend", "true")
-                //.option("dap", "4747")
+                //.option("inspect", port)
                 .build();
 
-        var result = context.eval(source);
-        System.out.println(result);
+        context.eval(source);
     }
 
 }

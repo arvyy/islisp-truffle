@@ -21,7 +21,7 @@ public class BuiltinCallNextMethod extends RootNode {
     @Override
     public Object execute(VirtualFrame frame) {
         var closure = (Closure) frame.getArguments()[0];
-        if (closure.nextMethods().isEmpty()) {
+        if (closure.nextMethods().size() == 0) {
             throw new ISLISPError("No next method", this);
         }
         return dispatchNode.executeDispatch(closure.nextMethods(), closure.args());

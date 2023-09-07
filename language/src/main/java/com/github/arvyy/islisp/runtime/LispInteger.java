@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
@@ -34,6 +35,7 @@ public record LispInteger(int value, SourceSection sourceSection) implements Val
     @ExportMessage float asFloat() throws UnsupportedMessageException { return value; }
     @ExportMessage double asDouble() throws UnsupportedMessageException { return value; }
     @ExportMessage boolean fitsInBigInteger() { return true; }
+    @CompilerDirectives.TruffleBoundary
     @ExportMessage BigInteger asBigInteger() throws UnsupportedMessageException { return new BigInteger("" + value); }
 
 }
