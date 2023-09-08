@@ -75,6 +75,10 @@ public class Parser {
             var carName = ((Symbol) ((Pair) sexpr).car()).name();
             // builtins
             switch (carName) {
+                case "defdynamic":
+                    if (!topLevel)
+                        throw new RuntimeException();
+                    return parseDefDynamic(parserContext, sexpr.sourceSection(), rest);
                 case "defmacro":
                     if (!topLevel)
                         throw new RuntimeException();
@@ -117,6 +121,12 @@ public class Parser {
                     return parseLetNode(parserContext, sexpr.sourceSection(), rest);
                 case "let*":
                     return parseLetStarNode(parserContext, sexpr.sourceSection(), rest);
+                case "dynamic":
+                    return parseDynamic(parserContext, sexpr.sourceSection(), rest);
+                case "dynamic-let":
+                    return parseDynamicLet(parserContext, sexpr.sourceSection(), rest);
+                case "set-dynamic":
+                    return parseSetDynamic(parserContext, sexpr.sourceSection(), rest);
                 case "unwind-protect":
                     return parseUnwindProtectNode(parserContext, sexpr.sourceSection(), rest);
             }
@@ -164,6 +174,40 @@ public class Parser {
         }
         //TODO
         throw new RuntimeException();
+    }
+
+    private ISLISPSetDynamicNode parseSetDynamic(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var args = readList(rest);
+        var initalizer = parseExpressionNode(parserContext, args.get(0));
+        var symbol = (Symbol) args.get(1);
+        return new ISLISPSetDynamicNode(symbol, initalizer, sourceSection);
+    }
+
+    private ISLISPDynamicLetNode parseDynamicLet(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var args = readList(rest);
+        var bindingList = readList(args.get(0));
+        var symbols = new Symbol[bindingList.size()];
+        var initializers = new ISLISPExpressionNode[bindingList.size()];
+        for (int i = 0; i < symbols.length; i++) {
+            var bindingEntry = readList(bindingList.get(i));
+            symbols[i] = (Symbol) bindingEntry.get(0);
+            initializers[i] = parseExpressionNode(parserContext, bindingEntry.get(1));
+        }
+        var body = new ISLISPExpressionNode[args.size() - 1];
+        for (int i = 0; i < body.length; i++) {
+            body[i] = parseExpressionNode(parserContext, args.get(i + 1));
+        }
+        return new ISLISPDynamicLetNode(symbols, initializers, body, sourceSection);
+    }
+
+    private ISLISPDynamicLookupNode parseDynamic(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var args = readList(rest);
+        return new ISLISPDynamicLookupNode((Symbol) args.get(0), sourceSection);
+    }
+
+    private ISLISPDefDynamicNode parseDefDynamic(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var args = readList(rest);
+        return new ISLISPDefDynamicNode((Symbol) args.get(0), parseExpressionNode(parserContext, args.get(1)), sourceSection);
     }
 
     private ISLISPDefMethodNode parseDefMethod(ParserContext parserContext, SourceSection sourceSection, Value rest) {
@@ -478,7 +522,7 @@ public class Parser {
             }
             return lst;
         } else if (v instanceof Symbol s) {
-            if (s.equals(ISLISPContext.get(null).getNIL())) {
+            if (s.identityReference() == ISLISPContext.get(null).getNIL().identityReference()) {
                 return List.of();
             }
         }

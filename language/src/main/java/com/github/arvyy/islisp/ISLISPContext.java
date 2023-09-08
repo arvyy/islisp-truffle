@@ -27,12 +27,14 @@ public class ISLISPContext {
     private final Map<SymbolReference, LispFunction> macros;
     private final Map<String, SymbolReference> symbols;
     private final Map<SymbolReference, LispClass> classes;
+    private final Map<SymbolReference, DynamicVar> dynamicVars;
 
     public ISLISPContext(ISLISPTruffleLanguage language, Env env) {
         this.language = language;
         this.env = env;
         globalFunctions = new HashMap<>();
         genericFunctions = new HashMap<>();
+        dynamicVars = new HashMap<>();
         macros = new HashMap<>();
         symbols = new HashMap<>();
         classes = new HashMap<>();
@@ -79,6 +81,16 @@ public class ISLISPContext {
         genericFunctions.clear();
         macros.clear();
         initGlobalFunctions();
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public void registerDynamicVar(SymbolReference symbolReference, DynamicVar v) {
+        dynamicVars.put(symbolReference, v);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public DynamicVar lookupDynamicVar(SymbolReference symbolReference) {
+        return dynamicVars.get(symbolReference);
     }
 
     @CompilerDirectives.TruffleBoundary
