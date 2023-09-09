@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPTruffleLanguage;
+import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.nodes.*;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -70,7 +71,7 @@ public class Parser {
     }
 
     ISLISPExpressionNode parseExpressionNode(ParserContext parserContext, Value sexpr, boolean topLevel) {
-        if (sexpr instanceof Pair && ((Pair) sexpr).car() instanceof Symbol) {
+        if (sexpr instanceof Pair && ((Pair) sexpr).car() instanceof Symbol symbol) {
             var rest = ((Pair) sexpr).cdr();
             var carName = ((Symbol) ((Pair) sexpr).car()).name();
             // builtins
@@ -131,6 +132,30 @@ public class Parser {
                     return parseUnwindProtectNode(parserContext, sexpr.sourceSection(), rest);
             }
             // macros
+            if ("setf".equals(carName)) {
+                var args = Utils.readList(rest);
+                var form = macroExpand(args.get(0), false);
+                var value = args.get(1);
+                if (form instanceof Symbol s) {
+                    return parseExpressionNode(parserContext, Utils.listToValue(List.of(
+                            ISLISPContext.get(null).namedSymbol("setq"),
+                            s,
+                            value
+                    ), sexpr.sourceSection()));
+                }
+                var formList = Utils.readList(form);
+                var setfDispatchSymbol = (Symbol) formList.get(0);
+                var setfDispatch = ISLISPContext.get(null).lookupSetfTransformer(setfDispatchSymbol.identityReference());
+                if (setfDispatch == null) throw new RuntimeException("Unknown setf form");
+                return parseExpressionNode(parserContext, setfDispatch.transform(formList, value, sexpr.sourceSection()));
+            }
+            var expanded = macroExpand(sexpr, true);
+            if (sexpr == expanded) {
+                return parseDirectFunctionCall(parserContext, sexpr.sourceSection(), symbol, ((Pair) sexpr).cdr());
+            } else {
+                return parseExpressionNode(parserContext, expanded, topLevel);
+            }
+            /*
             var symbol = ISLISPContext.get(null).namedSymbol(carName);
             var maybeMacro = ISLISPContext.get(null).lookupMacro(symbol.identityReference());
             if (maybeMacro != null) {
@@ -144,6 +169,7 @@ public class Parser {
                 return parseExpressionNode(parserContext, transformedSexpr, topLevel);
             }
             return parseDirectFunctionCall(parserContext, sexpr.sourceSection(), symbol, ((Pair) sexpr).cdr());
+             */
         }
         //a list pattern, but car isn't a symbol: it might be immediate lambda call
         if (sexpr instanceof Pair) {
@@ -176,20 +202,46 @@ public class Parser {
         throw new RuntimeException();
     }
 
+    static Value macroExpand(Value form, boolean single) {
+        if (form instanceof Pair p && p.car() instanceof Symbol symbol) {
+            var rest = p.cdr();
+            var maybeMacro = ISLISPContext.get(null).lookupMacro(symbol.identityReference());
+            if (maybeMacro != null) {
+                var args = new ArrayList<Value>();
+                args.add(null); // closure param
+                Iterable<Value> it = rest.equals(ISLISPContext.get(null).getNIL())? List.of() : (Pair) rest;
+                for (var e: it) {
+                    args.add(e);
+                }
+                var transformedSexpr = (Value) maybeMacro.callTarget().call(args.toArray());
+                if (transformedSexpr instanceof Pair tp && !single) {
+                    var parts = Utils.readList(tp);
+                    var newParts = parts.stream()
+                            .map(part -> macroExpand(part, false))
+                            .collect(Collectors.toList());
+                    return Utils.listToValue(newParts, form.sourceSection());
+                } else {
+                    return transformedSexpr;
+                }
+            }
+        }
+        return form;
+    }
+
     private ISLISPSetDynamicNode parseSetDynamic(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var args = readList(rest);
+        var args = Utils.readList(rest);
         var initalizer = parseExpressionNode(parserContext, args.get(0));
         var symbol = (Symbol) args.get(1);
         return new ISLISPSetDynamicNode(symbol, initalizer, sourceSection);
     }
 
     private ISLISPDynamicLetNode parseDynamicLet(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var args = readList(rest);
-        var bindingList = readList(args.get(0));
+        var args = Utils.readList(rest);
+        var bindingList = Utils.readList(args.get(0));
         var symbols = new Symbol[bindingList.size()];
         var initializers = new ISLISPExpressionNode[bindingList.size()];
         for (int i = 0; i < symbols.length; i++) {
-            var bindingEntry = readList(bindingList.get(i));
+            var bindingEntry = Utils.readList(bindingList.get(i));
             symbols[i] = (Symbol) bindingEntry.get(0);
             initializers[i] = parseExpressionNode(parserContext, bindingEntry.get(1));
         }
@@ -200,20 +252,20 @@ public class Parser {
         return new ISLISPDynamicLetNode(symbols, initializers, body, sourceSection);
     }
 
-    private ISLISPDynamicLookupNode parseDynamic(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var args = readList(rest);
+    private static ISLISPDynamicLookupNode parseDynamic(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var args = Utils.readList(rest);
         return new ISLISPDynamicLookupNode((Symbol) args.get(0), sourceSection);
     }
 
     private ISLISPDefDynamicNode parseDefDynamic(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var args = readList(rest);
+        var args = Utils.readList(rest);
         return new ISLISPDefDynamicNode((Symbol) args.get(0), parseExpressionNode(parserContext, args.get(1)), sourceSection);
     }
 
     private ISLISPDefMethodNode parseDefMethod(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var args = readList(rest);
+        var args = Utils.readList(rest);
         var name = (Symbol) args.get(0);
-        var parameterList = readList(args.get(1));
+        var parameterList = Utils.readList(args.get(1));
         var plainParamList = new ArrayList<Symbol>();
         var paramTypes = new ArrayList<Symbol>();
         for (var el: parameterList) {
@@ -221,7 +273,7 @@ public class Parser {
                 plainParamList.add(s);
                 paramTypes.add(ISLISPContext.get(null).namedSymbol("<object>"));
             } else if (el instanceof Pair p) {
-                var paramWithType = readList(p);
+                var paramWithType = Utils.readList(p);
                 if (paramWithType.size() != 2) {
                     throw new RuntimeException();
                 }
@@ -257,15 +309,15 @@ public class Parser {
         return new ISLISPDefMethodNode(name, paramTypes.toArray(Symbol[]::new), parserContext.frameBuilder.build(), slotsAndNewContext.slots, callNextMethodVar.slot, nextMethodPVar.slot, body, sourceSection);
     }
 
-    private ISLISPDefGeneric parseDefGeneric(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var args = readList(rest);
+    private static ISLISPDefGeneric parseDefGeneric(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var args = Utils.readList(rest);
         var name = (Symbol) args.get(0);
-        var lambdaList = readList(args.get(1));
+        var lambdaList = Utils.readList(args.get(1));
         return new ISLISPDefGeneric(name, lambdaList.size(), false, sourceSection);
     }
 
     private ISLISPReturnFromNode parseReturnFrom(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var args = readList(rest);
+        var args = Utils.readList(rest);
         var name = (Symbol) args.get(0);
         var blockId = parserContext.blocks.get(name.identityReference())
                 .orElseThrow(() -> new RuntimeException("Bogus return-from"));
@@ -274,7 +326,7 @@ public class Parser {
     }
 
     private ISLISPBlockNode parseBlock(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var args = readList(rest);
+        var args = Utils.readList(rest);
         var name = (Symbol) args.get(0);
         var newContext = parserContext.pushBlockScope(name.identityReference());
         var blockId = newContext.blocks.get(name.identityReference()).get();
@@ -295,7 +347,7 @@ public class Parser {
     }
 
     ISLISPExpressionNode parseIndirectFunCall(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var args = readList(rest);
+        var args = Utils.readList(rest);
         var argNodes = new ArrayList<ISLISPExpressionNode>();
         for (Value arg : args) {
             argNodes.add(parseExpressionNode(parserContext, arg));
@@ -333,7 +385,7 @@ public class Parser {
     }
 
     ISLISPLambdaNode parseLambda(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var restList = readList(rest);
+        var restList = Utils.readList(rest);
         parserContext = parserContext.pushFrameDescriptor();
         var slotsAndNewContext = processFrameDescriptorsForFunctionArguments(parserContext.pushClosureScope(), restList.get(0));
         var bodyStatements = restList.stream()
@@ -345,7 +397,7 @@ public class Parser {
     }
 
     ISLISPDefunNode parseDefun(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var restList = readList(rest);
+        var restList = Utils.readList(rest);
         var name = ((Symbol) restList.get(0)).name();
         parserContext = parserContext.pushFrameDescriptor();
         var slotsAndNewContext = processFrameDescriptorsForFunctionArguments(parserContext, restList.get(1));
@@ -362,7 +414,7 @@ public class Parser {
             ParserContext parserContext,
             Value parameterList
     ) {
-        var args = readList(parameterList)
+        var args = Utils.readList(parameterList)
                 .stream()
                 .peek(v -> {
                     if (!(v instanceof Symbol)) {
@@ -452,14 +504,14 @@ public class Parser {
     }
 
     ISLISPLetNode parseLetNode(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var lst = readList(rest);
-        var variablesList = readList(lst.get(0));
+        var lst = Utils.readList(rest);
+        var variablesList = Utils.readList(lst.get(0));
         var bodyExpressions = lst.subList(1, lst.size());
         var variableSlots = new int[variablesList.size()];
         var variableInitializers = new ISLISPExpressionNode[variablesList.size()];
         var variableNameMap = new HashMap<SymbolReference, VariableContext>();
         for (var i = 0; i < variablesList.size(); i++) {
-            var variable = readList(variablesList.get(i));
+            var variable = Utils.readList(variablesList.get(i));
             var variableName = (Symbol) variable.get(0);
             var variableInitializer = variable.get(1);
             variableSlots[i] = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
@@ -481,13 +533,13 @@ public class Parser {
     }
 
     ISLISPLetNode parseLetStarNode(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var lst = readList(rest);
-        var variablesList = readList(lst.get(0));
+        var lst = Utils.readList(rest);
+        var variablesList = Utils.readList(lst.get(0));
         var bodyExpressions = lst.subList(1, lst.size());
         var variableSlots = new int[variablesList.size()];
         var variableInitializers = new ISLISPExpressionNode[variablesList.size()];
         for (var i = 0; i < variablesList.size(); i++) {
-            var variable = readList(variablesList.get(i));
+            var variable = Utils.readList(variablesList.get(i));
             var variableName = (Symbol) variable.get(0);
             var variableInitializer = variable.get(1);
             variableSlots[i] = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
@@ -505,7 +557,7 @@ public class Parser {
     }
 
     ISLISPUnwindProtectNode parseUnwindProtectNode(ParserContext parserContext, SourceSection sourceSection, Value rest) {
-        var lst = readList(rest);
+        var lst = Utils.readList(rest);
         var body = parseExpressionNode(parserContext, lst.get(0));
         var cleanups = new ISLISPExpressionNode[lst.size() - 1];
         for (int i = 0; i < cleanups.length; i++) {
@@ -514,20 +566,6 @@ public class Parser {
         return new ISLISPUnwindProtectNode(body, cleanups, sourceSection);
     }
 
-    List<Value> readList(Value v) {
-        if (v instanceof Pair p) {
-            var lst = new ArrayList<Value>();
-            for (var el: p) {
-                lst.add(el);
-            }
-            return lst;
-        } else if (v instanceof Symbol s) {
-            if (s.identityReference() == ISLISPContext.get(null).getNIL().identityReference()) {
-                return List.of();
-            }
-        }
-        throw new RuntimeException();
-    }
 }
 
 class SlotsAndNewContext {

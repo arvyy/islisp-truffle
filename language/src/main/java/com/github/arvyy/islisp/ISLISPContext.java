@@ -9,6 +9,7 @@ import com.oracle.truffle.api.nodes.Node;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ public class ISLISPContext {
     private final Map<SymbolReference, LispFunction> globalFunctions;
     private final Map<SymbolReference, GenericFunctionDescriptor> genericFunctions;
     private final Map<SymbolReference, LispFunction> macros;
+    private final Map<SymbolReference, SetfTransformer> setfTransformers;
     private final Map<String, SymbolReference> symbols;
     private final Map<SymbolReference, LispClass> classes;
     private final Map<SymbolReference, DynamicVar> dynamicVars;
@@ -38,8 +40,10 @@ public class ISLISPContext {
         macros = new HashMap<>();
         symbols = new HashMap<>();
         classes = new HashMap<>();
+        setfTransformers = new HashMap<>();
         initGlobalFunctions();
         initBuiltinClasses();
+        initSetfExpanders();
     }
 
     void initGlobalFunctions() {
@@ -48,12 +52,33 @@ public class ISLISPContext {
         globalFunctions.put(namedSymbol("-").identityReference(), BuiltinSubtract.makeLispFunction(language));
         globalFunctions.put(namedSymbol("=").identityReference(), BuiltinNumericEqual.makeLispFunction(language));
         globalFunctions.put(namedSymbol(">").identityReference(), BuiltinNumericGt.makeLispFunction(language));
-        //globalFunctions.put(namedSymbol("print").identityReference(), BuiltinPrint.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("car").identityReference(), BuiltinCar.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("cdr").identityReference(), BuiltinCdr.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("cons").identityReference(), BuiltinCons.makeLispFunction(language));
         globalFunctions.put(namedSymbol("class-of").identityReference(), BuiltinClassOf.makeLispFunction(language));
         globalFunctions.put(namedSymbol("gensym").identityReference(), BuiltinGensym.makeLispFunction(language));
         globalFunctions.put(namedSymbol("format-integer").identityReference(), BuiltinFormatInteger.makeLispFunction(language));
         globalFunctions.put(namedSymbol("format-char").identityReference(), BuiltinFormatChar.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("set-car").identityReference(), BuiltinSetCar.makeLispFunction(language));
+        globalFunctions.put(namedSymbol("set-cdr").identityReference(), BuiltinSetCdr.makeLispFunction(language));
         globalFunctions.put(namedSymbol("standard-output").identityReference(), BuiltinStandardOutputStream.makeLispFunction(language));
+    }
+
+    void initSetfExpanders() {
+        setfTransformers.put(namedSymbol("car").identityReference(), (forms, value, sourceSection) -> {
+            return Utils.listToValue(List.of(
+                    namedSymbol("set-car"),
+                    forms.get(1),
+                    value
+            ), sourceSection);
+        });
+        setfTransformers.put(namedSymbol("cdr").identityReference(), (forms, value, sourceSection) -> {
+            return Utils.listToValue(List.of(
+                    namedSymbol("set-cdr"),
+                    forms.get(1),
+                    value
+            ), sourceSection);
+        });
     }
 
     void initBuiltin(String name, String... parents) {
@@ -81,6 +106,16 @@ public class ISLISPContext {
         genericFunctions.clear();
         macros.clear();
         initGlobalFunctions();
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public void registerSetfTransformer(SymbolReference symbolReference, SetfTransformer transformer) {
+        setfTransformers.put(symbolReference, transformer);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public SetfTransformer lookupSetfTransformer(SymbolReference symbolReference) {
+        return setfTransformers.get(symbolReference);
     }
 
     @CompilerDirectives.TruffleBoundary

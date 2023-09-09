@@ -8,7 +8,36 @@ import com.oracle.truffle.api.source.SourceSection;
 import java.util.Iterator;
 
 @ExportLibrary(InteropLibrary.class)
-public record Pair(Value car, Value cdr, SourceSection sourceSection) implements Value, TruffleObject, Iterable<Value> {
+public final class Pair implements Value, TruffleObject, Iterable<Value> {
+
+    private Value car, cdr;
+    private SourceSection sourceSection;
+
+    public Pair(Value car, Value cdr, SourceSection sourceSection) {
+        this.car = car;
+        this.cdr = cdr;
+        this.sourceSection = sourceSection;
+    }
+
+    public Value car() {
+        return car;
+    }
+
+    public void setCar(Value v) {
+        car = v;
+    }
+
+    public Value cdr() {
+        return cdr;
+    }
+
+    public void setCdr(Value v) {
+        cdr = v;
+    }
+
+    public SourceSection sourceSection() {
+        return sourceSection;
+    }
 
     @Override
     public Iterator<Value> iterator() {
@@ -31,8 +60,7 @@ class PairIterator implements Iterator<Value> {
     @Override
     public Value next() {
         var car = ((Pair) next).car();
-        var cdr = ((Pair) next).cdr();
-        next = cdr;
+        next = ((Pair) next).cdr();
         return car;
     }
 }
