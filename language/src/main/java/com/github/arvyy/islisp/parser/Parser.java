@@ -128,6 +128,8 @@ public class Parser {
                     return parseDynamicLet(parserContext, sexpr.sourceSection(), rest);
                 case "set-dynamic":
                     return parseSetDynamic(parserContext, sexpr.sourceSection(), rest);
+                case "setq":
+                    return parseSetq(parserContext, sexpr.sourceSection(), rest);
                 case "unwind-protect":
                     return parseUnwindProtectNode(parserContext, sexpr.sourceSection(), rest);
             }
@@ -199,6 +201,19 @@ public class Parser {
             }
         }
         //TODO
+        throw new RuntimeException();
+    }
+
+    private ISLISPSetqNode parseSetq(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var args = Utils.readList(rest);
+        var name = (Symbol) args.get(0);
+        var expr = parseExpressionNode(parserContext, args.get(1));
+        var maybeVar = parserContext.variables.get(name.identityReference());
+        if (maybeVar.isPresent()) {
+            var variableContext = maybeVar.get();
+            var index = parserContext.frameDepth - variableContext.frameDepth;
+            return new ISLISPSetqNode(index, variableContext.slot, expr, sourceSection);
+        }
         throw new RuntimeException();
     }
 
