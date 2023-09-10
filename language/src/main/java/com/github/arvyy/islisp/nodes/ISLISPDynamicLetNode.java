@@ -1,7 +1,7 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.runtime.DynamicVar;
+import com.github.arvyy.islisp.runtime.ValueReference;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -12,7 +12,7 @@ import com.oracle.truffle.api.source.SourceSection;
 public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
 
     @CompilerDirectives.CompilationFinal
-    private DynamicVar vars[];
+    private ValueReference vars[];
     private final Symbol symbols[];
 
     @Children
@@ -33,11 +33,11 @@ public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
     public Value executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         if (vars == null) {
-            vars = new DynamicVar[symbols.length];
+            vars = new ValueReference[symbols.length];
             for (int i = 0; i < vars.length; i++) {
                 var existing = ctx.lookupDynamicVar(symbols[i].identityReference());
                 if (existing == null) {
-                    vars[i] = new DynamicVar();
+                    vars[i] = new ValueReference();
                     vars[i].setValue(null);
                     ctx.registerDynamicVar(symbols[i].identityReference(), vars[i]);
                 } else {

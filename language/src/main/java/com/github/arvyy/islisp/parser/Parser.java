@@ -76,10 +76,22 @@ public class Parser {
             var carName = ((Symbol) ((Pair) sexpr).car()).name();
             // builtins
             switch (carName) {
+                case "defconstant":
+                    if (!topLevel)
+                        throw new RuntimeException();
+                    return parseDefConstant(parserContext, sexpr.sourceSection(), rest);
                 case "defdynamic":
                     if (!topLevel)
                         throw new RuntimeException();
                     return parseDefDynamic(parserContext, sexpr.sourceSection(), rest);
+                case "defgeneric":
+                    if (!topLevel)
+                        throw new RuntimeException();
+                    return parseDefGeneric(parserContext, sexpr.sourceSection(), rest);
+                case "defglobal":
+                    if (!topLevel)
+                        throw new RuntimeException();
+                    return parseDefGlobal(parserContext, sexpr.sourceSection(), rest);
                 case "defmacro":
                     if (!topLevel)
                         throw new RuntimeException();
@@ -88,10 +100,6 @@ public class Parser {
                     if (!topLevel)
                         throw new RuntimeException();
                     return parseDefun(parserContext, sexpr.sourceSection(), rest);
-                case "defgeneric":
-                    if (!topLevel)
-                        throw new RuntimeException();
-                    return parseDefGeneric(parserContext, sexpr.sourceSection(), rest);
                 case "defmethod":
                     if (!topLevel)
                         throw new RuntimeException();
@@ -201,11 +209,25 @@ public class Parser {
                 var slot = variableContext.slot;
                 return new ISLISPLexicalIdentifierNode(index, slot, sexpr.sourceSection());
             } else {
-                //TODO global lookup node
+                return new ISLISPGlobalIdentifierNode(symbol, sexpr.sourceSection());
             }
         }
         //TODO
         throw new RuntimeException();
+    }
+
+    private ISLISPDefGlobalNode parseDefGlobal(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var args = Utils.readList(rest);
+        var name = (Symbol) args.get(0);
+        var init = parseExpressionNode(parserContext, args.get(1));
+        return new ISLISPDefGlobalNode(name, init, sourceSection);
+    }
+
+    private ISLISPDefConstantNode parseDefConstant(ParserContext parserContext, SourceSection sourceSection, Value rest) {
+        var args = Utils.readList(rest);
+        var name = (Symbol) args.get(0);
+        var init = parseExpressionNode(parserContext, args.get(1));
+        return new ISLISPDefConstantNode(name, init, sourceSection);
     }
 
     private ISLISPTagBodyGoNode parseTagBodyGo(ParserContext parserContext, SourceSection sourceSection, Value rest) {
@@ -257,8 +279,9 @@ public class Parser {
             var variableContext = maybeVar.get();
             var index = parserContext.frameDepth - variableContext.frameDepth;
             return new ISLISPSetqNode(index, variableContext.slot, expr, sourceSection);
+        } else {
+            return new ISLISPSetqNode(name, expr, sourceSection);
         }
-        throw new RuntimeException();
     }
 
     static Value macroExpand(Value form, boolean single) {

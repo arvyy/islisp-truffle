@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ISLISPContext {
 
@@ -29,7 +28,8 @@ public class ISLISPContext {
     private final Map<SymbolReference, SetfTransformer> setfTransformers;
     private final Map<String, SymbolReference> symbols;
     private final Map<SymbolReference, LispClass> classes;
-    private final Map<SymbolReference, DynamicVar> dynamicVars;
+    private final Map<SymbolReference, ValueReference> dynamicVars;
+    private final Map<SymbolReference, ValueReference> globalVars;
 
     public ISLISPContext(ISLISPTruffleLanguage language, Env env) {
         this.language = language;
@@ -41,6 +41,7 @@ public class ISLISPContext {
         symbols = new HashMap<>();
         classes = new HashMap<>();
         setfTransformers = new HashMap<>();
+        globalVars = new HashMap<>();
         initGlobalFunctions();
         initBuiltinClasses();
         initSetfExpanders();
@@ -105,7 +106,24 @@ public class ISLISPContext {
         globalFunctions.clear();
         genericFunctions.clear();
         macros.clear();
+        globalVars.clear();
+        setfTransformers.clear();
+        classes.clear();
         initGlobalFunctions();
+        initBuiltinClasses();
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public void registerGlobalVar(SymbolReference symbolReference, Value init, boolean readonly) {
+        var v = new ValueReference();
+        v.setValue(init);
+        v.setReadOnly(readonly);
+        globalVars.put(symbolReference, v);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public ValueReference lookupGlobalVar(SymbolReference symbolReference) {
+        return globalVars.get(symbolReference);
     }
 
     @CompilerDirectives.TruffleBoundary
@@ -119,12 +137,12 @@ public class ISLISPContext {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void registerDynamicVar(SymbolReference symbolReference, DynamicVar v) {
+    public void registerDynamicVar(SymbolReference symbolReference, ValueReference v) {
         dynamicVars.put(symbolReference, v);
     }
 
     @CompilerDirectives.TruffleBoundary
-    public DynamicVar lookupDynamicVar(SymbolReference symbolReference) {
+    public ValueReference lookupDynamicVar(SymbolReference symbolReference) {
         return dynamicVars.get(symbolReference);
     }
 

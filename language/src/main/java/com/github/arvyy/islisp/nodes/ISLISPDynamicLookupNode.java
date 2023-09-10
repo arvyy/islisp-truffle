@@ -2,7 +2,7 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPError;
-import com.github.arvyy.islisp.runtime.DynamicVar;
+import com.github.arvyy.islisp.runtime.ValueReference;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -14,7 +14,7 @@ public class ISLISPDynamicLookupNode extends ISLISPExpressionNode {
     private final Symbol symbol;
 
     @CompilerDirectives.CompilationFinal
-    private DynamicVar dynamicVar;
+    private ValueReference valueReference;
 
     public ISLISPDynamicLookupNode(Symbol symbol, SourceSection sourceSection) {
         super(sourceSection);
@@ -23,13 +23,13 @@ public class ISLISPDynamicLookupNode extends ISLISPExpressionNode {
 
     @Override
     public Value executeGeneric(VirtualFrame frame) {
-        if (dynamicVar == null) {
-            dynamicVar = ISLISPContext.get(this).lookupDynamicVar(symbol.identityReference());
-            if (dynamicVar == null) {
+        if (valueReference == null) {
+            valueReference = ISLISPContext.get(this).lookupDynamicVar(symbol.identityReference());
+            if (valueReference == null) {
                 throw new ISLISPError("Undefined dynamic variable", this);
             }
         }
-        var value = dynamicVar.getValue();
+        var value = valueReference.getValue();
         if (value == null) {
             throw new ISLISPError("Undefined dynamic variable", this);
         }
