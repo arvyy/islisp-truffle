@@ -12,8 +12,15 @@ import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ISLISPDefMethodNode extends ISLISPExpressionNode {
+
+    public enum MethodQualifier {
+        none, before, after, around
+    }
+
+    private final MethodQualifier methodQualifier;
 
     private final Symbol name;
 
@@ -24,8 +31,20 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
     @Child
     private ISLISPUserDefinedFunctionNode userDefinedFunctionNode;
 
-    public ISLISPDefMethodNode(Symbol name, Symbol[] argsClassNames, FrameDescriptor frameDescriptor, int[] namedArgumentSlots, int restArgumentsSlot, int callNextMethodSlot, int hasNextMethodSlot, ISLISPExpressionNode body, SourceSection sourceSection) {
+    public ISLISPDefMethodNode(
+            MethodQualifier methodQualifier,
+            Symbol name,
+            Symbol[] argsClassNames,
+            FrameDescriptor frameDescriptor,
+            int[] namedArgumentSlots,
+            int restArgumentsSlot,
+            int callNextMethodSlot,
+            int hasNextMethodSlot,
+            ISLISPExpressionNode body,
+            SourceSection sourceSection
+    ) {
         super(sourceSection);
+        this.methodQualifier = Objects.requireNonNull(methodQualifier);
         this.namedArgumentSlots = namedArgumentSlots;
         this.name = name;
         var ctx = ISLISPContext.get(this);
@@ -44,7 +63,14 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
         for (int i = 0; i < argsClassNames.length; i++) {
             classes[i] = ctx.lookupClass(argsClassNames[i].identityReference());
         }
-        ctx.lookupGenericFunctionDispatchTree(name.identityReference()).getDispatchTree().addMethod(classes, userDefinedFunctionNode.getCallTarget(), this);
+        var definition = ctx.lookupGenericFunctionDispatchTree(name.identityReference());
+        var callTarget = userDefinedFunctionNode.getCallTarget();
+        switch (methodQualifier) {
+            case none -> definition.addPrimaryMethod(classes, callTarget, this);
+            case before -> definition.addBeforeMethod(classes, callTarget, this);
+            case around -> definition.addAroundMethod(classes, callTarget, this);
+            case after -> definition.addAfterMethod(classes, callTarget, this);
+        }
         return name;
     }
 

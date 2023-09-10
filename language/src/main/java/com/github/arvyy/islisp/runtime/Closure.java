@@ -10,5 +10,5 @@ import java.util.List;
 // non-null frame means this is a lambda
 // non-null nextMethods & args means this is a generic method
 // Since this is passed as first argument, it means closures are linked, ie, frame.getArguments()[0] is also a Closure
-public record Closure(MaterializedFrame frame, ArraySlice<CallTarget> nextMethods, Object[] args) {
+public record Closure(MaterializedFrame frame, GenericMethodApplicableMethods applicableMethods, Object[] args) {
 }

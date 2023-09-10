@@ -72,26 +72,28 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode implements 
             var value = (Value) frame.getArguments()[i];
             argumentTypes[i - 1] = (LispClass) classOfCall.call(null, value);
         }
-        return executeGeneric(frame, argumentTypes);
+        var arguments = new Value[frame.getArguments().length - 1];
+        System.arraycopy(frame.getArguments(), 1, arguments, 0, arguments.length);
+        return executeGeneric(frame, argumentTypes, arguments);
     }
 
-    abstract Object executeGeneric(VirtualFrame frame, LispClass[] classes);
+    abstract Object executeGeneric(VirtualFrame frame, LispClass[] classes, Value[] arguments);
 
     @Specialization(
             guards = "classesEqual(classes, lastClasses)",
-            assumptions = "genericFunctionDescriptor.getDispatchTree().getAssumption()")
+            assumptions = "genericFunctionDescriptor.getAssumption()")
     Object executeSpecial(
             VirtualFrame frame,
             LispClass[] classes,
+            Value[] arguments,
             @Cached("classes") LispClass[] lastClasses,
-            @Cached("getApplicableMethods(classes)") ArraySlice<CallTarget> applicableMethods
+            @Cached("getApplicableMethods(classes)") GenericMethodApplicableMethods applicableMethods
     ) {
-        return dispatchNode.executeDispatch(applicableMethods, frame.getArguments());
+        return dispatchNode.executeDispatch(applicableMethods, arguments);
     }
 
-    ArraySlice<CallTarget> getApplicableMethods(LispClass[] classes) {
-        var dispatchTree = genericFunctionDescriptor.getDispatchTree();
-        return dispatchTree.getApplicableMethods(classes);
+    GenericMethodApplicableMethods getApplicableMethods(LispClass[] classes) {
+        return genericFunctionDescriptor.getApplicableMethods(classes);
     }
 
     boolean classesEqual(LispClass[] classes1, LispClass[] classes2) {

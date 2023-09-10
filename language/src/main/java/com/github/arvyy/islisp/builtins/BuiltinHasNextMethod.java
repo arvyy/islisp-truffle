@@ -19,7 +19,9 @@ public class BuiltinHasNextMethod extends RootNode {
     public Object execute(VirtualFrame frame) {
         var closure = (Closure) frame.getArguments()[0];
         var ctx = ISLISPContext.get(this);
-        return closure.nextMethods().size() == 0? ctx.getNIL() : ctx.getT();
+        return (closure.applicableMethods().aroundMethods().size() == 0 && closure.applicableMethods().primaryMethods().size() == 0)?
+                ctx.getNIL() :
+                ctx.getT();
     }
 
 }

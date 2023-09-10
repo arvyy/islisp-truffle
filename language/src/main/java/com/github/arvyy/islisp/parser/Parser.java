@@ -346,7 +346,16 @@ public class Parser {
     private ISLISPDefMethodNode parseDefMethod(ParserContext parserContext, SourceSection sourceSection, Value rest) {
         var args = Utils.readList(rest);
         var name = (Symbol) args.get(0);
-        var parameterList = Utils.readList(args.get(1));
+        var methodQualifiers = new ArrayList<String>();
+        for (int i = 1; i < args.size(); i++) {
+            if (args.get(i) instanceof Symbol s && !s.name().equals("nil")) {
+                methodQualifiers.add(s.name());
+            } else {
+                break;
+            }
+        }
+        var paramListIndex = 1 + methodQualifiers.size();
+        var parameterList = Utils.readList(args.get(paramListIndex));
         var plainParamList = new ArrayList<Symbol>();
         var paramTypes = new ArrayList<Symbol>();
         for (var el: parameterList) {
@@ -372,22 +381,62 @@ public class Parser {
         }
         parserContext = parserContext.pushFrameDescriptor();
         var slotsAndNewContext = processFrameDescriptorsForFunctionArguments(parserContext, plainParamList);
-        var callNextMethodVar = new ParserContext.VariableContext();
-        callNextMethodVar.slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
-        callNextMethodVar.frameDepth = 0;
-        var nextMethodPVar = new ParserContext.VariableContext();
-        nextMethodPVar.slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
-        nextMethodPVar.frameDepth = 0;
-        var newContext = slotsAndNewContext.context.pushLexicalFunctionScope(Map.of(
-                ISLISPContext.get(null).namedSymbol("next-method-p").identityReference(), nextMethodPVar,
-                ISLISPContext.get(null).namedSymbol("call-next-method").identityReference(), callNextMethodVar
-        ));
+        ParserContext bodyParserContext;
+        int callNextMethodSlot;
+        int hasNextMethodSlot;
+        ISLISPDefMethodNode.MethodQualifier methodQualifier = ISLISPDefMethodNode.MethodQualifier.none;
+        if (methodQualifiers.contains(":before")) {
+            if (methodQualifier != ISLISPDefMethodNode.MethodQualifier.none) {
+                throw new RuntimeException("Incompatible method qualifiers");
+            }
+            methodQualifier = ISLISPDefMethodNode.MethodQualifier.before;
+        }
+        if (methodQualifiers.contains(":after")) {
+            if (methodQualifier != ISLISPDefMethodNode.MethodQualifier.none) {
+                throw new RuntimeException("Incompatible method qualifiers");
+            }
+            methodQualifier = ISLISPDefMethodNode.MethodQualifier.after;
+        }
+        if (methodQualifiers.contains(":around")) {
+            if (methodQualifier != ISLISPDefMethodNode.MethodQualifier.none) {
+                throw new RuntimeException("Incompatible method qualifiers");
+            }
+            methodQualifier = ISLISPDefMethodNode.MethodQualifier.around;
+        }
+        if (methodQualifier == ISLISPDefMethodNode.MethodQualifier.before || methodQualifier == ISLISPDefMethodNode.MethodQualifier.after) {
+            callNextMethodSlot = -1;
+            hasNextMethodSlot = -1;
+            bodyParserContext = parserContext;
+        } else {
+            var callNextMethodVar = new ParserContext.VariableContext();
+            callNextMethodVar.slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
+            callNextMethodVar.frameDepth = 0;
+            var nextMethodPVar = new ParserContext.VariableContext();
+            nextMethodPVar.slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
+            nextMethodPVar.frameDepth = 0;
+            bodyParserContext = slotsAndNewContext.context.pushLexicalFunctionScope(Map.of(
+                    ISLISPContext.get(null).namedSymbol("next-method-p").identityReference(), nextMethodPVar,
+                    ISLISPContext.get(null).namedSymbol("call-next-method").identityReference(), callNextMethodVar
+            ));
+            callNextMethodSlot = callNextMethodVar.slot;
+            hasNextMethodSlot = nextMethodPVar.slot;
+        }
         var bodyStatements = args.stream()
-                .skip(2)
-                .map(v -> parseExpressionNode(newContext, v))
+                .skip(paramListIndex + 1)
+                .map(v -> parseExpressionNode(bodyParserContext, v))
                 .toArray(ISLISPExpressionNode[]::new);
         var body = new ISLISPProgn(bodyStatements, null);
-        return new ISLISPDefMethodNode(name, paramTypes.toArray(Symbol[]::new), parserContext.frameBuilder.build(), slotsAndNewContext.namedArgsSlots, slotsAndNewContext.restArgsSlot, callNextMethodVar.slot, nextMethodPVar.slot, body, sourceSection);
+        return new ISLISPDefMethodNode(
+                methodQualifier,
+                name,
+                paramTypes.toArray(Symbol[]::new),
+                parserContext.frameBuilder.build(),
+                slotsAndNewContext.namedArgsSlots,
+                slotsAndNewContext.restArgsSlot,
+                callNextMethodSlot,
+                hasNextMethodSlot,
+                body,
+                sourceSection);
     }
 
     private static ISLISPDefGeneric parseDefGeneric(ParserContext parserContext, SourceSection sourceSection, Value rest) {

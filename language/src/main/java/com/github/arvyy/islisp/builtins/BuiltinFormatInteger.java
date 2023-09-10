@@ -32,12 +32,12 @@ public abstract class BuiltinFormatInteger extends RootNode {
     }
 
     @Specialization
-    public void executeProper(LispOutputStream stream, LispInteger integer, LispInteger radix) {
+    public void doProper(LispOutputStream stream, LispInteger integer, LispInteger radix) {
         doPrint(stream.outputStream(), integer.value(), radix.value());
     }
 
     @Fallback
-    public void executeFallback(Object stream, Object integer, Object radix) {
+    public void doFallback(Object stream, Object integer, Object radix) {
         throw new ISLISPError("Bad arguments", this);
     }
 

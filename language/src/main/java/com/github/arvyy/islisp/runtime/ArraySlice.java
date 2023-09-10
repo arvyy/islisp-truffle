@@ -28,8 +28,10 @@ public record ArraySlice<T>(T[] els, int start, int end) {
     }
 
     public ArraySlice<T> add(T el) {
-        var newEls = Arrays.copyOf(els, els.length + 1);
-        return new ArraySlice<>(newEls, start, end + 1);
+        var newEls = Arrays.copyOf(els, size() + 1);
+        System.arraycopy(els, start, newEls, 0, size());
+        newEls[size()] = el;
+        return new ArraySlice<>(newEls, 0, size() + 1);
     }
 
     public void sort(Comparator<T> comparator) {

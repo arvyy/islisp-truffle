@@ -86,7 +86,8 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
         }
         for (var i = 0; i < namedArgumentSlots.length; i++) {
             int slot = namedArgumentSlots[i];
-            frame.setObject(slot, frame.getArguments()[i + 1]);
+            var arg = frame.getArguments()[i + 1];
+            frame.setObject(slot, arg);
         }
         if (restArgumentsSlot >= 0) {
             Value value = ISLISPContext.get(this).getNIL();

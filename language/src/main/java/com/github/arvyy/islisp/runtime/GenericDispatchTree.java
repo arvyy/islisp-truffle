@@ -8,6 +8,7 @@ import com.oracle.truffle.api.TruffleRuntime;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.utilities.CyclicAssumption;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 public class GenericDispatchTree {
@@ -16,23 +17,18 @@ public class GenericDispatchTree {
     private CallTarget callTarget;
     private LispClass clazz;
     private ArraySlice<GenericDispatchTree> children;
-    private CyclicAssumption assumption;
 
     public GenericDispatchTree() {
         size = 0;
         callTarget = null;
         clazz = null;
         children = new ArraySlice<>(new GenericDispatchTree[0]);
-        assumption = new CyclicAssumption("Generic method tree unchanged");
     }
 
-    @CompilerDirectives.TruffleBoundary
     public void addMethod(LispClass[] argTypes, CallTarget callTarget, Node node) {
         addMethod(new ArraySlice<>(argTypes), callTarget, node);
-        assumption.invalidate("New method added");
     }
 
-    @CompilerDirectives.TruffleBoundary
     public void addMethod(ArraySlice<LispClass> argTypes, CallTarget callTarget, Node node) {
         size++;
         if (argTypes.size() == 0) {
@@ -56,7 +52,8 @@ public class GenericDispatchTree {
                 newNode.clazz = nextArg;
                 newNode.addMethod(argTypes.drop(1), callTarget, node);
                 children = children.add(newNode);
-                children.sort(Comparator.comparing(tree -> tree.clazz, this::compareClassSpecificities));
+                //children.sort(Comparator.comparing(tree -> tree.clazz, this::compareClassSpecificities));
+                Arrays.sort(children.els(), Comparator.comparing(tree -> tree.clazz, this::compareClassSpecificities));
             }
         }
     }
@@ -87,7 +84,6 @@ public class GenericDispatchTree {
         return  size;
     }
 
-    @CompilerDirectives.TruffleBoundary
     public ArraySlice<CallTarget> getApplicableMethods(LispClass[] argTypes) {
         var result = new CallTarget[size];
         var usedSize = collectApplicatableMethods(new ArraySlice<>(argTypes), result, 0);
@@ -103,13 +99,10 @@ public class GenericDispatchTree {
         int[] index = new int[] { resultIndex };
         children.forEach(child -> {
             if (isSubclassOf(nextArg, child.clazz)) {
-                index[0] = collectApplicatableMethods(argTypes.drop(1), result, index[0]);
+                index[0] = child.collectApplicatableMethods(argTypes.drop(1), result, index[0]);
             }
         });
         return index[0];
     }
 
-    public Assumption getAssumption() {
-        return assumption.getAssumption();
-    }
 }
