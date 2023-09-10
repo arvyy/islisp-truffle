@@ -6,7 +6,6 @@ import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.nodes.*;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
-import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.source.SourceSection;
 
@@ -388,7 +387,7 @@ public class Parser {
                 .map(v -> parseExpressionNode(newContext, v))
                 .toArray(ISLISPExpressionNode[]::new);
         var body = new ISLISPProgn(bodyStatements, null);
-        return new ISLISPDefMethodNode(name, paramTypes.toArray(Symbol[]::new), parserContext.frameBuilder.build(), slotsAndNewContext.slots, callNextMethodVar.slot, nextMethodPVar.slot, body, sourceSection);
+        return new ISLISPDefMethodNode(name, paramTypes.toArray(Symbol[]::new), parserContext.frameBuilder.build(), slotsAndNewContext.namedArgsSlots, slotsAndNewContext.restArgsSlot, callNextMethodVar.slot, nextMethodPVar.slot, body, sourceSection);
     }
 
     private static ISLISPDefGeneric parseDefGeneric(ParserContext parserContext, SourceSection sourceSection, Value rest) {
@@ -475,7 +474,7 @@ public class Parser {
                 .map(v -> parseExpressionNode(slotsAndNewContext.context, v))
                 .toArray(ISLISPExpressionNode[]::new);
         var body = new ISLISPProgn(bodyStatements, null);
-        return new ISLISPLambdaNode(parserContext.frameBuilder.build(), slotsAndNewContext.slots, body, sourceSection);
+        return new ISLISPLambdaNode(parserContext.frameBuilder.build(), slotsAndNewContext.namedArgsSlots, slotsAndNewContext.restArgsSlot, body, sourceSection);
     }
 
     ISLISPDefunNode parseDefun(ParserContext parserContext, SourceSection sourceSection, Value rest) {
@@ -489,7 +488,7 @@ public class Parser {
                 .toArray(ISLISPExpressionNode[]::new);
         var body = new ISLISPProgn(bodyStatements, null);
         var symbol = ISLISPContext.get(null).namedSymbol(name);
-        return new ISLISPDefunNode(symbol, parserContext.frameBuilder.build(), slotsAndNewContext.slots, body, sourceSection);
+        return new ISLISPDefunNode(symbol, parserContext.frameBuilder.build(), slotsAndNewContext.namedArgsSlots, slotsAndNewContext.restArgsSlot, body, sourceSection);
     }
 
     SlotsAndNewContext processFrameDescriptorsForFunctionArguments(
@@ -512,15 +511,36 @@ public class Parser {
             ParserContext parserContext,
             List<Symbol> parameterList
     ) {
+        var restSlot = -1;
         var positionalArgumentSlots = new ArrayList<Integer>();
         var variables = new HashMap<SymbolReference, ParserContext.VariableContext>();
+        int NAMED_ARGS = 0;
+        int AFTER_REST_KW = 1;
+        int AFTER_REST_ARG = 2;
+        int state = NAMED_ARGS;
         for (var arg: parameterList) {
-            var slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
-            positionalArgumentSlots.add(slot);
-            var variableContext = new ParserContext.VariableContext();
-            variableContext.frameDepth = parserContext.frameDepth;
-            variableContext.slot = slot;
-            variables.put(arg.identityReference(), variableContext);
+            var isRestKw = "&rest".equals(arg.name()) || ":rest".equals(arg.name());
+            if (state == NAMED_ARGS && !isRestKw) {
+                var slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
+                positionalArgumentSlots.add(slot);
+                var variableContext = new ParserContext.VariableContext();
+                variableContext.frameDepth = parserContext.frameDepth;
+                variableContext.slot = slot;
+                variables.put(arg.identityReference(), variableContext);
+            } else if (state == NAMED_ARGS && isRestKw) {
+                state = AFTER_REST_KW;
+            } else if (state == AFTER_REST_KW && !isRestKw) {
+                state = AFTER_REST_ARG;
+                restSlot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
+                var variableContext = new ParserContext.VariableContext();
+                variableContext.frameDepth = parserContext.frameDepth;
+                variableContext.slot = restSlot;
+                variables.put(arg.identityReference(), variableContext);
+            } else if (state == AFTER_REST_ARG) {
+                throw new RuntimeException("Multiple symbols after :rest");
+            } else {
+                throw new RuntimeException("Bad parameter list form");
+            }
         }
         var argSlots = new int[positionalArgumentSlots.size()];
         for (var i = 0; i < positionalArgumentSlots.size(); i++) {
@@ -528,8 +548,9 @@ public class Parser {
         }
         var newContext = parserContext.pushLexicalScope(variables);
         var result = new SlotsAndNewContext();
-        result.slots = argSlots;
+        result.namedArgsSlots = argSlots;
         result.context = newContext;
+        result.restArgsSlot = restSlot;
         return result;
     }
 
@@ -650,7 +671,8 @@ public class Parser {
 
 
     private static class SlotsAndNewContext {
-        int[] slots;
+        int[] namedArgsSlots;
+        int restArgsSlot;
         ParserContext context;
     }
 }

@@ -24,20 +24,20 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
     @Child
     private ISLISPUserDefinedFunctionNode userDefinedFunctionNode;
 
-    public ISLISPDefMethodNode(Symbol name, Symbol[] argsClassNames, FrameDescriptor frameDescriptor, int[] namedArgumentSlots, int callNextMethodSlot, int hasNextMethodSlot, ISLISPExpressionNode body, SourceSection sourceSection) {
+    public ISLISPDefMethodNode(Symbol name, Symbol[] argsClassNames, FrameDescriptor frameDescriptor, int[] namedArgumentSlots, int restArgumentsSlot, int callNextMethodSlot, int hasNextMethodSlot, ISLISPExpressionNode body, SourceSection sourceSection) {
         super(sourceSection);
         this.namedArgumentSlots = namedArgumentSlots;
         this.name = name;
         var ctx = ISLISPContext.get(this);
         this.argsClassNames = argsClassNames;
-        userDefinedFunctionNode = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), frameDescriptor, body, namedArgumentSlots, callNextMethodSlot, hasNextMethodSlot, sourceSection);
+        userDefinedFunctionNode = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), frameDescriptor, body, namedArgumentSlots, restArgumentsSlot, callNextMethodSlot, hasNextMethodSlot, sourceSection);
     }
 
     @Override
     public Value executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         var genericFunctionDescriptor = ctx.lookupGenericFunctionDispatchTree(name.identityReference());
-        if (namedArgumentSlots.length < genericFunctionDescriptor.getRequiredArgCount()) {
+        if (namedArgumentSlots.length != genericFunctionDescriptor.getRequiredArgCount()) {
             throw new ISLISPError("defmethod signature doesn't match defgeneric", this);
         }
         var classes = new LispClass[argsClassNames.length];

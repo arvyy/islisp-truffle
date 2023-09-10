@@ -19,11 +19,11 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
     @Child
     ISLISPUserDefinedFunctionNode functionNode;
 
-    public ISLISPDefunNode(Symbol name, FrameDescriptor frameDescriptor, int[] namedArgumentSlots, ISLISPExpressionNode body, SourceSection sourceSection) {
+    public ISLISPDefunNode(Symbol name, FrameDescriptor frameDescriptor, int[] namedArgumentSlots, int restArgsSlot, ISLISPExpressionNode body, SourceSection sourceSection) {
         super(true, sourceSection);
         this.name = name;
         var ctx = ISLISPContext.get(this);
-        functionNode = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), frameDescriptor, body, namedArgumentSlots, -1, -1, sourceSection);
+        functionNode = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), frameDescriptor, body, namedArgumentSlots, restArgsSlot, -1, -1, sourceSection);
     }
 
     @Override

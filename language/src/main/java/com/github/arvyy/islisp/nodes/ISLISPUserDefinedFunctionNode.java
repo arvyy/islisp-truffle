@@ -1,10 +1,14 @@
 package com.github.arvyy.islisp.nodes;
 
+import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPTruffleLanguage;
+import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.builtins.BuiltinCallNextMethod;
 import com.github.arvyy.islisp.builtins.BuiltinHasNextMethod;
 import com.github.arvyy.islisp.runtime.Closure;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.github.arvyy.islisp.runtime.Pair;
+import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.MaterializedFrame;
@@ -29,6 +33,7 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
     private BuiltinHasNextMethod hasNextMethod;
 
     private final int[] namedArgumentSlots;
+    private final int restArgumentsSlot;
 
     private final int callNextMethodSlot;
     private final int hasNextMethodSlot;
@@ -38,6 +43,7 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
             FrameDescriptor frameDescriptor,
             ISLISPExpressionNode body,
             int[] namedArgumentSlots,
+            int restArgumentsSlot,
             int callNextMethodSlot,
             int hasNextMethodSlot,
             SourceSection sourceSection
@@ -45,6 +51,7 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
         super(language, frameDescriptor);
         this.body = body;
         this.namedArgumentSlots = namedArgumentSlots;
+        this.restArgumentsSlot = restArgumentsSlot;
         this.callNextMethodSlot = callNextMethodSlot;
         this.hasNextMethodSlot = hasNextMethodSlot;
         this.sourceSection = sourceSection;
@@ -63,6 +70,7 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
         namedArgumentSlots = null;
         callNextMethodSlot = -1;
         hasNextMethodSlot = -1;
+        restArgumentsSlot = -1;
     }
 
     @Override
@@ -79,6 +87,13 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
         for (var i = 0; i < namedArgumentSlots.length; i++) {
             int slot = namedArgumentSlots[i];
             frame.setObject(slot, frame.getArguments()[i + 1]);
+        }
+        if (restArgumentsSlot >= 0) {
+            Value value = ISLISPContext.get(this).getNIL();
+            for (int i = frame.getArguments().length - 1; i >= namedArgumentSlots.length + 1; i--) {
+                value = new Pair((Value) frame.getArguments()[i], value, null);
+            }
+            frame.setObject(restArgumentsSlot, value);
         }
         return body.executeGeneric(frame);
     }
