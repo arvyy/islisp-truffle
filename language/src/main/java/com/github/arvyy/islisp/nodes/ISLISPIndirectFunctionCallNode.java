@@ -3,6 +3,8 @@ package com.github.arvyy.islisp.nodes;
 import com.github.arvyy.islisp.ISLISPError;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.instrumentation.StandardTags;
+import com.oracle.truffle.api.instrumentation.Tag;
 import com.oracle.truffle.api.source.SourceSection;
 
 public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
@@ -31,5 +33,13 @@ public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
         }
         var functionValue = fn.executeGeneric(frame);
         return dispatchNode.executeDispatch(functionValue, argValues);
+    }
+
+    @Override
+    public boolean hasTag(Class<? extends Tag> tag) {
+        if (tag == StandardTags.CallTag.class) {
+            return true;
+        }
+        return super.hasTag(tag);
     }
 }

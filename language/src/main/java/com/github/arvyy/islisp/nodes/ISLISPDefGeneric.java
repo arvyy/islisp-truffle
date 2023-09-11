@@ -19,7 +19,7 @@ public class ISLISPDefGeneric extends ISLISPExpressionNode {
 
 
     public ISLISPDefGeneric(Symbol name, int requiredArgsCount, boolean hasRest, SourceSection sourceSection) {
-        super(sourceSection);
+        super(true, sourceSection);
         this.name = name;
         this.requiredArgsCount = requiredArgsCount;
         this.hasRest = hasRest;

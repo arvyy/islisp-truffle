@@ -23,11 +23,6 @@ public class ISLISPRootNode extends RootNode {
         this.sourceSection = sourceSection;
     }
 
-    protected ISLISPRootNode(ISLISPRootNode copy) {
-        super(copy.getLanguage(ISLISPTruffleLanguage.class), copy.getFrameDescriptor());
-        sourceSection = copy.sourceSection;
-    }
-
     @Override
     public SourceSection getSourceSection() {
         return sourceSection;
@@ -46,13 +41,4 @@ public class ISLISPRootNode extends RootNode {
         }
     }
 
-    @Override
-    public boolean isInstrumentable() {
-        return true;
-    }
-
-    @Override
-    public boolean isInternal() {
-        return false;
-    }
 }

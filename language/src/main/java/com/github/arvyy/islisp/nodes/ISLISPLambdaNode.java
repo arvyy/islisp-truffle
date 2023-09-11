@@ -10,12 +10,11 @@ import com.oracle.truffle.api.source.SourceSection;
 public class ISLISPLambdaNode extends ISLISPExpressionNode {
 
     @Child
-    ISLISPUserDefinedFunctionNode functionNode;
+    ISLISPRootNode functionNode;
 
-    public ISLISPLambdaNode(FrameDescriptor frameDescriptor, int[] namedArgumentSlots, int restArgumentsSlot, ISLISPExpressionNode body, SourceSection sourceSection) {
-        super(sourceSection);
-        var ctx = ISLISPContext.get(this);
-        functionNode = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), frameDescriptor, body, namedArgumentSlots, restArgumentsSlot, -1, -1, sourceSection);
+    public ISLISPLambdaNode(ISLISPRootNode functionNode) {
+        super(functionNode.getSourceSection());
+        this.functionNode = functionNode;
     }
 
     @Override

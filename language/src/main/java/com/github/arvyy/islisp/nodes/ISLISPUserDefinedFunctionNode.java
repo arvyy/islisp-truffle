@@ -19,9 +19,7 @@ import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.SourceSection;
 
 @GenerateWrapper
-public class ISLISPUserDefinedFunctionNode extends RootNode implements InstrumentableNode {
-
-    private final SourceSection sourceSection;
+public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
 
     @Child
     private ISLISPExpressionNode body;
@@ -40,7 +38,6 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
 
     public ISLISPUserDefinedFunctionNode(
             TruffleLanguage<?> language,
-            FrameDescriptor frameDescriptor,
             ISLISPExpressionNode body,
             int[] namedArgumentSlots,
             int restArgumentsSlot,
@@ -48,13 +45,12 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
             int hasNextMethodSlot,
             SourceSection sourceSection
     ) {
-        super(language, frameDescriptor);
+        super(sourceSection);
         this.body = body;
         this.namedArgumentSlots = namedArgumentSlots;
         this.restArgumentsSlot = restArgumentsSlot;
         this.callNextMethodSlot = callNextMethodSlot;
         this.hasNextMethodSlot = hasNextMethodSlot;
-        this.sourceSection = sourceSection;
         body.markRootBody();
         if (hasNextMethodSlot >= 0) {
             hasNextMethod = new BuiltinHasNextMethod(language);
@@ -66,7 +62,6 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
 
     protected ISLISPUserDefinedFunctionNode() {
         super(null);
-        sourceSection = null;
         namedArgumentSlots = null;
         callNextMethodSlot = -1;
         hasNextMethodSlot = -1;
@@ -75,7 +70,7 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
 
     @Override
     @ExplodeLoop
-    public Object execute(VirtualFrame frame) {
+    public Value executeGeneric(VirtualFrame frame) {
         if (callNextMethodSlot >= 0) {
             var closure = (Closure) frame.getArguments()[0];
             frame.setObject(callNextMethodSlot, new LispFunction(closure, callNextMethod.getCallTarget()));
@@ -116,8 +111,4 @@ public class ISLISPUserDefinedFunctionNode extends RootNode implements Instrumen
         return new ISLISPUserDefinedFunctionNodeWrapper(this, probe);
     }
 
-    @Override
-    public SourceSection getSourceSection() {
-        return sourceSection;
-    }
 }

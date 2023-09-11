@@ -24,8 +24,7 @@ import com.oracle.truffle.api.source.SourceSection;
 import java.sql.Array;
 import java.util.ArrayList;
 
-@GenerateWrapper
-public abstract class ISLISPDefGenericExecutionNode extends RootNode implements InstrumentableNode {
+public abstract class ISLISPDefGenericExecutionNode extends RootNode {
 
     private final Symbol name;
     private final SourceSection sourceSection;
@@ -102,16 +101,6 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode implements 
                 return false;
         }
         return true;
-    }
-
-    @Override
-    public boolean isInstrumentable() {
-        return true;
-    }
-
-    @Override
-    public WrapperNode createWrapper(ProbeNode probe) {
-        return new ISLISPDefGenericExecutionNodeWrapper(this, this, probe);
     }
 
     @Override

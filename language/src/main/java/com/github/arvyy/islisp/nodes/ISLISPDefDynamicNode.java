@@ -15,7 +15,7 @@ public class ISLISPDefDynamicNode extends ISLISPExpressionNode {
     private ISLISPExpressionNode initializer;
 
     public ISLISPDefDynamicNode(Symbol name, ISLISPExpressionNode initializer, SourceSection sourceSection) {
-        super(sourceSection);
+        super(true, sourceSection);
         this.name = name;
         this.initializer = initializer;
     }

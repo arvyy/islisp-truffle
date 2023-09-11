@@ -26,37 +26,36 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
 
     private final Symbol[] argsClassNames;
 
-    private final int[] namedArgumentSlots;
-
+    private final int requiredArgCount;
+    private final boolean hasRest;
     @Child
-    private ISLISPUserDefinedFunctionNode userDefinedFunctionNode;
+    private ISLISPRootNode functionNode;
 
     public ISLISPDefMethodNode(
             MethodQualifier methodQualifier,
             Symbol name,
             Symbol[] argsClassNames,
-            FrameDescriptor frameDescriptor,
-            int[] namedArgumentSlots,
-            int restArgumentsSlot,
-            int callNextMethodSlot,
-            int hasNextMethodSlot,
-            ISLISPExpressionNode body,
-            SourceSection sourceSection
+            int requiredArgCount,
+            boolean hasRest,
+            ISLISPRootNode functionNode
     ) {
-        super(sourceSection);
+        super(true, functionNode.getSourceSection());
         this.methodQualifier = Objects.requireNonNull(methodQualifier);
-        this.namedArgumentSlots = namedArgumentSlots;
         this.name = name;
-        var ctx = ISLISPContext.get(this);
         this.argsClassNames = argsClassNames;
-        userDefinedFunctionNode = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), frameDescriptor, body, namedArgumentSlots, restArgumentsSlot, callNextMethodSlot, hasNextMethodSlot, sourceSection);
+        this.requiredArgCount = requiredArgCount;
+        this.hasRest = hasRest;
+        this.functionNode = functionNode;
     }
 
     @Override
     public Value executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         var genericFunctionDescriptor = ctx.lookupGenericFunctionDispatchTree(name.identityReference());
-        if (namedArgumentSlots.length != genericFunctionDescriptor.getRequiredArgCount()) {
+        if (requiredArgCount != genericFunctionDescriptor.getRequiredArgCount()) {
+            throw new ISLISPError("defmethod signature doesn't match defgeneric", this);
+        }
+        if (hasRest != genericFunctionDescriptor.hasRest()) {
             throw new ISLISPError("defmethod signature doesn't match defgeneric", this);
         }
         var classes = new LispClass[argsClassNames.length];
@@ -64,7 +63,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
             classes[i] = ctx.lookupClass(argsClassNames[i].identityReference());
         }
         var definition = ctx.lookupGenericFunctionDispatchTree(name.identityReference());
-        var callTarget = userDefinedFunctionNode.getCallTarget();
+        var callTarget = functionNode.getCallTarget();
         switch (methodQualifier) {
             case none -> definition.addPrimaryMethod(classes, callTarget, this);
             case before -> definition.addBeforeMethod(classes, callTarget, this);

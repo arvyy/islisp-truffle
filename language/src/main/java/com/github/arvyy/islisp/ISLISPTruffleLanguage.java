@@ -12,6 +12,7 @@ import com.oracle.truffle.api.instrumentation.StandardTags;
 @ProvidedTags({
     StandardTags.ExpressionTag.class,
     StandardTags.StatementTag.class,
+    StandardTags.CallTag.class,
     StandardTags.RootTag.class,
     StandardTags.RootBodyTag.class,
     StandardTags.ReadVariableTag.class,

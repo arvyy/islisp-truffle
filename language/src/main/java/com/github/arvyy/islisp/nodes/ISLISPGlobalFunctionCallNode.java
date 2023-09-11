@@ -6,6 +6,8 @@ import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.instrumentation.StandardTags;
+import com.oracle.truffle.api.instrumentation.Tag;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
@@ -41,5 +43,13 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
             argValues[i] = arguments[i].executeGeneric(frame);
         }
         return dispatchNode.executeDispatch(function, argValues);
+    }
+
+    @Override
+    public boolean hasTag(Class<? extends Tag> tag) {
+        if (tag == StandardTags.CallTag.class) {
+            return true;
+        }
+        return super.hasTag(tag);
     }
 }

@@ -13,7 +13,7 @@ public class ISLISPDefConstantNode extends ISLISPExpressionNode {
     private ISLISPExpressionNode expression;
 
     public ISLISPDefConstantNode(Symbol name, ISLISPExpressionNode expression, SourceSection sourceSection) {
-        super(sourceSection);
+        super(true, sourceSection);
         this.name = name;
         this.expression = expression;
     }

@@ -425,23 +425,23 @@ public class Parser {
                 .skip(paramListIndex + 1)
                 .map(v -> parseExpressionNode(bodyParserContext, v))
                 .toArray(ISLISPExpressionNode[]::new);
-        var body = new ISLISPProgn(bodyStatements, null);
+        var body = new ISLISPProgn(bodyStatements, span(bodyStatements[0].getSourceSection(), bodyStatements[bodyStatements.length - 1].getSourceSection()));
+        var ctx = ISLISPContext.get(null);
+        var userDefinedFunctionNode = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), body, slotsAndNewContext.namedArgsSlots, slotsAndNewContext.restArgsSlot, callNextMethodSlot, hasNextMethodSlot, sourceSection);
+        var rootNode = new ISLISPRootNode(ctx.getLanguage(), new ISLISPExpressionNode[] { userDefinedFunctionNode }, parserContext.frameBuilder.build(), sourceSection);
         return new ISLISPDefMethodNode(
                 methodQualifier,
                 name,
                 paramTypes.toArray(Symbol[]::new),
-                parserContext.frameBuilder.build(),
-                slotsAndNewContext.namedArgsSlots,
-                slotsAndNewContext.restArgsSlot,
-                callNextMethodSlot,
-                hasNextMethodSlot,
-                body,
-                sourceSection);
+                slotsAndNewContext.namedArgsSlots.length,
+                slotsAndNewContext.restArgsSlot != -1,
+                rootNode);
     }
 
     private static ISLISPDefGeneric parseDefGeneric(ParserContext parserContext, SourceSection sourceSection, Value rest) {
         var args = Utils.readList(rest);
         var name = (Symbol) args.get(0);
+        //TODO :rest
         var lambdaList = Utils.readList(args.get(1));
         return new ISLISPDefGeneric(name, lambdaList.size(), false, sourceSection);
     }
@@ -522,8 +522,11 @@ public class Parser {
                 .skip(1)
                 .map(v -> parseExpressionNode(slotsAndNewContext.context, v))
                 .toArray(ISLISPExpressionNode[]::new);
-        var body = new ISLISPProgn(bodyStatements, null);
-        return new ISLISPLambdaNode(parserContext.frameBuilder.build(), slotsAndNewContext.namedArgsSlots, slotsAndNewContext.restArgsSlot, body, sourceSection);
+        var body = new ISLISPProgn(bodyStatements, span(bodyStatements[0].getSourceSection(), bodyStatements[bodyStatements.length - 1].getSourceSection()));
+        var ctx = ISLISPContext.get(null);
+        var userDefinedFunctionNode = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), body, slotsAndNewContext.namedArgsSlots, slotsAndNewContext.restArgsSlot, -1, -1, sourceSection);
+        var rootNode = new ISLISPRootNode(ctx.getLanguage(), new ISLISPExpressionNode[] { userDefinedFunctionNode }, parserContext.frameBuilder.build(), sourceSection);
+        return new ISLISPLambdaNode(rootNode);
     }
 
     ISLISPDefunNode parseDefun(ParserContext parserContext, SourceSection sourceSection, Value rest) {
@@ -535,9 +538,12 @@ public class Parser {
                 .skip(2)
                 .map(v -> parseExpressionNode(slotsAndNewContext.context, v))
                 .toArray(ISLISPExpressionNode[]::new);
-        var body = new ISLISPProgn(bodyStatements, null);
+        var body = new ISLISPProgn(bodyStatements, span(bodyStatements[0].getSourceSection(), bodyStatements[bodyStatements.length - 1].getSourceSection()));
         var symbol = ISLISPContext.get(null).namedSymbol(name);
-        return new ISLISPDefunNode(symbol, parserContext.frameBuilder.build(), slotsAndNewContext.namedArgsSlots, slotsAndNewContext.restArgsSlot, body, sourceSection);
+        var ctx = ISLISPContext.get(null);
+        var userDefinedFunctionNode = new ISLISPUserDefinedFunctionNode(ctx.getLanguage(), body, slotsAndNewContext.namedArgsSlots, slotsAndNewContext.restArgsSlot, -1, -1, sourceSection);
+        var rootNode = new ISLISPRootNode(ctx.getLanguage(), new ISLISPExpressionNode[] { userDefinedFunctionNode }, parserContext.frameBuilder.build(), sourceSection);
+        return new ISLISPDefunNode(symbol, rootNode);
     }
 
     SlotsAndNewContext processFrameDescriptorsForFunctionArguments(

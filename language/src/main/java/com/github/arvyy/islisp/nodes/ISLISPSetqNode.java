@@ -9,6 +9,8 @@ import com.github.arvyy.islisp.runtime.ValueReference;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.instrumentation.StandardTags;
+import com.oracle.truffle.api.instrumentation.Tag;
 import com.oracle.truffle.api.source.SourceSection;
 
 public class ISLISPSetqNode extends ISLISPExpressionNode {
@@ -63,4 +65,10 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
         }
     }
 
+    @Override
+    public boolean hasTag(Class<? extends Tag> tag) {
+        if (tag == StandardTags.WriteVariableTag.class)
+            return true;
+        return super.hasTag(tag);
+    }
 }
