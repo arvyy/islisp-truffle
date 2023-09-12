@@ -17,6 +17,7 @@ import com.oracle.truffle.api.instrumentation.StandardTags;
     StandardTags.RootBodyTag.class,
     StandardTags.ReadVariableTag.class,
     StandardTags.WriteVariableTag.class,
+    DebuggerTags.AlwaysHalt.class
 })
 public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
 

@@ -80,6 +80,7 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
             frame.setObject(hasNextMethodSlot, new LispFunction(closure, hasNextMethod.getCallTarget()));
         }
         for (var i = 0; i < namedArgumentSlots.length; i++) {
+            //TODO validate all arguments supplied
             int slot = namedArgumentSlots[i];
             var arg = frame.getArguments()[i + 1];
             frame.setObject(slot, arg);

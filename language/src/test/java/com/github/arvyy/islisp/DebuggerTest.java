@@ -29,13 +29,12 @@ public class DebuggerTest {
                             (+ a 2))
                         (foo 3)""", "test.lisp")
                 .build();
-        session.install(Breakpoint.newBuilder(source).lineIs(2).build());
+        session.install(Breakpoint.newBuilder(source).lineIs(3).columnIs(1).build());
         context.eval("islisp", source.getCharacters());
         assertNotNull(suspendedEvent[0]);
     }
 
     @Test
-    @Disabled
     public void testCodeDebugger() {
         var context = Context.newBuilder()
                 .build();

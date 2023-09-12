@@ -40,6 +40,5 @@ public class ISLISPLexicalIdentifierNode extends ISLISPExpressionNode {
     @Override
     public Object getNodeObject() {
         return super.getNodeObject();
-
     }
 }
