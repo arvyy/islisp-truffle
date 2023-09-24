@@ -9,10 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 public record StandardClass(
-        List<LispClass> parents,
+        LispClass[] parents,
         StaticShape<DefaultStaticObjectFactory> shape,
-        Map<String, StaticProperty> slots
+        Slot[] slots,
+        boolean isAbstract
 ) implements LispClass {
+
+    public record Slot(SymbolReference name, StaticProperty property, LispFunction initForm, SymbolReference initArg) {}
 
     @Override
     public SourceSection sourceSection() {
@@ -21,7 +24,7 @@ public record StandardClass(
 
     @Override
     public List<LispClass> getParents() {
-        return parents;
+        return List.of(parents);
     }
 
 }

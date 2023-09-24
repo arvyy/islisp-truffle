@@ -48,6 +48,14 @@ public abstract class BuiltinClassOf extends RootNode {
     }
 
     @Specialization
+    protected LispClass doStandardClass(
+            StandardClass clazz,
+            @Cached("loadStandardClass()") LispClass builtinClass
+    ) {
+        return builtinClass;
+    }
+
+    @Specialization
     protected LispClass doStandardClassObject(StandardClassObject obj) {
         return obj.getLispClass();
     }
@@ -62,6 +70,14 @@ public abstract class BuiltinClassOf extends RootNode {
     LispClass loadFunctionClass() { return loadClass("<function>"); }
     LispClass loadNullClass() { return loadClass("<null>"); }
     LispClass loadSymbolClass() { return loadClass("<symbol>"); }
+
+    LispClass loadBuiltinClass() {
+        return loadClass("<built-in-class>");
+    }
+
+    LispClass loadStandardClass() {
+        return loadClass("<standard-class>");
+    }
 
     LispClass loadClass(String name) {
         var ctx = ISLISPContext.get(this);

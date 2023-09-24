@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp;
 
 import com.github.arvyy.islisp.builtins.*;
+import com.github.arvyy.islisp.nodes.ISLISPDefGenericExecutionNodeGen;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -42,8 +43,8 @@ public class ISLISPContext {
         classes = new HashMap<>();
         setfTransformers = new HashMap<>();
         globalVars = new HashMap<>();
-        initGlobalFunctions();
         initBuiltinClasses();
+        initGlobalFunctions();
         initSetfExpanders();
     }
 
@@ -63,6 +64,15 @@ public class ISLISPContext {
         globalFunctions.put(namedSymbol("set-car").identityReference(), BuiltinSetCar.makeLispFunction(language));
         globalFunctions.put(namedSymbol("set-cdr").identityReference(), BuiltinSetCdr.makeLispFunction(language));
         globalFunctions.put(namedSymbol("standard-output").identityReference(), BuiltinStandardOutputStream.makeLispFunction(language));
+
+        var createDescriptor = new GenericFunctionDescriptor(1, true);
+        createDescriptor.addPrimaryMethod(
+                new LispClass[] { classes.get(namedSymbol("<standard-class>").identityReference()) },
+                BuiltinCreateStandardClassObject.makeLispFunction(language).callTarget(),
+                null);
+        genericFunctions.put(namedSymbol("create").identityReference(), createDescriptor);
+        var executionNode = ISLISPDefGenericExecutionNodeGen.create(namedSymbol("create"), getLanguage(), null);
+        globalFunctions.put(namedSymbol("create").identityReference(), new LispFunction(executionNode.getCallTarget()));
     }
 
     void initSetfExpanders() {
@@ -87,11 +97,12 @@ public class ISLISPContext {
         var parentClasses = Arrays.stream(parents)
                 .map(pname -> classes.get(namedSymbol(pname).identityReference()))
                 .toList();
-        classes.put(symbol.identityReference(), new BuiltinClass(parentClasses, symbol));
+        classes.put(symbol.identityReference(), new BuiltinClass(parentClasses, symbol, false));
     }
 
     void initBuiltinClasses() {
         initBuiltin("<object>");
+        initBuiltin("<standard-class>", "<object>");
         initBuiltin("<function>", "<object>");
         initBuiltin("<number>", "<object>");
         initBuiltin("<symbol>", "<object>");
@@ -109,8 +120,8 @@ public class ISLISPContext {
         globalVars.clear();
         setfTransformers.clear();
         classes.clear();
-        initGlobalFunctions();
         initBuiltinClasses();
+        initGlobalFunctions();
     }
 
     @CompilerDirectives.TruffleBoundary

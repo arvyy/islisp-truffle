@@ -8,6 +8,7 @@ import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
     private final int requiredArgCount;
     private final boolean hasRest;
     @Child
-    private ISLISPRootNode functionNode;
+    private RootNode functionNode;
 
     public ISLISPDefMethodNode(
             MethodQualifier methodQualifier,
@@ -37,7 +38,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
             Symbol[] argsClassNames,
             int requiredArgCount,
             boolean hasRest,
-            ISLISPRootNode functionNode
+            RootNode functionNode
     ) {
         super(true, functionNode.getSourceSection());
         this.methodQualifier = Objects.requireNonNull(methodQualifier);

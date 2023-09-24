@@ -10,6 +10,7 @@ import com.oracle.truffle.api.utilities.CyclicAssumption;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Objects;
 
 public class GenericDispatchTree {
 
@@ -71,6 +72,8 @@ public class GenericDispatchTree {
     }
 
     private boolean isSubclassOf(LispClass cls1, LispClass cls2) {
+        Objects.requireNonNull(cls1);
+        Objects.requireNonNull(cls2);
         if (cls1 == cls2)
             return true;
         for (var p: cls1.getParents()) {
