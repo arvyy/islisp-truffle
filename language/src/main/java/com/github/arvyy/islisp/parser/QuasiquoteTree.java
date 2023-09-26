@@ -15,14 +15,14 @@ import java.util.Arrays;
 //TODO calcify non-atoms into Atom if there are no internal substitutions
 public sealed interface QuasiquoteTree {
 
-    record Atom(Value value) implements QuasiquoteTree {}
-    record List(QuasiquoteTree[] children) implements QuasiquoteTree {}
-    record Quasiquote(QuasiquoteTree value) implements QuasiquoteTree {}
-    record Unquote(QuasiquoteTree value) implements QuasiquoteTree {}
-    record UnquoteSplicing(QuasiquoteTree value) implements QuasiquoteTree {}
-    record Hole(int index) implements QuasiquoteTree {}
+    record Atom(Value value) implements QuasiquoteTree { }
+    record List(QuasiquoteTree[] children) implements QuasiquoteTree { }
+    record Quasiquote(QuasiquoteTree value) implements QuasiquoteTree { }
+    record Unquote(QuasiquoteTree value) implements QuasiquoteTree { }
+    record UnquoteSplicing(QuasiquoteTree value) implements QuasiquoteTree { }
+    record Hole(int index) implements QuasiquoteTree { }
 
-    record QuasiquoteTreeAndExpressions(QuasiquoteTree tree, Value[] expressions) {}
+    record QuasiquoteTreeAndExpressions(QuasiquoteTree tree, Value[] expressions) { }
 
     static QuasiquoteTreeAndExpressions parseQuasiquoteTree(Value expr) {
         return parseQuasiquoteTree(expr, 0, 0);
@@ -52,13 +52,14 @@ public sealed interface QuasiquoteTree {
                         if (level == 1) {
                             var hole = new Hole(holeIndex);
                             if (isSplicing) {
-                                return new QuasiquoteTreeAndExpressions(new UnquoteSplicing(hole), new Value[] { rest });
+                                return new QuasiquoteTreeAndExpressions(new UnquoteSplicing(hole), new Value[]{rest});
                             } else {
-                                return new QuasiquoteTreeAndExpressions(new Unquote(hole), new Value[] { rest });
+                                return new QuasiquoteTreeAndExpressions(new Unquote(hole), new Value[]{rest});
                             }
                         } else {
                             return parseQuasiquoteTree(rest, level - 1, holeIndex);
                         }
+                     default:
                 }
             }
             // regular list
@@ -69,7 +70,9 @@ public sealed interface QuasiquoteTree {
                 expressions.addAll(Arrays.asList(parsedChildResult.expressions));
                 children.add(parsedChildResult.tree);
             }
-            return new QuasiquoteTreeAndExpressions(new List(children.toArray(QuasiquoteTree[]::new)), expressions.toArray(Value[]::new));
+            return new QuasiquoteTreeAndExpressions(
+                    new List(children.toArray(QuasiquoteTree[]::new)),
+                    expressions.toArray(Value[]::new));
         }
         if (expr instanceof LispInteger || expr instanceof Symbol) {
             return new QuasiquoteTreeAndExpressions(new Atom(expr), new Value[]{});
@@ -77,7 +80,7 @@ public sealed interface QuasiquoteTree {
         throw new RuntimeException();
     }
 
-    public static Value evalQuasiquoteTree(QuasiquoteTree tree, Value[] substitutionValues, Node node) {
+    static Value evalQuasiquoteTree(QuasiquoteTree tree, Value[] substitutionValues, Node node) {
         if (tree instanceof Atom a) {
             return a.value;
         }
@@ -101,8 +104,8 @@ public sealed interface QuasiquoteTree {
                             for (var v: p) {
                                 values.add(v);
                             }
-                        } else if(substitutionValues[h.index] instanceof Symbol s) {
-                            if (s != ISLISPContext.get(null).getNIL()) {
+                        } else if (substitutionValues[h.index] instanceof Symbol s) {
+                            if (s != ISLISPContext.get(null).getNil()) {
                                 throw new ISLISPError("Unquote splicing not list", node);
                             }
                         } else {
@@ -116,7 +119,7 @@ public sealed interface QuasiquoteTree {
                     values.add(evalQuasiquoteTree(child, substitutionValues, node));
                 }
             }
-            Value lispList = ISLISPContext.get(null).getNIL();
+            Value lispList = ISLISPContext.get(null).getNil();
             for (int i = values.size() - 1; i >= 0; i--) {
                 lispList = new Pair(values.get(i), lispList, null);
             }

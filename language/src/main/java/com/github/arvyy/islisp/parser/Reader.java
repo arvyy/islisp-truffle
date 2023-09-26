@@ -35,8 +35,9 @@ public class Reader {
 
     public Optional<Value> readSingle() {
         Optional<Token> maybeT = lexer.getToken();
-        if (maybeT.isEmpty())
+        if (maybeT.isEmpty()) {
             return Optional.empty();
+        }
         var t = maybeT.get();
         if (t instanceof Token.IdentifierToken) {
             var identifier = ((Token.IdentifierToken) t).identifier();
@@ -49,11 +50,11 @@ public class Reader {
             var lispInt = new LispInteger(value, section());
             return Optional.of(lispInt);
         }
-        if (t instanceof Token.QuasiquoteToken ||
-                t instanceof Token.QuoteToken ||
-                t instanceof Token.UnquoteSpliceToken ||
-                t instanceof Token.UnquoteToken ||
-                t instanceof Token.FunctionRefToken
+        if (t instanceof Token.QuasiquoteToken
+                || t instanceof Token.QuoteToken
+                || t instanceof Token.UnquoteSpliceToken
+                || t instanceof Token.UnquoteToken
+                || t instanceof Token.FunctionRefToken
         ) {
             String symbolName;
             if (t instanceof Token.QuasiquoteToken) {
@@ -70,9 +71,20 @@ public class Reader {
             var quoteSection = section();
             var value = readSingle().orElseThrow(); //TODO
             var normalizedSyntaxSymbol = ISLISPContext.get(null).namedSymbol(symbolName);
-            var nil = ISLISPContext.get(null).getNIL();
-            var fullSection = source.createSection(quoteSection.getStartLine(), quoteSection.getStartColumn(), value.sourceSection().getEndLine(), value.sourceSection().getEndColumn());
-            return Optional.of(new Pair(normalizedSyntaxSymbol, new Pair(value, nil, value.sourceSection()), fullSection));
+            var nil = ISLISPContext.get(null).getNil();
+            var fullSection = source.createSection(
+                    quoteSection.getStartLine(),
+                    quoteSection.getStartColumn(),
+                    value.sourceSection().getEndLine(),
+                    value.sourceSection().getEndColumn());
+            return Optional.of(
+                    new Pair(
+                            normalizedSyntaxSymbol,
+                            new Pair(
+                                    value,
+                                    nil,
+                                    value.sourceSection()),
+                            fullSection));
         }
         /*
         if (t instanceof Token.VectorBracketOpenToken) {
@@ -98,8 +110,9 @@ public class Reader {
             var lst = new ArrayList<Value>();
             while (true) {
                 next = lexer.peekToken();
-                if (next.isEmpty())
+                if (next.isEmpty()) {
                     throw new RuntimeException("Premature end of file");
+                }
                 var token = next.get();
                 if (token instanceof Token.BracketCloseToken) {
                     lexer.getToken();
@@ -107,11 +120,11 @@ public class Reader {
                     var endColumn = lexer.getColumn();
                     var section = source.createSection(startLine, startColumn, endLine, endColumn);
                     if (lst.isEmpty()) {
-                        var nil = ISLISPContext.get(null).getNIL();
+                        var nil = ISLISPContext.get(null).getNil();
                         var nilWithPos = new Symbol(nil.name(), nil.identityReference(), section);
                         return Optional.of(nilWithPos);
                     } else {
-                        Value tail = ISLISPContext.get(null).getNIL();
+                        Value tail = ISLISPContext.get(null).getNil();
                         for (var i = lst.size() - 1; i >= 0; i--) {
                             tail = new Pair(lst.get(i), tail, null);
                         }

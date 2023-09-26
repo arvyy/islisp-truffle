@@ -2,7 +2,6 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPError;
-import com.github.arvyy.islisp.builtins.BuiltinClassSlotReader;
 import com.github.arvyy.islisp.builtins.BuiltinClassSlotReaderNodeGen;
 import com.github.arvyy.islisp.builtins.BuiltinClassSlotWriterNodeGen;
 import com.github.arvyy.islisp.runtime.*;
@@ -25,9 +24,16 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
     private final boolean isAbstract;
 
     @Children
-    private ISLISPExpressionNode[] slotDefMethods;
+    private final ISLISPExpressionNode[] slotDefMethods;
 
-    public ISLISPDefClassNode(TruffleLanguage<?> language, Symbol name, List<Symbol> superclassName, List<SlotDefinition> slots, boolean isAbstract, SourceSection sourceSection) {
+    public ISLISPDefClassNode(
+            TruffleLanguage<?> language,
+            Symbol name,
+            List<Symbol> superclassName,
+            List<SlotDefinition> slots,
+            boolean isAbstract,
+            SourceSection sourceSection
+    ) {
         super(sourceSection);
         this.name = name;
         this.superclassName = superclassName;
@@ -39,25 +45,25 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
     private ISLISPExpressionNode[] buildSlotFunctionNodes(TruffleLanguage<?> language) {
         var exprs = new ArrayList<ISLISPExpressionNode>();
         for (var slot: slots) {
-            for (var reader: slot.readerName) {
+            for (var reader: slot.getReaderName()) {
                 exprs.add(new ISLISPDefGeneric(reader, 1, false, null));
                 exprs.add(new ISLISPDefMethodNode(
                         ISLISPDefMethodNode.MethodQualifier.none,
                         reader,
-                        new Symbol[]{ name },
+                        new Symbol[]{name},
                         1,
                         false,
-                        BuiltinClassSlotReaderNodeGen.create(slot.name, language)));
+                        BuiltinClassSlotReaderNodeGen.create(slot.getName(), language)));
             }
-            for (var writer: slot.writerName) {
+            for (var writer: slot.getWriterName()) {
                 exprs.add(new ISLISPDefGeneric(writer, 2, false, null));
                 exprs.add(new ISLISPDefMethodNode(
                         ISLISPDefMethodNode.MethodQualifier.none,
                         writer,
-                        new Symbol[]{ name, ISLISPContext.get(this).namedSymbol("<object>") },
+                        new Symbol[]{name, ISLISPContext.get(this).namedSymbol("<object>")},
                         2,
                         false,
-                        BuiltinClassSlotWriterNodeGen.create(slot.name, language)));
+                        BuiltinClassSlotWriterNodeGen.create(slot.getName(), language)));
             }
         }
         return exprs.toArray(ISLISPExpressionNode[]::new);
@@ -79,9 +85,13 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
             if (clazz instanceof StandardClass standardClass) {
                 for (var parentSlot: standardClass.slots()) {
                     if (!myslots.containsKey(parentSlot.name())) {
-                        var property = new DefaultStaticProperty(parentSlot.name().id + "");
+                        var property = new DefaultStaticProperty(parentSlot.name().getId() + "");
                         shapeBuilder.property(property, Object.class, false);
-                        var slot = new StandardClass.Slot(parentSlot.name(), property, parentSlot.initForm(), parentSlot.initArg());
+                        var slot = new StandardClass.Slot(
+                                parentSlot.name(),
+                                property,
+                                parentSlot.initForm(),
+                                parentSlot.initArg());
                         myslots.put(parentSlot.name(), slot);
                     }
                 }
@@ -89,32 +99,32 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
         }
         // add own unique properties
         for (var slot: slots) {
-            var slotInParent = myslots.get(slot.name.identityReference());
+            var slotInParent = myslots.get(slot.getName().identityReference());
             StaticProperty property;
             SymbolReference initArg;
             LispFunction initForm;
             if (slotInParent == null) {
-                property = new DefaultStaticProperty(slot.name.identityReference().id + "");
+                property = new DefaultStaticProperty(slot.getName().identityReference().getId() + "");
                 shapeBuilder.property(property, Object.class, false);
             } else {
                 property = slotInParent.property();
             }
-            if (slot.initArg != null) {
-                initArg = slot.initArg.identityReference();
+            if (slot.getInitArg() != null) {
+                initArg = slot.getInitArg().identityReference();
             } else if (slotInParent != null) {
                 initArg = slotInParent.initArg();
             } else {
                 initArg = null;
             }
-            if (slot.initializer != null) {
-                initForm = new LispFunction(slot.initializer.getCallTarget());
+            if (slot.getInitializer() != null) {
+                initForm = new LispFunction(slot.getInitializer().getCallTarget());
             } else if (slotInParent != null) {
                 initForm = slotInParent.initForm();
             } else {
                 initForm = null;
             }
-            var newSlot = new StandardClass.Slot(slot.name.identityReference(), property, initForm, initArg);
-            myslots.put(slot.name.identityReference(), newSlot);
+            var newSlot = new StandardClass.Slot(slot.getName().identityReference(), property, initForm, initArg);
+            myslots.put(slot.getName().identityReference(), newSlot);
         }
         var newClass = new StandardClass(
                 superclasses.toArray(LispClass[]::new),
@@ -130,13 +140,69 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
     }
 
     public static class SlotDefinition {
-        public Symbol name;
-        public Symbol[] readerName;
-        public Symbol[] writerName;
-        public Symbol[] accessorName;
-        public Symbol[] boundpName;
-        public ISLISPRootNode initializer;
-        public Symbol initArg;
+        private Symbol name;
+        private Symbol[] readerName;
+        private Symbol[] writerName;
+        private Symbol[] accessorName;
+        private Symbol[] boundpName;
+        private ISLISPRootNode initializer;
+        private Symbol initArg;
+
+        public Symbol getName() {
+            return name;
+        }
+
+        public void setName(Symbol name) {
+            this.name = name;
+        }
+
+        public Symbol[] getReaderName() {
+            return readerName;
+        }
+
+        public void setReaderName(Symbol[] readerName) {
+            this.readerName = readerName;
+        }
+
+        public Symbol[] getWriterName() {
+            return writerName;
+        }
+
+        public void setWriterName(Symbol[] writerName) {
+            this.writerName = writerName;
+        }
+
+        public Symbol[] getAccessorName() {
+            return accessorName;
+        }
+
+        public void setAccessorName(Symbol[] accessorName) {
+            this.accessorName = accessorName;
+        }
+
+        public Symbol[] getBoundpName() {
+            return boundpName;
+        }
+
+        public void setBoundpName(Symbol[] boundpName) {
+            this.boundpName = boundpName;
+        }
+
+        public ISLISPRootNode getInitializer() {
+            return initializer;
+        }
+
+        public void setInitializer(ISLISPRootNode initializer) {
+            this.initializer = initializer;
+        }
+
+        public Symbol getInitArg() {
+            return initArg;
+        }
+
+        public void setInitArg(Symbol initArg) {
+            this.initArg = initArg;
+        }
     }
 
 }

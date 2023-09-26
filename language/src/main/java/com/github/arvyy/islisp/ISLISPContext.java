@@ -12,16 +12,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class ISLISPContext {
 
-    private static final TruffleLanguage.ContextReference<ISLISPContext> ctxRef = TruffleLanguage.ContextReference.create(ISLISPTruffleLanguage.class);
+    private static final TruffleLanguage.ContextReference<ISLISPContext> CTX_REF
+            = TruffleLanguage.ContextReference.create(ISLISPTruffleLanguage.class);
     public static ISLISPContext get(Node node) {
-        return ctxRef.get(node);
+        return CTX_REF.get(node);
      }
     private final ISLISPTruffleLanguage language;
     private final Env env;
-    private Symbol NIL, T;
+    private Symbol nil;
+    private Symbol t;
 
     private final Map<SymbolReference, LispFunction> globalFunctions;
     private final Map<SymbolReference, GenericFunctionDescriptor> genericFunctions;
@@ -48,26 +51,30 @@ public class ISLISPContext {
         initSetfExpanders();
     }
 
+    void initGlobalFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
+        globalFunctions.put(namedSymbol(name).identityReference(), f.apply(language));
+    }
+
     void initGlobalFunctions() {
-        globalFunctions.put(namedSymbol("+").identityReference(), BuiltinAdd.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("eq").identityReference(), BuiltinEq.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("-").identityReference(), BuiltinSubtract.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("=").identityReference(), BuiltinNumericEqual.makeLispFunction(language));
-        globalFunctions.put(namedSymbol(">").identityReference(), BuiltinNumericGt.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("car").identityReference(), BuiltinCar.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("cdr").identityReference(), BuiltinCdr.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("cons").identityReference(), BuiltinCons.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("class-of").identityReference(), BuiltinClassOf.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("gensym").identityReference(), BuiltinGensym.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("format-integer").identityReference(), BuiltinFormatInteger.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("format-char").identityReference(), BuiltinFormatChar.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("set-car").identityReference(), BuiltinSetCar.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("set-cdr").identityReference(), BuiltinSetCdr.makeLispFunction(language));
-        globalFunctions.put(namedSymbol("standard-output").identityReference(), BuiltinStandardOutputStream.makeLispFunction(language));
+        initGlobalFunction("+", BuiltinAdd::makeLispFunction);
+        initGlobalFunction("eq", BuiltinEq::makeLispFunction);
+        initGlobalFunction("-", BuiltinSubtract::makeLispFunction);
+        initGlobalFunction("=", BuiltinNumericEqual::makeLispFunction);
+        initGlobalFunction(">", BuiltinNumericGt::makeLispFunction);
+        initGlobalFunction("car", BuiltinCar::makeLispFunction);
+        initGlobalFunction("cdr", BuiltinCdr::makeLispFunction);
+        initGlobalFunction("cons", BuiltinCons::makeLispFunction);
+        initGlobalFunction("class-of", BuiltinClassOf::makeLispFunction);
+        initGlobalFunction("gensym", BuiltinGensym::makeLispFunction);
+        initGlobalFunction("format-integer", BuiltinFormatInteger::makeLispFunction);
+        initGlobalFunction("format-char", BuiltinFormatChar::makeLispFunction);
+        initGlobalFunction("set-car", BuiltinSetCar::makeLispFunction);
+        initGlobalFunction("set-cdr", BuiltinSetCdr::makeLispFunction);
+        initGlobalFunction("standard-output", BuiltinStandardOutputStream::makeLispFunction);
 
         var createDescriptor = new GenericFunctionDescriptor(1, true);
         createDescriptor.addPrimaryMethod(
-                new LispClass[] { classes.get(namedSymbol("<standard-class>").identityReference()) },
+                new LispClass[] {classes.get(namedSymbol("<standard-class>").identityReference())},
                 BuiltinCreateStandardClassObject.makeLispFunction(language).callTarget(),
                 null);
         genericFunctions.put(namedSymbol("create").identityReference(), createDescriptor);
@@ -167,7 +174,11 @@ public class ISLISPContext {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void registerGenericFunction(SymbolReference symbolReference, LispFunction function, GenericFunctionDescriptor descriptor) {
+    public void registerGenericFunction(
+            SymbolReference symbolReference,
+            LispFunction function,
+            GenericFunctionDescriptor descriptor
+    ) {
         globalFunctions.put(symbolReference, function);
         genericFunctions.put(symbolReference, descriptor);
     }
@@ -211,18 +222,18 @@ public class ISLISPContext {
         return new Symbol(name, v, null);
     }
 
-    public Symbol getNIL() {
-        if (NIL == null) {
-            NIL = namedSymbol("nil");
+    public Symbol getNil() {
+        if (nil == null) {
+            nil = namedSymbol("nil");
         }
-        return NIL;
+        return nil;
     }
 
     public Symbol getT() {
-        if (T == null) {
-            T = namedSymbol("t");
+        if (t == null) {
+            t = namedSymbol("t");
         }
-        return T;
+        return t;
     }
 
     private int gensymIndex = 1;

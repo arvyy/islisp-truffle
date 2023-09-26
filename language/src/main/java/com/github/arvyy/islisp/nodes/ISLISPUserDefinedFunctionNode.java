@@ -1,8 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.ISLISPTruffleLanguage;
-import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.builtins.BuiltinCallNextMethod;
 import com.github.arvyy.islisp.builtins.BuiltinHasNextMethod;
 import com.github.arvyy.islisp.runtime.Closure;
@@ -10,12 +8,9 @@ import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.TruffleLanguage;
-import com.oracle.truffle.api.frame.FrameDescriptor;
-import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.*;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
-import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.SourceSection;
 
 @GenerateWrapper
@@ -86,7 +81,7 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
             frame.setObject(slot, arg);
         }
         if (restArgumentsSlot >= 0) {
-            Value value = ISLISPContext.get(this).getNIL();
+            Value value = ISLISPContext.get(this).getNil();
             for (int i = frame.getArguments().length - 1; i >= namedArgumentSlots.length + 1; i--) {
                 value = new Pair((Value) frame.getArguments()[i], value, null);
             }
@@ -102,9 +97,7 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
 
     @Override
     public boolean hasTag(Class<? extends Tag> tag) {
-        if (tag == StandardTags.RootTag.class)
-            return true;
-        return false;
+        return tag == StandardTags.RootTag.class;
     }
 
     @Override

@@ -28,7 +28,7 @@ public abstract class BuiltinFormatInteger extends RootNode {
     @Override
     public final Value execute(VirtualFrame frame) {
         executeGeneric(frame.getArguments()[1], frame.getArguments()[2], frame.getArguments()[3]);
-        return ISLISPContext.get(this).getNIL();
+        return ISLISPContext.get(this).getNil();
     }
 
     @Specialization

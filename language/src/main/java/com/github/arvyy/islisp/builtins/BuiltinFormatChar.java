@@ -25,7 +25,7 @@ public abstract class BuiltinFormatChar extends RootNode {
     @Override
     public final Value execute(VirtualFrame frame) {
         executeGeneric(frame.getArguments()[1], frame.getArguments()[2]);
-        return ISLISPContext.get(this).getNIL();
+        return ISLISPContext.get(this).getNil();
     }
 
     @Specialization
@@ -42,7 +42,7 @@ public abstract class BuiltinFormatChar extends RootNode {
     @CompilerDirectives.TruffleBoundary
     void doPrint(OutputStream os, int codepoint) {
         try {
-            os.write(new String(new int[] { codepoint }, 0, 1).getBytes(StandardCharsets.UTF_8));
+            os.write(new String(new int[] {codepoint}, 0, 1).getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw new ISLISPError(e.getMessage(), this);
         }

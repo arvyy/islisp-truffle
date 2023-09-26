@@ -1,10 +1,6 @@
 package com.github.arvyy.islisp.runtime;
 
-import com.oracle.truffle.api.CallTarget;
-import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.MaterializedFrame;
-
-import java.util.List;
 
 // Object passed around as first argument to function invocations. Not all fields can be active at once:
 // non-null frame means this is a lambda

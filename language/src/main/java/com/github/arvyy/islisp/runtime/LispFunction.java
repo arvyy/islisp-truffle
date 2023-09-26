@@ -7,8 +7,6 @@ import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.source.SourceSection;
 
-import java.util.List;
-
 @ExportLibrary(InteropLibrary.class)
 public record LispFunction(Closure closure, CallTarget callTarget, boolean isGeneric) implements Value, TruffleObject {
 

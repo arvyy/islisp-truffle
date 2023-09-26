@@ -10,8 +10,9 @@ import java.util.Iterator;
 @ExportLibrary(InteropLibrary.class)
 public final class Pair implements Value, TruffleObject, Iterable<Value> {
 
-    private Value car, cdr;
-    private SourceSection sourceSection;
+    private Value car;
+    private Value cdr;
+    private final SourceSection sourceSection;
 
     public Pair(Value car, Value cdr, SourceSection sourceSection) {
         this.car = car;

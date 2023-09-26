@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.profiles.ConditionProfile;
@@ -12,15 +11,20 @@ public class ISLISPIfNode extends ISLISPExpressionNode {
     private final ConditionProfile conditionProfile;
 
     @Child
-    private ISLISPExpressionNode testExpr;
+    private final ISLISPExpressionNode testExpr;
 
     @Child
-    private ISLISPExpressionNode truthyExpr;
+    private final ISLISPExpressionNode truthyExpr;
 
     @Child
-    private ISLISPExpressionNode falsyExpr;
+    private final ISLISPExpressionNode falsyExpr;
 
-    public ISLISPIfNode(ISLISPExpressionNode testExpr, ISLISPExpressionNode truthyExpr, ISLISPExpressionNode falsyExpr, SourceSection sourceSection) {
+    public ISLISPIfNode(
+            ISLISPExpressionNode testExpr,
+            ISLISPExpressionNode truthyExpr,
+            ISLISPExpressionNode falsyExpr,
+            SourceSection sourceSection
+    ) {
         super(sourceSection);
         conditionProfile = ConditionProfile.createCountingProfile();
         this.testExpr = testExpr;
@@ -31,7 +35,7 @@ public class ISLISPIfNode extends ISLISPExpressionNode {
     @Override
     public Value executeGeneric(VirtualFrame frame) {
         var test = testExpr.executeGeneric(frame);
-        if (conditionProfile.profile(test == ISLISPContext.get(this).getNIL())) {
+        if (conditionProfile.profile(test == ISLISPContext.get(this).getNil())) {
             return falsyExpr.executeGeneric(frame);
         } else {
             return truthyExpr.executeGeneric(frame);

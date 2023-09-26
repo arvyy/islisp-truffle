@@ -12,16 +12,21 @@ import com.oracle.truffle.api.source.SourceSection;
 public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
 
     @CompilerDirectives.CompilationFinal
-    private ValueReference vars[];
-    private final Symbol symbols[];
+    private ValueReference[] vars;
+    private final Symbol[] symbols;
 
     @Children
-    ISLISPExpressionNode initializers[];
+    ISLISPExpressionNode[] initializers;
 
     @Children
-    ISLISPExpressionNode body[];
+    ISLISPExpressionNode[] body;
 
-    public ISLISPDynamicLetNode(Symbol symbols[], ISLISPExpressionNode initializers[], ISLISPExpressionNode body[], SourceSection sourceSection) {
+    public ISLISPDynamicLetNode(
+            Symbol[] symbols,
+            ISLISPExpressionNode[] initializers,
+            ISLISPExpressionNode[] body,
+            SourceSection sourceSection
+    ) {
         super(sourceSection);
         this.symbols = symbols;
         this.initializers = initializers;
@@ -55,8 +60,9 @@ public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
             vars[i].setValue(values[i]);
         }
         try {
-            if (body.length == 0)
-                return ctx.getNIL();
+            if (body.length == 0) {
+                return ctx.getNil();
+            }
             for (int i = 0; i < body.length - 1; i++) {
                 body[i].executeGeneric(frame);
             }

@@ -17,7 +17,12 @@ public class ISLISPTagBodyNode extends ISLISPExpressionNode {
     @Children
     private ISLISPExpressionNode[] expressions;
 
-    public ISLISPTagBodyNode(int[] tagIds, int[] tagPosition, ISLISPExpressionNode[] expressions, SourceSection sourceSection) {
+    public ISLISPTagBodyNode(
+            int[] tagIds,
+            int[] tagPosition,
+            ISLISPExpressionNode[] expressions,
+            SourceSection sourceSection
+    ) {
         super(sourceSection);
         this.tagIds = tagIds;
         this.tagPosition = tagPosition;
@@ -30,7 +35,7 @@ public class ISLISPTagBodyNode extends ISLISPExpressionNode {
         while (true) {
             try {
                 if (pos >= expressions.length) {
-                    return ISLISPContext.get(this).getNIL();
+                    return ISLISPContext.get(this).getNil();
                 } else {
                     expressions[pos].executeGeneric(frame);
                     pos++;
@@ -44,8 +49,9 @@ public class ISLISPTagBodyNode extends ISLISPExpressionNode {
                     }
                 }
                 // no such go id found -- possibly targetted at a different tagbody form. Rethrow
-                if (index == -1)
+                if (index == -1) {
                     throw e;
+                }
                 pos = tagPosition[index];
             }
         }

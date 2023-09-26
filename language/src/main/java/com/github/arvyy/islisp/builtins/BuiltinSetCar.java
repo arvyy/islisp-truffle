@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.builtins;
 
 import com.github.arvyy.islisp.ISLISPError;
-import com.github.arvyy.islisp.SetfTransformer;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.github.arvyy.islisp.runtime.Value;

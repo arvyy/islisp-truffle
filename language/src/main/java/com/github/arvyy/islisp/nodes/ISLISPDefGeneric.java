@@ -15,7 +15,7 @@ public class ISLISPDefGeneric extends ISLISPExpressionNode {
     private final boolean hasRest;
 
     @Child
-    private ISLISPDefGenericExecutionNode executionNode;
+    private final ISLISPDefGenericExecutionNode executionNode;
 
 
     public ISLISPDefGeneric(Symbol name, int requiredArgsCount, boolean hasRest, SourceSection sourceSection) {

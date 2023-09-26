@@ -13,16 +13,16 @@ import com.oracle.truffle.api.source.SourceSection;
 
 public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
 
-    private Symbol name;
+    private final Symbol name;
 
     @CompilerDirectives.CompilationFinal
     private LispFunction function;
 
     @Children
-    private ISLISPExpressionNode[] arguments;
+    private final ISLISPExpressionNode[] arguments;
 
     @Child
-    private ISLISPFunctionDispatchNode dispatchNode;
+    private final ISLISPFunctionDispatchNode dispatchNode;
 
     public ISLISPGlobalFunctionCallNode(Symbol name, ISLISPExpressionNode[] arguments, SourceSection sourceSection) {
         super(sourceSection);

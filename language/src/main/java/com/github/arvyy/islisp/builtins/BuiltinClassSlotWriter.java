@@ -40,20 +40,20 @@ public abstract class BuiltinClassSlotWriter extends RootNode {
             @Cached("lookupProperty(clazz)") StaticProperty property
     ) {
         property.setObject(clsObject.data(), value);
-        return ISLISPContext.get(this).getNIL();
+        return ISLISPContext.get(this).getNil();
     }
 
     @Specialization
     Object doUnspecialized(StandardClassObject clsObject, Object value) {
         lookupProperty(clsObject.clazz()).setObject(clsObject.data(), value);
-        return ISLISPContext.get(this).getNIL();
+        return ISLISPContext.get(this).getNil();
     }
 
     @CompilerDirectives.TruffleBoundary
     StaticProperty lookupProperty(StandardClass clazz) {
-        for (var slot: clazz.slots()) {
-            if (slot.name().equals(this.slot.identityReference())) {
-                return slot.property();
+        for (var classSlot: clazz.slots()) {
+            if (classSlot.name().equals(slot.identityReference())) {
+                return classSlot.property();
             }
         }
         return null;

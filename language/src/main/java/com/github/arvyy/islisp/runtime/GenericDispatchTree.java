@@ -1,12 +1,8 @@
 package com.github.arvyy.islisp.runtime;
 
 import com.github.arvyy.islisp.ISLISPError;
-import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.CallTarget;
-import com.oracle.truffle.api.CompilerDirectives;
-import com.oracle.truffle.api.TruffleRuntime;
 import com.oracle.truffle.api.nodes.Node;
-import com.oracle.truffle.api.utilities.CyclicAssumption;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -26,17 +22,17 @@ public class GenericDispatchTree {
         children = new ArraySlice<>(new GenericDispatchTree[0]);
     }
 
-    public void addMethod(LispClass[] argTypes, CallTarget callTarget, Node node) {
-        addMethod(new ArraySlice<>(argTypes), callTarget, node);
+    public void addMethod(LispClass[] argTypes, CallTarget pCallTarget, Node node) {
+        addMethod(new ArraySlice<>(argTypes), pCallTarget, node);
     }
 
-    public void addMethod(ArraySlice<LispClass> argTypes, CallTarget callTarget, Node node) {
+    public void addMethod(ArraySlice<LispClass> argTypes, CallTarget pCallTarget, Node node) {
         size++;
         if (argTypes.size() == 0) {
             if (this.callTarget != null) {
                 throw new ISLISPError("Duplicate generic implementation", node); //TODO
             }
-            this.callTarget = callTarget;
+            this.callTarget = pCallTarget;
         } else {
             var index = -1;
             var nextArg = argTypes.get(0);
@@ -47,11 +43,11 @@ public class GenericDispatchTree {
                 }
             }
             if (index != -1) {
-                children.get(index).addMethod(argTypes.drop(1), callTarget, node);
+                children.get(index).addMethod(argTypes.drop(1), pCallTarget, node);
             } else {
                 var newNode = new GenericDispatchTree();
                 newNode.clazz = nextArg;
-                newNode.addMethod(argTypes.drop(1), callTarget, node);
+                newNode.addMethod(argTypes.drop(1), pCallTarget, node);
                 children = children.add(newNode);
                 //children.sort(Comparator.comparing(tree -> tree.clazz, this::compareClassSpecificities));
                 Arrays.sort(children.els(), Comparator.comparing(tree -> tree.clazz, this::compareClassSpecificities));
@@ -60,8 +56,9 @@ public class GenericDispatchTree {
     }
 
     private int compareClassSpecificities(LispClass cls1, LispClass cls2) {
-        if (cls1 == cls2)
+        if (cls1 == cls2) {
             return 0;
+        }
         if (isSubclassOf(cls1, cls2)) {
             return -1;
         }
@@ -74,11 +71,13 @@ public class GenericDispatchTree {
     private boolean isSubclassOf(LispClass cls1, LispClass cls2) {
         Objects.requireNonNull(cls1);
         Objects.requireNonNull(cls2);
-        if (cls1 == cls2)
+        if (cls1 == cls2) {
             return true;
+        }
         for (var p: cls1.getParents()) {
-            if (isSubclassOf(p, cls2))
+            if (isSubclassOf(p, cls2)) {
                 return true;
+            }
         }
         return false;
     }
@@ -99,7 +98,7 @@ public class GenericDispatchTree {
             return resultIndex + 1;
         }
         var nextArg = argTypes.get(0);
-        int[] index = new int[] { resultIndex };
+        int[] index = new int[] {resultIndex};
         children.forEach(child -> {
             if (isSubclassOf(nextArg, child.clazz)) {
                 index[0] = child.collectApplicatableMethods(argTypes.drop(1), result, index[0]);

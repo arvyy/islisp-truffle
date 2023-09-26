@@ -6,10 +6,13 @@ public class SymbolReference {
 
     private static int last = 0;
 
-    public final int id;
+    private final int id;
 
     public SymbolReference() {
         id = last++;
     }
 
+    public int getId() {
+        return id;
+    }
 }

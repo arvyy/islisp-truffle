@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.runtime;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
@@ -45,7 +44,9 @@ public record ArraySlice<T>(T[] els, int start, int end) {
     }
 
     static <T> void sort(ArraySlice<T> arr, Comparator<T> comparator) {
-        if (arr.size() <= 1) return;
+        if (arr.size() <= 1) {
+            return;
+        }
         int middle = (arr.end - arr.start) / 2;
         var left = new ArraySlice<>(arr.els, arr.start, middle);
         var right = new ArraySlice<>(arr.els, middle, arr.end);

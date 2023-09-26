@@ -11,9 +11,13 @@ public class ISLISPQuasiquoteNode extends ISLISPExpressionNode {
     private final QuasiquoteTree tree;
 
     @Children
-    private ISLISPExpressionNode[] expressionNodes;
+    private final ISLISPExpressionNode[] expressionNodes;
 
-    public ISLISPQuasiquoteNode(SourceSection sourceSection, QuasiquoteTree tree, ISLISPExpressionNode[] expressionNodes) {
+    public ISLISPQuasiquoteNode(
+            SourceSection sourceSection,
+            QuasiquoteTree tree,
+            ISLISPExpressionNode[] expressionNodes
+    ) {
         super(sourceSection);
         this.tree = tree;
         this.expressionNodes = expressionNodes;

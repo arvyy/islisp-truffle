@@ -12,7 +12,7 @@ public class ISLISPBlockNode extends ISLISPExpressionNode {
     private final int blockId;
 
     @Children
-    private ISLISPExpressionNode[] expressionNodes;
+    private final ISLISPExpressionNode[] expressionNodes;
 
     public ISLISPBlockNode(int blockId, ISLISPExpressionNode[] expressionNodes, SourceSection sourceSection) {
         super(sourceSection);
@@ -23,8 +23,9 @@ public class ISLISPBlockNode extends ISLISPExpressionNode {
     @Override
     @ExplodeLoop
     public Value executeGeneric(VirtualFrame frame) {
-        if (expressionNodes.length == 0)
-            return ISLISPContext.get(this).getNIL();
+        if (expressionNodes.length == 0) {
+            return ISLISPContext.get(this).getNil();
+        }
         try {
             for (int i = 0; i < expressionNodes.length - 1; i++) {
                 expressionNodes[i].executeGeneric(frame);

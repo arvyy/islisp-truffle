@@ -6,7 +6,6 @@ import com.oracle.truffle.api.staticobject.StaticProperty;
 import com.oracle.truffle.api.staticobject.StaticShape;
 
 import java.util.List;
-import java.util.Map;
 
 public record StandardClass(
         LispClass[] parents,
@@ -15,7 +14,12 @@ public record StandardClass(
         boolean isAbstract
 ) implements LispClass {
 
-    public record Slot(SymbolReference name, StaticProperty property, LispFunction initForm, SymbolReference initArg) {}
+    public record Slot(
+            SymbolReference name,
+            StaticProperty property,
+            LispFunction initForm,
+            SymbolReference initArg
+    ) { }
 
     @Override
     public SourceSection sourceSection() {
@@ -28,3 +32,4 @@ public record StandardClass(
     }
 
 }
+

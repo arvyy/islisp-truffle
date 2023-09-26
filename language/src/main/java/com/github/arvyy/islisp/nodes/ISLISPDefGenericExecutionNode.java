@@ -6,23 +6,14 @@ import com.github.arvyy.islisp.ISLISPTruffleLanguage;
 import com.github.arvyy.islisp.builtins.BuiltinClassOf;
 import com.github.arvyy.islisp.builtins.BuiltinClassOfNodeGen;
 import com.github.arvyy.islisp.runtime.*;
-import com.oracle.truffle.api.Assumption;
-import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.instrumentation.GenerateWrapper;
-import com.oracle.truffle.api.instrumentation.InstrumentableNode;
-import com.oracle.truffle.api.instrumentation.ProbeNode;
 import com.oracle.truffle.api.nodes.DirectCallNode;
-import com.oracle.truffle.api.nodes.IndirectCallNode;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.SourceSection;
-
-import java.sql.Array;
-import java.util.ArrayList;
 
 public abstract class ISLISPDefGenericExecutionNode extends RootNode {
 
@@ -61,7 +52,8 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
     @Override
     public final Object execute(VirtualFrame frame) {
         if (genericFunctionDescriptor == null) {
-            genericFunctionDescriptor = ISLISPContext.get(this).lookupGenericFunctionDispatchTree(name.identityReference());
+            genericFunctionDescriptor = ISLISPContext.get(this)
+                    .lookupGenericFunctionDispatchTree(name.identityReference());
         }
         if (frame.getArguments().length - 1 < genericFunctionDescriptor.getRequiredArgCount()) {
             throw new ISLISPError("Not enough args", this);
@@ -97,8 +89,9 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
 
     boolean classesEqual(LispClass[] classes1, LispClass[] classes2) {
         for (int i = 0; i < classes1.length; i++) {
-            if (classes1[i] != classes2[i])
+            if (classes1[i] != classes2[i]) {
                 return false;
+            }
         }
         return true;
     }

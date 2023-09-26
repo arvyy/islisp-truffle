@@ -4,7 +4,6 @@ import com.github.arvyy.islisp.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispInteger;
 import com.github.arvyy.islisp.runtime.Value;
-import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;

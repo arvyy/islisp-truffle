@@ -1,8 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.ISLISPTruffleLanguage;
-import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -15,9 +13,14 @@ public class ISLISPRootNode extends RootNode {
     private final SourceSection sourceSection;
 
     @Children
-    private ISLISPExpressionNode[] expressionNodes;
+    private final ISLISPExpressionNode[] expressionNodes;
 
-    public ISLISPRootNode(TruffleLanguage<?> language, ISLISPExpressionNode[] expressionNodes, FrameDescriptor frameDescriptor, SourceSection sourceSection) {
+    public ISLISPRootNode(
+            TruffleLanguage<?> language,
+            ISLISPExpressionNode[] expressionNodes,
+            FrameDescriptor frameDescriptor,
+            SourceSection sourceSection
+    ) {
         super(language, frameDescriptor);
         this.expressionNodes = expressionNodes;
         this.sourceSection = sourceSection;
@@ -37,7 +40,7 @@ public class ISLISPRootNode extends RootNode {
         if (expressionNodes.length != 0) {
             return expressionNodes[expressionNodes.length - 1].executeGeneric(frame);
         } else {
-            return ISLISPContext.get(this).getNIL();
+            return ISLISPContext.get(this).getNil();
         }
     }
 

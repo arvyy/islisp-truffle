@@ -44,7 +44,7 @@ public abstract class BuiltinClassOf extends RootNode {
             Symbol symbol,
             @Cached("loadNullClass()") LispClass nullClass,
             @Cached("loadSymbolClass()") LispClass symbolClass) {
-        return symbol.name().equals("NIL")? nullClass : symbolClass;
+        return symbol.name().equals("NIL") ? nullClass : symbolClass;
     }
 
     @Specialization
@@ -66,10 +66,18 @@ public abstract class BuiltinClassOf extends RootNode {
         throw new ISLISPError("Unknown class for value: " + value, this);
     }
 
-    LispClass loadIntegerClass() { return loadClass("<integer>"); }
-    LispClass loadFunctionClass() { return loadClass("<function>"); }
-    LispClass loadNullClass() { return loadClass("<null>"); }
-    LispClass loadSymbolClass() { return loadClass("<symbol>"); }
+    LispClass loadIntegerClass() {
+        return loadClass("<integer>");
+    }
+    LispClass loadFunctionClass() {
+        return loadClass("<function>");
+    }
+    LispClass loadNullClass() {
+        return loadClass("<null>");
+    }
+    LispClass loadSymbolClass() {
+        return loadClass("<symbol>");
+    }
 
     LispClass loadBuiltinClass() {
         return loadClass("<built-in-class>");

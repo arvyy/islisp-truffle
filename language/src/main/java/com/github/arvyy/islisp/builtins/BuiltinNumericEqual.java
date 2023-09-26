@@ -4,12 +4,10 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispInteger;
-import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.exception.AbstractTruffleException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.profiles.CountingConditionProfile;
@@ -32,9 +30,10 @@ public abstract class BuiltinNumericEqual extends RootNode {
 
     @Specialization
     Value doInts(LispInteger a, LispInteger b) {
-        if (profile.profile(a.value() == b.value()))
+        if (profile.profile(a.value() == b.value())) {
             return ISLISPContext.get(this).getT();
-        return ISLISPContext.get(this).getNIL();
+        }
+        return ISLISPContext.get(this).getNil();
     }
 
     @Fallback

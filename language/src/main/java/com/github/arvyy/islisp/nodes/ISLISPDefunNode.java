@@ -4,13 +4,9 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.Value;
-import com.oracle.truffle.api.CompilerAsserts;
-import com.oracle.truffle.api.CompilerDirectives;
-import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.instrumentation.Tag;
-import com.oracle.truffle.api.source.SourceSection;
 
 public class ISLISPDefunNode extends ISLISPExpressionNode {
 
@@ -34,8 +30,9 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
 
     @Override
     public boolean hasTag(Class<? extends Tag> tag) {
-        if (tag == StandardTags.StatementTag.class)
+        if (tag == StandardTags.StatementTag.class) {
             return true;
+        }
         return super.hasTag(tag);
     }
 }

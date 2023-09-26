@@ -1,6 +1,5 @@
 package com.github.arvyy.islisp.nodes;
 
-import com.github.arvyy.islisp.ISLISPError;
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.StandardTags;
@@ -10,15 +9,19 @@ import com.oracle.truffle.api.source.SourceSection;
 public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
 
     @Child
-    private ISLISPExpressionNode fn;
+    private final ISLISPExpressionNode fn;
 
     @Children
-    private ISLISPExpressionNode[] arguments;
+    private final ISLISPExpressionNode[] arguments;
 
     @Child
-    private ISLISPFunctionDispatchNode dispatchNode;
+    private final ISLISPFunctionDispatchNode dispatchNode;
 
-    public ISLISPIndirectFunctionCallNode(ISLISPExpressionNode fn, ISLISPExpressionNode[] arguments, SourceSection sourceSection) {
+    public ISLISPIndirectFunctionCallNode(
+            ISLISPExpressionNode fn,
+            ISLISPExpressionNode[] arguments,
+            SourceSection sourceSection
+    ) {
         super(sourceSection);
         this.fn = fn;
         this.arguments = arguments;

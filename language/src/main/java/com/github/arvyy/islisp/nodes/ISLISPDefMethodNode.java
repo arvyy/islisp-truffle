@@ -3,16 +3,11 @@ package com.github.arvyy.islisp.nodes;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispClass;
-import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.Value;
-import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
-import com.oracle.truffle.api.source.SourceSection;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class ISLISPDefMethodNode extends ISLISPExpressionNode {
@@ -30,7 +25,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
     private final int requiredArgCount;
     private final boolean hasRest;
     @Child
-    private RootNode functionNode;
+    private final RootNode functionNode;
 
     public ISLISPDefMethodNode(
             MethodQualifier methodQualifier,
@@ -70,6 +65,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
             case before -> definition.addBeforeMethod(classes, callTarget, this);
             case around -> definition.addAroundMethod(classes, callTarget, this);
             case after -> definition.addAfterMethod(classes, callTarget, this);
+            default -> { }
         }
         return name;
     }

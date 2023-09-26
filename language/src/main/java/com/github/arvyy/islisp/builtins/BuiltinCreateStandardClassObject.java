@@ -23,7 +23,7 @@ public class BuiltinCreateStandardClassObject extends RootNode {
             var initArg = (Symbol) frame.getArguments()[i];
             for (int j = 0; j < clazz.slots().length; j++) {
                 var slot = clazz.slots()[j];
-                if (slot.initArg().id == initArg.identityReference().id) {
+                if (slot.initArg().getId() == initArg.identityReference().getId()) {
                     slot.property().setObject(obj.data(), frame.getArguments()[i + 1]);
                 }
             }

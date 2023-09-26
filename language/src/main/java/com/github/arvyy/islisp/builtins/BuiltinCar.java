@@ -1,8 +1,6 @@
 package com.github.arvyy.islisp.builtins;
 
 import com.github.arvyy.islisp.ISLISPError;
-import com.github.arvyy.islisp.nodes.ISLISPDefGenericExecutionNode;
-import com.github.arvyy.islisp.nodes.ISLISPExpressionNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.github.arvyy.islisp.runtime.Value;
@@ -11,7 +9,6 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
-import com.oracle.truffle.api.source.SourceSection;
 
 public abstract class BuiltinCar extends RootNode {
 

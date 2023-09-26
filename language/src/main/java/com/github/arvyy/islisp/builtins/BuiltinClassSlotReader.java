@@ -2,7 +2,6 @@ package com.github.arvyy.islisp.builtins;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPError;
-import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.StandardClass;
 import com.github.arvyy.islisp.runtime.StandardClassObject;
 import com.github.arvyy.islisp.runtime.Symbol;
@@ -40,7 +39,7 @@ public abstract class BuiltinClassSlotReader extends RootNode {
             @Cached("clsObject.clazz()") StandardClass clazz,
             @Cached("lookupProperty(clazz)") StaticProperty property
     ) {
-        return Objects.requireNonNullElse(property.getObject(clsObject.data()), ISLISPContext.get(this).getNIL());
+        return Objects.requireNonNullElse(property.getObject(clsObject.data()), ISLISPContext.get(this).getNil());
     }
 
     @Specialization
@@ -50,9 +49,9 @@ public abstract class BuiltinClassSlotReader extends RootNode {
 
     @CompilerDirectives.TruffleBoundary
     StaticProperty lookupProperty(StandardClass clazz) {
-        for (var slot: clazz.slots()) {
-            if (slot.name().equals(this.slot.identityReference())) {
-                return slot.property();
+        for (var classSlot: clazz.slots()) {
+            if (classSlot.name().equals(slot.identityReference())) {
+                return classSlot.property();
             }
         }
         return null;

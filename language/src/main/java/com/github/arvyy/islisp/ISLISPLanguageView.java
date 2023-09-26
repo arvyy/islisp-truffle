@@ -10,7 +10,7 @@ import com.oracle.truffle.api.library.ExportMessage;
 @ExportLibrary(value = InteropLibrary.class, delegateTo = "delegate")
 public class ISLISPLanguageView implements TruffleObject {
 
-    protected final Object delegate;
+    final Object delegate;
 
     public ISLISPLanguageView(Object delegate) {
         this.delegate = delegate;

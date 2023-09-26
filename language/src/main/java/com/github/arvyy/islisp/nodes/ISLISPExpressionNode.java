@@ -2,14 +2,10 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.CompilerDirectives;
-import com.oracle.truffle.api.debug.DebuggerTags;
-import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.dsl.TypeSystem;
 import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.*;
 import com.oracle.truffle.api.nodes.Node;
-import com.oracle.truffle.api.object.Shape;
 import com.oracle.truffle.api.source.SourceSection;
 
 @TypeSystemReference(ISLISPTypes.class)
@@ -49,7 +45,7 @@ public abstract class ISLISPExpressionNode extends Node implements Instrumentabl
 
     @Override
     public WrapperNode createWrapper(ProbeNode probe) {
-        return new ISLISPExpressionNodeWrapper(getSourceSection(),this, probe);
+        return new ISLISPExpressionNodeWrapper(getSourceSection(), this, probe);
     }
 
     @Override
@@ -59,12 +55,12 @@ public abstract class ISLISPExpressionNode extends Node implements Instrumentabl
 
     @Override
     public boolean hasTag(Class<? extends Tag> tag) {
-        if (tag == StandardTags.ExpressionTag.class)
+        if (tag == StandardTags.ExpressionTag.class) {
             return true;
-        if (tag == StandardTags.StatementTag.class)
+        }
+        if (tag == StandardTags.StatementTag.class) {
             return true;
-        if (tag == StandardTags.RootBodyTag.class && isRootBody)
-            return true;
-        return false;
+        }
+        return tag == StandardTags.RootBodyTag.class && isRootBody;
     }
 }

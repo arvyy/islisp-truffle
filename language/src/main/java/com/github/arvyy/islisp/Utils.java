@@ -8,7 +8,10 @@ import com.oracle.truffle.api.source.SourceSection;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Utils {
+public final class Utils {
+
+    private Utils() { }
+
     public static List<Value> readList(Value v) {
         if (v instanceof Pair p) {
             var lst = new ArrayList<Value>();
@@ -17,7 +20,7 @@ public class Utils {
             }
             return lst;
         } else if (v instanceof Symbol s) {
-            if (s.identityReference() == ISLISPContext.get(null).getNIL().identityReference()) {
+            if (s.identityReference() == ISLISPContext.get(null).getNil().identityReference()) {
                 return List.of();
             }
         }
@@ -25,7 +28,7 @@ public class Utils {
     }
 
     public static Value listToValue(List<Value> lst, SourceSection sourceSection) {
-        Value val = ISLISPContext.get(null).getNIL();
+        Value val = ISLISPContext.get(null).getNil();
         for (int i = lst.size() - 1; i >= 0; i--) {
             val = new Pair(lst.get(i), val, null);
         }

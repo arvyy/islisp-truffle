@@ -1,10 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
-import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.Value;
-import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
@@ -12,15 +8,19 @@ import com.oracle.truffle.api.source.SourceSection;
 public class ISLISPDirectLambdaCallNode extends ISLISPExpressionNode {
 
     @Child
-    private ISLISPLambdaNode lambdaNode;
+    private final ISLISPLambdaNode lambdaNode;
 
     @Children
-    private ISLISPExpressionNode[] arguments;
+    private final ISLISPExpressionNode[] arguments;
 
     @Child
-    private ISLISPFunctionDispatchNode dispatchNode;
+    private final ISLISPFunctionDispatchNode dispatchNode;
 
-    public ISLISPDirectLambdaCallNode(ISLISPLambdaNode lambdaNode, ISLISPExpressionNode[] arguments, SourceSection sourceSection) {
+    public ISLISPDirectLambdaCallNode(
+            ISLISPLambdaNode lambdaNode,
+            ISLISPExpressionNode[] arguments,
+            SourceSection sourceSection
+    ) {
         super(sourceSection);
         this.lambdaNode = lambdaNode;
         this.arguments = arguments;

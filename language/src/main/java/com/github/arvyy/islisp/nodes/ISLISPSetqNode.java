@@ -67,8 +67,9 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
 
     @Override
     public boolean hasTag(Class<? extends Tag> tag) {
-        if (tag == StandardTags.WriteVariableTag.class)
+        if (tag == StandardTags.WriteVariableTag.class) {
             return true;
+        }
         return super.hasTag(tag);
     }
 }

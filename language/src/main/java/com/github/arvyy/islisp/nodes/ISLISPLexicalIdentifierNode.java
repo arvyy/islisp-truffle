@@ -32,8 +32,9 @@ public class ISLISPLexicalIdentifierNode extends ISLISPExpressionNode {
 
     @Override
     public boolean hasTag(Class<? extends Tag> tag) {
-        if (tag == StandardTags.ReadVariableTag.class)
+        if (tag == StandardTags.ReadVariableTag.class) {
             return true;
+        }
         return super.hasTag(tag);
     }
 

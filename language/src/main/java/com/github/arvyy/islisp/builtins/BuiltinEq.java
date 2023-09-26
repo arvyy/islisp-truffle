@@ -17,7 +17,7 @@ public class BuiltinEq extends RootNode {
         if (frame.getArguments()[1] == frame.getArguments()[2]) {
             return ISLISPContext.get(null).getT();
         } else {
-            return ISLISPContext.get(null).getNIL();
+            return ISLISPContext.get(null).getNil();
         }
     }
 

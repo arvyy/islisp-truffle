@@ -10,7 +10,7 @@ public class ISLISPDefConstantNode extends ISLISPExpressionNode {
 
     private final Symbol name;
     @Child
-    private ISLISPExpressionNode expression;
+    private final ISLISPExpressionNode expression;
 
     public ISLISPDefConstantNode(Symbol name, ISLISPExpressionNode expression, SourceSection sourceSection) {
         super(true, sourceSection);

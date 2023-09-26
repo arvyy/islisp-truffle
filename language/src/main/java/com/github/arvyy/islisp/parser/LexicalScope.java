@@ -19,10 +19,12 @@ public class LexicalScope<Key, Value> {
     }
 
     public Optional<Value> get(Key key) {
-        if (myValues.containsKey(key))
+        if (myValues.containsKey(key)) {
             return Optional.ofNullable(myValues.get(key));
-        if (parent != null)
+        }
+        if (parent != null) {
             return parent.get(key);
+        }
         return Optional.empty();
     }
 

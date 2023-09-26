@@ -11,7 +11,7 @@ import com.oracle.truffle.api.nodes.RootNode;
 public class BuiltinCallNextMethod extends RootNode {
 
     @Child
-    private ISLISPGenericFunctionDispatchNode dispatchNode;
+    private final ISLISPGenericFunctionDispatchNode dispatchNode;
 
     public BuiltinCallNextMethod(TruffleLanguage<?> language) {
         super(language);
@@ -21,10 +21,11 @@ public class BuiltinCallNextMethod extends RootNode {
     @Override
     public Object execute(VirtualFrame frame) {
         var closure = (Closure) frame.getArguments()[0];
-        if (closure.applicableMethods().aroundMethods().size() == 0 && closure.applicableMethods().primaryMethods().size() == 0) {
+        var applicables = closure.applicableMethods();
+        if (applicables.aroundMethods().size() == 0 && applicables.primaryMethods().size() == 0) {
             throw new ISLISPError("No next method", this);
         }
-        return dispatchNode.executeDispatch(closure.applicableMethods(), closure.args());
+        return dispatchNode.executeDispatch(applicables, closure.args());
     }
 
 }
