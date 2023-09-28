@@ -11,7 +11,7 @@ import com.oracle.truffle.api.nodes.RootNode;
 public class BuiltinCallNextMethod extends RootNode {
 
     @Child
-    private final ISLISPGenericFunctionDispatchNode dispatchNode;
+    private ISLISPGenericFunctionDispatchNode dispatchNode;
 
     public BuiltinCallNextMethod(TruffleLanguage<?> language) {
         super(language);

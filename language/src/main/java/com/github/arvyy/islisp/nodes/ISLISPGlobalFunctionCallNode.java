@@ -19,10 +19,10 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
     private LispFunction function;
 
     @Children
-    private final ISLISPExpressionNode[] arguments;
+    private ISLISPExpressionNode[] arguments;
 
     @Child
-    private final ISLISPFunctionDispatchNode dispatchNode;
+    private ISLISPFunctionDispatchNode dispatchNode;
 
     public ISLISPGlobalFunctionCallNode(Symbol name, ISLISPExpressionNode[] arguments, SourceSection sourceSection) {
         super(sourceSection);

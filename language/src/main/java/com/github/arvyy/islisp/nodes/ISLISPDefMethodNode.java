@@ -25,7 +25,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
     private final int requiredArgCount;
     private final boolean hasRest;
     @Child
-    private final RootNode functionNode;
+    private RootNode functionNode;
 
     public ISLISPDefMethodNode(
             MethodQualifier methodQualifier,

@@ -8,10 +8,10 @@ import com.oracle.truffle.api.source.SourceSection;
 public class ISLISPUnwindProtectNode extends ISLISPExpressionNode {
 
     @Child
-    private final ISLISPExpressionNode expression;
+    private ISLISPExpressionNode expression;
 
     @Children
-    private final ISLISPExpressionNode[] cleanups;
+    private ISLISPExpressionNode[] cleanups;
 
     public ISLISPUnwindProtectNode(
             ISLISPExpressionNode expressionNode,

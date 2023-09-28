@@ -11,13 +11,13 @@ public class ISLISPIfNode extends ISLISPExpressionNode {
     private final ConditionProfile conditionProfile;
 
     @Child
-    private final ISLISPExpressionNode testExpr;
+    private ISLISPExpressionNode testExpr;
 
     @Child
-    private final ISLISPExpressionNode truthyExpr;
+    private ISLISPExpressionNode truthyExpr;
 
     @Child
-    private final ISLISPExpressionNode falsyExpr;
+    private ISLISPExpressionNode falsyExpr;
 
     public ISLISPIfNode(
             ISLISPExpressionNode testExpr,

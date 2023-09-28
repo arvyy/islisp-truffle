@@ -10,7 +10,7 @@ public class ISLISPReturnFromNode extends ISLISPExpressionNode {
     private final int blockId;
 
     @Child
-    private final ISLISPExpressionNode resultForm;
+    private ISLISPExpressionNode resultForm;
 
     public ISLISPReturnFromNode(int blockId, ISLISPExpressionNode resultForm, SourceSection sourceSection) {
         super(sourceSection);

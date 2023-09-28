@@ -9,13 +9,13 @@ import com.oracle.truffle.api.source.SourceSection;
 public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
 
     @Child
-    private final ISLISPExpressionNode fn;
+    private ISLISPExpressionNode fn;
 
     @Children
-    private final ISLISPExpressionNode[] arguments;
+    private ISLISPExpressionNode[] arguments;
 
     @Child
-    private final ISLISPFunctionDispatchNode dispatchNode;
+    private ISLISPFunctionDispatchNode dispatchNode;
 
     public ISLISPIndirectFunctionCallNode(
             ISLISPExpressionNode fn,

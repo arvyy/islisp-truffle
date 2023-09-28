@@ -12,7 +12,7 @@ public class ISLISPDefDynamicNode extends ISLISPExpressionNode {
     private final Symbol name;
 
     @Child
-    private final ISLISPExpressionNode initializer;
+    private ISLISPExpressionNode initializer;
 
     public ISLISPDefDynamicNode(Symbol name, ISLISPExpressionNode initializer, SourceSection sourceSection) {
         super(true, sourceSection);

@@ -8,13 +8,13 @@ import com.oracle.truffle.api.source.SourceSection;
 public class ISLISPDirectLambdaCallNode extends ISLISPExpressionNode {
 
     @Child
-    private final ISLISPLambdaNode lambdaNode;
+    private ISLISPLambdaNode lambdaNode;
 
     @Children
-    private final ISLISPExpressionNode[] arguments;
+    private ISLISPExpressionNode[] arguments;
 
     @Child
-    private final ISLISPFunctionDispatchNode dispatchNode;
+    private ISLISPFunctionDispatchNode dispatchNode;
 
     public ISLISPDirectLambdaCallNode(
             ISLISPLambdaNode lambdaNode,
