@@ -116,6 +116,10 @@ public class Parser {
                     return parseDefun(parserContext, sexpr.sourceSection(), sexpr);
                 case "defmethod":
                     return parseDefMethod(parserContext, sexpr.sourceSection(), sexpr);
+                case "catch":
+                    return parseCatchNode(parserContext, sexpr.sourceSection(), sexpr);
+                case "throw":
+                    return parseThrowNode(parserContext, sexpr.sourceSection(), sexpr);
                 case "progn":
                     return parseProgn(parserContext, sexpr.sourceSection(), sexpr, topLevel);
                 case "funcall":
@@ -219,6 +223,23 @@ public class Parser {
             }
         }
         throw new ParsingException(sexpr.sourceSection(), "Unrecognized form.");
+    }
+
+    private ISLISPThrowNode parseThrowNode(ParserContext parserContext, SourceSection sourceSection, Value sexpr) {
+        var args = requireList(sexpr, 3, 3);
+        var tagForm = parseExpressionNode(parserContext, args.get(1));
+        var resultForm = parseExpressionNode(parserContext, args.get(2));
+        return new ISLISPThrowNode(tagForm, resultForm, sourceSection);
+    }
+
+    ISLISPCatchNode parseCatchNode(ParserContext parserContext, SourceSection sourceSection, Value sexpr) {
+        var args = requireList(sexpr, 2, -1);
+        var tagForm = parseExpressionNode(parserContext, args.get(1));
+        var forms = args.stream()
+                .skip(2)
+                .map(v -> parseExpressionNode(parserContext, v))
+                .toArray(ISLISPExpressionNode[]::new);
+        return new ISLISPCatchNode(tagForm, forms, sourceSection);
     }
 
     ISLISPDefGlobalNode parseDefGlobal(ParserContext parserContext, SourceSection sourceSection, Value sexpr) {

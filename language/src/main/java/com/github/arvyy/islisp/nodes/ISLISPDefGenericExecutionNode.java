@@ -1,7 +1,7 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.ISLISPError;
+import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.ISLISPTruffleLanguage;
 import com.github.arvyy.islisp.builtins.BuiltinClassOf;
 import com.github.arvyy.islisp.builtins.BuiltinClassOfNodeGen;

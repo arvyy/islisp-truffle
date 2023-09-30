@@ -1,6 +1,6 @@
 package com.github.arvyy.islisp.builtins;
 
-import com.github.arvyy.islisp.ISLISPError;
+import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPGenericFunctionDispatchNode;
 import com.github.arvyy.islisp.nodes.ISLISPGenericFunctionDispatchNodeGen;
 import com.github.arvyy.islisp.runtime.Closure;

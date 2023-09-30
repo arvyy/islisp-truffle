@@ -1,4 +1,4 @@
-package com.github.arvyy.islisp;
+package com.github.arvyy.islisp.exceptions;
 
 import com.oracle.truffle.api.exception.AbstractTruffleException;
 import com.oracle.truffle.api.nodes.Node;

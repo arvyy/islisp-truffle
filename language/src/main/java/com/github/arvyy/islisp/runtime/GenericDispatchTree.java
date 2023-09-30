@@ -1,6 +1,6 @@
 package com.github.arvyy.islisp.runtime;
 
-import com.github.arvyy.islisp.ISLISPError;
+import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.nodes.Node;
 
