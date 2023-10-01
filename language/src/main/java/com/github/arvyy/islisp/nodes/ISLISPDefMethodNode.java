@@ -4,7 +4,6 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispClass;
 import com.github.arvyy.islisp.runtime.Symbol;
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
@@ -45,7 +44,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
     }
 
     @Override
-    public Value executeGeneric(VirtualFrame frame) {
+    public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         var genericFunctionDescriptor = ctx.lookupGenericFunctionDispatchTree(name.identityReference());
         if (requiredArgCount != genericFunctionDescriptor.getRequiredArgCount()) {

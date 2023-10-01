@@ -21,13 +21,13 @@ public abstract class BuiltinClassOf extends RootNode {
 
     @Override
     public final LispClass execute(VirtualFrame frame) {
-        var value = (Value) frame.getArguments()[1];
+        var value = (Object) frame.getArguments()[1];
         return executeGeneric(value);
     }
 
     @Specialization
     protected LispClass doInt(
-            LispInteger integer,
+            int integer,
             @Cached("loadIntegerClass()") LispClass lispClass) {
         return lispClass;
     }
@@ -57,7 +57,7 @@ public abstract class BuiltinClassOf extends RootNode {
 
     @Specialization
     protected LispClass doStandardClassObject(StandardClassObject obj) {
-        return obj.getLispClass();
+        return obj.clazz();
     }
 
     @Fallback

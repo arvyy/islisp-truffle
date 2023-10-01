@@ -1,6 +1,5 @@
 package com.github.arvyy.islisp.nodes;
 
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
@@ -25,8 +24,8 @@ public class ISLISPUnwindProtectNode extends ISLISPExpressionNode {
 
     @Override
     @ExplodeLoop
-    public Value executeGeneric(VirtualFrame frame) {
-        Value result;
+    public Object executeGeneric(VirtualFrame frame) {
+        Object result;
         try {
             result = expression.executeGeneric(frame);
         } catch (RuntimeException e) {

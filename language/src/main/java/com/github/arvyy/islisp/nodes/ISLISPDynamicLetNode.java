@@ -1,9 +1,8 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.runtime.ValueReference;
 import com.github.arvyy.islisp.runtime.Symbol;
-import com.github.arvyy.islisp.runtime.Value;
+import com.github.arvyy.islisp.runtime.ValueReference;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
@@ -11,7 +10,7 @@ import com.oracle.truffle.api.source.SourceSection;
 
 public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
 
-    @CompilerDirectives.CompilationFinal
+    @CompilerDirectives.CompilationFinal(dimensions = 1)
     private ValueReference[] vars;
     private final Symbol[] symbols;
 
@@ -35,7 +34,7 @@ public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
 
     @Override
     @ExplodeLoop
-    public Value executeGeneric(VirtualFrame frame) {
+    public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         if (vars == null) {
             vars = new ValueReference[symbols.length];
@@ -50,8 +49,8 @@ public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
                 }
             }
         }
-        var oldValues = new Value[vars.length];
-        var values = new Value[vars.length];
+        var oldValues = new Object[vars.length];
+        var values = new Object[vars.length];
         for (int i = 0; i < values.length; i++) {
             values[i] = initializers[i].executeGeneric(frame);
             oldValues[i] = vars[i].getValue();

@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.debug.DebuggerTags;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.Tag;
@@ -14,7 +13,7 @@ public class ISLISPDebuggerNode extends ISLISPExpressionNode {
     }
 
     @Override
-    public Value executeGeneric(VirtualFrame frame) {
+    public Object executeGeneric(VirtualFrame frame) {
         return ISLISPContext.get(this).getNil();
     }
 

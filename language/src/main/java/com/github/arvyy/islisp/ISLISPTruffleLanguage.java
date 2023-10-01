@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp;
 
+import com.github.arvyy.islisp.parser.EqWrapper;
 import com.github.arvyy.islisp.parser.Parser;
 import com.github.arvyy.islisp.parser.Reader;
 import com.oracle.truffle.api.CallTarget;
@@ -7,6 +8,9 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.debug.DebuggerTags;
 import com.oracle.truffle.api.instrumentation.ProvidedTags;
 import com.oracle.truffle.api.instrumentation.StandardTags;
+import com.oracle.truffle.api.source.SourceSection;
+
+import java.util.HashMap;
 
 @TruffleLanguage.Registration(id = "islisp", name = "ISLISP")
 @ProvidedTags({
@@ -28,17 +32,12 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
 
     @Override
     public CallTarget parse(ParsingRequest request) throws Exception {
-        var islispReader = new Reader(request.getSource());
+        var sourceMap = new HashMap<EqWrapper, SourceSection>();
+        var islispReader = new Reader(request.getSource(), sourceMap);
         var content = islispReader.readAll();
-        var parser = new Parser();
+        var parser = new Parser(sourceMap);
         var rootNode = parser.parseRootNode(this, content);
         return rootNode.getCallTarget();
     }
 
-    /*
-    @Override
-    protected Object getLanguageView(ISLISPContext context, Object value) {
-        return new ISLISPLanguageView(value);
-    }
-     */
 }

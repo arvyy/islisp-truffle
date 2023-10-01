@@ -60,24 +60,24 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
         }
         var argumentTypes = new LispClass[genericFunctionDescriptor.getRequiredArgCount()];
         for (int i = 1; i <= genericFunctionDescriptor.getRequiredArgCount(); i++) {
-            var value = (Value) frame.getArguments()[i];
+            var value = frame.getArguments()[i];
             argumentTypes[i - 1] = (LispClass) classOfCall.call(null, value);
         }
-        var arguments = new Value[frame.getArguments().length - 1];
+        var arguments = new Object[frame.getArguments().length - 1];
         System.arraycopy(frame.getArguments(), 1, arguments, 0, arguments.length);
         return executeGeneric(frame, argumentTypes, arguments);
     }
 
-    abstract Object executeGeneric(VirtualFrame frame, LispClass[] classes, Value[] arguments);
+    abstract Object executeGeneric(VirtualFrame frame, LispClass[] classes, Object[] arguments);
 
     @Specialization(
             guards = "classesEqual(classes, lastClasses)",
             assumptions = "genericFunctionDescriptor.getAssumption()")
-    Object executeSpecial(
+    Object doSpecial(
             VirtualFrame frame,
             LispClass[] classes,
-            Value[] arguments,
-            @Cached("classes") LispClass[] lastClasses,
+            Object[] arguments,
+            @Cached(value = "classes", dimensions = 0) LispClass[] lastClasses,
             @Cached("getApplicableMethods(classes)") GenericMethodApplicableMethods applicableMethods
     ) {
         return dispatchNode.executeDispatch(applicableMethods, arguments);

@@ -1,31 +1,36 @@
 package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.runtime.*;
+import com.github.arvyy.islisp.runtime.LispChar;
+import com.github.arvyy.islisp.runtime.Pair;
+import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class Reader {
 
     private final Lexer lexer;
     private final Source source;
+    private final Map<EqWrapper, SourceSection> sourceSectionMap;
 
-    public Reader(Source source) {
+    public Reader(Source source, Map<EqWrapper, SourceSection> sourceSectionMap) {
         this.source = source;
         lexer = new ISLISPLexer(source.getReader());
+        this.sourceSectionMap = sourceSectionMap;
     }
 
     SourceSection section() {
         return source.createSection(lexer.getLine(), lexer.getColumn(), lexer.getLength());
     }
 
-    public List<Value> readAll() {
-        var lst = new ArrayList<Value>();
-        Optional<Value> maybeValue = readSingle();
+    public List<Object> readAll() {
+        var lst = new ArrayList<Object>();
+        Optional<Object> maybeValue = readSingle();
         while (maybeValue.isPresent()) {
             lst.add(maybeValue.get());
             maybeValue = readSingle();
@@ -33,7 +38,7 @@ public class Reader {
         return lst;
     }
 
-    public Optional<Value> readSingle() {
+    public Optional<Object> readSingle() {
         Optional<Token> maybeT = lexer.getToken();
         if (maybeT.isEmpty()) {
             return Optional.empty();
@@ -42,13 +47,13 @@ public class Reader {
         if (t instanceof Token.IdentifierToken) {
             var identifier = ((Token.IdentifierToken) t).identifier();
             var symbol = ISLISPContext.get(null).namedSymbol(identifier);
-            var symbolWithSource = new Symbol(symbol.name(), symbol.identityReference(), section());
+            var symbolWithSource = new Symbol(symbol.name(), symbol.identityReference());
+            sourceSectionMap.put(new EqWrapper(symbolWithSource), section());
             return Optional.of(symbolWithSource);
         }
         if (t instanceof Token.ExactNumberToken) {
             var value = ((Token.ExactNumberToken) t).value();
-            var lispInt = new LispInteger(value, section());
-            return Optional.of(lispInt);
+            return Optional.of(value);
         }
         if (t instanceof Token.QuasiquoteToken
                 || t instanceof Token.QuoteToken
@@ -69,45 +74,28 @@ public class Reader {
                 symbolName = "unquote";
             }
             var quoteSection = section();
-            var value = readSingle().orElseThrow(); //TODO
+            var value = readSingle().orElseThrow();
+            var endSection = sourceSectionMap.get(new EqWrapper(value));
             var normalizedSyntaxSymbol = ISLISPContext.get(null).namedSymbol(symbolName);
             var nil = ISLISPContext.get(null).getNil();
             var fullSection = source.createSection(
                     quoteSection.getStartLine(),
                     quoteSection.getStartColumn(),
-                    value.sourceSection().getEndLine(),
-                    value.sourceSection().getEndColumn());
-            return Optional.of(
-                    new Pair(
-                            normalizedSyntaxSymbol,
-                            new Pair(
-                                    value,
-                                    nil,
-                                    value.sourceSection()),
-                            fullSection));
+                    endSection.getEndLine(),
+                    endSection.getEndColumn());
+            var result = new Pair(
+                normalizedSyntaxSymbol,
+                new Pair(
+                    value,
+                    nil));
+            sourceSectionMap.put(new EqWrapper(result), fullSection);
+            return Optional.of(result);
         }
-        /*
-        if (t instanceof Token.VectorBracketOpenToken) {
-            Optional<Token> next;
-            var lst = new ArrayList<Value>();
-            while (true) {
-                next = lexer.peekToken();
-                if (next.isEmpty())
-                    throw new RuntimeException("Premature end of file");
-                var token = next.get();
-                if (token instanceof Token.BracketCloseToken) {
-                    lexer.getToken();
-                    return Optional.of(new Value.ImmutableVector(lst));
-                }
-                lst.add(readSingle().orElseThrow()); //TODO
-            }
-        }
-         */
         if (t instanceof Token.BracketOpenToken) {
             var startLine = lexer.getLine();
             var startColumn = lexer.getColumn();
             Optional<Token> next;
-            var lst = new ArrayList<Value>();
+            var lst = new ArrayList<Object>();
             while (true) {
                 next = lexer.peekToken();
                 if (next.isEmpty()) {
@@ -121,23 +109,26 @@ public class Reader {
                     var section = source.createSection(startLine, startColumn, endLine, endColumn);
                     if (lst.isEmpty()) {
                         var nil = ISLISPContext.get(null).getNil();
-                        var nilWithPos = new Symbol(nil.name(), nil.identityReference(), section);
+                        var nilWithPos = new Symbol(nil.name(), nil.identityReference());
+                        sourceSectionMap.put(new EqWrapper(nilWithPos), section);
                         return Optional.of(nilWithPos);
                     } else {
-                        Value tail = ISLISPContext.get(null).getNil();
+                        Object tail = ISLISPContext.get(null).getNil();
                         for (var i = lst.size() - 1; i >= 0; i--) {
-                            tail = new Pair(lst.get(i), tail, null);
+                            tail = new Pair(lst.get(i), tail);
                         }
                         var parsedTail = (Pair) tail;
-                        var finalList = new Pair(parsedTail.car(), parsedTail.cdr(), section);
-                        return Optional.of(finalList);
+                        sourceSectionMap.put(new EqWrapper(parsedTail), section);
+                        return Optional.of(parsedTail);
                     }
                 }
                 lst.add(readSingle().orElseThrow()); //TODO
             }
         }
         if (t instanceof Token.CharToken c) {
-            return Optional.of(new LispChar(c.value(), section()));
+            var lispChar = new LispChar(c.value());
+            sourceSectionMap.put(new EqWrapper(lispChar), section());
+            return Optional.of(lispChar);
         }
         return Optional.empty();
     }

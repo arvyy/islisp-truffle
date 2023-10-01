@@ -2,8 +2,6 @@ package com.github.arvyy.islisp.builtins;
 
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispInteger;
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -17,29 +15,29 @@ public abstract class BuiltinSubtract extends RootNode {
         super(language);
     }
 
-    abstract Value executeGeneric(Value a, Value b);
+    abstract Object executeGeneric(Object a, Object b);
 
     @Override
     @ExplodeLoop
-    public final Value execute(VirtualFrame frame) {
+    public final Object execute(VirtualFrame frame) {
         if (frame.getArguments().length == 2) {
-            return executeGeneric(new LispInteger(0, null), (Value) frame.getArguments()[1]);
+            return executeGeneric(0, (Object) frame.getArguments()[1]);
         }
-        Value diff = (Value) frame.getArguments()[1];
+        Object diff = (Object) frame.getArguments()[1];
         for (int i = 2; i < frame.getArguments().length; i++) {
-            diff = executeGeneric(diff, (Value) frame.getArguments()[i]);
+            diff = executeGeneric(diff, (Object) frame.getArguments()[i]);
         }
         return diff;
     }
 
     @Specialization
     @ExplodeLoop
-    Value executeInts(LispInteger a, LispInteger b) {
-        return new LispInteger(a.value() - b.value(), null);
+    Object doInts(int a, int b) {
+        return a - b;
     }
 
     @Fallback
-    Value notNumbers(Value a, Value b) {
+    Object notNumbers(Object a, Object b) {
         throw new ISLISPError("Not numbers", this);
     }
 

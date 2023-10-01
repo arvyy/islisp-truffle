@@ -3,7 +3,6 @@ package com.github.arvyy.islisp.builtins;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -18,7 +17,7 @@ public class BuiltinPrint extends RootNode {
     }
 
     @Override
-    public Value execute(VirtualFrame frame) {
+    public Object execute(VirtualFrame frame) {
         println(frame.getArguments()[1]);
         return ISLISPContext.get(this).getNil();
     }

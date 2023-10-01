@@ -3,9 +3,7 @@ package com.github.arvyy.islisp.builtins;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispInteger;
 import com.github.arvyy.islisp.runtime.LispOutputStream;
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -26,14 +24,14 @@ public abstract class BuiltinFormatInteger extends RootNode {
     abstract void executeGeneric(Object stream, Object integer, Object radix);
 
     @Override
-    public final Value execute(VirtualFrame frame) {
+    public final Object execute(VirtualFrame frame) {
         executeGeneric(frame.getArguments()[1], frame.getArguments()[2], frame.getArguments()[3]);
         return ISLISPContext.get(this).getNil();
     }
 
     @Specialization
-    public void doProper(LispOutputStream stream, LispInteger integer, LispInteger radix) {
-        doPrint(stream.outputStream(), integer.value(), radix.value());
+    public void doProper(LispOutputStream stream, int integer, int radix) {
+        doPrint(stream.outputStream(), integer, radix);
     }
 
     @Fallback

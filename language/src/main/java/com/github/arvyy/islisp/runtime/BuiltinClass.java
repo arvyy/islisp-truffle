@@ -1,7 +1,5 @@
 package com.github.arvyy.islisp.runtime;
 
-import com.oracle.truffle.api.source.SourceSection;
-
 import java.util.List;
 
 public final class BuiltinClass implements LispClass {
@@ -19,11 +17,6 @@ public final class BuiltinClass implements LispClass {
     @Override
     public List<LispClass> getParents() {
         return parents;
-    }
-
-    @Override
-    public SourceSection sourceSection() {
-        return null;
     }
 
     @Override

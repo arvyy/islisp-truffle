@@ -1,6 +1,5 @@
 package com.github.arvyy.islisp.nodes;
 
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.instrumentation.Tag;
@@ -29,8 +28,8 @@ public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
     }
 
     @Override
-    public Value executeGeneric(VirtualFrame frame) {
-        var argValues = new Value[arguments.length];
+    public Object executeGeneric(VirtualFrame frame) {
+        var argValues = new Object[arguments.length];
         for (int i = 0; i < argValues.length; i++) {
             argValues[i] = arguments[i].executeGeneric(frame);
         }

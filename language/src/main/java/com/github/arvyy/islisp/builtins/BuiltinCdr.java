@@ -3,7 +3,6 @@ package com.github.arvyy.islisp.builtins;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Pair;
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -16,10 +15,10 @@ public abstract class BuiltinCdr extends RootNode {
         super(language);
     }
 
-    protected abstract Value executeGeneric(Object arg);
+    protected abstract Object executeGeneric(Object arg);
 
     @Override
-    public final Value execute(VirtualFrame frame) {
+    public final Object execute(VirtualFrame frame) {
         if (frame.getArguments().length != 2) {
             throw new ISLISPError("Wrong arg count", this);
         }
@@ -27,12 +26,12 @@ public abstract class BuiltinCdr extends RootNode {
     }
 
     @Specialization
-    public Value doPair(Pair p) {
+    public Object doPair(Pair p) {
         return p.cdr();
     }
 
     @Fallback
-    public Value fallback(Object o) {
+    public Object fallback(Object o) {
         throw new ISLISPError("Not a pair", this);
     }
 

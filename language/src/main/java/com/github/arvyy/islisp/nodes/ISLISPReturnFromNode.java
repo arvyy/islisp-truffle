@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.exceptions.ISLISPReturnFromException;
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.source.SourceSection;
 
@@ -19,7 +18,7 @@ public class ISLISPReturnFromNode extends ISLISPExpressionNode {
     }
 
     @Override
-    public Value executeGeneric(VirtualFrame frame) {
+    public Object executeGeneric(VirtualFrame frame) {
         throw new ISLISPReturnFromException(blockId, resultForm.executeGeneric(frame));
     }
 }

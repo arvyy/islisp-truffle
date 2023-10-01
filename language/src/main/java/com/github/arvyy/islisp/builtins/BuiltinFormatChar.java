@@ -23,7 +23,7 @@ public abstract class BuiltinFormatChar extends RootNode {
     abstract void executeGeneric(Object stream, Object ch);
 
     @Override
-    public final Value execute(VirtualFrame frame) {
+    public final Object execute(VirtualFrame frame) {
         executeGeneric(frame.getArguments()[1], frame.getArguments()[2]);
         return ISLISPContext.get(this).getNil();
     }

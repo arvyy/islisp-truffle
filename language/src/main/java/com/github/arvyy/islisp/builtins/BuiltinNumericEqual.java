@@ -3,8 +3,6 @@ package com.github.arvyy.islisp.builtins;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispInteger;
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -21,23 +19,23 @@ public abstract class BuiltinNumericEqual extends RootNode {
         profile = CountingConditionProfile.create();
     }
 
-    abstract Value executeGeneric(Value a, Value b);
+    abstract Object executeGeneric(Object a, Object b);
 
     @Override
     public final Object execute(VirtualFrame frame) {
-        return executeGeneric((Value) frame.getArguments()[1], (Value) frame.getArguments()[2]);
+        return executeGeneric(frame.getArguments()[1], frame.getArguments()[2]);
     }
 
     @Specialization
-    Value doInts(LispInteger a, LispInteger b) {
-        if (profile.profile(a.value() == b.value())) {
+    Object doInts(int a, int b) {
+        if (profile.profile(a == b)) {
             return ISLISPContext.get(this).getT();
         }
         return ISLISPContext.get(this).getNil();
     }
 
     @Fallback
-    Value notNumbers(Value a, Value b) {
+    Object notNumbers(Object a, Object b) {
         throw new ISLISPError("Not numbers", this);
     }
 

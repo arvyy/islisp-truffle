@@ -4,7 +4,6 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.GenericFunctionDescriptor;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Symbol;
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.source.SourceSection;
 
@@ -28,7 +27,7 @@ public class ISLISPDefGeneric extends ISLISPExpressionNode {
     }
 
     @Override
-    public Value executeGeneric(VirtualFrame frame) {
+    public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         var descriptor = new GenericFunctionDescriptor(requiredArgsCount, hasRest);
         var function = new LispFunction(null, executionNode.getCallTarget(), true);

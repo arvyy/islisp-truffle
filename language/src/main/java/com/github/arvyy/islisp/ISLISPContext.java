@@ -83,19 +83,19 @@ public class ISLISPContext {
     }
 
     void initSetfExpanders() {
-        setfTransformers.put(namedSymbol("car").identityReference(), (forms, value, sourceSection) -> {
+        setfTransformers.put(namedSymbol("car").identityReference(), (forms, value) -> {
             return Utils.listToValue(List.of(
                     namedSymbol("set-car"),
                     forms.get(1),
                     value
-            ), sourceSection);
+            ));
         });
-        setfTransformers.put(namedSymbol("cdr").identityReference(), (forms, value, sourceSection) -> {
+        setfTransformers.put(namedSymbol("cdr").identityReference(), (forms, value) -> {
             return Utils.listToValue(List.of(
                     namedSymbol("set-cdr"),
                     forms.get(1),
                     value
-            ), sourceSection);
+            ));
         });
     }
 
@@ -132,7 +132,7 @@ public class ISLISPContext {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void registerGlobalVar(SymbolReference symbolReference, Value init, boolean readonly) {
+    public void registerGlobalVar(SymbolReference symbolReference, Object init, boolean readonly) {
         var v = new ValueReference();
         v.setValue(init);
         v.setReadOnly(readonly);
@@ -219,7 +219,7 @@ public class ISLISPContext {
     @CompilerDirectives.TruffleBoundary
     public Symbol namedSymbol(String name) {
         var v = symbols.computeIfAbsent(name, k -> new SymbolReference());
-        return new Symbol(name, v, null);
+        return new Symbol(name, v);
     }
 
     public Symbol getNil() {

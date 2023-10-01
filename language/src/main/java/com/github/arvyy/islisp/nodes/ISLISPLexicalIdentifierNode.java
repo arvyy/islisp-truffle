@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.runtime.Closure;
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.StandardTags;
@@ -22,12 +21,12 @@ public class ISLISPLexicalIdentifierNode extends ISLISPExpressionNode {
 
     @Override
     @ExplodeLoop
-    public Value executeGeneric(VirtualFrame frame) {
+    public Object executeGeneric(VirtualFrame frame) {
         Frame f = frame;
         for (int i = 0; i < frameIndex; i++) {
             f = ((Closure) f.getArguments()[0]).frame();
         }
-        return (Value) f.getObject(frameSlot);
+        return (Object) f.getObject(frameSlot);
     }
 
     @Override

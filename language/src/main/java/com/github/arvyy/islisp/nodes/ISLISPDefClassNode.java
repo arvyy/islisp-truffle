@@ -70,7 +70,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
     }
 
     @Override
-    public Value executeGeneric(VirtualFrame frame) {
+    public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(null);
         var myslots = new HashMap<SymbolReference, StandardClass.Slot>();
         var shapeBuilder = StaticShape.newBuilder(ctx.getLanguage());

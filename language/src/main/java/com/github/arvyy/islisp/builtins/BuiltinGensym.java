@@ -17,7 +17,7 @@ public class BuiltinGensym extends RootNode {
 
     @Override
     public Object execute(VirtualFrame frame) {
-        return new Symbol(makeGensymName(), new SymbolReference(), null);
+        return new Symbol(makeGensymName(), new SymbolReference());
     }
 
     @CompilerDirectives.TruffleBoundary

@@ -1,6 +1,5 @@
 package com.github.arvyy.islisp.nodes;
 
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -37,7 +36,7 @@ public abstract class ISLISPExpressionNode extends Node implements Instrumentabl
     }
 
 
-    public abstract Value executeGeneric(VirtualFrame frame);
+    public abstract Object executeGeneric(VirtualFrame frame);
 
     public boolean isDefinitionNode() {
         return isDefinitionNode;

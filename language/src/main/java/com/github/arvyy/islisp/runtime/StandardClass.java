@@ -1,6 +1,5 @@
 package com.github.arvyy.islisp.runtime;
 
-import com.oracle.truffle.api.source.SourceSection;
 import com.oracle.truffle.api.staticobject.DefaultStaticObjectFactory;
 import com.oracle.truffle.api.staticobject.StaticProperty;
 import com.oracle.truffle.api.staticobject.StaticShape;
@@ -20,11 +19,6 @@ public record StandardClass(
             LispFunction initForm,
             SymbolReference initArg
     ) { }
-
-    @Override
-    public SourceSection sourceSection() {
-        return null;
-    }
 
     @Override
     public List<LispClass> getParents() {

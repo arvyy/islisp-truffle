@@ -1,6 +1,5 @@
 package com.github.arvyy.islisp.exceptions;
 
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.nodes.ControlFlowException;
 
 /**
@@ -9,9 +8,9 @@ import com.oracle.truffle.api.nodes.ControlFlowException;
 public class ISLISPReturnFromException extends ControlFlowException {
 
     private final int blockId;
-    private final Value value;
+    private final Object value;
 
-    public ISLISPReturnFromException(int blockId, Value value) {
+    public ISLISPReturnFromException(int blockId, Object value) {
         this.blockId = blockId;
         this.value = value;
     }
@@ -20,7 +19,7 @@ public class ISLISPReturnFromException extends ControlFlowException {
         return blockId;
     }
 
-    public Value getValue() {
+    public Object getValue() {
         return value;
     }
 }

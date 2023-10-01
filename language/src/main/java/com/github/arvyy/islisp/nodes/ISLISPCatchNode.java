@@ -3,7 +3,6 @@ package com.github.arvyy.islisp.nodes;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.builtins.BuiltinEq;
 import com.github.arvyy.islisp.exceptions.ISLISPThrowException;
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
@@ -24,8 +23,8 @@ public class ISLISPCatchNode extends ISLISPExpressionNode {
 
     @Override
     @ExplodeLoop
-    public Value executeGeneric(VirtualFrame frame) {
-        var tagValue = tagForm.executeGeneric(frame);
+    public Object executeGeneric(VirtualFrame frame) {
+        var tagObject = tagForm.executeGeneric(frame);
         try {
             if (body.length == 0) {
                 return ISLISPContext.get(this).getNil();
@@ -35,8 +34,8 @@ public class ISLISPCatchNode extends ISLISPExpressionNode {
             }
             return body[body.length - 1].executeGeneric(frame);
         } catch (ISLISPThrowException e) {
-            if (BuiltinEq.isEq(tagValue, e.getCatchTag())) {
-                return (Value) e.getResult();
+            if (BuiltinEq.isEq(tagObject, e.getCatchTag())) {
+                return e.getResult();
             } else {
                 throw e;
             }

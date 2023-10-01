@@ -3,7 +3,6 @@ package com.github.arvyy.islisp.nodes;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Symbol;
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.StandardTags;
@@ -34,11 +33,11 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
 
     @Override
     @ExplodeLoop
-    public Value executeGeneric(VirtualFrame frame) {
+    public Object executeGeneric(VirtualFrame frame) {
         if (function == null) {
             function = ISLISPContext.get(this).lookupFunction(name.identityReference());
         }
-        var argValues = new Value[arguments.length];
+        var argValues = new Object[arguments.length];
         for (int i = 0; i < argValues.length; i++) {
             argValues[i] = arguments[i].executeGeneric(frame);
         }

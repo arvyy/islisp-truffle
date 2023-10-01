@@ -1,47 +1,37 @@
 package com.github.arvyy.islisp.runtime;
 
-import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
-import com.oracle.truffle.api.library.ExportLibrary;
-import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.Iterator;
 
-@ExportLibrary(InteropLibrary.class)
-public final class Pair implements Value, TruffleObject, Iterable<Value> {
+public final class Pair implements TruffleObject, Iterable<Object> {
 
-    private Value car;
-    private Value cdr;
-    private final SourceSection sourceSection;
+    private Object car;
+    private Object cdr;
 
-    public Pair(Value car, Value cdr, SourceSection sourceSection) {
+    public Pair(Object car, Object cdr) {
         this.car = car;
         this.cdr = cdr;
-        this.sourceSection = sourceSection;
     }
 
-    public Value car() {
+    public Object car() {
         return car;
     }
 
-    public void setCar(Value v) {
+    public void setCar(Object v) {
         car = v;
     }
 
-    public Value cdr() {
+    public Object cdr() {
         return cdr;
     }
 
-    public void setCdr(Value v) {
+    public void setCdr(Object v) {
         cdr = v;
     }
 
-    public SourceSection sourceSection() {
-        return sourceSection;
-    }
-
     @Override
-    public Iterator<Value> iterator() {
+    public Iterator<Object> iterator() {
         var iterator = new PairIterator();
         iterator.next = this;
         return iterator;
@@ -49,9 +39,9 @@ public final class Pair implements Value, TruffleObject, Iterable<Value> {
 
 }
 
-class PairIterator implements Iterator<Value> {
+class PairIterator implements Iterator<Object> {
 
-    Value next;
+    Object next;
 
     @Override
     public boolean hasNext() {
@@ -59,7 +49,7 @@ class PairIterator implements Iterator<Value> {
     }
 
     @Override
-    public Value next() {
+    public Object next() {
         var car = ((Pair) next).car();
         next = ((Pair) next).cdr();
         return car;

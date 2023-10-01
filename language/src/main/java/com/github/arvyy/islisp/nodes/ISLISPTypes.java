@@ -1,8 +1,17 @@
 package com.github.arvyy.islisp.nodes;
 
-import com.github.arvyy.islisp.runtime.Value;
+import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.dsl.TypeSystem;
 
-@TypeSystem({ Value.class })
+@TypeSystem({
+    LispClass.class,
+    LispFunction.class,
+    Pair.class,
+    StandardClassObject.class,
+    Symbol.class,
+    LispOutputStream.class,
+    LispChar.class,
+    int.class
+})
 public class ISLISPTypes {
 }

@@ -9,3 +9,8 @@
   (print (get-bar f))
   (set-bar f 2)
   (print (get-bar f)))
+
+;; check inheritance
+(defclass <foo2> (<foo>) ())
+(let ((f (create (class <foo2>) 'bar 2)))
+  (print (get-bar f)))

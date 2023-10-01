@@ -1,9 +1,8 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.runtime.ValueReference;
 import com.github.arvyy.islisp.runtime.Symbol;
-import com.github.arvyy.islisp.runtime.Value;
+import com.github.arvyy.islisp.runtime.ValueReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.source.SourceSection;
 
@@ -21,7 +20,7 @@ public class ISLISPDefDynamicNode extends ISLISPExpressionNode {
     }
 
     @Override
-    public Value executeGeneric(VirtualFrame frame) {
+    public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         var dynamicVar = new ValueReference();
         dynamicVar.setValue(initializer.executeGeneric(frame));

@@ -2,14 +2,14 @@ package com.github.arvyy.islisp.runtime;
 
 public class ValueReference {
 
-    private Value value;
+    private Object value;
     private boolean readOnly;
 
-    public Value getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(Value v) {
+    public void setValue(Object v) {
         value = v;
     }
 

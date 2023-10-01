@@ -2,10 +2,8 @@ package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
-import com.github.arvyy.islisp.runtime.LispInteger;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.github.arvyy.islisp.runtime.Symbol;
-import com.github.arvyy.islisp.runtime.Value;
 import com.oracle.truffle.api.nodes.Node;
 
 import java.util.ArrayList;
@@ -15,23 +13,23 @@ import java.util.Arrays;
 //TODO calcify non-atoms into Atom if there are no internal substitutions
 public sealed interface QuasiquoteTree {
 
-    record Atom(Value value) implements QuasiquoteTree { }
+    record Atom(Object value) implements QuasiquoteTree { }
     record List(QuasiquoteTree[] children) implements QuasiquoteTree { }
     record Quasiquote(QuasiquoteTree value) implements QuasiquoteTree { }
     record Unquote(QuasiquoteTree value) implements QuasiquoteTree { }
     record UnquoteSplicing(QuasiquoteTree value) implements QuasiquoteTree { }
     record Hole(int index) implements QuasiquoteTree { }
 
-    record QuasiquoteTreeAndExpressions(QuasiquoteTree tree, Value[] expressions) { }
+    record QuasiquoteTreeAndExpressions(QuasiquoteTree tree, Object[] expressions) { }
 
-    static QuasiquoteTreeAndExpressions parseQuasiquoteTree(Value expr) {
+    static QuasiquoteTreeAndExpressions parseQuasiquoteTree(Object expr) {
         return parseQuasiquoteTree(expr, 0, 0);
     }
 
-    private static QuasiquoteTreeAndExpressions parseQuasiquoteTree(Value expr, int level, int holeIndex) {
+    private static QuasiquoteTreeAndExpressions parseQuasiquoteTree(Object expr, int level, int holeIndex) {
         if (expr instanceof Pair p) {
             if (p.car() instanceof Symbol s) {
-                Value rest;
+                Object rest;
                 boolean isSplicing = false;
                 switch (s.name()) {
                     case "quasiquote":
@@ -52,9 +50,9 @@ public sealed interface QuasiquoteTree {
                         if (level == 1) {
                             var hole = new Hole(holeIndex);
                             if (isSplicing) {
-                                return new QuasiquoteTreeAndExpressions(new UnquoteSplicing(hole), new Value[]{rest});
+                                return new QuasiquoteTreeAndExpressions(new UnquoteSplicing(hole), new Object[]{rest});
                             } else {
-                                return new QuasiquoteTreeAndExpressions(new Unquote(hole), new Value[]{rest});
+                                return new QuasiquoteTreeAndExpressions(new Unquote(hole), new Object[]{rest});
                             }
                         } else {
                             return parseQuasiquoteTree(rest, level - 1, holeIndex);
@@ -63,7 +61,7 @@ public sealed interface QuasiquoteTree {
                 }
             }
             // regular list
-            var expressions = new ArrayList<Value>();
+            var expressions = new ArrayList<Object>();
             var children = new ArrayList<QuasiquoteTree>();
             for (var v: p) {
                 var parsedChildResult = parseQuasiquoteTree(v, level, holeIndex + expressions.size());
@@ -72,15 +70,15 @@ public sealed interface QuasiquoteTree {
             }
             return new QuasiquoteTreeAndExpressions(
                     new List(children.toArray(QuasiquoteTree[]::new)),
-                    expressions.toArray(Value[]::new));
+                    expressions.toArray(Object[]::new));
         }
-        if (expr instanceof LispInteger || expr instanceof Symbol) {
-            return new QuasiquoteTreeAndExpressions(new Atom(expr), new Value[]{});
+        if (expr instanceof Integer || expr instanceof Symbol) {
+            return new QuasiquoteTreeAndExpressions(new Atom(expr), new Object[]{});
         }
         throw new RuntimeException();
     }
 
-    static Value evalQuasiquoteTree(QuasiquoteTree tree, Value[] substitutionValues, Node node) {
+    static Object evalQuasiquoteTree(QuasiquoteTree tree, Object[] substitutionValues, Node node) {
         if (tree instanceof Atom a) {
             return a.value;
         }
@@ -89,14 +87,14 @@ public sealed interface QuasiquoteTree {
                 return substitutionValues[h.index];
             } else {
                 var value = evalQuasiquoteTree(u.value, substitutionValues, node);
-                return new Pair(ISLISPContext.get(null).namedSymbol("unquote"), value, null);
+                return new Pair(ISLISPContext.get(null).namedSymbol("unquote"), value);
             }
         }
         if (tree instanceof UnquoteSplicing) {
             throw new ISLISPError("Bad unquotesplicing use", node);
         }
         if (tree instanceof List l) {
-            var values = new ArrayList<Value>();
+            var values = new ArrayList<Object>();
             for (var child: l.children) {
                 if (child instanceof UnquoteSplicing us) {
                     if (us.value instanceof Hole h) {
@@ -113,15 +111,15 @@ public sealed interface QuasiquoteTree {
                         }
                     } else {
                         var value = evalQuasiquoteTree(child, substitutionValues, node);
-                        values.add(new Pair(ISLISPContext.get(null).namedSymbol("unquote-splicing"), value, null));
+                        values.add(new Pair(ISLISPContext.get(null).namedSymbol("unquote-splicing"), value));
                     }
                 } else {
                     values.add(evalQuasiquoteTree(child, substitutionValues, node));
                 }
             }
-            Value lispList = ISLISPContext.get(null).getNil();
+            Object lispList = ISLISPContext.get(null).getNil();
             for (int i = values.size() - 1; i >= 0; i--) {
-                lispList = new Pair(values.get(i), lispList, null);
+                lispList = new Pair(values.get(i), lispList);
             }
             return lispList;
         }
