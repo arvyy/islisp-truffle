@@ -33,6 +33,22 @@ public abstract class BuiltinClassOf extends RootNode {
     }
 
     @Specialization
+    protected LispClass doString(
+        String str,
+        @Cached("loadStringClass()") LispClass lispClass
+    ) {
+        return lispClass;
+    }
+
+    @Specialization
+    protected LispClass doStringBuffer(
+        StringBuffer str,
+        @Cached("loadStringClass()") LispClass lispClass
+    ) {
+        return lispClass;
+    }
+
+    @Specialization
     protected LispClass doFunction(
             LispFunction fun,
             @Cached("loadFunctionClass()") LispClass lispClass) {
@@ -85,6 +101,10 @@ public abstract class BuiltinClassOf extends RootNode {
 
     LispClass loadStandardClass() {
         return loadClass("<standard-class>");
+    }
+
+    LispClass loadStringClass() {
+        return loadClass("<string>");
     }
 
     LispClass loadClass(String name) {

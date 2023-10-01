@@ -46,6 +46,7 @@ public class ISLISPContext {
         classes = new HashMap<>();
         setfTransformers = new HashMap<>();
         globalVars = new HashMap<>();
+        initBuiltinVars();
         initBuiltinClasses();
         initGlobalFunctions();
         initSetfExpanders();
@@ -68,6 +69,7 @@ public class ISLISPContext {
         initGlobalFunction("gensym", BuiltinGensym::makeLispFunction);
         initGlobalFunction("format-integer", BuiltinFormatInteger::makeLispFunction);
         initGlobalFunction("format-char", BuiltinFormatChar::makeLispFunction);
+        initGlobalFunction("format-object", BuiltinFormatObject::makeLispFunction);
         initGlobalFunction("set-car", BuiltinSetCar::makeLispFunction);
         initGlobalFunction("set-cdr", BuiltinSetCdr::makeLispFunction);
         initGlobalFunction("standard-output", BuiltinStandardOutputStream::makeLispFunction);
@@ -118,6 +120,24 @@ public class ISLISPContext {
         initBuiltin("<integer>", "<number>");
         initBuiltin("<float>", "<number>");
         initBuiltin("<built-in-class>", "<object>");
+        initBuiltin("<basic-array>", "<object>");
+        initBuiltin("<basic-vector>", "<basic-array>");
+        initBuiltin("<string>", "<basic-vector>");
+    }
+
+    void initBuiltinVars() {
+        {
+            var r = new ValueReference();
+            r.setValue(getNil());
+            r.setReadOnly(true);
+            globalVars.put(getNil().identityReference(), r);
+        }
+        {
+            var r = new ValueReference();
+            r.setValue(getT());
+            r.setReadOnly(true);
+            globalVars.put(getT().identityReference(), r);
+        }
     }
 
     public void reset() {
@@ -127,6 +147,7 @@ public class ISLISPContext {
         globalVars.clear();
         setfTransformers.clear();
         classes.clear();
+        initBuiltinVars();
         initBuiltinClasses();
         initGlobalFunctions();
     }

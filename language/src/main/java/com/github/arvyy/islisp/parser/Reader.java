@@ -130,6 +130,9 @@ public class Reader {
             sourceSectionMap.put(new EqWrapper(lispChar), section());
             return Optional.of(lispChar);
         }
+        if (t instanceof Token.StringToken str) {
+            return Optional.of(str.value());
+        }
         return Optional.empty();
     }
 }

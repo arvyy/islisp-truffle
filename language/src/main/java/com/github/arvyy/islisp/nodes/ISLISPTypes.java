@@ -11,6 +11,8 @@ import com.oracle.truffle.api.dsl.TypeSystem;
     Symbol.class,
     LispOutputStream.class,
     LispChar.class,
+    String.class,
+    StringBuffer.class,
     int.class
 })
 public class ISLISPTypes {
