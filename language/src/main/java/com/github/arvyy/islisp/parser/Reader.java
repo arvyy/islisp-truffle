@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.LispChar;
+import com.github.arvyy.islisp.runtime.LispVector;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.source.Source;
@@ -90,6 +91,29 @@ public class Reader {
                     nil));
             sourceSectionMap.put(new EqWrapper(result), fullSection);
             return Optional.of(result);
+        }
+        if (t instanceof Token.VectorBracketOpenToken) {
+            var startLine = lexer.getLine();
+            var startColumn = lexer.getColumn();
+            Optional<Token> next;
+            var lst = new ArrayList<Object>();
+            while (true) {
+                next = lexer.peekToken();
+                if (next.isEmpty()) {
+                    throw new RuntimeException("Premature end of file");
+                }
+                var token = next.get();
+                if (token instanceof Token.BracketCloseToken) {
+                    lexer.getToken();
+                    var endLine = lexer.getLine();
+                    var endColumn = lexer.getColumn();
+                    var section = source.createSection(startLine, startColumn, endLine, endColumn);
+                    var vec = new LispVector(lst.toArray());
+                    sourceSectionMap.put(new EqWrapper(vec), section);
+                    return Optional.of(vec);
+                }
+                lst.add(readSingle().orElseThrow()); //TODO
+            }
         }
         if (t instanceof Token.BracketOpenToken) {
             var startLine = lexer.getLine();

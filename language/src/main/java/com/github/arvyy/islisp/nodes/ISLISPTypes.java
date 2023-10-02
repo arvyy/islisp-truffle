@@ -13,6 +13,7 @@ import com.oracle.truffle.api.dsl.TypeSystem;
     LispChar.class,
     String.class,
     StringBuffer.class,
+    LispVector.class,
     int.class
 })
 public class ISLISPTypes {

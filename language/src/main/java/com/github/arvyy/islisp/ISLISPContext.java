@@ -66,6 +66,7 @@ public class ISLISPContext {
         initGlobalFunction("cdr", BuiltinCdr::makeLispFunction);
         initGlobalFunction("cons", BuiltinCons::makeLispFunction);
         initGlobalFunction("class-of", BuiltinClassOf::makeLispFunction);
+        initGlobalFunction("elt", BuiltinElt::makeLispFunction);
         initGlobalFunction("gensym", BuiltinGensym::makeLispFunction);
         initGlobalFunction("format-integer", BuiltinFormatInteger::makeLispFunction);
         initGlobalFunction("format-char", BuiltinFormatChar::makeLispFunction);
@@ -123,6 +124,7 @@ public class ISLISPContext {
         initBuiltin("<basic-array>", "<object>");
         initBuiltin("<basic-vector>", "<basic-array>");
         initBuiltin("<string>", "<basic-vector>");
+        initBuiltin("<general-vector>", "<basic-vector>");
     }
 
     void initBuiltinVars() {

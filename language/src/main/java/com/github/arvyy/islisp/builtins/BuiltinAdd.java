@@ -20,15 +20,15 @@ public abstract class BuiltinAdd extends RootNode {
     @Override
     @ExplodeLoop
     public final Object execute(VirtualFrame frame) {
-        Object sum = 0;
+        int sum = 0;
         for (int i = 1; i < frame.getArguments().length; i++) {
-            sum = executeGeneric(sum, frame.getArguments()[i]);
+            sum = (int) executeGeneric(sum, frame.getArguments()[i]);
         }
         return sum;
     }
 
     @Specialization
-    Object executeInts(int a, int b) {
+    int doInts(int a, int b) {
         return a + b;
     }
 

@@ -217,7 +217,7 @@ public class Parser {
                 }
             }
         }
-        if (sexpr instanceof Integer || sexpr instanceof LispChar || sexpr instanceof String) {
+        if (sexpr instanceof Integer || sexpr instanceof LispChar || sexpr instanceof String || sexpr instanceof LispVector) {
             return new ISLISPLiteralNode(sexpr, null);
         }
         if (sexpr instanceof Symbol symbol) {
