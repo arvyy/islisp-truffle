@@ -66,6 +66,7 @@ public class ISLISPContext {
         initGlobalFunction("cdr", BuiltinCdr::makeLispFunction);
         initGlobalFunction("cons", BuiltinCons::makeLispFunction);
         initGlobalFunction("class-of", BuiltinClassOf::makeLispFunction);
+        initGlobalFunction("create-vector", BuiltinCreateVector::makeLispFunction);
         initGlobalFunction("elt", BuiltinElt::makeLispFunction);
         initGlobalFunction("gensym", BuiltinGensym::makeLispFunction);
         initGlobalFunction("format-integer", BuiltinFormatInteger::makeLispFunction);
@@ -74,6 +75,7 @@ public class ISLISPContext {
         initGlobalFunction("set-car", BuiltinSetCar::makeLispFunction);
         initGlobalFunction("set-cdr", BuiltinSetCdr::makeLispFunction);
         initGlobalFunction("standard-output", BuiltinStandardOutputStream::makeLispFunction);
+        initGlobalFunction("vector", BuiltinVector::makeLispFunction);
 
         var createDescriptor = new GenericFunctionDescriptor(1, true);
         createDescriptor.addPrimaryMethod(
