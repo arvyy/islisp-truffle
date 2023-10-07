@@ -166,6 +166,9 @@ public class Parser {
                     return parseTagBodyGo(parserContext, sexpr);
                 case "unwind-protect":
                     return parseUnwindProtectNode(parserContext, sexpr);
+                case "with-handler":
+                    return parseWithHandler(parserContext, sexpr);
+
                 default:
             }
             // macros
@@ -232,6 +235,16 @@ public class Parser {
             }
         }
         throw new ParsingException(source(sexpr), "Unrecognized form.");
+    }
+
+    private ISLISPWithHandlerNode parseWithHandler(ParserContext parserContext, Object sexpr) {
+        var args = requireList(sexpr, 2, -1);
+        var handlerExpression = parseExpressionNode(parserContext, args.get(1));
+        var body = args.stream()
+            .skip(2)
+            .map(e -> parseExpressionNode(parserContext, e))
+            .toArray(ISLISPExpressionNode[]::new);
+        return new ISLISPWithHandlerNode(handlerExpression, body, source(sexpr));
     }
 
     private ISLISPThrowNode parseThrowNode(ParserContext parserContext, Object sexpr) {

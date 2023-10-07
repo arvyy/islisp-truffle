@@ -35,6 +35,8 @@ public class ISLISPContext {
     private final Map<SymbolReference, ValueReference> dynamicVars;
     private final Map<SymbolReference, ValueReference> globalVars;
 
+    private HandlerChain handlerChain;
+
     public ISLISPContext(ISLISPTruffleLanguage language, Env env) {
         this.language = language;
         this.env = env;
@@ -50,6 +52,17 @@ public class ISLISPContext {
         initBuiltinClasses();
         initGlobalFunctions();
         initSetfExpanders();
+        handlerChain = null; // TOOD default handler
+    }
+
+    public void pushHandler(LispFunction f) {
+        handlerChain = new HandlerChain(f, handlerChain);
+    }
+
+    public LispFunction popHandler() {
+        var f = handlerChain.handler();
+        handlerChain = handlerChain.rest();
+        return f;
     }
 
     void initGlobalFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
@@ -76,6 +89,9 @@ public class ISLISPContext {
         initGlobalFunction("set-cdr", BuiltinSetCdr::makeLispFunction);
         initGlobalFunction("standard-output", BuiltinStandardOutputStream::makeLispFunction);
         initGlobalFunction("vector", BuiltinVector::makeLispFunction);
+        initGlobalFunction("signal-condition", BuiltinSignalCondition::makeLispFunction);
+        initGlobalFunction("continue-condition", BuiltinContinueCondition::makeLispFunction);
+
 
         var createDescriptor = new GenericFunctionDescriptor(1, true);
         createDescriptor.addPrimaryMethod(
