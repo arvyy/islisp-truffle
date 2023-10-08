@@ -32,10 +32,7 @@ public class Parser {
         var root = new ISLISPRootNode(
                 language,
                 expressionNodes.toArray(ISLISPExpressionNode[]::new),
-                parserContext.frameBuilder.build(),
-                span(
-                        expressionNodes.get(0).getSourceSection(),
-                        expressionNodes.get(expressionNodes.size() - 1).getSourceSection())
+                parserContext.frameBuilder.build()
         );
         return root;
     }
@@ -43,7 +40,7 @@ public class Parser {
     SourceSection span(SourceSection a, SourceSection b) {
         return a.getSource().createSection(
                 a.getStartLine(), a.getStartColumn(),
-                b.getStartLine(), b.getStartColumn()
+                b.getEndLine(), b.getEndColumn()
         );
     }
 
@@ -52,8 +49,7 @@ public class Parser {
             var root = new ISLISPRootNode(
                     null,
                     new ISLISPExpressionNode[]{expression},
-                    null,
-                    expression.getSourceSection());
+                    null);
             root.getCallTarget().call();
         }
         if (expression instanceof ISLISPPrognNode) {
@@ -494,8 +490,7 @@ public class Parser {
         var rootNode = new ISLISPRootNode(
                 ctx.getLanguage(),
                 new ISLISPExpressionNode[]{userDefinedFunctionNode},
-                parserContext.frameBuilder.build(),
-                source(sexpr));
+                parserContext.frameBuilder.build());
         return new ISLISPDefMethodNode(
                 methodQualifier,
                 name,
@@ -545,8 +540,7 @@ public class Parser {
                             initForm = new ISLISPRootNode(
                                     ctx.getLanguage(),
                                     new ISLISPExpressionNode[]{formExpression},
-                                    newParserContext.frameBuilder.build(),
-                                    source(value));
+                                    newParserContext.frameBuilder.build());
                         }
                         case ":initarg" -> {
                             if (initArg != null) {
@@ -693,8 +687,7 @@ public class Parser {
         var rootNode = new ISLISPRootNode(
                 ctx.getLanguage(),
                 new ISLISPExpressionNode[]{userDefinedFunctionNode},
-                parserContext.frameBuilder.build(),
-                source(sexpr));
+                parserContext.frameBuilder.build());
         return new ISLISPLambdaNode(rootNode);
     }
 
@@ -723,8 +716,7 @@ public class Parser {
         var rootNode = new ISLISPRootNode(
                 ctx.getLanguage(),
                 new ISLISPExpressionNode[]{userDefinedFunctionNode},
-                parserContext.frameBuilder.build(),
-                source(sexpr));
+                parserContext.frameBuilder.build());
         return new ISLISPDefunNode(name, rootNode);
     }
 

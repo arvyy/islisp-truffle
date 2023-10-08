@@ -8,8 +8,11 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.debug.DebuggerTags;
 import com.oracle.truffle.api.instrumentation.ProvidedTags;
 import com.oracle.truffle.api.instrumentation.StandardTags;
+import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
 
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @TruffleLanguage.Registration(id = "islisp", name = "ISLISP")
@@ -33,8 +36,17 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
     @Override
     public CallTarget parse(ParsingRequest request) throws Exception {
         var sourceMap = new HashMap<EqWrapper, SourceSection>();
-        var islispReader = new Reader(request.getSource(), sourceMap);
-        var content = islispReader.readAll();
+        var preludeSource = Source
+            .newBuilder(
+                "islisp",
+                new InputStreamReader(ISLISPTruffleLanguage.class.getResourceAsStream("/islispprelude.lisp")),
+                "islispprelude.lisp")
+            .build();
+        var preludeContent = new Reader(preludeSource, sourceMap).readAll();
+        var userContent = new Reader(request.getSource(), sourceMap).readAll();
+        var content = new ArrayList<>(preludeContent.size() + userContent.size());
+        content.addAll(preludeContent);
+        content.addAll(userContent);
         var parser = new Parser(sourceMap);
         var rootNode = parser.parseRootNode(this, content);
         return rootNode.getCallTarget();

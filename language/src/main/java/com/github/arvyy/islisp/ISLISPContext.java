@@ -82,6 +82,7 @@ public class ISLISPContext {
         initGlobalFunction("create-vector", ISLISPCreateVector::makeLispFunction);
         initGlobalFunction("elt", ISLISPElt::makeLispFunction);
         initGlobalFunction("gensym", ISLISPGensym::makeLispFunction);
+        initGlobalFunction("instancep", ISLISPInstancep::makeLispFunction);
         initGlobalFunction("format-integer", ISLISPFormatInteger::makeLispFunction);
         initGlobalFunction("format-char", ISLISPFormatChar::makeLispFunction);
         initGlobalFunction("format-object", ISLISPFormatObject::makeLispFunction);
@@ -90,6 +91,7 @@ public class ISLISPContext {
         initGlobalFunction("standard-output", ISLISPStandardOutputStream::makeLispFunction);
         initGlobalFunction("vector", ISLISPVector::makeLispFunction);
         initGlobalFunction("signal-condition", ISLISPSignalCondition::makeLispFunction);
+        initGlobalFunction("subclassp", ISLISPSubclassp::makeLispFunction);
         initGlobalFunction("continue-condition", ISLISPContinueCondition::makeLispFunction);
 
 
