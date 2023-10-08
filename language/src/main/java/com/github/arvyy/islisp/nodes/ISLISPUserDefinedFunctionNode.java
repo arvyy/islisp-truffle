@@ -1,8 +1,8 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.builtins.BuiltinCallNextMethod;
-import com.github.arvyy.islisp.builtins.BuiltinHasNextMethod;
+import com.github.arvyy.islisp.functions.ISLISPCallNextMethod;
+import com.github.arvyy.islisp.functions.ISLISPHasNextMethod;
 import com.github.arvyy.islisp.runtime.Closure;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Pair;
@@ -22,10 +22,10 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
     private ISLISPExpressionNode body;
 
     @Child
-    private BuiltinCallNextMethod callNextMethod;
+    private ISLISPCallNextMethod callNextMethod;
 
     @Child
-    private BuiltinHasNextMethod hasNextMethod;
+    private ISLISPHasNextMethod hasNextMethod;
 
     private final int[] namedArgumentSlots;
     private final int restArgumentsSlot;
@@ -50,10 +50,10 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
         this.hasNextMethodSlot = hasNextMethodSlot;
         body.markRootBody();
         if (hasNextMethodSlot >= 0) {
-            hasNextMethod = new BuiltinHasNextMethod(language);
+            hasNextMethod = new ISLISPHasNextMethod(language);
         }
         if (callNextMethodSlot >= 0) {
-            callNextMethod = new BuiltinCallNextMethod(language);
+            callNextMethod = new ISLISPCallNextMethod(language);
         }
     }
 

@@ -1,6 +1,6 @@
 package com.github.arvyy.islisp;
 
-import com.github.arvyy.islisp.builtins.*;
+import com.github.arvyy.islisp.functions.*;
 import com.github.arvyy.islisp.nodes.ISLISPDefGenericExecutionNodeGen;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -70,33 +70,33 @@ public class ISLISPContext {
     }
 
     void initGlobalFunctions() {
-        initGlobalFunction("+", BuiltinAdd::makeLispFunction);
-        initGlobalFunction("eq", BuiltinEq::makeLispFunction);
-        initGlobalFunction("-", BuiltinSubtract::makeLispFunction);
-        initGlobalFunction("=", BuiltinNumericEqual::makeLispFunction);
-        initGlobalFunction(">", BuiltinNumericGt::makeLispFunction);
-        initGlobalFunction("car", BuiltinCar::makeLispFunction);
-        initGlobalFunction("cdr", BuiltinCdr::makeLispFunction);
-        initGlobalFunction("cons", BuiltinCons::makeLispFunction);
-        initGlobalFunction("class-of", BuiltinClassOf::makeLispFunction);
-        initGlobalFunction("create-vector", BuiltinCreateVector::makeLispFunction);
-        initGlobalFunction("elt", BuiltinElt::makeLispFunction);
-        initGlobalFunction("gensym", BuiltinGensym::makeLispFunction);
-        initGlobalFunction("format-integer", BuiltinFormatInteger::makeLispFunction);
-        initGlobalFunction("format-char", BuiltinFormatChar::makeLispFunction);
-        initGlobalFunction("format-object", BuiltinFormatObject::makeLispFunction);
-        initGlobalFunction("set-car", BuiltinSetCar::makeLispFunction);
-        initGlobalFunction("set-cdr", BuiltinSetCdr::makeLispFunction);
-        initGlobalFunction("standard-output", BuiltinStandardOutputStream::makeLispFunction);
-        initGlobalFunction("vector", BuiltinVector::makeLispFunction);
-        initGlobalFunction("signal-condition", BuiltinSignalCondition::makeLispFunction);
-        initGlobalFunction("continue-condition", BuiltinContinueCondition::makeLispFunction);
+        initGlobalFunction("+", ISLISPAdd::makeLispFunction);
+        initGlobalFunction("eq", ISLISPEq::makeLispFunction);
+        initGlobalFunction("-", ISLISPSubtract::makeLispFunction);
+        initGlobalFunction("=", ISLISPNumericEqual::makeLispFunction);
+        initGlobalFunction(">", ISLISPNumericGt::makeLispFunction);
+        initGlobalFunction("car", ISLISPCar::makeLispFunction);
+        initGlobalFunction("cdr", ISLISPCdr::makeLispFunction);
+        initGlobalFunction("cons", ISLISPCons::makeLispFunction);
+        initGlobalFunction("class-of", ISLISPClassOf::makeLispFunction);
+        initGlobalFunction("create-vector", ISLISPCreateVector::makeLispFunction);
+        initGlobalFunction("elt", ISLISPElt::makeLispFunction);
+        initGlobalFunction("gensym", ISLISPGensym::makeLispFunction);
+        initGlobalFunction("format-integer", ISLISPFormatInteger::makeLispFunction);
+        initGlobalFunction("format-char", ISLISPFormatChar::makeLispFunction);
+        initGlobalFunction("format-object", ISLISPFormatObject::makeLispFunction);
+        initGlobalFunction("set-car", ISLISPSetCar::makeLispFunction);
+        initGlobalFunction("set-cdr", ISLISPSetCdr::makeLispFunction);
+        initGlobalFunction("standard-output", ISLISPStandardOutputStream::makeLispFunction);
+        initGlobalFunction("vector", ISLISPVector::makeLispFunction);
+        initGlobalFunction("signal-condition", ISLISPSignalCondition::makeLispFunction);
+        initGlobalFunction("continue-condition", ISLISPContinueCondition::makeLispFunction);
 
 
         var createDescriptor = new GenericFunctionDescriptor(1, true);
         createDescriptor.addPrimaryMethod(
                 new LispClass[] {classes.get(namedSymbol("<standard-class>").identityReference())},
-                BuiltinCreateStandardClassObject.makeLispFunction(language).callTarget(),
+                ISLISPCreateStandardClassObject.makeLispFunction(language).callTarget(),
                 null);
         genericFunctions.put(namedSymbol("create").identityReference(), createDescriptor);
         var executionNode = ISLISPDefGenericExecutionNodeGen.create(namedSymbol("create"), getLanguage(), null);
@@ -146,18 +146,15 @@ public class ISLISPContext {
     }
 
     void initBuiltinVars() {
-        {
-            var r = new ValueReference();
-            r.setValue(getNil());
-            r.setReadOnly(true);
-            globalVars.put(getNil().identityReference(), r);
-        }
-        {
-            var r = new ValueReference();
-            r.setValue(getT());
-            r.setReadOnly(true);
-            globalVars.put(getT().identityReference(), r);
-        }
+        var nilref = new ValueReference();
+        nilref.setValue(getNil());
+        nilref.setReadOnly(true);
+        globalVars.put(getNil().identityReference(), nilref);
+
+        var tref = new ValueReference();
+        tref.setValue(getT());
+        tref.setReadOnly(true);
+        globalVars.put(getT().identityReference(), tref);
     }
 
     public void reset() {

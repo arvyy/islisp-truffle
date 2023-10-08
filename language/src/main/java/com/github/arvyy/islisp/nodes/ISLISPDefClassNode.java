@@ -2,8 +2,8 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
-import com.github.arvyy.islisp.builtins.BuiltinClassSlotReaderNodeGen;
-import com.github.arvyy.islisp.builtins.BuiltinClassSlotWriterNodeGen;
+import com.github.arvyy.islisp.functions.ISLISPClassSlotReaderNodeGen;
+import com.github.arvyy.islisp.functions.ISLISPClassSlotWriterNodeGen;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -46,24 +46,24 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
         var exprs = new ArrayList<ISLISPExpressionNode>();
         for (var slot: slots) {
             for (var reader: slot.getReaderName()) {
-                exprs.add(new ISLISPDefGeneric(reader, 1, false, null));
+                exprs.add(new ISLISPDefGenericNode(reader, 1, false, null));
                 exprs.add(new ISLISPDefMethodNode(
                         ISLISPDefMethodNode.MethodQualifier.none,
                         reader,
                         new Symbol[]{name},
                         1,
                         false,
-                        BuiltinClassSlotReaderNodeGen.create(slot.getName(), language)));
+                        ISLISPClassSlotReaderNodeGen.create(slot.getName(), language)));
             }
             for (var writer: slot.getWriterName()) {
-                exprs.add(new ISLISPDefGeneric(writer, 2, false, null));
+                exprs.add(new ISLISPDefGenericNode(writer, 2, false, null));
                 exprs.add(new ISLISPDefMethodNode(
                         ISLISPDefMethodNode.MethodQualifier.none,
                         writer,
                         new Symbol[]{name, ISLISPContext.get(this).namedSymbol("<object>")},
                         2,
                         false,
-                        BuiltinClassSlotWriterNodeGen.create(slot.getName(), language)));
+                        ISLISPClassSlotWriterNodeGen.create(slot.getName(), language)));
             }
         }
         return exprs.toArray(ISLISPExpressionNode[]::new);

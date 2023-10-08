@@ -15,7 +15,11 @@ public class ISLISPWithHandlerNode extends ISLISPExpressionNode {
     @Children
     private ISLISPExpressionNode[] body;
 
-    public ISLISPWithHandlerNode(ISLISPExpressionNode handlerFunctionExpression, ISLISPExpressionNode[] body, SourceSection sourceSection) {
+    public ISLISPWithHandlerNode(
+        ISLISPExpressionNode handlerFunctionExpression,
+        ISLISPExpressionNode[] body,
+        SourceSection sourceSection
+    ) {
         super(sourceSection);
         this.handlerFunctionExpression = handlerFunctionExpression;
         this.body = body;

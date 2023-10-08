@@ -1,11 +1,14 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.ISLISPTruffleLanguage;
-import com.github.arvyy.islisp.builtins.BuiltinClassOf;
-import com.github.arvyy.islisp.builtins.BuiltinClassOfNodeGen;
-import com.github.arvyy.islisp.runtime.*;
+import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.functions.ISLISPClassOf;
+import com.github.arvyy.islisp.functions.ISLISPClassOfNodeGen;
+import com.github.arvyy.islisp.runtime.GenericFunctionDescriptor;
+import com.github.arvyy.islisp.runtime.GenericMethodApplicableMethods;
+import com.github.arvyy.islisp.runtime.LispClass;
+import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Cached;
@@ -24,7 +27,7 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
     GenericFunctionDescriptor genericFunctionDescriptor;
 
     @Child
-    BuiltinClassOf classOf;
+    ISLISPClassOf classOf;
 
     @Child
     ISLISPGenericFunctionDispatchNode dispatchNode;
@@ -35,7 +38,7 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
         super(language);
         this.name = name;
         this.sourceSection = sourceSection;
-        this.classOf = BuiltinClassOfNodeGen.create(language);
+        this.classOf = ISLISPClassOfNodeGen.create(language);
         classOfCall = DirectCallNode.create(classOf.getCallTarget());
         dispatchNode = ISLISPGenericFunctionDispatchNodeGen.create();
     }
