@@ -79,20 +79,21 @@ public class ISLISPContext {
         initGlobalFunction("cdr", ISLISPCdr::makeLispFunction);
         initGlobalFunction("cons", ISLISPCons::makeLispFunction);
         initGlobalFunction("class-of", ISLISPClassOf::makeLispFunction);
+        initGlobalFunction("continue-condition", ISLISPContinueCondition::makeLispFunction);
         initGlobalFunction("create-vector", ISLISPCreateVector::makeLispFunction);
         initGlobalFunction("elt", ISLISPElt::makeLispFunction);
-        initGlobalFunction("gensym", ISLISPGensym::makeLispFunction);
-        initGlobalFunction("instancep", ISLISPInstancep::makeLispFunction);
         initGlobalFunction("format-integer", ISLISPFormatInteger::makeLispFunction);
         initGlobalFunction("format-char", ISLISPFormatChar::makeLispFunction);
         initGlobalFunction("format-object", ISLISPFormatObject::makeLispFunction);
+        initGlobalFunction("gensym", ISLISPGensym::makeLispFunction);
+        initGlobalFunction("instancep", ISLISPInstancep::makeLispFunction);
+        initGlobalFunction("length", ISLISPLength::makeLispFunction);
         initGlobalFunction("set-car", ISLISPSetCar::makeLispFunction);
         initGlobalFunction("set-cdr", ISLISPSetCdr::makeLispFunction);
-        initGlobalFunction("standard-output", ISLISPStandardOutputStream::makeLispFunction);
-        initGlobalFunction("vector", ISLISPVector::makeLispFunction);
         initGlobalFunction("signal-condition", ISLISPSignalCondition::makeLispFunction);
+        initGlobalFunction("standard-output", ISLISPStandardOutputStream::makeLispFunction);
         initGlobalFunction("subclassp", ISLISPSubclassp::makeLispFunction);
-        initGlobalFunction("continue-condition", ISLISPContinueCondition::makeLispFunction);
+        initGlobalFunction("vector", ISLISPVector::makeLispFunction);
 
 
         var createDescriptor = new GenericFunctionDescriptor(1, true);
