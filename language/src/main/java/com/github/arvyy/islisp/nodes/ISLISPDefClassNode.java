@@ -5,6 +5,7 @@ import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.functions.ISLISPClassSlotReaderNodeGen;
 import com.github.arvyy.islisp.functions.ISLISPClassSlotWriterNodeGen;
 import com.github.arvyy.islisp.runtime.*;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.source.SourceSection;
@@ -71,6 +72,15 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
+        executeOutsideTruffle();
+        for (var function: slotDefMethods) {
+            function.executeGeneric(frame);
+        }
+        return name;
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    void executeOutsideTruffle() {
         var ctx = ISLISPContext.get(null);
         var myslots = new HashMap<SymbolReference, StandardClass.Slot>();
         var shapeBuilder = StaticShape.newBuilder(ctx.getLanguage());
@@ -133,10 +143,6 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                 isAbstract
         );
         ctx.registerClass(name.identityReference(), newClass);
-        for (var function: slotDefMethods) {
-            function.executeGeneric(frame);
-        }
-        return name;
     }
 
     public static class SlotDefinition {

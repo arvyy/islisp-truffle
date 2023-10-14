@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.LispClass;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.Node;
 
@@ -36,18 +37,24 @@ public class ISLISPErrorSignalerNode extends Node {
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
 
+    @CompilerDirectives.TruffleBoundary
     DirectCallNode getSignalCallNode() {
         if (signalCallNode == null) {
             var ctx = ISLISPContext.get(this);
-            signalCallNode = DirectCallNode.create(ctx.lookupFunction(ctx.namedSymbol("signal-condition").identityReference()).callTarget());
+            signalCallNode = DirectCallNode.create(
+                ctx.lookupFunction(ctx.namedSymbol("signal-condition").identityReference())
+                    .callTarget());
         }
         return signalCallNode;
     }
 
+    @CompilerDirectives.TruffleBoundary
     DirectCallNode getCreateCallNode() {
         if (createCallNode == null) {
             var ctx = ISLISPContext.get(this);
-            createCallNode = DirectCallNode.create(ctx.lookupFunction(ctx.namedSymbol("create").identityReference()).callTarget());
+            createCallNode = DirectCallNode.create(
+                ctx.lookupFunction(ctx.namedSymbol("create").identityReference())
+                    .callTarget());
         }
         return createCallNode;
     }

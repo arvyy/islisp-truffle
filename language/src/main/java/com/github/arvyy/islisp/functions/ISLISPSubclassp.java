@@ -49,11 +49,13 @@ public abstract class ISLISPSubclassp extends RootNode {
     }
 
     boolean isSubclassHelper(LispClass clazz1, LispClass clazz2) {
-        if (clazz1 == clazz2)
+        if (clazz1 == clazz2) {
             return true;
+        }
         for (var parent: clazz1.getParents()) {
-            if (isSubclassHelper(parent, clazz2))
+            if (isSubclassHelper(parent, clazz2)) {
                 return true;
+            }
         }
         return false;
     }

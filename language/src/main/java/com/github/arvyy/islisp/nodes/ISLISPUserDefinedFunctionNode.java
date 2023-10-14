@@ -75,7 +75,10 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
         var argCount = frame.getArguments().length - 1;
         var hasRest = restArgumentsSlot >= 0;
         if (argCount < namedArgumentSlots.length || (argCount > namedArgumentSlots.length && !hasRest)) {
-            return errorSignalerNode.signalWrongArgumentCount(argCount, namedArgumentSlots.length, hasRest? -1 : namedArgumentSlots.length);
+            return errorSignalerNode.signalWrongArgumentCount(
+                argCount,
+                namedArgumentSlots.length,
+                hasRest ? -1 : namedArgumentSlots.length);
         }
         if (callNextMethodSlot >= 0) {
             var closure = (Closure) frame.getArguments()[0];
