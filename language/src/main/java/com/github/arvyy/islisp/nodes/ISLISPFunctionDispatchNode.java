@@ -1,6 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
-import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -11,6 +11,13 @@ import com.oracle.truffle.api.nodes.IndirectCallNode;
 import com.oracle.truffle.api.nodes.Node;
 
 public abstract class ISLISPFunctionDispatchNode extends Node {
+
+    @Child
+    private ISLISPErrorSignalerNode errorSignalerNode;
+
+    public ISLISPFunctionDispatchNode() {
+        errorSignalerNode = new ISLISPErrorSignalerNode();
+    }
 
     public abstract Object executeDispatch(Object lispFunction, Object[] arguments);
 
@@ -40,7 +47,9 @@ public abstract class ISLISPFunctionDispatchNode extends Node {
 
     @Fallback
     public Object notAFunction(Object notAFunction, Object[] args) {
-        throw new ISLISPError("Not a function", this);
+        var ctx = ISLISPContext.get(this);
+        var functionClass = ctx.lookupClass(ctx.namedSymbol("<function>").identityReference());
+        return errorSignalerNode.signalWrongType(notAFunction, functionClass);
     }
 
 }

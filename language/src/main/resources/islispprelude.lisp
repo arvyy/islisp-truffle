@@ -5,6 +5,10 @@
 
 (defclass <program-error> (<error>) ())
 
+(defclass <domain-error> (<program-error>)
+    ((object :reader domain-error-object :initarg object)
+     (expected-class :reader domain-error-expected-class :initarg expected-class)))
+
 (defclass <arity-error> (<program-error>)
     ((actual :reader arity-error-actual-count :initarg actual)
      (required-min :reader arity-error-required-min :initarg required-min)
