@@ -27,6 +27,9 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
     @Child
     private ISLISPHasNextMethod hasNextMethod;
 
+    @Child
+    private ISLISPErrorSignalerNode errorSignalerNode;
+
     private final int[] namedArgumentSlots;
     private final int restArgumentsSlot;
 
@@ -43,6 +46,7 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
             SourceSection sourceSection
     ) {
         super(sourceSection);
+        errorSignalerNode = new ISLISPErrorSignalerNode();
         this.body = body;
         this.namedArgumentSlots = namedArgumentSlots;
         this.restArgumentsSlot = restArgumentsSlot;
@@ -68,6 +72,11 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
     @Override
     @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
+        var argCount = frame.getArguments().length - 1;
+        var hasRest = restArgumentsSlot >= 0;
+        if (argCount < namedArgumentSlots.length || (argCount > namedArgumentSlots.length && !hasRest)) {
+            return errorSignalerNode.signalWrongArgumentCount(argCount, namedArgumentSlots.length, hasRest? -1 : namedArgumentSlots.length);
+        }
         if (callNextMethodSlot >= 0) {
             var closure = (Closure) frame.getArguments()[0];
             frame.setObject(callNextMethodSlot, new LispFunction(closure, callNextMethod.getCallTarget()));
@@ -77,12 +86,11 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
             frame.setObject(hasNextMethodSlot, new LispFunction(closure, hasNextMethod.getCallTarget()));
         }
         for (var i = 0; i < namedArgumentSlots.length; i++) {
-            //TODO validate all arguments supplied
             int slot = namedArgumentSlots[i];
             var arg = frame.getArguments()[i + 1];
             frame.setObject(slot, arg);
         }
-        if (restArgumentsSlot >= 0) {
+        if (hasRest) {
             Object value = ISLISPContext.get(this).getNil();
             for (int i = frame.getArguments().length - 1; i >= namedArgumentSlots.length + 1; i--) {
                 value = new Pair(frame.getArguments()[i], value);

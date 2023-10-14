@@ -42,4 +42,5 @@ public abstract class ISLISPFunctionDispatchNode extends Node {
     public Object notAFunction(Object notAFunction, Object[] args) {
         throw new ISLISPError("Not a function", this);
     }
+
 }

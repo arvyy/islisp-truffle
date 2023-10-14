@@ -23,7 +23,7 @@ public class ISLISPCreateStandardClassObject extends RootNode {
             var initArg = (Symbol) frame.getArguments()[i];
             for (int j = 0; j < clazz.slots().length; j++) {
                 var slot = clazz.slots()[j];
-                if (slot.initArg().getId() == initArg.identityReference().getId()) {
+                if (slot.initArg() != null && slot.initArg().getId() == initArg.identityReference().getId()) {
                     slot.property().setObject(obj.data(), frame.getArguments()[i + 1]);
                 }
             }
