@@ -249,6 +249,11 @@ public class ISLISPContext {
         return classes.get(symbolReference);
     }
 
+    @CompilerDirectives.TruffleBoundary
+    public LispClass lookupClass(String name) {
+        return lookupClass(namedSymbol(name).identityReference());
+    }
+
     public ISLISPTruffleLanguage getLanguage() {
         return language;
     }
