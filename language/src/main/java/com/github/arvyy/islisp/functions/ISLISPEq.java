@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
+import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -9,12 +10,19 @@ import com.oracle.truffle.api.nodes.RootNode;
 
 public class ISLISPEq extends RootNode {
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     protected ISLISPEq(TruffleLanguage<?> language) {
         super(language);
+        errorSignalerNode = new ISLISPErrorSignalerNode();
     }
 
     @Override
     public Object execute(VirtualFrame frame) {
+        if (frame.getArguments().length != 3) {
+            return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 2, 2);
+        }
         if (isEq(frame.getArguments()[1], frame.getArguments()[2])) {
             return ISLISPContext.get(null).getT();
         } else {

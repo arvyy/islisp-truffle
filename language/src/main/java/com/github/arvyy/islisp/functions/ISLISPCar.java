@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
-import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.ISLISPContext;
+import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -11,8 +12,12 @@ import com.oracle.truffle.api.nodes.RootNode;
 
 public abstract class ISLISPCar extends RootNode {
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     protected ISLISPCar(TruffleLanguage<?> language) {
         super(language);
+        errorSignalerNode = new ISLISPErrorSignalerNode();
     }
 
     protected abstract Object executeGeneric(Object arg);
@@ -20,7 +25,7 @@ public abstract class ISLISPCar extends RootNode {
     @Override
     public final Object execute(VirtualFrame frame) {
         if (frame.getArguments().length != 2) {
-            throw new ISLISPError("Wrong arg count", this);
+            return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 1, 1);
         }
         return executeGeneric(frame.getArguments()[1]);
     }
@@ -32,7 +37,7 @@ public abstract class ISLISPCar extends RootNode {
 
     @Fallback
     public Object fallback(Object o) {
-        throw new ISLISPError("Not a pair", this);
+        return errorSignalerNode.signalWrongType(o, ISLISPContext.get(this).lookupClass("<cons>"));
     }
 
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {

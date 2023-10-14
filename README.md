@@ -1,3 +1,8 @@
 Extensions
 
-* (debugger)
+* (debugger) statement
+* condition stacktraces
+* eval
+
+Missing features
+* metaclasses

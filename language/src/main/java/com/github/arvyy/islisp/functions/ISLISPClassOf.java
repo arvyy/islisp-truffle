@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -13,14 +14,20 @@ import com.oracle.truffle.api.nodes.RootNode;
 
 public abstract class ISLISPClassOf extends RootNode {
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     public ISLISPClassOf(TruffleLanguage<?> language) {
         super(language);
     }
 
-    protected abstract LispClass executeGeneric(Object value);
+    protected abstract Object executeGeneric(Object value);
 
     @Override
-    public final LispClass execute(VirtualFrame frame) {
+    public final Object execute(VirtualFrame frame) {
+        if (frame.getArguments().length != 2) {
+            return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 1, 1);
+        }
         var value = (Object) frame.getArguments()[1];
         return executeGeneric(value);
     }
