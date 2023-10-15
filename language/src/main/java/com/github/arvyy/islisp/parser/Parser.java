@@ -162,6 +162,8 @@ public class Parser {
                     return parseTagBodyGo(parserContext, sexpr);
                 case "unwind-protect":
                     return parseUnwindProtectNode(parserContext, sexpr);
+                case "while":
+                    return parseWhile(parserContext, sexpr);
                 case "with-handler":
                     return parseWithHandler(parserContext, sexpr);
 
@@ -235,6 +237,16 @@ public class Parser {
             }
         }
         throw new ParsingException(source(sexpr), "Unrecognized form.");
+    }
+
+    private ISLISPWhileNode parseWhile(ParserContext parserContext, Object sexpr) {
+        var args = requireList(sexpr, 2, -1);
+        var testExpression = parseExpressionNode(parserContext, args.get(1));
+        var body = args.stream()
+            .skip(2)
+            .map(e -> parseExpressionNode(parserContext, e))
+            .toArray(ISLISPExpressionNode[]::new);
+        return new ISLISPWhileNode(testExpression, body, source(sexpr));
     }
 
     private ISLISPWithHandlerNode parseWithHandler(ParserContext parserContext, Object sexpr) {
