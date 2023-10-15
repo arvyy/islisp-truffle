@@ -24,7 +24,12 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
     @Child
     private ISLISPFunctionDispatchNode dispatchNode;
 
-    public ISLISPGlobalFunctionCallNode(Symbol name, boolean setf, ISLISPExpressionNode[] arguments, SourceSection sourceSection) {
+    public ISLISPGlobalFunctionCallNode(
+        Symbol name,
+        boolean setf,
+        ISLISPExpressionNode[] arguments,
+        SourceSection sourceSection
+    ) {
         super(sourceSection);
         this.name = name;
         this.setf = setf;

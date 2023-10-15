@@ -18,7 +18,13 @@ public class ISLISPDefGenericNode extends ISLISPExpressionNode {
     private ISLISPDefGenericExecutionNode executionNode;
 
 
-    public ISLISPDefGenericNode(Symbol name, boolean setf, int requiredArgsCount, boolean hasRest, SourceSection sourceSection) {
+    public ISLISPDefGenericNode(
+        Symbol name,
+        boolean setf,
+        int requiredArgsCount,
+        boolean hasRest,
+        SourceSection sourceSection
+    ) {
         super(true, sourceSection);
         this.name = name;
         this.requiredArgsCount = requiredArgsCount;

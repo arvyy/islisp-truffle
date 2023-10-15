@@ -86,8 +86,10 @@ Initial = {Letter} | {SpecialInitial}
 Letter = [a-zA-Z]
 SpecialInitial = "!" | "$" | "%" | "&" | "*" | "/" | ":" | "<" | "=" | ">" | "?" | "^" | "_" | "~"
 Subsequent = {Initial} | {Digit} | {SpecialSubsequent}
+BinDigit = [0-1]
 Digit = [0-9]
-HexDigit = {Digit} | [a-f]
+OctDigit = [0-7]
+HexDigit = {Digit} | [a-f] | [A-F]
 ExplicitSign = "+" | "-"
 SpecialSubsequent = {ExplicitSign} | "." | "@"
 InlineHexEscape = "\x" {HexScalarValue} ";"
@@ -102,8 +104,8 @@ PeculiarIdentifier =
 DotSubsequent = {SignSubsequent} | "."
 SignSubsequent = {Initial} | {ExplicitSign} | "@"
 SymbolElement = [^|\\] | {InlineHexEscape} | {MnemonicEscape} | \|
-Character = "#\". | "#\x" {HexScalarValue} | "#\" {CharacterName}
-CharacterName = alarm | backspace | delete | escape | newline | null | return | space | tab
+Character = "#\". | "#\" {CharacterName}
+CharacterName = newline | space | tab
 
 
 
@@ -186,8 +188,20 @@ CharacterName = alarm | backspace | delete | escape | newline | null | return | 
     yybegin(CHAR);
   }
 
+  ("#B" | "#b") {ExplicitSign}? {BinDigit}+ {
+    return new Token.ExactNumberToken(Integer.parseInt(yytext().substring(2), 2));
+  }
+
+  ("#o" | "#O") {ExplicitSign}? {OctDigit}+ {
+    return new Token.ExactNumberToken(Integer.parseInt(yytext().substring(2), 8));
+  }
+
   {ExplicitSign}? {Digit}+ {
     return new Token.ExactNumberToken(Integer.parseInt(yytext()));
+  }
+
+  ("#x" | "#X") {ExplicitSign}? {HexDigit}+ {
+    return new Token.ExactNumberToken(Integer.parseInt(yytext().substring(2), 16));
   }
 
   {WhiteSpace} {}
@@ -236,45 +250,13 @@ CharacterName = alarm | backspace | delete | escape | newline | null | return | 
 }
 
 <CHAR> {
-    "alarm" {
-        yybegin(YYINITIAL);
-        return new Token.CharToken(0x07);
-    }
-    "backspace" {
-        yybegin(YYINITIAL);
-        return new Token.CharToken(0x08);
-    }
-    "delete" {
-        yybegin(YYINITIAL);
-        return new Token.CharToken(0x7f);
-    }
-    "escape" {
-        yybegin(YYINITIAL);
-        return new Token.CharToken(0x1b);
-    }
     "newline" {
         yybegin(YYINITIAL);
         return new Token.CharToken(0x0a);
     }
-    "null" {
-        yybegin(YYINITIAL);
-        return new Token.CharToken(0x00);
-    }
-    "return" {
-        yybegin(YYINITIAL);
-        return new Token.CharToken(0x0d);
-    }
     "space" {
         yybegin(YYINITIAL);
         return new Token.CharToken(0x20);
-    }
-    "tab" {
-        yybegin(YYINITIAL);
-        return new Token.CharToken(0x09);
-    }
-    "x" {HexScalarValue} {
-        yybegin(YYINITIAL);
-        return new Token.CharToken(Integer.parseInt(yytext().substring(1), 16));
     }
     . {
         yybegin(YYINITIAL);

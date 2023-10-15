@@ -683,7 +683,11 @@ public class Parser {
                     argNodes.toArray(ISLISPExpressionNode[]::new),
                     source(sexpr));
         } else {
-            return new ISLISPGlobalFunctionCallNode(name, false, argNodes.toArray(ISLISPExpressionNode[]::new), source(sexpr));
+            return new ISLISPGlobalFunctionCallNode(
+                name,
+                false,
+                argNodes.toArray(ISLISPExpressionNode[]::new),
+                source(sexpr));
         }
     }
 

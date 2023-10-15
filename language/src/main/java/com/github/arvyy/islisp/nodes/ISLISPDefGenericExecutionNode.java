@@ -35,7 +35,12 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
 
     DirectCallNode classOfCall;
 
-    public ISLISPDefGenericExecutionNode(Symbol name, boolean setf, TruffleLanguage<?> language, SourceSection sourceSection) {
+    public ISLISPDefGenericExecutionNode(
+        Symbol name,
+        boolean setf,
+        TruffleLanguage<?> language,
+        SourceSection sourceSection
+    ) {
         super(language);
         this.name = name;
         this.setf = setf;
