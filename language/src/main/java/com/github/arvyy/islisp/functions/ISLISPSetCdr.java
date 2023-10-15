@@ -26,7 +26,7 @@ public abstract class ISLISPSetCdr extends RootNode {
     }
 
     @Specialization
-    public Object doPair(Pair p, Object v) {
+    public Object doPair(Object v, Pair p) {
         p.setCdr(v);
         return v;
     }

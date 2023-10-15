@@ -36,6 +36,7 @@ public class ISLISPContext {
     private final Map<SymbolReference, LispClass> classes;
     private final Map<SymbolReference, ValueReference> dynamicVars;
     private final Map<SymbolReference, ValueReference> globalVars;
+    private final Map<SymbolReference, Map<SymbolReference, ValueReference>> symbolProperties;
 
     private HandlerChain handlerChain;
 
@@ -46,6 +47,7 @@ public class ISLISPContext {
         genericFunctions = new HashMap<>();
         setfGlobalFunctions = new HashMap<>();
         setfGenericFunctions = new HashMap<>();
+        symbolProperties = new HashMap<>();
         dynamicVars = new HashMap<>();
         macros = new HashMap<>();
         symbols = new HashMap<>();
@@ -92,8 +94,11 @@ public class ISLISPContext {
         initGlobalFunction("gensym", ISLISPGensym::makeLispFunction);
         initGlobalFunction("instancep", ISLISPInstancep::makeLispFunction);
         initGlobalFunction("length", ISLISPLength::makeLispFunction);
+        initGlobalFunction("property", ISLISPProperty::makeLispFunction);
+        initGlobalFunction("remove-property", ISLISPRemoveProperty::makeLispFunction);
         initGlobalFunction("set-car", ISLISPSetCar::makeLispFunction);
         initGlobalFunction("set-cdr", ISLISPSetCdr::makeLispFunction);
+        initGlobalFunction("set-property", ISLISPSetProperty::makeLispFunction);
         initGlobalFunction("signal-condition", ISLISPSignalCondition::makeLispFunction);
         initGlobalFunction("standard-output", ISLISPStandardOutputStream::makeLispFunction);
         initGlobalFunction("subclassp", ISLISPSubclassp::makeLispFunction);
@@ -113,16 +118,24 @@ public class ISLISPContext {
     void initSetfExpanders() {
         setfTransformers.put(namedSymbol("car").identityReference(), (forms, value) -> {
             return Utils.listToValue(List.of(
-                    namedSymbol("set-car"),
-                    forms.get(1),
-                    value
+                namedSymbol("set-car"),
+                value,
+                forms.get(1)
             ));
         });
         setfTransformers.put(namedSymbol("cdr").identityReference(), (forms, value) -> {
             return Utils.listToValue(List.of(
-                    namedSymbol("set-cdr"),
-                    forms.get(1),
-                    value
+                namedSymbol("set-cdr"),
+                value,
+                forms.get(1)
+            ));
+        });
+        setfTransformers.put(namedSymbol("property").identityReference(), (forms, value) -> {
+            return Utils.listToValue(List.of(
+                namedSymbol("set-property"),
+                value,
+                forms.get(1),
+                forms.get(2)
             ));
         });
     }
@@ -165,12 +178,15 @@ public class ISLISPContext {
     }
 
     public void reset() {
+        setfGlobalFunctions.clear();
         globalFunctions.clear();
+        setfGenericFunctions.clear();
         genericFunctions.clear();
         macros.clear();
         globalVars.clear();
         setfTransformers.clear();
         classes.clear();
+        symbolProperties.clear();
         initBuiltinVars();
         initBuiltinClasses();
         initGlobalFunctions();
@@ -182,6 +198,14 @@ public class ISLISPContext {
         v.setValue(init);
         v.setReadOnly(readonly);
         globalVars.put(symbolReference, v);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public ValueReference lookupSymbolProperty(SymbolReference symbol, SymbolReference property) {
+        symbolProperties.putIfAbsent(symbol, new HashMap<>());
+        var properties = symbolProperties.get(symbol);
+        properties.putIfAbsent(property, new ValueReference());
+        return properties.get(property);
     }
 
     @CompilerDirectives.TruffleBoundary

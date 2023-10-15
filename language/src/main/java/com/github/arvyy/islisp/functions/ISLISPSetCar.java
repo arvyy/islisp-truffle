@@ -26,7 +26,7 @@ public abstract class ISLISPSetCar extends RootNode {
     }
 
     @Specialization
-    public Object doPair(Pair p, Object v) {
+    public Object doPair(Object v, Pair p) {
         p.setCar(v);
         return v;
     }
