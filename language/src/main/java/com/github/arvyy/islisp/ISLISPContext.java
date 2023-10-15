@@ -28,6 +28,8 @@ public class ISLISPContext {
 
     private final Map<SymbolReference, LispFunction> globalFunctions;
     private final Map<SymbolReference, GenericFunctionDescriptor> genericFunctions;
+    private final Map<SymbolReference, LispFunction> setfGlobalFunctions;
+    private final Map<SymbolReference, GenericFunctionDescriptor> setfGenericFunctions;
     private final Map<SymbolReference, LispFunction> macros;
     private final Map<SymbolReference, SetfTransformer> setfTransformers;
     private final Map<String, SymbolReference> symbols;
@@ -42,6 +44,8 @@ public class ISLISPContext {
         this.env = env;
         globalFunctions = new HashMap<>();
         genericFunctions = new HashMap<>();
+        setfGlobalFunctions = new HashMap<>();
+        setfGenericFunctions = new HashMap<>();
         dynamicVars = new HashMap<>();
         macros = new HashMap<>();
         symbols = new HashMap<>();
@@ -102,7 +106,7 @@ public class ISLISPContext {
                 ISLISPCreateStandardClassObject.makeLispFunction(language).callTarget(),
                 null);
         genericFunctions.put(namedSymbol("create").identityReference(), createDescriptor);
-        var executionNode = ISLISPDefGenericExecutionNodeGen.create(namedSymbol("create"), getLanguage(), null);
+        var executionNode = ISLISPDefGenericExecutionNodeGen.create(namedSymbol("create"), false, getLanguage(), null);
         globalFunctions.put(namedSymbol("create").identityReference(), new LispFunction(executionNode.getCallTarget()));
     }
 
@@ -211,22 +215,40 @@ public class ISLISPContext {
     }
     @CompilerDirectives.TruffleBoundary
     public LispFunction lookupFunction(SymbolReference symbolReference) {
-        return globalFunctions.get(symbolReference);
+        return lookupFunction(symbolReference, false);
+    }
+    @CompilerDirectives.TruffleBoundary
+    public LispFunction lookupFunction(SymbolReference symbolReference, boolean setf) {
+        if (setf) {
+            return setfGlobalFunctions.get(symbolReference);
+        } else {
+            return globalFunctions.get(symbolReference);
+        }
     }
 
     @CompilerDirectives.TruffleBoundary
     public void registerGenericFunction(
             SymbolReference symbolReference,
+            boolean setf,
             LispFunction function,
             GenericFunctionDescriptor descriptor
     ) {
-        globalFunctions.put(symbolReference, function);
-        genericFunctions.put(symbolReference, descriptor);
+        if (setf) {
+            setfGlobalFunctions.put(symbolReference, function);
+            setfGenericFunctions.put(symbolReference, descriptor);
+        } else {
+            globalFunctions.put(symbolReference, function);
+            genericFunctions.put(symbolReference, descriptor);
+        }
     }
 
     @CompilerDirectives.TruffleBoundary
-    public GenericFunctionDescriptor lookupGenericFunctionDispatchTree(SymbolReference symbolReference) {
-        return genericFunctions.get(symbolReference);
+    public GenericFunctionDescriptor lookupGenericFunctionDispatchTree(SymbolReference symbolReference, boolean setf) {
+        if (setf) {
+            return setfGenericFunctions.get(symbolReference);
+        } else {
+            return genericFunctions.get(symbolReference);
+        }
     }
 
     @CompilerDirectives.TruffleBoundary

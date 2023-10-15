@@ -47,20 +47,22 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
         var exprs = new ArrayList<ISLISPExpressionNode>();
         for (var slot: slots) {
             for (var reader: slot.getReaderName()) {
-                exprs.add(new ISLISPDefGenericNode(reader, 1, false, null));
+                exprs.add(new ISLISPDefGenericNode(reader, false, 1, false, null));
                 exprs.add(new ISLISPDefMethodNode(
                         ISLISPDefMethodNode.MethodQualifier.none,
                         reader,
+                        false,
                         new Symbol[]{name},
                         1,
                         false,
                         ISLISPClassSlotReaderNodeGen.create(slot.getName(), language)));
             }
             for (var writer: slot.getWriterName()) {
-                exprs.add(new ISLISPDefGenericNode(writer, 2, false, null));
+                exprs.add(new ISLISPDefGenericNode(writer, false, 2, false, null));
                 exprs.add(new ISLISPDefMethodNode(
                         ISLISPDefMethodNode.MethodQualifier.none,
                         writer,
+                        false,
                         new Symbol[]{name, ISLISPContext.get(this).namedSymbol("<object>")},
                         2,
                         false,

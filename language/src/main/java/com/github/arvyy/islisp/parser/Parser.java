@@ -186,7 +186,7 @@ public class Parser {
                 var setfDispatch = ISLISPContext.get(null)
                         .lookupSetfTransformer(setfDispatchSymbol.identityReference());
                 if (setfDispatch == null) {
-                    throw new ParsingException(source(form), "Unknown setf form.");
+                    return parseDirectSetfFunctionCall(parserContext, sexpr, placeList, value);
                 }
                 var transformed = setfDispatch.transform(placeList, value);
                 sourceSectionMap.put(new EqWrapper(transformed), source(sexpr));
@@ -402,7 +402,19 @@ public class Parser {
 
     ISLISPDefMethodNode parseDefMethod(ParserContext parserContext, Object sexpr) {
         var args = requireList(sexpr, 3, -1);
-        var name = (Symbol) args.get(1);
+        Symbol name;
+        boolean setf;
+        if (args.get(1) instanceof Symbol s) {
+            name = s;
+            setf = false;
+        } else {
+            var setfForm = requireList(args.get(1), 2, 2);
+            if (!(setfForm.get(0) instanceof Symbol setfSymbol) || !setfSymbol.name().equals("setf")) {
+                throw new ParsingException(source(sexpr), "Bad defmethod function spec");
+            }
+            name = downcast(setfForm.get(1), Symbol.class);
+            setf = true;
+        }
         var methodQualifiers = new ArrayList<String>();
         for (int i = 2; i < args.size(); i++) {
             if (args.get(i) instanceof Symbol s && !s.name().equals("nil")) {
@@ -494,6 +506,7 @@ public class Parser {
         return new ISLISPDefMethodNode(
                 methodQualifier,
                 name,
+                setf,
                 paramTypes.toArray(Symbol[]::new),
                 slotsAndNewContext.namedArgsSlots.length,
                 slotsAndNewContext.restArgsSlot != -1,
@@ -574,10 +587,22 @@ public class Parser {
 
     ISLISPDefGenericNode parseDefGeneric(ParserContext parserContext, Object sexpr) {
         var args = requireList(sexpr, 3, 3);
-        var name = downcast(args.get(1), Symbol.class);
+        Symbol name;
+        boolean setf;
+        if (args.get(1) instanceof Symbol s) {
+            name = s;
+            setf = false;
+        } else {
+            var setfForm = requireList(args.get(1), 2, 2);
+            if (!(setfForm.get(0) instanceof Symbol setfSymbol) || !setfSymbol.name().equals("setf")) {
+                throw new ParsingException(source(sexpr), "Bad defgeneric function spec");
+            }
+            name = downcast(setfForm.get(1), Symbol.class);
+            setf = true;
+        }
         //TODO :rest
         var lambdaList = requireList(args.get(2), -1, -1);
-        return new ISLISPDefGenericNode(name, lambdaList.size(), false, source(sexpr));
+        return new ISLISPDefGenericNode(name, setf, lambdaList.size(), false, source(sexpr));
     }
 
     ISLISPReturnFromNode parseReturnFrom(ParserContext parserContext, Object sexpr) {
@@ -623,6 +648,21 @@ public class Parser {
                 source(sexpr));
     }
 
+    ISLISPExpressionNode parseDirectSetfFunctionCall(
+        ParserContext parserContext,
+        Object sexpr,
+        List<Object> placeList,
+        Object value
+    ) {
+        var name = downcast(placeList.get(0), Symbol.class);
+        var args = new ArrayList<ISLISPExpressionNode>();
+        args.add(parseExpressionNode(parserContext, value));
+        for (int i = 1; i < placeList.size(); i++) {
+            args.add(parseExpressionNode(parserContext, placeList.get(i)));
+        }
+        return new ISLISPGlobalFunctionCallNode(name, true, args.toArray(ISLISPExpressionNode[]::new), source(sexpr));
+    }
+
     ISLISPExpressionNode parseDirectFunctionCall(
             ParserContext parserContext,
             Object sexpr
@@ -643,7 +683,7 @@ public class Parser {
                     argNodes.toArray(ISLISPExpressionNode[]::new),
                     source(sexpr));
         } else {
-            return new ISLISPGlobalFunctionCallNode(name, argNodes.toArray(ISLISPExpressionNode[]::new), source(sexpr));
+            return new ISLISPGlobalFunctionCallNode(name, false, argNodes.toArray(ISLISPExpressionNode[]::new), source(sexpr));
         }
     }
 

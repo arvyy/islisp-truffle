@@ -10,6 +10,7 @@ import com.oracle.truffle.api.source.SourceSection;
 public class ISLISPDefGenericNode extends ISLISPExpressionNode {
 
     private final Symbol name;
+    private final boolean setf;
     private final int requiredArgsCount;
     private final boolean hasRest;
 
@@ -17,13 +18,14 @@ public class ISLISPDefGenericNode extends ISLISPExpressionNode {
     private ISLISPDefGenericExecutionNode executionNode;
 
 
-    public ISLISPDefGenericNode(Symbol name, int requiredArgsCount, boolean hasRest, SourceSection sourceSection) {
+    public ISLISPDefGenericNode(Symbol name, boolean setf, int requiredArgsCount, boolean hasRest, SourceSection sourceSection) {
         super(true, sourceSection);
         this.name = name;
         this.requiredArgsCount = requiredArgsCount;
         this.hasRest = hasRest;
+        this.setf = setf;
         var ctx = ISLISPContext.get(this);
-        executionNode = ISLISPDefGenericExecutionNodeGen.create(name, ctx.getLanguage(), sourceSection);
+        executionNode = ISLISPDefGenericExecutionNodeGen.create(name, setf, ctx.getLanguage(), sourceSection);
     }
 
     @Override
@@ -31,7 +33,7 @@ public class ISLISPDefGenericNode extends ISLISPExpressionNode {
         var ctx = ISLISPContext.get(this);
         var descriptor = new GenericFunctionDescriptor(requiredArgsCount, hasRest);
         var function = new LispFunction(null, executionNode.getCallTarget(), true);
-        ctx.registerGenericFunction(name.identityReference(), function, descriptor);
+        ctx.registerGenericFunction(name.identityReference(), setf, function, descriptor);
         return name;
     }
 }

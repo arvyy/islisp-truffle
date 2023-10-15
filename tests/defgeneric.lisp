@@ -21,3 +21,12 @@
 
 (let ((result (foo1 9 10)))
   (print result))
+
+
+;; test setf
+(defgeneric (setf foo2) (value a))
+(defmethod (setf foo2) (value a)
+    (print a)
+    (print value))
+
+(setf (foo2 10) 11)

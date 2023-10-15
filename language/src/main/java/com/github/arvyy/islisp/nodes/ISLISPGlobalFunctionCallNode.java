@@ -13,6 +13,7 @@ import com.oracle.truffle.api.source.SourceSection;
 public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
 
     private final Symbol name;
+    private final boolean setf;
 
     @CompilerDirectives.CompilationFinal
     private LispFunction function;
@@ -23,9 +24,10 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
     @Child
     private ISLISPFunctionDispatchNode dispatchNode;
 
-    public ISLISPGlobalFunctionCallNode(Symbol name, ISLISPExpressionNode[] arguments, SourceSection sourceSection) {
+    public ISLISPGlobalFunctionCallNode(Symbol name, boolean setf, ISLISPExpressionNode[] arguments, SourceSection sourceSection) {
         super(sourceSection);
         this.name = name;
+        this.setf = setf;
         this.arguments = arguments;
         this.dispatchNode = ISLISPFunctionDispatchNodeGen.create();
     }
@@ -35,7 +37,7 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
     @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
         if (function == null) {
-            function = ISLISPContext.get(this).lookupFunction(name.identityReference());
+            function = ISLISPContext.get(this).lookupFunction(name.identityReference(), setf);
         }
         var argValues = new Object[arguments.length];
         for (int i = 0; i < argValues.length; i++) {

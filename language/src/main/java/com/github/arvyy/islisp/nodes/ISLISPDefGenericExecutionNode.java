@@ -21,6 +21,7 @@ import com.oracle.truffle.api.source.SourceSection;
 public abstract class ISLISPDefGenericExecutionNode extends RootNode {
 
     private final Symbol name;
+    private final boolean setf;
     private final SourceSection sourceSection;
 
     @CompilerDirectives.CompilationFinal
@@ -34,9 +35,10 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
 
     DirectCallNode classOfCall;
 
-    public ISLISPDefGenericExecutionNode(Symbol name, TruffleLanguage<?> language, SourceSection sourceSection) {
+    public ISLISPDefGenericExecutionNode(Symbol name, boolean setf, TruffleLanguage<?> language, SourceSection sourceSection) {
         super(language);
         this.name = name;
+        this.setf = setf;
         this.sourceSection = sourceSection;
         this.classOf = ISLISPClassOfNodeGen.create(language);
         classOfCall = DirectCallNode.create(classOf.getCallTarget());
@@ -46,6 +48,7 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
     protected ISLISPDefGenericExecutionNode(ISLISPDefGenericExecutionNode other) {
         super(other.getLanguage(ISLISPTruffleLanguage.class));
         name = other.name;
+        setf = other.setf;
         sourceSection = other.sourceSection;
         classOf = other.classOf;
         classOfCall = other.classOfCall;
@@ -56,7 +59,7 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
     public final Object execute(VirtualFrame frame) {
         if (genericFunctionDescriptor == null) {
             genericFunctionDescriptor = ISLISPContext.get(this)
-                    .lookupGenericFunctionDispatchTree(name.identityReference());
+                    .lookupGenericFunctionDispatchTree(name.identityReference(), setf);
         }
         if (frame.getArguments().length - 1 < genericFunctionDescriptor.getRequiredArgCount()) {
             throw new ISLISPError("Not enough args", this);

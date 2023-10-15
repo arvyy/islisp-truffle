@@ -23,12 +23,14 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
 
     private final int requiredArgCount;
     private final boolean hasRest;
+    private final boolean setf;
     @Child
     private RootNode functionNode;
 
     public ISLISPDefMethodNode(
             MethodQualifier methodQualifier,
             Symbol name,
+            boolean setf,
             Symbol[] argsClassNames,
             int requiredArgCount,
             boolean hasRest,
@@ -41,12 +43,13 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
         this.requiredArgCount = requiredArgCount;
         this.hasRest = hasRest;
         this.functionNode = functionNode;
+        this.setf = setf;
     }
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
-        var genericFunctionDescriptor = ctx.lookupGenericFunctionDispatchTree(name.identityReference());
+        var genericFunctionDescriptor = ctx.lookupGenericFunctionDispatchTree(name.identityReference(), setf);
         if (requiredArgCount != genericFunctionDescriptor.getRequiredArgCount()) {
             throw new ISLISPError("defmethod signature doesn't match defgeneric", this);
         }
@@ -57,13 +60,12 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
         for (int i = 0; i < argsClassNames.length; i++) {
             classes[i] = ctx.lookupClass(argsClassNames[i].identityReference());
         }
-        var definition = ctx.lookupGenericFunctionDispatchTree(name.identityReference());
         var callTarget = functionNode.getCallTarget();
         switch (methodQualifier) {
-            case none -> definition.addPrimaryMethod(classes, callTarget, this);
-            case before -> definition.addBeforeMethod(classes, callTarget, this);
-            case around -> definition.addAroundMethod(classes, callTarget, this);
-            case after -> definition.addAfterMethod(classes, callTarget, this);
+            case none -> genericFunctionDescriptor.addPrimaryMethod(classes, callTarget, this);
+            case before -> genericFunctionDescriptor.addBeforeMethod(classes, callTarget, this);
+            case around -> genericFunctionDescriptor.addAroundMethod(classes, callTarget, this);
+            case after -> genericFunctionDescriptor.addAfterMethod(classes, callTarget, this);
             default -> { }
         }
         return name;
