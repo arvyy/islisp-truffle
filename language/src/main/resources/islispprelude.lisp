@@ -15,7 +15,7 @@
      (required-max :reader arity-error-required-max :initarg required-max)))
 
 (defgeneric fill-in-condition-stacktrace (condition))
-(defmethod fill-in-condition-stacktrace ((condition <condition>))
+(defmethod fill-in-condition-stacktrace ((condition <serious-condition>))
     t)
 
 (defun /= (x1 x2)

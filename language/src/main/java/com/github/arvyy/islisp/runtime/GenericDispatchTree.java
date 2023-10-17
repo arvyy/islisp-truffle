@@ -22,11 +22,8 @@ public class GenericDispatchTree {
         children = new ArraySlice<>(new GenericDispatchTree[0]);
     }
 
-    public void addMethod(LispClass[] argTypes, CallTarget pCallTarget, Node node) {
-        addMethod(new ArraySlice<>(argTypes), pCallTarget, node);
-    }
-
     public void addMethod(ArraySlice<LispClass> argTypes, CallTarget pCallTarget, Node node) {
+        Objects.requireNonNull(pCallTarget);
         size++;
         if (argTypes.size() == 0) {
             if (this.callTarget != null) {

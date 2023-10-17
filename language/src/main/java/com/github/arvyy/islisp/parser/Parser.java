@@ -438,19 +438,28 @@ public class Parser {
         var paramListIndex = 2 + methodQualifiers.size();
         var parameterList = requireList(args.get(paramListIndex), -1, -1);
         var plainParamList = new ArrayList<Symbol>();
-        var paramTypes = new ArrayList<Symbol>();
+        // collect defmethod argument list into normal lambda list to resolve slots
         for (var el: parameterList) {
             if (el instanceof Symbol s) {
                 plainParamList.add(s);
-                paramTypes.add(ISLISPContext.get(null).namedSymbol("<object>"));
             } else if (el instanceof Pair p) {
                 var paramWithType = requireList(p, 2, 2);
                 plainParamList.add(downcast(paramWithType.get(0), Symbol.class));
-                paramTypes.add(downcast(paramWithType.get(1), Symbol.class));
             }
         }
         parserContext = parserContext.pushFrameDescriptor();
         var slotsAndNewContext = processFrameDescriptorsForFunctionArguments(parserContext, plainParamList);
+        // we know named slot count; collect their types to use for dispatch
+        List<Symbol> paramTypes = new ArrayList<>();
+        for (int i = 0; i < slotsAndNewContext.namedArgsSlots.length; i++) {
+            var el = parameterList.get(i);
+            if (el instanceof Symbol s) {
+                paramTypes.add(ISLISPContext.get(null).namedSymbol("<object>"));
+            } else if (el instanceof Pair p) {
+                var paramWithType = requireList(p, 2, 2);
+                paramTypes.add(downcast(paramWithType.get(1), Symbol.class));
+            }
+        }
         ParserContext bodyParserContext;
         int callNextMethodSlot;
         int hasNextMethodSlot;

@@ -37,7 +37,9 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
     ) {
         super(sourceSection);
         this.name = name;
-        this.superclassName = superclassName;
+        this.superclassName = superclassName.isEmpty()
+            ? List.of(ISLISPContext.get(this).namedSymbol("<object>"))
+            : superclassName;
         this.slots = slots;
         this.isAbstract = isAbstract;
         slotDefMethods = buildSlotFunctionNodes(language);
@@ -145,6 +147,11 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                 isAbstract
         );
         ctx.registerClass(name.identityReference(), newClass);
+    }
+
+    @Override
+    public boolean isDefinitionNode() {
+        return true;
     }
 
     public static class SlotDefinition {
