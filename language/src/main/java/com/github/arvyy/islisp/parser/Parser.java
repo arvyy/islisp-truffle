@@ -219,6 +219,7 @@ public class Parser {
             }
         }
         if (sexpr instanceof Integer
+            || sexpr instanceof Double
             || sexpr instanceof LispChar
             || sexpr instanceof String
             || sexpr instanceof LispVector

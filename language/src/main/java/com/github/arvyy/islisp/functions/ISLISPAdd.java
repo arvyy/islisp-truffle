@@ -2,14 +2,17 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
+import com.github.arvyy.islisp.nodes.ISLISPTypes;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
 
+@TypeSystemReference(ISLISPTypes.class)
 public abstract class ISLISPAdd extends RootNode {
 
     @Child
@@ -25,15 +28,20 @@ public abstract class ISLISPAdd extends RootNode {
     @Override
     @ExplodeLoop
     public final Object execute(VirtualFrame frame) {
-        int sum = 0;
+        Number sum = 0;
         for (int i = 1; i < frame.getArguments().length; i++) {
-            sum = (int) executeGeneric(sum, frame.getArguments()[i]);
+            sum = (Number) executeGeneric(sum, frame.getArguments()[i]);
         }
         return sum;
     }
 
-    @Specialization
+    @Specialization(rewriteOn = ArithmeticException.class)
     int doInts(int a, int b) {
+        return Math.addExact(a, b);
+    }
+
+    @Specialization
+    double doDoubles(double a, double b) {
         return a + b;
     }
 

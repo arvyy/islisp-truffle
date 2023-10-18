@@ -56,6 +56,9 @@ public class Reader {
             var value = ((Token.ExactNumberToken) t).value();
             return Optional.of(value);
         }
+        if (t instanceof Token.InexactNumberToken inexact) {
+            return Optional.of(inexact.value());
+        }
         if (t instanceof Token.QuasiquoteToken
                 || t instanceof Token.QuoteToken
                 || t instanceof Token.UnquoteSpliceToken

@@ -40,6 +40,13 @@ public abstract class ISLISPClassOf extends RootNode {
     }
 
     @Specialization
+    protected LispClass doFloat(
+        double flt,
+        @Cached("loadFloatClass()") LispClass lispClass) {
+        return lispClass;
+    }
+
+    @Specialization
     protected LispClass doString(
         String str,
         @Cached("loadStringClass()") LispClass lispClass
@@ -91,6 +98,9 @@ public abstract class ISLISPClassOf extends RootNode {
 
     LispClass loadIntegerClass() {
         return loadClass("<integer>");
+    }
+    LispClass loadFloatClass() {
+        return loadClass("<float>");
     }
     LispClass loadFunctionClass() {
         return loadClass("<function>");

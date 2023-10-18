@@ -109,16 +109,32 @@ public class ISLISPContext {
                 new LispClass[] {classes.get(namedSymbol("<standard-class>").identityReference())},
                 ISLISPCreateStandardClassObject.makeLispFunction(language).callTarget(),
                 null);
-        var createExecutionNode = ISLISPDefGenericExecutionNodeGen.create(namedSymbol("create"), false, getLanguage(), null);
-        registerGenericFunction(namedSymbol("create").identityReference(), false, new LispFunction(createExecutionNode.getCallTarget()), createDescriptor);
+        var createExecutionNode = ISLISPDefGenericExecutionNodeGen.create(
+            namedSymbol("create"),
+            false,
+            getLanguage(),
+            null);
+        registerGenericFunction(
+            namedSymbol("create").identityReference(),
+            false,
+            new LispFunction(createExecutionNode.getCallTarget()),
+            createDescriptor);
 
         var initializeObjectDescriptor = new GenericFunctionDescriptor(1, true);
         initializeObjectDescriptor.addPrimaryMethod(
             new LispClass[] {classes.get(namedSymbol("<object>").identityReference())},
             ISLISPInitializeObject.makeLispFunction(language).callTarget(),
             null);
-        var initializeObjectExecutionNode = ISLISPDefGenericExecutionNodeGen.create(namedSymbol("initialize-object"), false, getLanguage(), null);
-        registerGenericFunction(namedSymbol("initialize-object").identityReference(), false, new LispFunction(initializeObjectExecutionNode.getCallTarget()), initializeObjectDescriptor);
+        var initializeObjectExecutionNode = ISLISPDefGenericExecutionNodeGen.create(
+            namedSymbol("initialize-object"),
+            false,
+            getLanguage(),
+            null);
+        registerGenericFunction(
+            namedSymbol("initialize-object").identityReference(),
+            false,
+            new LispFunction(initializeObjectExecutionNode.getCallTarget()),
+            initializeObjectDescriptor);
 
 
     }

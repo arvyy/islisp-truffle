@@ -188,6 +188,14 @@ CharacterName = newline | space | tab
     yybegin(CHAR);
   }
 
+  {ExplicitSign}? {Digit}+ "." {Digit}+ "e" {ExplicitSign}? {Digit}+    |
+  {ExplicitSign}? {Digit}+ "." {Digit}+ "E" {ExplicitSign}? {Digit}+    |
+  {ExplicitSign}? {Digit}+ "e" {ExplicitSign}? {Digit}+                 |
+  {ExplicitSign}? {Digit}+ "E" {ExplicitSign}? {Digit}+                 |
+  {ExplicitSign}? {Digit}+ "." {Digit}+ {
+    return new Token.InexactNumberToken(Double.valueOf(yytext()));
+  }
+
   ("#B" | "#b") {ExplicitSign}? {BinDigit}+ {
     return new Token.ExactNumberToken(Integer.parseInt(yytext().substring(2), 2));
   }

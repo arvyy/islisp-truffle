@@ -23,16 +23,20 @@ public abstract class ISLISPSubtract extends RootNode {
         if (frame.getArguments().length == 2) {
             return executeGeneric(0, (Object) frame.getArguments()[1]);
         }
-        Object diff = (Object) frame.getArguments()[1];
+        Number diff = (Number) frame.getArguments()[1];
         for (int i = 2; i < frame.getArguments().length; i++) {
-            diff = executeGeneric(diff, (Object) frame.getArguments()[i]);
+            diff = (Number) executeGeneric(diff, (Number) frame.getArguments()[i]);
         }
         return diff;
     }
 
+    @Specialization(rewriteOn = ArithmeticException.class)
+    int doInts(int a, int b) {
+        return Math.subtractExact(a, b);
+    }
+
     @Specialization
-    @ExplodeLoop
-    Object doInts(int a, int b) {
+    double doDoubles(double a, double b) {
         return a - b;
     }
 

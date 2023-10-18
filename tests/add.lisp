@@ -6,12 +6,16 @@
     (print "OK1")
     (print "FAIL1"))
 
+(if (= 3 (+ 1.0 2.0))
+    (print "OK2")
+    (print "FAIL2"))
+
 (block exit
     (with-handler
       (lambda (condition)
         (if (instancep condition (class <domain-error>))
-            (print "OK2")
-            (print "FAIL2"))
+            (print "OK3")
+            (print "FAIL3"))
         (return-from exit nil))
       (+ 1 "2")
-      (print "FAIL2")))
+      (print "FAIL3")))

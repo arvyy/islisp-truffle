@@ -180,6 +180,8 @@
       <property name="optional" value="true"/>
     </module>
 
+    <module name="SuppressionCommentFilter"/>
+
   </module>
 
 </module>
