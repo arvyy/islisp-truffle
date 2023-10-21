@@ -127,14 +127,6 @@ CharacterName = newline | space | tab
     return new Token.VectorBracketOpenToken();
   }
 
-  "#u8(" {
-    return new Token.ByteVectorBracketOpenToken();
-  }
-
-  "#;(" {
-    return new Token.StatementCommentBracketOpenToken();
-  }
-
   "(" {
     return new Token.BracketOpenToken();
   }

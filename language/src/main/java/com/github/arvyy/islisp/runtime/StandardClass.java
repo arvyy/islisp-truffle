@@ -21,6 +21,14 @@ public record StandardClass(
         boolean isAbstract
 ) implements LispClass {
 
+    /**
+     * Standard class' slot information.
+     *
+     * @param name slot name
+     * @param property associated truffle property for manipulation
+     * @param initForm initialization form
+     * @param initArg initialization argument
+     */
     public record Slot(
             SymbolReference name,
             StaticProperty property,

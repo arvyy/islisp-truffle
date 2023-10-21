@@ -6,6 +6,9 @@ import org.graalvm.polyglot.Source;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Main ISLISP interpreter entrypoint.
+ */
 public final class Main {
 
     private Main() { }

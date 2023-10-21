@@ -14,6 +14,9 @@ import java.util.Objects;
  */
 public class ISLISPDefMethodNode extends ISLISPExpressionNode {
 
+    /**
+     * Type of defmethod.
+     */
     public enum MethodQualifier {
         none, before, after, around
     }

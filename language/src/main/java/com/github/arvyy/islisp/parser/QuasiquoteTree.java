@@ -16,13 +16,46 @@ import java.util.Arrays;
 //TODO calcify non-atoms into Atom if there are no internal substitutions
 public sealed interface QuasiquoteTree {
 
+    /**
+     * Statically known quasiquote value to be used as is.
+     *
+     * @param value
+     */
     record Atom(Object value) implements QuasiquoteTree { }
+
+    /**
+     * List of elements, some of which aren't statically known.
+     *
+     * @param children
+     */
     record List(QuasiquoteTree[] children) implements QuasiquoteTree { }
-    record Quasiquote(QuasiquoteTree value) implements QuasiquoteTree { }
-    record Unquote(QuasiquoteTree value) implements QuasiquoteTree { }
-    record UnquoteSplicing(QuasiquoteTree value) implements QuasiquoteTree { }
+
+    /**
+     * A part that needs to be unquoted.
+     *
+     * @param value
+     */
+    record Unquote(Hole value) implements QuasiquoteTree { }
+
+    /**
+     * A part that needs to be unquoted and spliced.
+     * @param value
+     */
+    record UnquoteSplicing(Hole value) implements QuasiquoteTree { }
+
+    /**
+     * Hole value, specifying which expression will fill it on execution.
+     *
+     * @param index expression index corresponding to the hole
+     */
     record Hole(int index) implements QuasiquoteTree { }
 
+    /**
+     * Tuple of tree structure and expressions in holes.
+     *
+     * @param tree
+     * @param expressions
+     */
     record QuasiquoteTreeAndExpressions(QuasiquoteTree tree, Object[] expressions) { }
 
     /**
@@ -100,12 +133,7 @@ public sealed interface QuasiquoteTree {
             return a.value;
         }
         if (tree instanceof Unquote u) {
-            if (u.value instanceof Hole h) {
-                return substitutionValues[h.index];
-            } else {
-                var value = evalQuasiquoteTree(u.value, substitutionValues, node);
-                return new Pair(ISLISPContext.get(null).namedSymbol("unquote"), value);
-            }
+            return substitutionValues[u.value.index];
         }
         if (tree instanceof UnquoteSplicing) {
             throw new ISLISPError("Bad unquotesplicing use", node);
@@ -114,21 +142,16 @@ public sealed interface QuasiquoteTree {
             var values = new ArrayList<Object>();
             for (var child: l.children) {
                 if (child instanceof UnquoteSplicing us) {
-                    if (us.value instanceof Hole h) {
-                        if (substitutionValues[h.index] instanceof Pair p) {
-                            for (var v: p) {
-                                values.add(v);
-                            }
-                        } else if (substitutionValues[h.index] instanceof Symbol s) {
-                            if (s != ISLISPContext.get(null).getNil()) {
-                                throw new ISLISPError("Unquote splicing not list", node);
-                            }
-                        } else {
+                    if (substitutionValues[us.value.index] instanceof Pair p) {
+                        for (var v: p) {
+                            values.add(v);
+                        }
+                    } else if (substitutionValues[us.value.index] instanceof Symbol s) {
+                        if (s != ISLISPContext.get(null).getNil()) {
                             throw new ISLISPError("Unquote splicing not list", node);
                         }
                     } else {
-                        var value = evalQuasiquoteTree(child, substitutionValues, node);
-                        values.add(new Pair(ISLISPContext.get(null).namedSymbol("unquote-splicing"), value));
+                        throw new ISLISPError("Unquote splicing not list", node);
                     }
                 } else {
                     values.add(evalQuasiquoteTree(child, substitutionValues, node));
