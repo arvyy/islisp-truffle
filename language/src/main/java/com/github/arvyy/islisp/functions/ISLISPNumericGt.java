@@ -10,11 +10,14 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.profiles.CountingConditionProfile;
 
+/**
+ * Implements numeric comparator `>`.
+ */
 public abstract class ISLISPNumericGt extends RootNode {
 
     private final CountingConditionProfile profile;
 
-    protected ISLISPNumericGt(TruffleLanguage<?> language) {
+    ISLISPNumericGt(TruffleLanguage<?> language) {
         super(language);
         profile = CountingConditionProfile.create();
     }
@@ -39,6 +42,12 @@ public abstract class ISLISPNumericGt extends RootNode {
         throw new ISLISPError("Not numbers", this);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     *
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPNumericGtNodeGen.create(lang).getCallTarget());
     }

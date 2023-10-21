@@ -8,6 +8,13 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 
+/**
+ * A tree of all generic function's method instances for specific type (primary, before, after, around).
+ * For each generic parameter, it has as many branches as there are different classes
+ * used for said parameter in declared methods, with each branch leading to examination of following generic parameter.
+ * The methods are automatically sorted by specificity. Given a set of argument types, returned applicable methods' set
+ * is sorted from most specific to least specific.
+ */
 public class GenericDispatchTree {
 
     private int size;
@@ -15,6 +22,9 @@ public class GenericDispatchTree {
     private LispClass clazz;
     private ArraySlice<GenericDispatchTree> children;
 
+    /**
+     * Create generic dispatch tree.
+     */
     public GenericDispatchTree() {
         size = 0;
         callTarget = null;
@@ -22,6 +32,13 @@ public class GenericDispatchTree {
         children = new ArraySlice<>(new GenericDispatchTree[0]);
     }
 
+    /**
+     * Add new method entry.
+     *
+     * @param argTypes array of parameter types for the signature
+     * @param pCallTarget implementation
+     * @param node relevant node to signal error from
+     */
     public void addMethod(ArraySlice<LispClass> argTypes, CallTarget pCallTarget, Node node) {
         Objects.requireNonNull(pCallTarget);
         size++;
@@ -79,10 +96,19 @@ public class GenericDispatchTree {
         return false;
     }
 
+    /**
+     * @return count of the tree entries
+     */
     public int size() {
         return  size;
     }
 
+    /**
+     * Find applicable methods for given type invocation.
+     *
+     * @param argTypes types for which found methods must be compatible with
+     * @return array of applicable call targets
+     */
     public ArraySlice<CallTarget> getApplicableMethods(LispClass[] argTypes) {
         var result = new CallTarget[size];
         var usedSize = collectApplicatableMethods(new ArraySlice<>(argTypes), result, 0);

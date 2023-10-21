@@ -11,9 +11,12 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `instancep` predicate, returning if a given object belongs to given class.
+ */
 public abstract class ISLISPInstancep extends RootNode {
 
-    protected ISLISPInstancep(TruffleLanguage<?> language) {
+    ISLISPInstancep(TruffleLanguage<?> language) {
         super(language);
     }
 
@@ -45,6 +48,12 @@ public abstract class ISLISPInstancep extends RootNode {
         return ctx.lookupFunction(ctx.namedSymbol("subclassp").identityReference()).callTarget();
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     *
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPInstancepNodeGen.create(lang).getCallTarget());
     }

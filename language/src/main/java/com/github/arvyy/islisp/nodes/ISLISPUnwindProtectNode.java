@@ -4,6 +4,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `unwind-protect` syntax for defining cleanup forms after execution of body.
+ */
 public class ISLISPUnwindProtectNode extends ISLISPExpressionNode {
 
     @Child
@@ -12,6 +15,13 @@ public class ISLISPUnwindProtectNode extends ISLISPExpressionNode {
     @Children
     private ISLISPExpressionNode[] cleanups;
 
+    /**
+     * Create unwind-protect node.
+     *
+     * @param expressionNode body expression
+     * @param cleanups clean up expressions to be executed upon return or non-local control transfer
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPUnwindProtectNode(
             ISLISPExpressionNode expressionNode,
             ISLISPExpressionNode[] cleanups,

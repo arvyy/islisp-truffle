@@ -15,6 +15,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Truffle framework entrypoint for ISLISP.
+ */
 @TruffleLanguage.Registration(id = "islisp", name = "ISLISP")
 @ProvidedTags({
     StandardTags.ExpressionTag.class,

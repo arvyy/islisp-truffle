@@ -12,6 +12,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.profiles.CountingConditionProfile;
 
+/**
+ * Implements numeric equality function `=`.
+ */
 @TypeSystemReference(ISLISPTypes.class)
 public abstract class ISLISPNumericEqual extends RootNode {
 
@@ -19,7 +22,7 @@ public abstract class ISLISPNumericEqual extends RootNode {
     private ISLISPErrorSignalerNode errorSignalerNode;
     private final CountingConditionProfile profile;
 
-    protected ISLISPNumericEqual(TruffleLanguage<?> language) {
+    ISLISPNumericEqual(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode();
         profile = CountingConditionProfile.create();
@@ -55,6 +58,12 @@ public abstract class ISLISPNumericEqual extends RootNode {
         return errorSignalerNode.signalWrongType(b, numberClass);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     *
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPNumericEqualNodeGen.create(lang).getCallTarget());
     }

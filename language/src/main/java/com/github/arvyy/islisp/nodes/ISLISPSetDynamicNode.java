@@ -8,6 +8,9 @@ import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `set-dynamic` syntax for updating value of a dynamically scoped variable.
+ */
 public class ISLISPSetDynamicNode extends ISLISPExpressionNode {
 
     private final Symbol symbol;
@@ -18,6 +21,13 @@ public class ISLISPSetDynamicNode extends ISLISPExpressionNode {
     @Child
     ISLISPExpressionNode expression;
 
+    /**
+     * Create set-dynamic node.
+     *
+     * @param symbol dynamic variable name
+     * @param expression value expression
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPSetDynamicNode(Symbol symbol, ISLISPExpressionNode expression, SourceSection sourceSection) {
         super(sourceSection);
         this.symbol = symbol;

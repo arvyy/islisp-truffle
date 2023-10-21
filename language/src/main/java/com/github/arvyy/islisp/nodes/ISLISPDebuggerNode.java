@@ -6,8 +6,15 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.Tag;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `debugger` syntax that halts upon execution.
+ */
 public class ISLISPDebuggerNode extends ISLISPExpressionNode {
 
+    /**
+     * Create debugger node.
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPDebuggerNode(SourceSection sourceSection) {
         super(sourceSection);
     }

@@ -11,14 +11,29 @@ import com.oracle.truffle.api.source.SourceSection;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Parser builds the nodes for the program's AST.
+ */
 public class Parser {
 
     private final Map<EqWrapper, SourceSection> sourceSectionMap;
 
+    /**
+     * Create parser.
+     *
+     * @param sourceSectionMap map, mapping sexpr wrapped into eqwrapper to corresponding source location
+     */
     public Parser(Map<EqWrapper, SourceSection> sourceSectionMap) {
         this.sourceSectionMap = sourceSectionMap;
     }
 
+    /**
+     * Parse root node from given list of sexprs.
+     *
+     * @param language language reference
+     * @param content list of top level sexprs
+     * @return root node
+     */
     public ISLISPRootNode parseRootNode(ISLISPTruffleLanguage language, List<Object> content) {
         var expressionNodes = new ArrayList<ISLISPExpressionNode>();
         var parserContext = new ParserContext();
@@ -530,7 +545,6 @@ public class Parser {
                 name,
                 setf,
                 paramTypes.toArray(Symbol[]::new),
-                slotsAndNewContext.namedArgsSlots.length,
                 slotsAndNewContext.restArgsSlot != -1,
                 rootNode);
     }

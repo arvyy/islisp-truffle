@@ -7,6 +7,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.instrumentation.Tag;
 
+/**
+ * Implements `defun` syntax for creating new user defined simple functions.
+ */
 public class ISLISPDefunNode extends ISLISPExpressionNode {
 
     final Symbol name;
@@ -14,6 +17,12 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
     @Child
     ISLISPRootNode functionNode;
 
+    /**
+     * Create defun node.
+     *
+     * @param name function's symbol name
+     * @param functionNode root node wrapping function body
+     */
     public ISLISPDefunNode(Symbol name, ISLISPRootNode functionNode) {
         super(true, functionNode.getSourceSection());
         this.name = name;

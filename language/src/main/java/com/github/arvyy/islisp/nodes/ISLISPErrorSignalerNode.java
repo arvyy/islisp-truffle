@@ -11,9 +11,20 @@ import com.oracle.truffle.api.nodes.Node;
  */
 public class ISLISPErrorSignalerNode extends Node {
 
+    @Child
     DirectCallNode signalCallNode;
+
+    @Child
     DirectCallNode createCallNode;
 
+    /**
+     * Signal error about wrong count of supplied arguments.
+     *
+     * @param actual actual arg count
+     * @param min minimum required argument count
+     * @param max maximum argument count (or -1 if unbound)
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
     public Object signalWrongArgumentCount(int actual, int min, int max) {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
@@ -26,6 +37,13 @@ public class ISLISPErrorSignalerNode extends Node {
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
 
+    /**
+     * Signal error about unexpected object being supplied.
+     *
+     * @param obj offending object
+     * @param expectedClass expected class
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
     public Object signalWrongType(Object obj, LispClass expectedClass) {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(

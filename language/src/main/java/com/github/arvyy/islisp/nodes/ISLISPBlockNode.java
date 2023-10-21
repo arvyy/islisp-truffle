@@ -6,6 +6,10 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `block` syntax. At parsetime each block is associated with a unique id. return-from
+ * is implemented through a control flow exception that carries the same id as the block it's returning to.
+ */
 public class ISLISPBlockNode extends ISLISPExpressionNode {
 
     private final int blockId;
@@ -13,6 +17,13 @@ public class ISLISPBlockNode extends ISLISPExpressionNode {
     @Children
     private final ISLISPExpressionNode[] expressionNodes;
 
+    /**
+     * Create block node.
+     *
+     * @param blockId unique id to match against return-from nodes.
+     * @param expressionNodes body of the block
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPBlockNode(int blockId, ISLISPExpressionNode[] expressionNodes, SourceSection sourceSection) {
         super(sourceSection);
         this.blockId = blockId;

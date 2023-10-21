@@ -10,6 +10,12 @@ public final class Main {
 
     private Main() { }
 
+    /**
+     * Main ISLISP interpreter entrypoint.
+     *
+     * @param args commandline args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
 
         var source = Source.newBuilder("islisp", new File(args[0]))

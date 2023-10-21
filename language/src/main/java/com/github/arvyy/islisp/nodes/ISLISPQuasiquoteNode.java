@@ -5,6 +5,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements quasiquote syntax, partial quoting.
+ */
 public class ISLISPQuasiquoteNode extends ISLISPExpressionNode {
 
     private final QuasiquoteTree tree;
@@ -12,6 +15,13 @@ public class ISLISPQuasiquoteNode extends ISLISPExpressionNode {
     @Children
     private final ISLISPExpressionNode[] expressionNodes;
 
+    /**
+     * Create quasiquote node.
+     *
+     * @param sourceSection corresponding source section to this node
+     * @param tree parsed partially quoted tree
+     * @param expressionNodes expressions for the unquoted parts of the tree
+     */
     public ISLISPQuasiquoteNode(
             SourceSection sourceSection,
             QuasiquoteTree tree,

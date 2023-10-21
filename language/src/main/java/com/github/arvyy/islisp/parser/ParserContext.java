@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Necessary parser context while doing recursive paring descent.
+ */
 class ParserContext {
     final int frameDepth;
     final LexicalScope<SymbolReference, VariableContext> variables;

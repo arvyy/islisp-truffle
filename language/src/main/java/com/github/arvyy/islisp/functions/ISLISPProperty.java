@@ -11,12 +11,15 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `property` function, that returns value for a given property for a given symbol.
+ */
 public abstract class ISLISPProperty extends RootNode {
 
     @Child
     private ISLISPErrorSignalerNode errorSignalerNode;
 
-    public ISLISPProperty(TruffleLanguage<?> language) {
+    ISLISPProperty(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode();
     }
@@ -35,7 +38,7 @@ public abstract class ISLISPProperty extends RootNode {
         return executeGeneric(frame.getArguments()[1], frame.getArguments()[2], defaultValue);
     }
 
-    protected abstract Object executeGeneric(Object symbol, Object property, Object defaultValue);
+    abstract Object executeGeneric(Object symbol, Object property, Object defaultValue);
 
     @Specialization(guards = {
         "symbol.identityReference().getId() == symbolLastId",
@@ -74,6 +77,12 @@ public abstract class ISLISPProperty extends RootNode {
         return !(symbol instanceof Symbol && property instanceof Symbol);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     *
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPPropertyNodeGen.create(lang).getCallTarget());
     }

@@ -10,17 +10,20 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `cdr` function, returning pair's second slot.
+ */
 public abstract class ISLISPCdr extends RootNode {
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
-    protected ISLISPCdr(TruffleLanguage<?> language) {
+    ISLISPCdr(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode();
     }
 
-    protected abstract Object executeGeneric(Object arg);
+    abstract Object executeGeneric(Object arg);
 
     @Override
     public final Object execute(VirtualFrame frame) {
@@ -31,15 +34,20 @@ public abstract class ISLISPCdr extends RootNode {
     }
 
     @Specialization
-    public Object doPair(Pair p) {
+    Object doPair(Pair p) {
         return p.cdr();
     }
 
     @Fallback
-    public Object fallback(Object o) {
+    Object fallback(Object o) {
         return errorSignalerNode.signalWrongType(o, ISLISPContext.get(this).lookupClass("<cons>"));
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPCdrNodeGen.create(lang).getCallTarget());
     }

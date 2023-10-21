@@ -12,13 +12,16 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements numeric adition function `+`.
+ */
 @TypeSystemReference(ISLISPTypes.class)
 public abstract class ISLISPAdd extends RootNode {
 
     @Child
     private ISLISPErrorSignalerNode errorSignalerNode;
 
-    public ISLISPAdd(TruffleLanguage<?> language) {
+    ISLISPAdd(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode();
     }
@@ -52,6 +55,11 @@ public abstract class ISLISPAdd extends RootNode {
         return errorSignalerNode.signalWrongType(b, numberClass);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPAddNodeGen.create(lang).getCallTarget());
     }

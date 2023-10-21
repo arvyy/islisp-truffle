@@ -5,16 +5,28 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `progn` syntax for grouping multiple statements together.
+ */
 public class ISLISPPrognNode extends ISLISPExpressionNode {
 
     @Children
     private final ISLISPExpressionNode[] body;
 
+    /**
+     * Create progn node.
+     *
+     * @param body body expressions
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPPrognNode(ISLISPExpressionNode[] body, SourceSection sourceSection) {
         super(sourceSection);
         this.body = body;
     }
 
+    /**
+     * @return body expressions
+     */
     public ISLISPExpressionNode[] getBodyNodes() {
         return body;
     }

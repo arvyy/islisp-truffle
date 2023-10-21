@@ -3,13 +3,19 @@ package com.github.arvyy.islisp.parser;
 import com.oracle.truffle.api.source.SourceSection;
 
 /**
- * Indicates error during parsing stage
+ * Indicates error during parsing stage.
  */
 public class ParsingException extends RuntimeException {
 
     private final SourceSection sourceSection;
     private final String reason;
 
+    /**
+     * Create parsing exception.
+     *
+     * @param sourceSection violating source section
+     * @param reason reason description
+     */
     public ParsingException(SourceSection sourceSection, String reason) {
         super(makeMessage(sourceSection, reason));
         this.sourceSection = sourceSection;

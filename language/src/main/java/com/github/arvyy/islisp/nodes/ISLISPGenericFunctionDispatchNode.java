@@ -10,13 +10,23 @@ import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.IndirectCallNode;
 import com.oracle.truffle.api.nodes.Node;
 
+/**
+ * Helper node for dispatching generic calls. Invoked on initial generic call and subsequent `call-next-method` calls.
+ */
 public abstract class ISLISPGenericFunctionDispatchNode extends Node {
 
+    /**
+     * Execute dispatch of the generic function.
+     *
+     * @param methods collected applicable methods for this specific invocation
+     * @param arguments function arguments
+     * @return generic function result
+     */
     public abstract Object executeDispatch(GenericMethodApplicableMethods methods, Object[] arguments);
 
     @ExplodeLoop
     @Specialization
-    public Object doIndirect(
+    Object doIndirect(
             GenericMethodApplicableMethods applicableMethods,
             Object[] args,
             @Cached IndirectCallNode callNode) {

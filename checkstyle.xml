@@ -3,45 +3,9 @@
           "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
           "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
-<!--
-
-  Checkstyle configuration that checks the sun coding conventions from:
-
-    - the Java Language Specification at
-      https://docs.oracle.com/javase/specs/jls/se11/html/index.html
-
-    - the Sun Code Conventions at https://www.oracle.com/java/technologies/javase/codeconventions-contents.html
-
-    - the Javadoc guidelines at
-      https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html
-
-    - the JDK Api documentation https://docs.oracle.com/en/java/javase/11/
-
-    - some best practices
-
-  Checkstyle is very configurable. Be sure to read the documentation at
-  https://checkstyle.org (or in your downloaded distribution).
-
-  Most Checks are configurable, be sure to consult the documentation.
-
-  To completely disable a check, just comment it out or delete it from the file.
-  To suppress certain violations please review suppression filters.
-
-  Finally, it is worth reading the documentation.
-
--->
-
 <module name="Checker">
-  <!--
-      If you set the basedir property below, then all reported file
-      names will be relative to the specified directory. See
-      https://checkstyle.org/config.html#Checker
-
-      <property name="basedir" value="${basedir}"/>
-  -->
   <property name="severity" value="error"/>
-
-  <property name="fileExtensions" value="java, properties, xml"/>
+  <property name="fileExtensions" value="java"/>
 
   <!-- Excludes all 'module-info.java' files              -->
   <!-- See https://checkstyle.org/filefilters/index.html -->
@@ -49,20 +13,13 @@
     <property name="fileNamePattern" value="module\-info\.java$"/>
   </module>
 
-  <!-- https://checkstyle.org/filters/suppressionfilter.html -->
-  <module name="SuppressionFilter">
-    <property name="file" value="${org.checkstyle.sun.suppressionfilter.config}"
-              default="checkstyle-suppressions.xml" />
-    <property name="optional" value="true"/>
-  </module>
+  <!-- Checks that a package-info.java file exists for each package.     -->
+  <!-- See https://checkstyle.org/checks/javadoc/javadocpackage.html#JavadocPackage -->
+  <module name="JavadocPackage"/>
 
   <!-- Checks whether files end with a new line.                        -->
   <!-- See https://checkstyle.org/checks/misc/newlineatendoffile.html -->
   <module name="NewlineAtEndOfFile"/>
-
-  <!-- Checks that property files contain the same keys.         -->
-  <!-- See https://checkstyle.org/checks/misc/translation.html -->
-  <module name="Translation"/>
 
   <!-- Checks for Size Violations.                    -->
   <!-- See https://checkstyle.org/checks/sizes/index.html -->
@@ -85,14 +42,15 @@
     <property name="message" value="Line has trailing spaces."/>
   </module>
 
-  <!-- Checks for Headers                                -->
-  <!-- See https://checkstyle.org/checks/header/index.html   -->
-  <!-- <module name="Header"> -->
-  <!--   <property name="headerFile" value="${checkstyle.header.file}"/> -->
-  <!--   <property name="fileExtensions" value="java"/> -->
-  <!-- </module> -->
-
   <module name="TreeWalker">
+
+    <!-- Checks for Javadoc comments.                     -->
+    <!-- See https://checkstyle.org/checks/javadoc/index.html -->
+    <module name="InvalidJavadocPosition"/>
+    <module name="JavadocMethod"/>
+    <module name="JavadocType"/>
+    <module name="JavadocStyle"/>
+    <module name="MissingJavadocMethod"/>
 
     <!-- Checks for Naming Conventions.                  -->
     <!-- See https://checkstyle.org/checks/naming/index.html -->
@@ -172,13 +130,6 @@
     <module name="ArrayTypeStyle"/>
     <module name="TodoComment"/>
     <module name="UpperEll"/>
-
-    <!-- https://checkstyle.org/filters/suppressionxpathfilter.html -->
-    <module name="SuppressionXpathFilter">
-      <property name="file" value="${org.checkstyle.sun.suppressionxpathfilter.config}"
-                default="checkstyle-xpath-suppressions.xml" />
-      <property name="optional" value="true"/>
-    </module>
 
     <module name="SuppressionCommentFilter"/>
 

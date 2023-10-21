@@ -14,9 +14,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Implements `format-char` function, that writes a given character to output stream.
+ */
 public abstract class ISLISPFormatChar extends RootNode {
 
-    public ISLISPFormatChar(TruffleLanguage<?> language) {
+    ISLISPFormatChar(TruffleLanguage<?> language) {
         super(language);
     }
 
@@ -29,12 +32,12 @@ public abstract class ISLISPFormatChar extends RootNode {
     }
 
     @Specialization
-    public void executeProper(LispOutputStream stream, LispChar ch) {
+    void executeProper(LispOutputStream stream, LispChar ch) {
         doPrint(stream.outputStream(), ch.codepoint());
     }
 
     @Fallback
-    public void executeFallback(Object stream, Object c) {
+    void executeFallback(Object stream, Object c) {
         throw new ISLISPError("Bad arguments", this);
     }
 
@@ -48,6 +51,11 @@ public abstract class ISLISPFormatChar extends RootNode {
         }
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPFormatCharNodeGen.create(lang).getCallTarget());
     }

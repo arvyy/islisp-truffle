@@ -10,9 +10,12 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `subclassp` predicate function, that returns if one class is a subclass of another.
+ */
 public abstract class ISLISPSubclassp extends RootNode {
 
-    protected ISLISPSubclassp(TruffleLanguage<?> language) {
+    ISLISPSubclassp(TruffleLanguage<?> language) {
         super(language);
     }
 
@@ -60,6 +63,12 @@ public abstract class ISLISPSubclassp extends RootNode {
         return false;
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     *
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPSubclasspNodeGen.create(lang).getCallTarget());
     }

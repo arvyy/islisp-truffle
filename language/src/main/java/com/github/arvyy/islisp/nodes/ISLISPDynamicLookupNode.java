@@ -8,6 +8,9 @@ import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `dynamic` syntax to lookup current value of a dynamically scoped variable.
+ */
 public class ISLISPDynamicLookupNode extends ISLISPExpressionNode {
 
     private final Symbol symbol;
@@ -15,6 +18,12 @@ public class ISLISPDynamicLookupNode extends ISLISPExpressionNode {
     @CompilerDirectives.CompilationFinal
     private ValueReference valueReference;
 
+    /**
+     * Creaste dynamic variable lookup node.
+     *
+     * @param symbol variable name
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPDynamicLookupNode(Symbol symbol, SourceSection sourceSection) {
         super(sourceSection);
         this.symbol = symbol;

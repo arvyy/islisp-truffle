@@ -7,9 +7,12 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `standard-output-stream` function.
+ */
 public class ISLISPStandardOutputStream extends RootNode {
 
-    protected ISLISPStandardOutputStream(TruffleLanguage<?> language) {
+    ISLISPStandardOutputStream(TruffleLanguage<?> language) {
         super(language);
     }
 
@@ -19,6 +22,12 @@ public class ISLISPStandardOutputStream extends RootNode {
         return new LispOutputStream(ISLISPContext.get(this).getEnv().out());
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     *
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(new ISLISPStandardOutputStream(lang).getCallTarget());
     }

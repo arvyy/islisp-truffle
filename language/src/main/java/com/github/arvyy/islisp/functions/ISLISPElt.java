@@ -12,12 +12,15 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `elt` function, that returns an element in sequence for a given index.
+ */
 public abstract class ISLISPElt extends RootNode {
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
-    protected ISLISPElt(TruffleLanguage<?> language) {
+    ISLISPElt(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode();
     }
@@ -56,6 +59,11 @@ public abstract class ISLISPElt extends RootNode {
         throw new ISLISPError("Bad sequence or index", this);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPEltNodeGen.create(lang).getCallTarget());
     }

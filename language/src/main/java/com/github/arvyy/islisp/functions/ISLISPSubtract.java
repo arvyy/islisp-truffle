@@ -9,9 +9,12 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements numeric subtraction function `-`.
+ */
 public abstract class ISLISPSubtract extends RootNode {
 
-    public ISLISPSubtract(TruffleLanguage<?> language) {
+    ISLISPSubtract(TruffleLanguage<?> language) {
         super(language);
     }
 
@@ -45,6 +48,12 @@ public abstract class ISLISPSubtract extends RootNode {
         throw new ISLISPError("Not numbers", this);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     *
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPSubtractNodeGen.create(lang).getCallTarget());
     }

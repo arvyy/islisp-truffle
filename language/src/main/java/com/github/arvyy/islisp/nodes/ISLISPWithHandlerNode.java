@@ -8,6 +8,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `with-handler` syntax for installing condition handler.
+ */
 public class ISLISPWithHandlerNode extends ISLISPExpressionNode {
 
     @Child
@@ -19,6 +22,13 @@ public class ISLISPWithHandlerNode extends ISLISPExpressionNode {
     @Child
     ISLISPFunctionDispatchNode handlerDispatch;
 
+    /**
+     * Create with-handler node.
+     *
+     * @param handlerFunctionExpression expression that should yield handler function.
+     * @param body set of expressions for the duration of which the handler will be installed
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPWithHandlerNode(
         ISLISPExpressionNode handlerFunctionExpression,
         ISLISPExpressionNode[] body,

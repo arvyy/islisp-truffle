@@ -8,12 +8,15 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `conditinue-condition` function, which defers condition handling to the next handler.
+ */
 public class ISLISPContinueCondition extends RootNode {
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
-    protected ISLISPContinueCondition(TruffleLanguage<?> language) {
+    ISLISPContinueCondition(TruffleLanguage<?> language) {
         super(language);
     }
 
@@ -32,6 +35,11 @@ public class ISLISPContinueCondition extends RootNode {
         throw new ISLISPContinueException(condition, value);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(new ISLISPContinueCondition(lang).getCallTarget());
     }

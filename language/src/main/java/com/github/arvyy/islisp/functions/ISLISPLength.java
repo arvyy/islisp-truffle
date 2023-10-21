@@ -11,9 +11,12 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `length` function, return the size of a given sequence.
+ */
 public abstract class ISLISPLength extends RootNode {
 
-    protected ISLISPLength(TruffleLanguage<?> language) {
+    ISLISPLength(TruffleLanguage<?> language) {
         super(language);
     }
 
@@ -54,6 +57,12 @@ public abstract class ISLISPLength extends RootNode {
         return len;
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     *
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPLengthNodeGen.create(lang).getCallTarget());
     }

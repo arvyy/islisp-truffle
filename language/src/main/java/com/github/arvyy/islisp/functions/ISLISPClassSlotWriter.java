@@ -14,10 +14,19 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.staticobject.StaticProperty;
 
+/**
+ * Function instantiated for defclass slots with :writer option.
+ */
 public abstract class ISLISPClassSlotWriter extends RootNode {
 
     private final Symbol slot;
 
+    /**
+     * Create slot writer root node.
+     *
+     * @param slot slot's name
+     * @param language language reference
+     */
     public ISLISPClassSlotWriter(Symbol slot, TruffleLanguage<?> language) {
         super(language);
         this.slot = slot;

@@ -18,6 +18,10 @@ import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Helper node that acts as an entry point when invoking a generic function. Collects applicable
+ * methods before initiating dispatch chain.
+ */
 public abstract class ISLISPDefGenericExecutionNode extends RootNode {
 
     private final Symbol name;
@@ -35,6 +39,14 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
 
     DirectCallNode classOfCall;
 
+    /**
+     * Create defgeneric execution node.
+     *
+     * @param name generic function name
+     * @param setf whether function is of setf form
+     * @param language language reference
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPDefGenericExecutionNode(
         Symbol name,
         boolean setf,

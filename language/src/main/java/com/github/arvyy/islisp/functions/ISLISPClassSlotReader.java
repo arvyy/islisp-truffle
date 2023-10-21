@@ -16,10 +16,19 @@ import com.oracle.truffle.api.staticobject.StaticProperty;
 
 import java.util.Objects;
 
+/**
+ * Function instantiated for defclass slots with :reader option.
+ */
 public abstract class ISLISPClassSlotReader extends RootNode {
 
     private final Symbol slot;
 
+    /**
+     * Create slot reader root node.
+     *
+     * @param slot slot's name
+     * @param language language reference
+     */
     public ISLISPClassSlotReader(Symbol slot, TruffleLanguage<?> language) {
         super(language);
         this.slot = slot;

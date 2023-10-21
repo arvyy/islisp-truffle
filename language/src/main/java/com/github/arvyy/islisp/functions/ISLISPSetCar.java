@@ -9,13 +9,16 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `set-car` function, assigns value to the first slot of a pair.
+ */
 public abstract class ISLISPSetCar extends RootNode {
 
-    protected ISLISPSetCar(TruffleLanguage<?> language) {
+    ISLISPSetCar(TruffleLanguage<?> language) {
         super(language);
     }
 
-    protected abstract Object executeGeneric(Object arg1, Object arg2);
+    abstract Object executeGeneric(Object arg1, Object arg2);
 
     @Override
     public final Object execute(VirtualFrame frame) {
@@ -26,16 +29,22 @@ public abstract class ISLISPSetCar extends RootNode {
     }
 
     @Specialization
-    public Object doPair(Object v, Pair p) {
+    Object doPair(Object v, Pair p) {
         p.setCar(v);
         return v;
     }
 
     @Fallback
-    public Object fallback(Object arg1, Object arg2) {
+    Object fallback(Object arg1, Object arg2) {
         throw new ISLISPError("Not a pair", this);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     *
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPSetCarNodeGen.create(lang).getCallTarget());
     }

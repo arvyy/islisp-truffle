@@ -1,5 +1,8 @@
 package com.github.arvyy.islisp.parser;
 
+/**
+ * Possible values to be returned from Lexer.
+ */
 public sealed interface Token {
 
     record ExactNumberToken(int value) implements Token { }

@@ -6,10 +6,19 @@ import com.github.arvyy.islisp.runtime.Symbol;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Misc static utilities.
+ */
 public final class Utils {
 
     private Utils() { }
 
+    /**
+     * Parse sexpr (Pair or nil) to a java list.
+     *
+     * @param v sesxpr
+     * @return java list
+     */
     public static List<Object> readList(Object v) {
         if (v instanceof Pair p) {
             var lst = new ArrayList<Object>();
@@ -25,6 +34,12 @@ public final class Utils {
         throw new RuntimeException();
     }
 
+    /**
+     * Convert java list to sexpr equivalent.
+     *
+     * @param lst java list
+     * @return sexpr
+     */
     public static Object listToValue(List<Object> lst) {
         Object val = ISLISPContext.get(null).getNil();
         for (int i = lst.size() - 1; i >= 0; i--) {

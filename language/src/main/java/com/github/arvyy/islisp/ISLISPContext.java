@@ -14,10 +14,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Context class holding all active data for the execution.
+ */
 public class ISLISPContext {
 
     private static final TruffleLanguage.ContextReference<ISLISPContext> CTX_REF
             = TruffleLanguage.ContextReference.create(ISLISPTruffleLanguage.class);
+
+    /**
+     * Get current islisp context.
+     *
+     * @param node node where context used, can be null.
+     * @return context
+     */
     public static ISLISPContext get(Node node) {
         return CTX_REF.get(node);
      }
@@ -40,6 +50,12 @@ public class ISLISPContext {
 
     private HandlerChain handlerChain;
 
+    /**
+     * Create islisp context.
+     *
+     * @param language
+     * @param env
+     */
     public ISLISPContext(ISLISPTruffleLanguage language, Env env) {
         this.language = language;
         this.env = env;
@@ -61,10 +77,19 @@ public class ISLISPContext {
         handlerChain = null; // TOOD default handler
     }
 
+    /**
+     * Push handler into active handler stack, making it first handler to be hit by the condition signal.
+     * @param f handler function
+     */
     public void pushHandler(LispFunction f) {
         handlerChain = new HandlerChain(f, handlerChain);
     }
 
+    /**
+     * Pop a signal handler from the active handler stack.
+     *
+     * @return popped handler
+     */
     public LispFunction popHandler() {
         var f = handlerChain.handler();
         handlerChain = handlerChain.rest();
@@ -75,6 +100,9 @@ public class ISLISPContext {
         globalFunctions.put(namedSymbol(name).identityReference(), f.apply(language));
     }
 
+    /**
+     * Initialize builtin functions into function namespace storage.
+     */
     void initGlobalFunctions() {
         initGlobalFunction("+", ISLISPAdd::makeLispFunction);
         initGlobalFunction("eq", ISLISPEq::makeLispFunction);
@@ -172,6 +200,9 @@ public class ISLISPContext {
         classes.put(symbol.identityReference(), new BuiltinClass(parentClasses, symbol, false));
     }
 
+    /**
+     * Initialize builtin class graph.
+     */
     void initBuiltinClasses() {
         initBuiltin("<object>");
         initBuiltin("<standard-class>", "<object>");
@@ -189,6 +220,9 @@ public class ISLISPContext {
         initBuiltin("<general-vector>", "<basic-vector>");
     }
 
+    /**
+     * Initialize builtin constants.
+     */
     void initBuiltinVars() {
         var nilref = new ValueReference();
         nilref.setValue(getNil());
@@ -201,6 +235,9 @@ public class ISLISPContext {
         globalVars.put(getT().identityReference(), tref);
     }
 
+    /**
+     * A soft reset to be done after macro expansion phase.
+     */
     public void reset() {
         setfGlobalFunctions.clear();
         globalFunctions.clear();
@@ -216,6 +253,13 @@ public class ISLISPContext {
         initGlobalFunctions();
     }
 
+    /**
+     * Register global variable (mutable or immutable).
+     *
+     * @param symbolReference variable name
+     * @param init initialization value
+     * @param readonly if the variable is a constant
+     */
     @CompilerDirectives.TruffleBoundary
     public void registerGlobalVar(SymbolReference symbolReference, Object init, boolean readonly) {
         var v = new ValueReference();
@@ -224,6 +268,13 @@ public class ISLISPContext {
         globalVars.put(symbolReference, v);
     }
 
+    /**
+     * Find an associated property's value reference with a symbol. Creates if missing.
+     *
+     * @param symbol symbol
+     * @param property property
+     * @return property's value reference
+     */
     @CompilerDirectives.TruffleBoundary
     public ValueReference lookupSymbolProperty(SymbolReference symbol, SymbolReference property) {
         symbolProperties.putIfAbsent(symbol, new HashMap<>());
@@ -232,39 +283,91 @@ public class ISLISPContext {
         return properties.get(property);
     }
 
+    /**
+     * Find global variable by name.
+     *
+     * @param symbolReference name
+     * @return variable's value reference or null if not found
+     */
     @CompilerDirectives.TruffleBoundary
     public ValueReference lookupGlobalVar(SymbolReference symbolReference) {
         return globalVars.get(symbolReference);
     }
 
+    /**
+     * Register setf transformer for a given name. When encountering `(setf (name form ...) value)`
+     * the given transformer will be used to expand it into a non-setf expression.
+     *
+     * @param symbolReference transformer name.
+     * @param transformer transformer.
+     */
     @CompilerDirectives.TruffleBoundary
     public void registerSetfTransformer(SymbolReference symbolReference, SetfTransformer transformer) {
         setfTransformers.put(symbolReference, transformer);
     }
 
+    /**
+     * Find a setf transformer for a given name.
+     *
+     * @param symbolReference transformer name.
+     * @return setf transformer or null if undefined
+     */
     @CompilerDirectives.TruffleBoundary
     public SetfTransformer lookupSetfTransformer(SymbolReference symbolReference) {
         return setfTransformers.get(symbolReference);
     }
 
+    /**
+     * Register dynamic variable.
+     *
+     * @param symbolReference variable name.
+     * @param v value reference.
+     */
     @CompilerDirectives.TruffleBoundary
     public void registerDynamicVar(SymbolReference symbolReference, ValueReference v) {
         dynamicVars.put(symbolReference, v);
     }
 
+    /**
+     * Find dynamic variable value reference for a given name.
+     *
+     * @param symbolReference dynamic variable name
+     * @return dynamic variable value reference
+     */
     @CompilerDirectives.TruffleBoundary
     public ValueReference lookupDynamicVar(SymbolReference symbolReference) {
         return dynamicVars.get(symbolReference);
     }
 
+    /**
+     * Register function into function namespace.
+     *
+     * @param symbolReference function name
+     * @param function function value
+     */
     @CompilerDirectives.TruffleBoundary
     public void registerFunction(SymbolReference symbolReference, LispFunction function) {
         globalFunctions.put(symbolReference, function);
     }
+
+    /**
+     * Find function by name. Function can be a generic function or plain.
+     *
+     * @param symbolReference function name
+     * @return function or null if undefined
+     */
     @CompilerDirectives.TruffleBoundary
     public LispFunction lookupFunction(SymbolReference symbolReference) {
         return lookupFunction(symbolReference, false);
     }
+
+    /**
+     * Find function by name. Function can be a generic function or plain.
+     *
+     * @param symbolReference function name
+     * @param setf whether function is of setf form in case it's generic.
+     * @return function or null if undefined
+     */
     @CompilerDirectives.TruffleBoundary
     public LispFunction lookupFunction(SymbolReference symbolReference, boolean setf) {
         if (setf) {
@@ -274,6 +377,14 @@ public class ISLISPContext {
         }
     }
 
+    /**
+     * Register a generic function.
+     *
+     * @param symbolReference function name
+     * @param setf whether it's of setf form
+     * @param function function call entrypoint function implementation
+     * @param descriptor generic descriptor
+     */
     @CompilerDirectives.TruffleBoundary
     public void registerGenericFunction(
             SymbolReference symbolReference,
@@ -290,6 +401,13 @@ public class ISLISPContext {
         }
     }
 
+    /**
+     * Find generic descriptor for a given generic function name.
+     *
+     * @param symbolReference generic function name
+     * @param setf if the function is of setf form
+     * @return generic function descriptor or null if undefined
+     */
     @CompilerDirectives.TruffleBoundary
     public GenericFunctionDescriptor lookupGenericFunctionDispatchTree(SymbolReference symbolReference, boolean setf) {
         if (setf) {
@@ -299,45 +417,95 @@ public class ISLISPContext {
         }
     }
 
+    /**
+     * Register macro with a given name.
+     *
+     * @param symbolReference macro name
+     * @param function macro implementation function
+     */
     @CompilerDirectives.TruffleBoundary
     public void registerMacro(SymbolReference symbolReference, LispFunction function) {
         macros.put(symbolReference, function);
     }
 
+    /**
+     * Find macro by given symbol reference name.
+     *
+     * @param symbolReference reference
+     * @return macro function or null if undefined
+     */
     @CompilerDirectives.TruffleBoundary
     public LispFunction lookupMacro(SymbolReference symbolReference) {
         return macros.get(symbolReference);
     }
 
+    /**
+     * Add a new class to context.
+     *
+     * @param symbolReference class name's reference
+     * @param clazz class instance
+     */
     @CompilerDirectives.TruffleBoundary
     public void registerClass(SymbolReference symbolReference, LispClass clazz) {
         classes.put(symbolReference, clazz);
     }
 
+    /**
+     * Find a class by symbol reference.
+     *
+     * @param symbolReference class symbolic name's reference
+     * @return class or null if doesn't exist
+     */
     @CompilerDirectives.TruffleBoundary
     public LispClass lookupClass(SymbolReference symbolReference) {
         return classes.get(symbolReference);
     }
 
+    /**
+     * Find a class by string name.
+     *
+     * @param name class name
+     * @return class or null if doesn't exit
+     */
     @CompilerDirectives.TruffleBoundary
     public LispClass lookupClass(String name) {
         return lookupClass(namedSymbol(name).identityReference());
     }
 
+    /**
+     * Get associated language reference.
+     *
+     * @return islisp language object
+     */
     public ISLISPTruffleLanguage getLanguage() {
         return language;
     }
 
+    /**
+     * Get execution environment.
+     *
+     * @return execution environment
+     */
     public Env getEnv() {
         return env;
     }
 
+    /**
+     * Get a named symbol name. Creates if doesn't exist.
+     * @param name symbol name
+     * @return symbol
+     */
     @CompilerDirectives.TruffleBoundary
     public Symbol namedSymbol(String name) {
         var v = symbols.computeIfAbsent(name, k -> new SymbolReference());
         return new Symbol(name, v);
     }
 
+    /**
+     * Get `nil` symbol.
+     *
+     * @return nil symbol
+     */
     public Symbol getNil() {
         if (nil == null) {
             nil = namedSymbol("nil");
@@ -345,6 +513,11 @@ public class ISLISPContext {
         return nil;
     }
 
+    /**
+     * Get `t` symbol.
+     *
+     * @return t symbol
+     */
     public Symbol getT() {
         if (t == null) {
             t = namedSymbol("t");
@@ -353,6 +526,12 @@ public class ISLISPContext {
     }
 
     private int gensymIndex = 1;
+
+    /**
+     * Get next index to be used in gensym's autogenerated name.
+     *
+     * @return next gensym index.
+     */
     public int gensymIndex() {
         return gensymIndex++;
     }

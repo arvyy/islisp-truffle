@@ -9,6 +9,9 @@ import com.oracle.truffle.api.nodes.RootNode;
 
 import java.util.Objects;
 
+/**
+ * Implements `defmethod` syntax for creating new method instance for a given generic function.
+ */
 public class ISLISPDefMethodNode extends ISLISPExpressionNode {
 
     public enum MethodQualifier {
@@ -21,18 +24,26 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
 
     private final Symbol[] argsClassNames;
 
-    private final int requiredArgCount;
     private final boolean hasRest;
     private final boolean setf;
     @Child
     private RootNode functionNode;
 
+    /**
+     * Create defmethod node.
+     *
+     * @param methodQualifier method qualifier
+     * @param name generic function's name
+     * @param setf is the signature plain or using setf
+     * @param argsClassNames parameters' types to use in resolution
+     * @param hasRest does method have :rest argument
+     * @param functionNode method's body implementation node
+     */
     public ISLISPDefMethodNode(
             MethodQualifier methodQualifier,
             Symbol name,
             boolean setf,
             Symbol[] argsClassNames,
-            int requiredArgCount,
             boolean hasRest,
             RootNode functionNode
     ) {
@@ -40,7 +51,6 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
         this.methodQualifier = Objects.requireNonNull(methodQualifier);
         this.name = name;
         this.argsClassNames = argsClassNames;
-        this.requiredArgCount = requiredArgCount;
         this.hasRest = hasRest;
         this.functionNode = functionNode;
         this.setf = setf;
@@ -50,7 +60,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
     public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         var genericFunctionDescriptor = ctx.lookupGenericFunctionDispatchTree(name.identityReference(), setf);
-        if (requiredArgCount != genericFunctionDescriptor.getRequiredArgCount()) {
+        if (argsClassNames.length != genericFunctionDescriptor.getRequiredArgCount()) {
             throw new ISLISPError("defmethod signature doesn't match defgeneric", this);
         }
         if (hasRest != genericFunctionDescriptor.hasRest()) {

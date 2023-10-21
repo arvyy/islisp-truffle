@@ -8,6 +8,10 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `dynamic-let` syntax for parameterizing dynamically scoped variables
+ * with values for the duration of the block.
+ */
 public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
 
     @CompilerDirectives.CompilationFinal(dimensions = 1)
@@ -20,6 +24,14 @@ public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
     @Children
     ISLISPExpressionNode[] body;
 
+    /**
+     * Create dynamic-let node.
+     *
+     * @param symbols locally bound variable names
+     * @param initializers initialization expression for each variable
+     * @param body body of the let
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPDynamicLetNode(
             Symbol[] symbols,
             ISLISPExpressionNode[] initializers,

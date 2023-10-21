@@ -6,9 +6,12 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `vector` function.
+ */
 public class ISLISPVector extends RootNode {
 
-    protected ISLISPVector(TruffleLanguage<?> language) {
+    ISLISPVector(TruffleLanguage<?> language) {
         super(language);
     }
 
@@ -19,6 +22,12 @@ public class ISLISPVector extends RootNode {
         return new LispVector(values);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     *
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(new ISLISPVector(lang).getCallTarget());
     }

@@ -12,6 +12,12 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `signal-condition` function. In case a condition is continuable,
+ * it invokes active handler function, pushing it to callstack. If condition is resumed,
+ * a control flow except unwinds back to the signal-condition call. If the condition isn't continuable,
+ * an exception is raised to unwind to the handler.
+ */
 public class ISLISPSignalCondition extends RootNode {
 
     @Child
@@ -20,7 +26,7 @@ public class ISLISPSignalCondition extends RootNode {
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
-    protected ISLISPSignalCondition(TruffleLanguage<?> language) {
+    ISLISPSignalCondition(TruffleLanguage<?> language) {
         super(language);
         dispatchNode = ISLISPFunctionDispatchNodeGen.create();
         errorSignalerNode = new ISLISPErrorSignalerNode();
@@ -54,6 +60,12 @@ public class ISLISPSignalCondition extends RootNode {
         }
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     *
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(new ISLISPSignalCondition(lang).getCallTarget());
     }

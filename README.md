@@ -3,6 +3,8 @@ Extensions
 * (debugger) statement
 * condition stacktraces
 * eval
+* \<external-object> api
+* string->symbol
 
-Missing features
+Omissions
 * metaclasses

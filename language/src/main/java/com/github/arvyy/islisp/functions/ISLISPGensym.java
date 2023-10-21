@@ -9,9 +9,12 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements a `gensym` function, that returns a new unnamed symbol distinct from any other symbol.
+ */
 public class ISLISPGensym extends RootNode {
 
-    protected ISLISPGensym(TruffleLanguage<?> language) {
+    ISLISPGensym(TruffleLanguage<?> language) {
         super(language);
     }
 
@@ -25,7 +28,11 @@ public class ISLISPGensym extends RootNode {
         return "gensym-" + ISLISPContext.get(this).gensymIndex();
     }
 
-
+    /**
+     * Construct LispFunction using this root node.
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(new ISLISPGensym(lang).getCallTarget());
     }

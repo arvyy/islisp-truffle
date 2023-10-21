@@ -15,9 +15,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Implements `format-integer` function, that writes a given integer to output stream.
+ */
 public abstract class ISLISPFormatInteger extends RootNode {
 
-    public ISLISPFormatInteger(TruffleLanguage<?> language) {
+    ISLISPFormatInteger(TruffleLanguage<?> language) {
         super(language);
     }
 
@@ -30,12 +33,12 @@ public abstract class ISLISPFormatInteger extends RootNode {
     }
 
     @Specialization
-    public void doProper(LispOutputStream stream, int integer, int radix) {
+    void doProper(LispOutputStream stream, int integer, int radix) {
         doPrint(stream.outputStream(), integer, radix);
     }
 
     @Fallback
-    public void doFallback(Object stream, Object integer, Object radix) {
+    void doFallback(Object stream, Object integer, Object radix) {
         throw new ISLISPError("Bad arguments", this);
     }
 
@@ -49,6 +52,11 @@ public abstract class ISLISPFormatInteger extends RootNode {
         }
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPFormatIntegerNodeGen.create(lang).getCallTarget());
     }

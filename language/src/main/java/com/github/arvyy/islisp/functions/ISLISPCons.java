@@ -7,12 +7,15 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `cons` function, creates a new pair from given two arguments.
+ */
 public class ISLISPCons extends RootNode {
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
-    public ISLISPCons(TruffleLanguage<?> language) {
+    ISLISPCons(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode();
     }
@@ -25,6 +28,11 @@ public class ISLISPCons extends RootNode {
         return new Pair(frame.getArguments()[1], frame.getArguments()[2]);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(new ISLISPCons(lang).getCallTarget());
     }

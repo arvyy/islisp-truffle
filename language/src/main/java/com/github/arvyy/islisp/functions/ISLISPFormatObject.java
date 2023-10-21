@@ -16,9 +16,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Implements `format-object` function, that writes a given object to output stream.
+ */
 public abstract class ISLISPFormatObject extends RootNode {
 
-    protected ISLISPFormatObject(TruffleLanguage<?> language) {
+    ISLISPFormatObject(TruffleLanguage<?> language) {
         super(language);
     }
 
@@ -53,6 +56,11 @@ public abstract class ISLISPFormatObject extends RootNode {
         }
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPFormatObjectNodeGen.create(lang).getCallTarget());
     }

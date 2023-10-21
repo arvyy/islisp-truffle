@@ -6,8 +6,16 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `next-method-p`, predicate informing if there are more applicable methods in the chain
+ * and thus if a `call-next-method` is valid.
+ */
 public class ISLISPHasNextMethod extends RootNode {
 
+    /**
+     * Create next-method-p node.
+     * @param language language reference
+     */
     public ISLISPHasNextMethod(TruffleLanguage<?> language) {
         super(language);
     }

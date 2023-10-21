@@ -10,6 +10,9 @@ import com.oracle.truffle.api.instrumentation.Tag;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements function call of a global function.
+ */
 public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
 
     private final Symbol name;
@@ -24,6 +27,14 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
     @Child
     private ISLISPFunctionDispatchNode dispatchNode;
 
+    /**
+     * Create global function call node.
+     *
+     * @param name function's name
+     * @param setf is this regular form or through setf
+     * @param arguments expressions to be evaluated and used as function arguments
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPGlobalFunctionCallNode(
         Symbol name,
         boolean setf,

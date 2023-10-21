@@ -12,16 +12,19 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `class-of` function, returning given object's class.
+ */
 public abstract class ISLISPClassOf extends RootNode {
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
-    public ISLISPClassOf(TruffleLanguage<?> language) {
+    ISLISPClassOf(TruffleLanguage<?> language) {
         super(language);
     }
 
-    protected abstract Object executeGeneric(Object value);
+    abstract Object executeGeneric(Object value);
 
     @Override
     public final Object execute(VirtualFrame frame) {
@@ -33,21 +36,21 @@ public abstract class ISLISPClassOf extends RootNode {
     }
 
     @Specialization
-    protected LispClass doInt(
+    LispClass doInt(
             int integer,
             @Cached("loadIntegerClass()") LispClass lispClass) {
         return lispClass;
     }
 
     @Specialization
-    protected LispClass doFloat(
+    LispClass doFloat(
         double flt,
         @Cached("loadFloatClass()") LispClass lispClass) {
         return lispClass;
     }
 
     @Specialization
-    protected LispClass doString(
+    LispClass doString(
         String str,
         @Cached("loadStringClass()") LispClass lispClass
     ) {
@@ -55,7 +58,7 @@ public abstract class ISLISPClassOf extends RootNode {
     }
 
     @Specialization
-    protected LispClass doStringBuffer(
+    LispClass doStringBuffer(
         StringBuffer str,
         @Cached("loadStringClass()") LispClass lispClass
     ) {
@@ -63,14 +66,14 @@ public abstract class ISLISPClassOf extends RootNode {
     }
 
     @Specialization
-    protected LispClass doFunction(
+    LispClass doFunction(
             LispFunction fun,
             @Cached("loadFunctionClass()") LispClass lispClass) {
         return lispClass;
     }
 
     @Specialization
-    protected LispClass doSymbol(
+    LispClass doSymbol(
             Symbol symbol,
             @Cached("loadNullClass()") LispClass nullClass,
             @Cached("loadSymbolClass()") LispClass symbolClass) {
@@ -78,7 +81,7 @@ public abstract class ISLISPClassOf extends RootNode {
     }
 
     @Specialization
-    protected LispClass doStandardClass(
+    LispClass doStandardClass(
             StandardClass clazz,
             @Cached("loadStandardClass()") LispClass builtinClass
     ) {
@@ -86,13 +89,13 @@ public abstract class ISLISPClassOf extends RootNode {
     }
 
     @Specialization
-    protected LispClass doStandardClassObject(StandardClassObject obj) {
+    LispClass doStandardClassObject(StandardClassObject obj) {
         return obj.clazz();
     }
 
     @Fallback
     @CompilerDirectives.TruffleBoundary
-    protected LispClass doFallback(Object value) {
+    LispClass doFallback(Object value) {
         throw new ISLISPError("Unknown class for value: " + value, this);
     }
 
@@ -130,6 +133,11 @@ public abstract class ISLISPClassOf extends RootNode {
         return ctx.lookupClass(symbol.identityReference());
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPClassOfNodeGen.create(lang).getCallTarget());
     }

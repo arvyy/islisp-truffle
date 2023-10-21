@@ -11,12 +11,15 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `remove-property` function, which removes given property from a given symbol.
+ */
 public abstract class ISLISPRemoveProperty extends RootNode {
 
     @Child
     private ISLISPErrorSignalerNode errorSignalerNode;
 
-    public ISLISPRemoveProperty(TruffleLanguage<?> language) {
+    ISLISPRemoveProperty(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode();
     }
@@ -32,7 +35,7 @@ public abstract class ISLISPRemoveProperty extends RootNode {
         return executeGeneric(frame.getArguments()[1], frame.getArguments()[2]);
     }
 
-    protected abstract Object executeGeneric(Object symbol, Object property);
+    abstract Object executeGeneric(Object symbol, Object property);
 
     @Specialization(guards = {
         "symbol.identityReference().getId() == symbolLastId",
@@ -71,6 +74,12 @@ public abstract class ISLISPRemoveProperty extends RootNode {
         return !(symbol instanceof Symbol && property instanceof Symbol);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     *
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPRemovePropertyNodeGen.create(lang).getCallTarget());
     }

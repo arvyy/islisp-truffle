@@ -8,11 +8,18 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `call-next-method`, invoking next applicable generic method in chain.
+ */
 public class ISLISPCallNextMethod extends RootNode {
 
     @Child
     private ISLISPGenericFunctionDispatchNode dispatchNode;
 
+    /**
+     * Create call-next-method node.
+     * @param language language reference
+     */
     public ISLISPCallNextMethod(TruffleLanguage<?> language) {
         super(language);
         dispatchNode = ISLISPGenericFunctionDispatchNodeGen.create();

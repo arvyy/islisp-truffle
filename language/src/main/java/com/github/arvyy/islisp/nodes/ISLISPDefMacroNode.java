@@ -4,11 +4,20 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+/**
+ * Implements `defmacro` syntax for creating syntax-macros.
+ * Functionally similar to simple function except it has a slightly different storage mechanism.
+ */
 public class ISLISPDefMacroNode extends ISLISPExpressionNode {
 
     @Child
     ISLISPDefunNode defun;
 
+    /**
+     * Create defmacro node.
+     *
+     * @param defun function definition for the macro.
+     */
     public ISLISPDefMacroNode(ISLISPDefunNode defun) {
         super(true, null);
         this.defun = defun;

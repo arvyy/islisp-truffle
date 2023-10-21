@@ -13,12 +13,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Reader using lexer's token input and forms
+ * sexprs to be parsed from.
+ */
 public class Reader {
 
     private final Lexer lexer;
     private final Source source;
     private final Map<EqWrapper, SourceSection> sourceSectionMap;
 
+    /**
+     * Create reader from given source.
+     *
+     * @param source source to read from
+     * @param sourceSectionMap map to populate with source location information while reading
+     */
     public Reader(Source source, Map<EqWrapper, SourceSection> sourceSectionMap) {
         this.source = source;
         lexer = new ISLISPLexer(source.getReader());
@@ -29,6 +39,9 @@ public class Reader {
         return source.createSection(lexer.getLine(), lexer.getColumn(), lexer.getLength());
     }
 
+    /**
+     * @return list of all top level expressions in given source.
+     */
     public List<Object> readAll() {
         var lst = new ArrayList<Object>();
         Optional<Object> maybeValue = readSingle();
@@ -39,6 +52,11 @@ public class Reader {
         return lst;
     }
 
+    /**
+     * Read single sexpr expression.
+     *
+     * @return sexpr expression
+     */
     public Optional<Object> readSingle() {
         Optional<Token> maybeT = lexer.getToken();
         if (maybeT.isEmpty()) {

@@ -12,6 +12,10 @@ import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.instrumentation.Tag;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `setq` syntax for setting value of either global or closure / local
+ * lexically scoped variable.
+ */
 public class ISLISPSetqNode extends ISLISPExpressionNode {
 
     private final int frameIndex;
@@ -25,6 +29,13 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
     @Child
     ISLISPExpressionNode expression;
 
+    /**
+     * Create setq node for the global variable.
+     *
+     * @param name global variable name
+     * @param expression value expression
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPSetqNode(Symbol name, ISLISPExpressionNode expression, SourceSection sourceSection) {
         super(sourceSection);
         this.name = name;
@@ -33,6 +44,14 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
         this.expression = expression;
     }
 
+    /**
+     * Create setq node for a local / closure variable.
+     *
+     * @param frameIndex frame index
+     * @param frameSlot frame slot in appropriate frame
+     * @param expression value expression
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPSetqNode(int frameIndex, int frameSlot, ISLISPExpressionNode expression, SourceSection sourceSection) {
         super(sourceSection);
         this.name = null;

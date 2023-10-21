@@ -5,12 +5,22 @@ import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `defglobal` syntax for defining global mutable variables.
+ */
 public class ISLISPDefGlobalNode extends ISLISPExpressionNode {
 
     private final Symbol name;
     @Child
     private ISLISPExpressionNode expression;
 
+    /**
+     * Create defglobal node.
+     *
+     * @param name variable name
+     * @param expression initial value
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPDefGlobalNode(Symbol name, ISLISPExpressionNode expression, SourceSection sourceSection) {
         super(true, sourceSection);
         this.name = name;

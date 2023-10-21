@@ -5,6 +5,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.profiles.ConditionProfile;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `if` syntax for logical branching.
+ */
 public class ISLISPIfNode extends ISLISPExpressionNode {
 
     private final ConditionProfile conditionProfile;
@@ -18,6 +21,14 @@ public class ISLISPIfNode extends ISLISPExpressionNode {
     @Child
     private ISLISPExpressionNode falsyExpr;
 
+    /**
+     * Create if node.
+     *
+     * @param testExpr expression used to determine the execution branch
+     * @param truthyExpr expression to evaluate if testExpr yielded truthy value
+     * @param falsyExpr expression to evaluate if testExpr yielded nil
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPIfNode(
             ISLISPExpressionNode testExpr,
             ISLISPExpressionNode truthyExpr,

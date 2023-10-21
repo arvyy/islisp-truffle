@@ -7,6 +7,9 @@ import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `function` syntax that allows looking up function from the function namespace to be used as a value.
+ */
 public class ISLISPFunctionRefNode extends ISLISPExpressionNode {
 
     private final Symbol name;
@@ -14,6 +17,11 @@ public class ISLISPFunctionRefNode extends ISLISPExpressionNode {
     @CompilerDirectives.CompilationFinal
     private LispFunction function;
 
+    /**
+     * Create function reference node.
+     * @param name function name in the function namespace.
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPFunctionRefNode(Symbol name, SourceSection sourceSection) {
         super(sourceSection);
         this.name = name;

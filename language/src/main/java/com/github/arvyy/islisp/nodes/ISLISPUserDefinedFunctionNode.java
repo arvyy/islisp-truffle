@@ -15,6 +15,10 @@ import com.oracle.truffle.api.instrumentation.Tag;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements prolog of a userdefined function; initiates appropriate
+ * frame slots from arguments before invoking body node.
+ */
 @GenerateWrapper
 public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
 
@@ -36,6 +40,17 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
     private final int callNextMethodSlot;
     private final int hasNextMethodSlot;
 
+    /**
+     * Create user defined function prolog node.
+     *
+     * @param language language reference
+     * @param body the actual body of the function
+     * @param namedArgumentSlots slots to be initialized from invocation arguments
+     * @param restArgumentsSlot slot to store rest invocation arguments into; -1 if absent
+     * @param callNextMethodSlot slot to store `call-next-method` invocation; -1 if not a generic function
+     * @param hasNextMethodSlot slot to store `next-method-p` invocation; -1 if not a generic function
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPUserDefinedFunctionNode(
             TruffleLanguage<?> language,
             ISLISPExpressionNode body,

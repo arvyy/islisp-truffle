@@ -9,9 +9,12 @@ import com.oracle.truffle.api.nodes.RootNode;
 
 import java.util.Arrays;
 
+/**
+ * Implements `create-vector` function; creates a vector instance.
+ */
 public class ISLISPCreateVector extends RootNode {
 
-    protected ISLISPCreateVector(TruffleLanguage<?> language) {
+    ISLISPCreateVector(TruffleLanguage<?> language) {
         super(language);
     }
 
@@ -28,6 +31,11 @@ public class ISLISPCreateVector extends RootNode {
         return new LispVector(values);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(new ISLISPCreateVector(lang).getCallTarget());
     }

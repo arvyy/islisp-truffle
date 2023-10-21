@@ -5,6 +5,9 @@ import com.github.arvyy.islisp.exceptions.ISLISPTagbodyGoException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `tagbody` syntax.
+ */
 public class ISLISPTagBodyNode extends ISLISPExpressionNode {
 
     // list of tags present in this tagbody form
@@ -16,6 +19,14 @@ public class ISLISPTagBodyNode extends ISLISPExpressionNode {
     @Children
     private ISLISPExpressionNode[] expressions;
 
+    /**
+     * Create tagbody node.
+     *
+     * @param tagIds array of tag ids for each possible jump point
+     * @param tagPosition possition array, where tagId[i] points to exresspion[tagPosition[i]]
+     * @param expressions array of body expressions
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPTagBodyNode(
             int[] tagIds,
             int[] tagPosition,

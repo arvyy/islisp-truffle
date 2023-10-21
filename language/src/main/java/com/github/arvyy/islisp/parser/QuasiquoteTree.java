@@ -9,6 +9,9 @@ import com.oracle.truffle.api.nodes.Node;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Representation of a quasiquote, specifying holes and ways to substitute them during evaluation.
+ */
 //TODO preserve source location
 //TODO calcify non-atoms into Atom if there are no internal substitutions
 public sealed interface QuasiquoteTree {
@@ -22,6 +25,12 @@ public sealed interface QuasiquoteTree {
 
     record QuasiquoteTreeAndExpressions(QuasiquoteTree tree, Object[] expressions) { }
 
+    /**
+     * Parse sexpr into quasiquote tree.
+     *
+     * @param expr sexpr
+     * @return quasiquote tree and expressions
+     */
     static QuasiquoteTreeAndExpressions parseQuasiquoteTree(Object expr) {
         return parseQuasiquoteTree(expr, 0, 0);
     }
@@ -78,6 +87,14 @@ public sealed interface QuasiquoteTree {
         throw new RuntimeException();
     }
 
+    /**
+     * Evaluate quasiquote tree, substituting holes with given values.
+     *
+     * @param tree quasiquote tree
+     * @param substitutionValues values to be substituted
+     * @param node node from which this execution is done; used in case of an error
+     * @return evaluated value
+     */
     static Object evalQuasiquoteTree(QuasiquoteTree tree, Object[] substitutionValues, Node node) {
         if (tree instanceof Atom a) {
             return a.value;

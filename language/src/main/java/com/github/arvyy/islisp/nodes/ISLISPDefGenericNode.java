@@ -7,6 +7,9 @@ import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `defgeneric` syntax for creating new generic methods.
+ */
 public class ISLISPDefGenericNode extends ISLISPExpressionNode {
 
     private final Symbol name;
@@ -18,6 +21,15 @@ public class ISLISPDefGenericNode extends ISLISPExpressionNode {
     private ISLISPDefGenericExecutionNode executionNode;
 
 
+    /**
+     * Create defgeneric node.
+     *
+     * @param name generic function name
+     * @param setf if function has setf form or not
+     * @param requiredArgsCount required arguments count
+     * @param hasRest has rest argument
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPDefGenericNode(
         Symbol name,
         boolean setf,

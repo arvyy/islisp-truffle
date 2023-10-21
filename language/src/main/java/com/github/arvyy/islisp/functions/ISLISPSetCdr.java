@@ -9,13 +9,16 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `set-cdr` function, assigns value to the second slot of a pair.
+ */
 public abstract class ISLISPSetCdr extends RootNode {
 
-    protected ISLISPSetCdr(TruffleLanguage<?> language) {
+    ISLISPSetCdr(TruffleLanguage<?> language) {
         super(language);
     }
 
-    protected abstract Object executeGeneric(Object arg1, Object arg2);
+    abstract Object executeGeneric(Object arg1, Object arg2);
 
     @Override
     public final Object execute(VirtualFrame frame) {
@@ -26,16 +29,22 @@ public abstract class ISLISPSetCdr extends RootNode {
     }
 
     @Specialization
-    public Object doPair(Object v, Pair p) {
+    Object doPair(Object v, Pair p) {
         p.setCdr(v);
         return v;
     }
 
     @Fallback
-    public Object fallback(Object arg1, Object arg2) {
+    Object fallback(Object arg1, Object arg2) {
         throw new ISLISPError("Not a pair", this);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     *
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(ISLISPSetCdrNodeGen.create(lang).getCallTarget());
     }

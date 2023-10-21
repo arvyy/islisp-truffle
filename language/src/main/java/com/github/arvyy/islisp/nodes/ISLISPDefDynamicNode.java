@@ -6,6 +6,9 @@ import com.github.arvyy.islisp.runtime.ValueReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `defdynamic` syntax for creating dynamically scoped variables.
+ */
 public class ISLISPDefDynamicNode extends ISLISPExpressionNode {
 
     private final Symbol name;
@@ -13,6 +16,13 @@ public class ISLISPDefDynamicNode extends ISLISPExpressionNode {
     @Child
     private ISLISPExpressionNode initializer;
 
+    /**
+     * Create defdynamic node.
+     *
+     * @param name dynamic variable's name
+     * @param initializer expression for variable's initial value
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPDefDynamicNode(Symbol name, ISLISPExpressionNode initializer, SourceSection sourceSection) {
         super(true, sourceSection);
         this.name = name;

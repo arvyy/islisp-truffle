@@ -5,6 +5,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `let` syntax for creating local lexical bindings.
+ */
 public class ISLISPLetNode extends ISLISPExpressionNode {
 
     final int[] variableSlots;
@@ -15,6 +18,14 @@ public class ISLISPLetNode extends ISLISPExpressionNode {
     @Children
     ISLISPExpressionNode[] body;
 
+    /**
+     * Create let node.
+     *
+     * @param variableSlots indeces of frame slots for locally introduced variables.
+     * @param variableInitializers expressions to be used to initialize variables
+     * @param body let's body
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPLetNode(
             int[] variableSlots,
             ISLISPExpressionNode[] variableInitializers,

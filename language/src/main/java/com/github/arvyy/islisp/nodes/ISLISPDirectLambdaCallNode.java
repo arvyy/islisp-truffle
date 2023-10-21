@@ -4,6 +4,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements special case when a `lambda` form is immediately invoked.
+ */
 public class ISLISPDirectLambdaCallNode extends ISLISPExpressionNode {
 
     @Child
@@ -15,6 +18,13 @@ public class ISLISPDirectLambdaCallNode extends ISLISPExpressionNode {
     @Child
     private ISLISPFunctionDispatchNode dispatchNode;
 
+    /**
+     * Create direct lambda call.
+     *
+     * @param lambdaNode lambda node
+     * @param arguments expressions to be used as arguments
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPDirectLambdaCallNode(
             ISLISPLambdaNode lambdaNode,
             ISLISPExpressionNode[] arguments,

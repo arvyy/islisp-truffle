@@ -11,6 +11,9 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Implements `create` method for &lt;standard-class&gt;.
+ */
 public class ISLISPCreateStandardClassObject extends RootNode {
 
     @Child
@@ -19,7 +22,7 @@ public class ISLISPCreateStandardClassObject extends RootNode {
     @CompilerDirectives.CompilationFinal
     private LispFunction initializeObjectFunction;
 
-    public ISLISPCreateStandardClassObject(TruffleLanguage<?> language) {
+    ISLISPCreateStandardClassObject(TruffleLanguage<?> language) {
         super(language);
         dispatchNode = ISLISPFunctionDispatchNodeGen.create();
     }
@@ -38,6 +41,11 @@ public class ISLISPCreateStandardClassObject extends RootNode {
         return dispatchNode.executeDispatch(initializeObjectFunction, args);
     }
 
+    /**
+     * Construct LispFunction using this root node.
+     * @param lang truffle language reference
+     * @return lisp function
+     */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         return new LispFunction(new ISLISPCreateStandardClassObject(lang).getCallTarget());
     }

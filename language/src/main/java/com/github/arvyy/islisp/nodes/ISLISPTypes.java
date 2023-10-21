@@ -25,9 +25,26 @@ public class ISLISPTypes {
 
     protected ISLISPTypes() { }
 
+    /**
+     * Implicitly convert int to double.
+     *
+     * @param v int value
+     * @return double value
+     */
     @ImplicitCast
     public static double intToDouble(int v) {
         return v;
+    }
+
+    /**
+     * Implicitly convert float to double.
+     *
+     * @param f float value
+     * @return double value
+     */
+    @ImplicitCast
+    public static double floatToDouble(float f) {
+        return f;
     }
 
 }

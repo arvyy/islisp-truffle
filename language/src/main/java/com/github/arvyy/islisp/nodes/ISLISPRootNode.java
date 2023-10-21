@@ -7,11 +7,21 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Root node that wraps all the top level statements.
+ */
 public class ISLISPRootNode extends RootNode {
 
     @Children
     private final ISLISPExpressionNode[] expressionNodes;
 
+    /**
+     * Create root node.
+     *
+     * @param language language reference
+     * @param expressionNodes root body
+     * @param frameDescriptor descriptor of known local variable locations
+     */
     public ISLISPRootNode(
             TruffleLanguage<?> language,
             ISLISPExpressionNode[] expressionNodes,

@@ -1,12 +1,15 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.functions.ISLISPEq;
 import com.github.arvyy.islisp.exceptions.ISLISPThrowException;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
+/**
+ * Implements `catch` syntax. Catches raise calls for matching tag object.
+ */
 public class ISLISPCatchNode extends ISLISPExpressionNode {
 
     @Child
@@ -15,6 +18,16 @@ public class ISLISPCatchNode extends ISLISPExpressionNode {
     @Children
     ISLISPExpressionNode[] body;
 
+    @Child
+    DirectCallNode eq;
+
+    /**
+     * Create catch node.
+     *
+     * @param tagForm expression for tag value
+     * @param body body expressions
+     * @param sourceSection corresponding source section to this node
+     */
     public ISLISPCatchNode(ISLISPExpressionNode tagForm, ISLISPExpressionNode[] body, SourceSection sourceSection) {
         super(sourceSection);
         this.tagForm = tagForm;
@@ -24,6 +37,12 @@ public class ISLISPCatchNode extends ISLISPExpressionNode {
     @Override
     @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
+        var ctx = ISLISPContext.get(this);
+        if (eq == null) {
+            eq = DirectCallNode.create(
+                ctx.lookupFunction(ctx.namedSymbol("eq").identityReference())
+                    .callTarget());
+        }
         var tagObject = tagForm.executeGeneric(frame);
         try {
             if (body.length == 0) {
@@ -34,7 +53,7 @@ public class ISLISPCatchNode extends ISLISPExpressionNode {
             }
             return body[body.length - 1].executeGeneric(frame);
         } catch (ISLISPThrowException e) {
-            if (ISLISPEq.isEq(tagObject, e.getCatchTag())) {
+            if (eq.call(null, tagObject, e.getCatchTag()) != ctx.getNil()) {
                 return e.getResult();
             } else {
                 throw e;
