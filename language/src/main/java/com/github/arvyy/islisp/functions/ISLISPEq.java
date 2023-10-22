@@ -34,6 +34,8 @@ public class ISLISPEq extends RootNode {
     }
 
     boolean isEq(Object o1, Object o2) {
+        // lisp symbol might not be pointerwise equal to a symbol with same name but different source location
+        // therefore identityReference must be used
         if (o1 instanceof Symbol s1 && o2 instanceof Symbol s2) {
             return s1.identityReference().getId() == s2.identityReference().getId();
         }

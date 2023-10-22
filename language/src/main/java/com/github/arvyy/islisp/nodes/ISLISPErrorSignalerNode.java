@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.LispClass;
+import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.Node;
@@ -51,6 +52,16 @@ public class ISLISPErrorSignalerNode extends Node {
             ctx.lookupClass(ctx.namedSymbol("<domain-error>").identityReference()),
             ctx.namedSymbol("object"), obj,
             ctx.namedSymbol("expected-class"), expectedClass
+        );
+        return getSignalCallNode().call(null, condition, ctx.getNil());
+    }
+
+    public Object signalUnboundVariable(Symbol name) {
+        var ctx = ISLISPContext.get(this);
+        var condition = getCreateCallNode().call(
+            null,
+            ctx.lookupClass(ctx.namedSymbol("<unbound-variable>").identityReference()),
+            ctx.namedSymbol("name"), name
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }

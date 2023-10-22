@@ -15,6 +15,9 @@ public class ISLISPGlobalIdentifierNode extends ISLISPExpressionNode {
     @CompilerDirectives.CompilationFinal
     private ValueReference valueReference;
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     private final Symbol name;
 
     /**
@@ -26,12 +29,16 @@ public class ISLISPGlobalIdentifierNode extends ISLISPExpressionNode {
     public ISLISPGlobalIdentifierNode(Symbol name, SourceSection sourceSection) {
         super(sourceSection);
         this.name = name;
+        errorSignalerNode = new ISLISPErrorSignalerNode();
     }
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         if (valueReference == null) {
             valueReference = ISLISPContext.get(this).lookupGlobalVar(name.identityReference());
+            if (valueReference == null) {
+                return errorSignalerNode.signalUnboundVariable(name);
+            }
         }
         return valueReference.getValue();
     }

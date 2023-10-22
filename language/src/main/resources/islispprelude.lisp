@@ -14,6 +14,14 @@
      (required-min :reader arity-error-required-min :initarg required-min)
      (required-max :reader arity-error-required-max :initarg required-max)))
 
+(defclass <undefined-entity> (<program-error>) ())
+
+(defclass <unbound-variable> (<undefined-entity>)
+    ((name :reader unbound-variable-name :initarg name)))
+
+(defclass <undefined-function> (<undefined-entity>)
+    ((name :reader undefined-function-name :initarg name)))
+
 (defgeneric fill-in-condition-stacktrace (condition))
 (defmethod fill-in-condition-stacktrace ((condition <serious-condition>))
     t)
