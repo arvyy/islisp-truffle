@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ExternalTest {
@@ -27,7 +26,7 @@ public class ExternalTest {
                 });
     }
 
-    void executeTest(Path lispFile) throws IOException {
+    void executeTest(Path lispFile) throws Throwable {
         var srcName = lispFile.getFileName().toString();
         var resultName = srcName.substring(0, srcName.length() - ".lisp".length()) + ".expect.txt";
         var resultFile = lispFile.getParent().resolve(resultName);

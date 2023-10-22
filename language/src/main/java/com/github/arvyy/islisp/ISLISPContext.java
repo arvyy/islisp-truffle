@@ -33,7 +33,11 @@ public class ISLISPContext {
      }
     private final ISLISPTruffleLanguage language;
     private final Env env;
+
+    @CompilerDirectives.CompilationFinal
     private Symbol nil;
+
+    @CompilerDirectives.CompilationFinal
     private Symbol t;
 
     private final Map<SymbolReference, LispFunction> globalFunctions;

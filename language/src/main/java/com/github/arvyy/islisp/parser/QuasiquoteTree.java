@@ -68,6 +68,15 @@ public sealed interface QuasiquoteTree {
         return parseQuasiquoteTree(expr, 0, 0);
     }
 
+    private static QuasiquoteTreeAndExpressions rewrap(QuasiquoteTreeAndExpressions parsed, Symbol s) {
+        var tree = parsed.tree;
+        var content = new ArrayList<QuasiquoteTree>();
+        content.add(new Atom(s));
+        content.add(tree);
+        tree = new List(content.toArray(QuasiquoteTree[]::new));
+        return new QuasiquoteTreeAndExpressions(tree, parsed.expressions);
+    }
+
     private static QuasiquoteTreeAndExpressions parseQuasiquoteTree(Object expr, int level, int holeIndex) {
         if (expr instanceof Pair p) {
             if (p.car() instanceof Symbol s) {
@@ -76,11 +85,11 @@ public sealed interface QuasiquoteTree {
                 switch (s.name()) {
                     case "quasiquote":
                         rest = ((Pair) p.cdr()).car();
-                        /*
-                        var res = parseQuasiquoteTree(rest, level + 1, holeIndex);
-                        return new QuasiquoteTreeAndExpressions(new Quasiquote(res.tree), res.expressions);
-                         */
-                        return parseQuasiquoteTree(rest, level + 1, holeIndex);
+                        if (level > 0) {
+                            return rewrap(parseQuasiquoteTree(rest, level + 1, holeIndex), s);
+                        } else {
+                            return parseQuasiquoteTree(rest, level + 1, holeIndex);
+                        }
                     case "unquote-splicing":
                         isSplicing = true;
                         // fallthrough
@@ -97,7 +106,7 @@ public sealed interface QuasiquoteTree {
                                 return new QuasiquoteTreeAndExpressions(new Unquote(hole), new Object[]{rest});
                             }
                         } else {
-                            return parseQuasiquoteTree(rest, level - 1, holeIndex);
+                            return rewrap(parseQuasiquoteTree(rest, level - 1, holeIndex), s);
                         }
                      default:
                 }
