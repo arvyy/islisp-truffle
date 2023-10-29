@@ -160,6 +160,8 @@ public class Parser {
                     return parseQuasiquote(parserContext, sexpr);
                 case "class":
                     return parseClassRef(parserContext, sexpr);
+                case "for":
+                    return parseFor(parserContext, sexpr);
                 case "block":
                     return parseBlock(parserContext, sexpr);
                 case "return-from":
@@ -258,6 +260,50 @@ public class Parser {
             }
         }
         throw new ParsingException(source(sexpr), "Unrecognized form.");
+    }
+
+    private ISLISPForNode parseFor(ParserContext parserContext, Object sexpr) {
+        var args = requireList(sexpr, 3, -1);
+        var slots = new ArrayList<Integer>();
+        var inits = new ArrayList<ISLISPExpressionNode>();
+        var steps = new ArrayList<ISLISPExpressionNode>();
+        var iterationSpecList = requireList(args.get(1), -1, -1);
+        var newLexicalScope = new HashMap<SymbolReference, ParserContext.VariableContext>();
+        for (var variableSpec: iterationSpecList) {
+            var varSpecList = requireList(variableSpec, 2, 3);
+            var varName = downcast(varSpecList.get(0), Symbol.class);
+            inits.add(parseExpressionNode(parserContext, varSpecList.get(1)));
+            var slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
+            slots.add(slot);
+            var variableContext = new ParserContext.VariableContext();
+            variableContext.slot = slot;
+            variableContext.frameDepth = parserContext.frameDepth;
+            newLexicalScope.put(varName.identityReference(), variableContext);
+        }
+        var internalParserContext = parserContext.pushLexicalScope(newLexicalScope);
+        for (var variableSpec : iterationSpecList) {
+            var varSpecList = requireList(variableSpec, 2, 3);
+            var varName = downcast(varSpecList.get(0), Symbol.class);
+            var step = varSpecList.size() == 2 ? varName : varSpecList.get(2);
+            steps.add(parseExpressionNode(internalParserContext, step));
+        }
+        var endTestGroup = requireList(args.get(2), 1, -1);
+        var testExpr = parseExpressionNode(internalParserContext, endTestGroup.get(0));
+        var resultBody = endTestGroup.stream()
+            .skip(1)
+            .map(resultExpr -> parseExpressionNode(internalParserContext, resultExpr));
+        var iterationBody = args.stream()
+            .skip(3)
+            .map(e -> parseExpressionNode(internalParserContext, e));
+        return new ISLISPForNode(
+            slots.stream().mapToInt(i -> i).toArray(),
+            inits.toArray(ISLISPExpressionNode[]::new),
+            steps.toArray(ISLISPExpressionNode[]::new),
+            iterationBody.toArray(ISLISPExpressionNode[]::new),
+            testExpr,
+            resultBody.toArray(ISLISPExpressionNode[]::new),
+            source(sexpr)
+        );
     }
 
     private ISLISPWhileNode parseWhile(ParserContext parserContext, Object sexpr) {
