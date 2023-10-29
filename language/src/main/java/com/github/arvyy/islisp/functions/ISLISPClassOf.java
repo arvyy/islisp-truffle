@@ -103,7 +103,15 @@ public abstract class ISLISPClassOf extends RootNode {
 
     @Specialization
     LispClass doOutputStream(
-        LispOutputStream vec,
+        LispOutputStream stream,
+        @Cached("loadStreamClass()") LispClass streamClass
+    ) {
+        return streamClass;
+    }
+
+    @Specialization
+    LispClass doInputStream(
+        LispInputStream stream,
         @Cached("loadStreamClass()") LispClass streamClass
     ) {
         return streamClass;

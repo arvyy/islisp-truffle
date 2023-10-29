@@ -115,9 +115,11 @@ public class ISLISPContext {
         initGlobalFunction(">", ISLISPNumericGt::makeLispFunction);
         initGlobalFunction("car", ISLISPCar::makeLispFunction);
         initGlobalFunction("cdr", ISLISPCdr::makeLispFunction);
-        initGlobalFunction("cons", ISLISPCons::makeLispFunction);
         initGlobalFunction("class-of", ISLISPClassOf::makeLispFunction);
+        initGlobalFunction("cons", ISLISPCons::makeLispFunction);
         initGlobalFunction("continue-condition", ISLISPContinueCondition::makeLispFunction);
+        initGlobalFunction("create-string-input-stream", ISLISPCreateStringInputStream::makeLispFunction);
+        initGlobalFunction("create-string-output-stream", ISLISPCreateStringOutputStream::makeLispFunction);
         initGlobalFunction("create-vector", ISLISPCreateVector::makeLispFunction);
         initGlobalFunction("elt", ISLISPElt::makeLispFunction);
         initGlobalFunction("error-output", ISLISPErrorOutputStream::makeLispFunction);
@@ -125,6 +127,7 @@ public class ISLISPContext {
         initGlobalFunction("format-char", ISLISPFormatChar::makeLispFunction);
         initGlobalFunction("format-object", ISLISPFormatObject::makeLispFunction);
         initGlobalFunction("gensym", ISLISPGensym::makeLispFunction);
+        initGlobalFunction("get-output-stream-string", ISLISPGetOutputStreamString::makeLispFunction);
         initGlobalFunction("instancep", ISLISPInstancep::makeLispFunction);
         initGlobalFunction("length", ISLISPLength::makeLispFunction);
         initGlobalFunction("property", ISLISPProperty::makeLispFunction);

@@ -18,7 +18,8 @@
 (defclass <program-error> (<error>) ())
 
 (defclass <domain-error> (<program-error>)
-    ((object :reader domain-error-object :initarg object)
+    ((message :reader domain-error-message :initarg message)
+     (object :reader domain-error-object :initarg object)
      (expected-class :reader domain-error-expected-class :initarg expected-class)))
 
 (defclass <arity-error> (<program-error>)
@@ -98,6 +99,9 @@
 (defun identity (obj) obj)
 
 (defun not (obj)
+  (if obj nil t))
+
+(defun null (obj)
   (if obj nil t))
 
 (defmacro or  (:rest args)

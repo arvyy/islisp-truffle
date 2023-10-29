@@ -58,10 +58,28 @@ public class ISLISPErrorSignalerNode extends Node {
      * @return undefined object, value of which shouldn't be relied upon.
      */
     public Object signalWrongType(Object obj, LispClass expectedClass) {
+        return signalDomainError("Unexpected type", obj, expectedClass);
+    }
+
+    public Object signalNotAnInputStream(Object obj) {
+        var expected = ISLISPContext.get(this).lookupClass("<stream>");
+        return signalDomainError("Not an input stream", obj, expected);
+    }
+
+    public Object signalNotStringOutputStream(Object obj) {
+        var expected = ISLISPContext.get(this).lookupClass("<stream>");
+        return signalDomainError(
+            "Not an output-stream made with create-string-output-stream",
+            obj,
+            expected);
+    }
+
+    Object signalDomainError(String message, Object obj, LispClass expectedClass) {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
             ctx.lookupClass(ctx.namedSymbol("<domain-error>").identityReference()),
+            ctx.namedSymbol("message"), message,
             ctx.namedSymbol("object"), obj,
             ctx.namedSymbol("expected-class"), expectedClass
         );
