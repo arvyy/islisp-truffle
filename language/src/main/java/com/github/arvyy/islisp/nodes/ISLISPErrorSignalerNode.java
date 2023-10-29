@@ -15,6 +15,11 @@ public class ISLISPErrorSignalerNode extends Node {
 
     private final SourceSection sourceSection;
 
+    /**
+     * Create helper error signaler node.
+     *
+     * @param source node from which error will be signalled
+     */
     public ISLISPErrorSignalerNode(Node source) {
         sourceSection = source.getSourceSection();
     }
@@ -63,6 +68,12 @@ public class ISLISPErrorSignalerNode extends Node {
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
 
+    /**
+     * Signal error about unbound variable.
+     *
+     * @param name variable name
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
     public Object signalUnboundVariable(Symbol name) {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(

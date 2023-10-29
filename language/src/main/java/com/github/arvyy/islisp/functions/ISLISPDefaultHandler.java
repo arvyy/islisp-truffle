@@ -9,7 +9,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 /**
- * Implements default condition-handler, equivalent to
+ * Implements default condition-handler. Equivalent to
  * (lambda (condition)
  *   (report-condition condition (error-output))
  *   (exit 1))
@@ -31,7 +31,7 @@ public class ISLISPDefaultHandler extends RootNode {
         var reportConditionFunction = ctx.lookupFunction(ctx.namedSymbol("report-condition").identityReference());
         var errorOutputFunction = ctx.lookupFunction(ctx.namedSymbol("error-output").identityReference());
         var errorOutput = dispatchNode.executeDispatch(errorOutputFunction, new Object[]{});
-        dispatchNode.executeDispatch(reportConditionFunction, new Object[]{ frame.getArguments()[1], errorOutput });
+        dispatchNode.executeDispatch(reportConditionFunction, new Object[]{frame.getArguments()[1], errorOutput});
         return dispatchNode.executeDispatch(exitFunction, new Object[] {1});
     }
 

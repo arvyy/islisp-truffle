@@ -29,6 +29,9 @@ public class ISLISPCurrentStacktrace extends RootNode {
         return currentStacktrace();
     }
 
+    /**
+     * @return current ISLISP stacktrace as a vector of strings.
+     */
     public static LispVector currentStacktrace() {
         var e = new RuntimeException();
         var stacktrace = TruffleStackTrace.getStackTrace(e);
@@ -48,10 +51,12 @@ public class ISLISPCurrentStacktrace extends RootNode {
     }
 
     static SourceSection findSourceSection(Node n) {
-        if (n == null)
+        if (n == null) {
             return null;
-        if (n.getSourceSection() != null)
+        }
+        if (n.getSourceSection() != null) {
             return n.getSourceSection();
+        }
         return findSourceSection(n.getParent());
     }
 
