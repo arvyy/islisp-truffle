@@ -18,7 +18,7 @@ public class ISLISPEq extends RootNode {
 
     ISLISPEq(TruffleLanguage<?> language) {
         super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override

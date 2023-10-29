@@ -5,6 +5,7 @@ Extensions
 * eval
 * \<external-object> api
 * string->symbol
+* (exit)
 
 Omissions
 * metaclasses

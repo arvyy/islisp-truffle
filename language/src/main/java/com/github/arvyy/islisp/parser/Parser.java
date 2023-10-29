@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.parser;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPTruffleLanguage;
 import com.github.arvyy.islisp.Utils;
+import com.github.arvyy.islisp.functions.ISLISPDefaultHandler;
 import com.github.arvyy.islisp.nodes.*;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.frame.FrameSlotKind;
@@ -44,12 +45,16 @@ public class Parser {
         }
         var ctx = ISLISPContext.get(null);
         ctx.reset();
-        var root = new ISLISPRootNode(
+        var topLevelConditionHandler = new ISLISPWithHandlerNode(
+            new ISLISPLiteralNode(ISLISPDefaultHandler.makeLispFunction(language), null),
+            expressionNodes.toArray(ISLISPExpressionNode[]::new),
+            null
+        );
+        return new ISLISPRootNode(
                 language,
-                expressionNodes.toArray(ISLISPExpressionNode[]::new),
+                new ISLISPExpressionNode[]{topLevelConditionHandler},
                 parserContext.frameBuilder.build()
         );
-        return root;
     }
 
     SourceSection span(SourceSection a, SourceSection b) {

@@ -1,7 +1,19 @@
 (defclass <serious-condition> ()
-    ((stacktrace :reader condition-stacktrace :writer set-condition-stacktrace)))
+    ((stacktrace :reader condition-stacktrace :writer set-condition-stacktrace)
+     (continuabl? :reader condition-continuable :writer set-condition-continuable)))
 
 (defclass <error> (<serious-condition>) ())
+
+(defclass <simple-error> (<error>)
+    ((format-string :reader simple-error-format-string :initarg format-string)
+     (format-arguments :reader simple-error-format-arguments :initarg simple-error-format-arguments)))
+
+(defun error (error-string :rest obj)
+    (signal-condition
+        (create (class <simple-error>)
+                'format-string error-string
+                'format-arguments obj)
+        nil))
 
 (defclass <program-error> (<error>) ())
 
@@ -22,9 +34,26 @@
 (defclass <undefined-function> (<undefined-entity>)
     ((name :reader undefined-function-name :initarg name)))
 
-(defgeneric fill-in-condition-stacktrace (condition))
-(defmethod fill-in-condition-stacktrace ((condition <serious-condition>))
+(defgeneric fill-stacktrace (condition))
+(defmethod fill-stacktrace ((condition <serious-condition>))
     t)
+
+(defgeneric report-condition (condition stream))
+(defmethod report-condition ((condition <serious-condition>) (stream <stream>))
+    (let ((stacktrace (condition-stacktrace condition)))
+        (if stacktrace
+          (let ((i 0)
+                (len (length stacktrace)))
+            (while (< i len)
+              (format-object stream (elt stacktrace i) nil)
+              (format-char stream #\newline)
+              (setf i (+ i 1)))))))
+
+(defmethod report-condition ((condition <unbound-variable>) (stream <stream>))
+    (format-object stream "Unbound variable: " nil)
+    (format-object stream (unbound-variable-name condition) nil)
+    (format-char stream #\newline)
+    (call-next-method))
 
 (defun /= (x1 x2)
   (not (= x1 x2)))

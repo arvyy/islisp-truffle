@@ -93,6 +93,22 @@ public abstract class ISLISPClassOf extends RootNode {
         return obj.clazz();
     }
 
+    @Specialization
+    LispClass doVector(
+        LispVector vec,
+        @Cached("loadVectorClass()") LispClass vectorClass
+    ) {
+        return vectorClass;
+    }
+
+    @Specialization
+    LispClass doOutputStream(
+        LispOutputStream vec,
+        @Cached("loadStreamClass()") LispClass streamClass
+    ) {
+        return streamClass;
+    }
+
     @Fallback
     @CompilerDirectives.TruffleBoundary
     LispClass doFallback(Object value) {
@@ -125,6 +141,14 @@ public abstract class ISLISPClassOf extends RootNode {
 
     LispClass loadStringClass() {
         return loadClass("<string>");
+    }
+
+    LispClass loadVectorClass() {
+        return loadClass("<general-vector>");
+    }
+
+    LispClass loadStreamClass() {
+        return loadClass("<stream>");
     }
 
     LispClass loadClass(String name) {

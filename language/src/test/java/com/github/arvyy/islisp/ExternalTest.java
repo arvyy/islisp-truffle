@@ -18,12 +18,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ExternalTest {
 
     @TestFactory
-    public Stream<DynamicTest> externalTests() throws IOException {
+    public Stream<DynamicTest> externalTestsPortable() throws IOException {
         return Files.list(Path.of("../tests"))
                 .filter(p -> p.getFileName().toString().endsWith(".lisp"))
                 .map(lispFile -> {
                     return DynamicTest.dynamicTest("Test " + lispFile.getFileName(), () -> executeTest(lispFile));
                 });
+    }
+
+    @TestFactory
+    public Stream<DynamicTest> externalTestsUnportable() throws IOException {
+        return Files.list(Path.of("../tests2"))
+            .filter(p -> p.getFileName().toString().endsWith(".lisp"))
+            .map(lispFile -> {
+                return DynamicTest.dynamicTest("Unportable test " + lispFile.getFileName(), () -> executeTest(lispFile));
+            });
     }
 
     void executeTest(Path lispFile) throws Throwable {

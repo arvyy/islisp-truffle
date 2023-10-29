@@ -21,7 +21,7 @@ public abstract class ISLISPRemoveProperty extends RootNode {
 
     ISLISPRemoveProperty(TruffleLanguage<?> language) {
         super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override

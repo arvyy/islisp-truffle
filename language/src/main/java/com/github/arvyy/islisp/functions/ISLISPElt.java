@@ -22,7 +22,7 @@ public abstract class ISLISPElt extends RootNode {
 
     ISLISPElt(TruffleLanguage<?> language) {
         super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override

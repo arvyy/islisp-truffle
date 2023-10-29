@@ -23,7 +23,7 @@ public abstract class ISLISPAdd extends RootNode {
 
     ISLISPAdd(TruffleLanguage<?> language) {
         super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     abstract Object executeGeneric(Object a, Object b);

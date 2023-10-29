@@ -29,7 +29,7 @@ public class ISLISPGlobalIdentifierNode extends ISLISPExpressionNode {
     public ISLISPGlobalIdentifierNode(Symbol name, SourceSection sourceSection) {
         super(sourceSection);
         this.name = name;
-        errorSignalerNode = new ISLISPErrorSignalerNode();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override

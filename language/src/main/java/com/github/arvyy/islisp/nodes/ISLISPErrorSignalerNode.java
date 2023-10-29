@@ -6,11 +6,18 @@ import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.Node;
+import com.oracle.truffle.api.source.SourceSection;
 
 /**
  * Helper class to signal errors from primitive / native forms.
  */
 public class ISLISPErrorSignalerNode extends Node {
+
+    private final SourceSection sourceSection;
+
+    public ISLISPErrorSignalerNode(Node source) {
+        sourceSection = source.getSourceSection();
+    }
 
     @Child
     DirectCallNode signalCallNode;
@@ -70,9 +77,10 @@ public class ISLISPErrorSignalerNode extends Node {
     DirectCallNode getSignalCallNode() {
         if (signalCallNode == null) {
             var ctx = ISLISPContext.get(this);
-            signalCallNode = DirectCallNode.create(
+            var callNode = DirectCallNode.create(
                 ctx.lookupFunction(ctx.namedSymbol("signal-condition").identityReference())
                     .callTarget());
+            signalCallNode = insert(callNode);
         }
         return signalCallNode;
     }
@@ -81,11 +89,16 @@ public class ISLISPErrorSignalerNode extends Node {
     DirectCallNode getCreateCallNode() {
         if (createCallNode == null) {
             var ctx = ISLISPContext.get(this);
-            createCallNode = DirectCallNode.create(
+            var callNode = DirectCallNode.create(
                 ctx.lookupFunction(ctx.namedSymbol("create").identityReference())
                     .callTarget());
+            createCallNode = insert(callNode);
         }
         return createCallNode;
     }
 
+    @Override
+    public SourceSection getSourceSection() {
+        return sourceSection;
+    }
 }

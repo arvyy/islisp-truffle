@@ -23,7 +23,7 @@ public abstract class ISLISPFunctionDispatchNode extends Node {
      * Create dispatch node.
      */
     public ISLISPFunctionDispatchNode() {
-        errorSignalerNode = new ISLISPErrorSignalerNode();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     /**

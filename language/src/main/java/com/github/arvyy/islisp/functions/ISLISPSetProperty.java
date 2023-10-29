@@ -21,7 +21,7 @@ public abstract class ISLISPSetProperty extends RootNode {
 
     ISLISPSetProperty(TruffleLanguage<?> language) {
         super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override

@@ -17,7 +17,7 @@ public class ISLISPCons extends RootNode {
 
     ISLISPCons(TruffleLanguage<?> language) {
         super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override

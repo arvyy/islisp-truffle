@@ -61,7 +61,7 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
             SourceSection sourceSection
     ) {
         super(sourceSection);
-        errorSignalerNode = new ISLISPErrorSignalerNode();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
         this.body = body;
         this.namedArgumentSlots = namedArgumentSlots;
         this.restArgumentsSlot = restArgumentsSlot;

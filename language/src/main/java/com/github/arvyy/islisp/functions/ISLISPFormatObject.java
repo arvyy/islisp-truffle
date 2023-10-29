@@ -7,6 +7,7 @@ import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispOutputStream;
 import com.github.arvyy.islisp.runtime.Pair;
+import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -29,7 +30,7 @@ public abstract class ISLISPFormatObject extends RootNode {
 
     ISLISPFormatObject(TruffleLanguage<?> language) {
         super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override
@@ -71,6 +72,10 @@ public abstract class ISLISPFormatObject extends RootNode {
             }
             if (value instanceof Integer i) {
                 writer.write(i.toString());
+                return;
+            }
+            if (value instanceof Symbol s) {
+                writer.write(s.name());
                 return;
             }
             if (value instanceof Pair p) {

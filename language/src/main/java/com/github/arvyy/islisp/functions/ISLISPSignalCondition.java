@@ -10,6 +10,7 @@ import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNodeGen;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.RootNode;
 
 /**
@@ -26,22 +27,53 @@ public class ISLISPSignalCondition extends RootNode {
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
+    @Child
+    DirectCallNode fillStacktrace;
+
+    @Child
+    DirectCallNode setContinuable;
+
+    @Child
+    DirectCallNode setStacktrace;
+
     ISLISPSignalCondition(TruffleLanguage<?> language) {
         super(language);
         dispatchNode = ISLISPFunctionDispatchNodeGen.create();
-        errorSignalerNode = new ISLISPErrorSignalerNode();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override
     public Object execute(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
+        if (fillStacktrace == null) {
+            var fillStacktraceFunction = ctx.lookupFunction(
+                ctx.namedSymbol("fill-stacktrace").identityReference());
+            fillStacktrace = insert(DirectCallNode.create(fillStacktraceFunction.callTarget()));
+        }
+        if (setContinuable == null) {
+            var setContinuableFunction = ctx.lookupFunction(
+                ctx.namedSymbol("set-condition-continuable").identityReference()
+            );
+            setContinuable = insert(DirectCallNode.create(setContinuableFunction.callTarget()));
+        }
+        if (setStacktrace == null) {
+            var setStacktraceFunction = ctx.lookupFunction(
+                ctx.namedSymbol("set-condition-stacktrace").identityReference()
+            );
+            setStacktrace = insert(DirectCallNode.create(setStacktraceFunction.callTarget()));
+        }
         if (frame.getArguments().length != 3) {
             return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length, 2, 2);
         }
         // TODO validate condition is actually condition
         var conditionValue = frame.getArguments()[1];
-        var continuable = frame.getArguments()[2] != ctx.getNil();
-        if (continuable) {
+        var shouldFill = fillStacktrace.call(null, conditionValue);
+        if (shouldFill != ctx.getNil()) {
+            setStacktrace.call(null, conditionValue, ISLISPCurrentStacktrace.currentStacktrace());
+        }
+        var continuable = frame.getArguments()[2];
+        setContinuable.call(null, conditionValue, continuable);
+        if (continuable != ctx.getNil()) {
             var handler = ctx.popHandler();
             try {
                 dispatchNode.executeDispatch(handler, new Object[]{conditionValue});

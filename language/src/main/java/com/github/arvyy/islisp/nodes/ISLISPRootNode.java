@@ -44,4 +44,8 @@ public class ISLISPRootNode extends RootNode {
         }
     }
 
+    @Override
+    public boolean isCaptureFramesForTrace() {
+        return true;
+    }
 }

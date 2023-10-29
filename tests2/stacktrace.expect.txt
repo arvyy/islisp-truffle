@@ -1,0 +1,4 @@
+Unbound variable: unbound-var
+	at stacktrace.lisp:10
+	at stacktrace.lisp:7
+	at stacktrace.lisp:17

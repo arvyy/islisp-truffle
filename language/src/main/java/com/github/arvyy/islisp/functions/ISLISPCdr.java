@@ -20,7 +20,7 @@ public abstract class ISLISPCdr extends RootNode {
 
     ISLISPCdr(TruffleLanguage<?> language) {
         super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     abstract Object executeGeneric(Object arg);

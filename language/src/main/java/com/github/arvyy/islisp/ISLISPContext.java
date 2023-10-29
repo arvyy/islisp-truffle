@@ -78,7 +78,6 @@ public class ISLISPContext {
         initBuiltinClasses();
         initGlobalFunctions();
         initSetfExpanders();
-        handlerChain = null; // TOOD default handler
     }
 
     /**
@@ -108,6 +107,7 @@ public class ISLISPContext {
      * Initialize builtin functions into function namespace storage.
      */
     void initGlobalFunctions() {
+        // standard
         initGlobalFunction("+", ISLISPAdd::makeLispFunction);
         initGlobalFunction("eq", ISLISPEq::makeLispFunction);
         initGlobalFunction("-", ISLISPSubtract::makeLispFunction);
@@ -120,6 +120,7 @@ public class ISLISPContext {
         initGlobalFunction("continue-condition", ISLISPContinueCondition::makeLispFunction);
         initGlobalFunction("create-vector", ISLISPCreateVector::makeLispFunction);
         initGlobalFunction("elt", ISLISPElt::makeLispFunction);
+        initGlobalFunction("error-output", ISLISPErrorOutputStream::makeLispFunction);
         initGlobalFunction("format-integer", ISLISPFormatInteger::makeLispFunction);
         initGlobalFunction("format-char", ISLISPFormatChar::makeLispFunction);
         initGlobalFunction("format-object", ISLISPFormatObject::makeLispFunction);
@@ -135,23 +136,15 @@ public class ISLISPContext {
         initGlobalFunction("standard-output", ISLISPStandardOutputStream::makeLispFunction);
         initGlobalFunction("subclassp", ISLISPSubclassp::makeLispFunction);
         initGlobalFunction("vector", ISLISPVector::makeLispFunction);
+        initCreateMethod();
+        initInitializeObjectMethod();
 
-        var createDescriptor = new GenericFunctionDescriptor(1, true);
-        createDescriptor.addPrimaryMethod(
-                new LispClass[] {classes.get(namedSymbol("<standard-class>").identityReference())},
-                ISLISPCreateStandardClassObject.makeLispFunction(language).callTarget(),
-                null);
-        var createExecutionNode = ISLISPDefGenericExecutionNodeGen.create(
-            namedSymbol("create"),
-            false,
-            getLanguage(),
-            null);
-        registerGenericFunction(
-            namedSymbol("create").identityReference(),
-            false,
-            new LispFunction(createExecutionNode.getCallTarget()),
-            createDescriptor);
+        //extension
+        initGlobalFunction("current-stacktrace", ISLISPCurrentStacktrace::makeLispFunction);
+        initGlobalFunction("exit", ISLISPExit::makeLispFunction);
+    }
 
+    private void initInitializeObjectMethod() {
         var initializeObjectDescriptor = new GenericFunctionDescriptor(1, true);
         initializeObjectDescriptor.addPrimaryMethod(
             new LispClass[] {classes.get(namedSymbol("<object>").identityReference())},
@@ -167,8 +160,24 @@ public class ISLISPContext {
             false,
             new LispFunction(initializeObjectExecutionNode.getCallTarget()),
             initializeObjectDescriptor);
+    }
 
-
+    private void initCreateMethod() {
+        var createDescriptor = new GenericFunctionDescriptor(1, true);
+        createDescriptor.addPrimaryMethod(
+                new LispClass[] {classes.get(namedSymbol("<standard-class>").identityReference())},
+                ISLISPCreateStandardClassObject.makeLispFunction(language).callTarget(),
+                null);
+        var createExecutionNode = ISLISPDefGenericExecutionNodeGen.create(
+            namedSymbol("create"),
+            false,
+            getLanguage(),
+            null);
+        registerGenericFunction(
+            namedSymbol("create").identityReference(),
+            false,
+            new LispFunction(createExecutionNode.getCallTarget()),
+            createDescriptor);
     }
 
     void initSetfExpanders() {
@@ -222,6 +231,7 @@ public class ISLISPContext {
         initBuiltin("<basic-vector>", "<basic-array>");
         initBuiltin("<string>", "<basic-vector>");
         initBuiltin("<general-vector>", "<basic-vector>");
+        initBuiltin("<stream>", "<object>");
     }
 
     /**

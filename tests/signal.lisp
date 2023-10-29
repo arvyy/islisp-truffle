@@ -14,7 +14,7 @@
         (lambda (c)
             (print "OK2")
             (return-from exit nil))
-        (signal-condition "condition" nil)
+        (error "message")
         (print "FAIL2")))
 
 (block exit
@@ -23,5 +23,5 @@
             (print "OK3.1")
             (continue-condition c "OK3.2")
             (print "FAIL3"))
-        (let ((v (signal-condition "condition" t)))
+        (let ((v (signal-condition (create (class <simple-error>) 'format-string "message") t)))
             (print v))))

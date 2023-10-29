@@ -8,18 +8,18 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 /**
- * Implements `standard-output` function.
+ * Implements `error-output` function.
  */
-public class ISLISPStandardOutputStream extends RootNode {
+public class ISLISPErrorOutputStream extends RootNode {
 
-    ISLISPStandardOutputStream(TruffleLanguage<?> language) {
+    ISLISPErrorOutputStream(TruffleLanguage<?> language) {
         super(language);
     }
 
     @Override
     public Object execute(VirtualFrame frame) {
-        //TODO dynamic parameterization (with-standard-output ...)
-        return new LispOutputStream(ISLISPContext.get(this).getEnv().out());
+        //TODO dynamic parameterization (with-error-output ...)
+        return new LispOutputStream(ISLISPContext.get(this).getEnv().err());
     }
 
     /**
@@ -29,7 +29,7 @@ public class ISLISPStandardOutputStream extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(new ISLISPStandardOutputStream(lang).getCallTarget());
+        return new LispFunction(new ISLISPErrorOutputStream(lang).getCallTarget());
     }
 
 }

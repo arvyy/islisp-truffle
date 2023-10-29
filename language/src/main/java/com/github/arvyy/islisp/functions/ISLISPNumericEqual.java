@@ -24,7 +24,7 @@ public abstract class ISLISPNumericEqual extends RootNode {
 
     ISLISPNumericEqual(TruffleLanguage<?> language) {
         super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
         profile = CountingConditionProfile.create();
     }
 
