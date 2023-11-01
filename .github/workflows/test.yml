@@ -5,16 +5,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: graalvm/setup-graalvm@v1
+      - uses: actions/setup-java@v3
         with:
-          java-version: '20.0.2'
-          distribution: 'graalvm'
+          java-version: '17'
+          distribution: 'temurin'
+          architecture: x64
       - name: Test
         run: |
           mvn test
       - name: Verify checkstyle
         run: |
           mvn validate
-      - name: Verify native build
-        run: |
-          make dist/islisp
