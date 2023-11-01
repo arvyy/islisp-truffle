@@ -61,11 +61,23 @@ public class ISLISPErrorSignalerNode extends Node {
         return signalDomainError("Unexpected type", obj, expectedClass);
     }
 
+    /**
+     * Signal error that a given object isn't input stream that can be read from.
+     *
+     * @param obj offending object.
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
     public Object signalNotAnInputStream(Object obj) {
         var expected = ISLISPContext.get(this).lookupClass("<stream>");
         return signalDomainError("Not an input stream", obj, expected);
     }
 
+    /**
+     * Signal error that a given object isn't output stream created with `create-string-output-stream`.
+     *
+     * @param obj offending object.
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
     public Object signalNotStringOutputStream(Object obj) {
         var expected = ISLISPContext.get(this).lookupClass("<stream>");
         return signalDomainError(
