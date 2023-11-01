@@ -1,0 +1,20 @@
+name: Test ISLISP
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '17'
+          distribution: 'graalvm'
+      - name: Test
+        run: |
+          mvn test
+      - name: Verify checkstyle
+        run: |
+          mvn validate
+      - name: Verify native build
+        run: |
+          make dist/islisp
