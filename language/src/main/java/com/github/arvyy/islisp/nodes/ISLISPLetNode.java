@@ -6,7 +6,7 @@ import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
 /**
- * Implements `let` syntax for creating local lexical bindings.
+ * Implements `let`, `let*`, `labels`, `flet` syntax for creating local lexical bindings.
  */
 public class ISLISPLetNode extends ISLISPExpressionNode {
 

@@ -160,12 +160,16 @@ public class Parser {
                     return parseQuasiquote(parserContext, sexpr);
                 case "class":
                     return parseClassRef(parserContext, sexpr);
+                case "flet":
+                    return parseFletNode(parserContext, sexpr);
                 case "for":
                     return parseFor(parserContext, sexpr);
                 case "block":
                     return parseBlock(parserContext, sexpr);
                 case "return-from":
                     return parseReturnFrom(parserContext, sexpr);
+                case "labels":
+                    return parseLabelsNode(parserContext, sexpr);
                 case "let":
                     return parseLetNode(parserContext, sexpr);
                 case "let*":
@@ -791,35 +795,42 @@ public class Parser {
         return new ISLISPDirectLambdaCallNode(lambdaNode, argNodes.toArray(ISLISPExpressionNode[]::new), source(sexpr));
     }
 
-    ISLISPLambdaNode parseLambda(ParserContext parserContext, Object sexpr) {
-        var args = requireList(sexpr, 2, -1);
-        var restList = args.subList(1, args.size());
+    ISLISPLambdaNode makeLambdaNode(
+        ParserContext parserContext,
+        Object argList,
+        List<Object> bodyExprs,
+        SourceSection source
+    ) {
         parserContext = parserContext.pushFrameDescriptor();
         var slotsAndNewContext =
-                processFrameDescriptorsForFunctionArguments(parserContext.pushClosureScope(), restList.get(0));
-        var bodyStatements = restList.stream()
-                .skip(1)
-                .map(v -> parseExpressionNode(slotsAndNewContext.context, v))
-                .toArray(ISLISPExpressionNode[]::new);
+            processFrameDescriptorsForFunctionArguments(parserContext.pushClosureScope(), argList);
+        var bodyStatements = bodyExprs.stream()
+            .map(v -> parseExpressionNode(slotsAndNewContext.context, v))
+            .toArray(ISLISPExpressionNode[]::new);
         var body = new ISLISPPrognNode(
-                bodyStatements,
-                span(
-                        bodyStatements[0].getSourceSection(),
-                        bodyStatements[bodyStatements.length - 1].getSourceSection()));
+            bodyStatements,
+            span(
+                bodyStatements[0].getSourceSection(),
+                bodyStatements[bodyStatements.length - 1].getSourceSection()));
         var ctx = ISLISPContext.get(null);
         var userDefinedFunctionNode = new ISLISPUserDefinedFunctionNode(
-                ctx.getLanguage(),
-                body,
-                slotsAndNewContext.namedArgsSlots,
-                slotsAndNewContext.restArgsSlot,
-                -1,
-                -1,
-                source(sexpr));
+            ctx.getLanguage(),
+            body,
+            slotsAndNewContext.namedArgsSlots,
+            slotsAndNewContext.restArgsSlot,
+            -1,
+            -1,
+            source);
         var rootNode = new ISLISPRootNode(
-                ctx.getLanguage(),
-                new ISLISPExpressionNode[]{userDefinedFunctionNode},
-                parserContext.frameBuilder.build());
+            ctx.getLanguage(),
+            new ISLISPExpressionNode[]{userDefinedFunctionNode},
+            parserContext.frameBuilder.build());
         return new ISLISPLambdaNode(rootNode);
+    }
+
+    ISLISPLambdaNode parseLambda(ParserContext parserContext, Object sexpr) {
+        var args = requireList(sexpr, 2, -1);
+        return makeLambdaNode(parserContext, args.get(1), args.subList(2, args.size()), source(sexpr));
     }
 
     ISLISPDefunNode parseDefun(ParserContext parserContext, Object sexpr) {
@@ -1013,6 +1024,50 @@ public class Parser {
             body[i] = parseExpressionNode(parserContext, bodyExpressions.get(i));
         }
         return new ISLISPLetNode(variableSlots, variableInitializers, body, source(sexpr));
+    }
+
+    ISLISPLetNode parseFletNode(ParserContext parserContext, Object sexpr) {
+        return parseFunctionLetNode(parserContext, sexpr, false);
+    }
+
+    ISLISPLetNode parseLabelsNode(ParserContext parserContext, Object sexpr) {
+        return parseFunctionLetNode(parserContext, sexpr, true);
+    }
+
+    ISLISPLetNode parseFunctionLetNode(ParserContext parserContext, Object sexpr, boolean augmentFunctionScope) {
+        var args = requireList(sexpr, 2, -1);
+        var functionList = requireList(args.get(1), -1, -1);
+        var bindingSlots = new int[functionList.size()];
+        var lambdaInitializers = new ISLISPExpressionNode[functionList.size()];
+        var bindingNameMap = new HashMap<SymbolReference, ParserContext.VariableContext>();
+        for (int i = 0; i < functionList.size(); i++) {
+            var function = requireList(functionList.get(i), 3, -1);
+            var name = downcast(function.get(0), Symbol.class);
+            bindingSlots[i] = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
+            var variableContext = new ParserContext.VariableContext();
+            variableContext.slot = bindingSlots[i];
+            variableContext.frameDepth = parserContext.frameDepth;
+            if (bindingNameMap.containsKey(name.identityReference())) {
+                throw new ParsingException(source(sexpr), "Duplicate variable declaration.");
+            }
+            bindingNameMap.put(name.identityReference(), variableContext);
+        }
+        var augmentedParserContext = parserContext.pushLexicalFunctionScope(bindingNameMap);
+        var lambdaBodyContext = augmentFunctionScope
+            ? augmentedParserContext
+            : parserContext;
+        for (int i = 0; i < functionList.size(); i++) {
+            var function = requireList(functionList.get(i), 3, -1);
+            var argumentList = function.get(1);
+            var body = function.subList(2, function.size());
+            lambdaInitializers[i] = makeLambdaNode(lambdaBodyContext, argumentList, body, source(function));
+        }
+        var body = args
+            .stream()
+            .skip(2)
+            .map(e -> parseExpressionNode(augmentedParserContext, e))
+            .toArray(ISLISPExpressionNode[]::new);
+        return new ISLISPLetNode(bindingSlots, lambdaInitializers, body, source(sexpr));
     }
 
     ISLISPUnwindProtectNode parseUnwindProtectNode(

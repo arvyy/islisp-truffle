@@ -36,13 +36,13 @@ public abstract class ISLISPCharEqual extends RootNode {
     @Specialization
     Object doProper(LispChar a, LispChar b) {
         var ctx = ISLISPContext.get(this);
-        return a.codepoint() == b.codepoint()? ctx.getT() : ctx.getNil();
+        return a.codepoint() == b.codepoint() ? ctx.getT() : ctx.getNil();
     }
 
     @Fallback
     Object fallback(Object a, Object b) {
         var ctx = ISLISPContext.get(this);
-        var offender = (a instanceof LispChar)? b : a;
+        var offender = (a instanceof LispChar) ? b : a;
         return errorSignalerNode.signalWrongType(offender, ctx.lookupClass("<character>"));
     }
 
