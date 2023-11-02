@@ -1,3 +1,25 @@
+(defmacro or  (:rest args)
+  (if (= 0 (length args))
+      nil
+      (if (= 1 (length args))
+          (car args)
+          (let ((first (car args))
+                (var (gensym))
+                (rest (cdr args)))
+            `(let ((,var ,first))
+                (if ,var ,var (or ,@rest)))))))
+
+(defmacro and (:rest args)
+  (if (= 0 (length args))
+      t
+      (if (= 1 (length args))
+          (car args)
+          (let ((first (car args))
+                (rest (cdr args)))
+            `(if ,first
+                 (and ,@rest)
+                 nil)))))
+
 (defclass <serious-condition> ()
     ((stacktrace :reader condition-stacktrace :writer set-condition-stacktrace)
      (continuabl? :reader condition-continuable :writer set-condition-continuable)))
@@ -68,21 +90,22 @@
 (defun <= (x1 x2)
   (or (< x1 x2) (= x1 x2)))
 
+(defun char/= (x1 x2)
+  (not (char= x1 x2)))
+
+(defun char>= (x1 x2)
+  (or (char> x1 x2) (char= x1 x2)))
+
+(defun char> (x1 x2)
+  (char< x2 x1))
+
+(defun char<= (x1 x2)
+  (or (char< x1 x2) (char= x1 x2)))
+
 (defun abs (x)
   (if (< x 0)
       (- x)
       x))
-
-(defmacro and (:rest args)
-  (if (= 0 (length args))
-      t
-      (if (= 1 (length args))
-          (car args)
-          (let ((first (car args))
-                (rest (cdr args)))
-            `(if ,first
-                 (and ,@rest)
-                 nil)))))
 
 (defun numberp (obj)
   (instancep obj (class <number>)))
@@ -104,13 +127,3 @@
 (defun null (obj)
   (if obj nil t))
 
-(defmacro or  (:rest args)
-  (if (= 0 (length args))
-      nil
-      (if (= 1 (length args))
-          (car args)
-          (let ((first (car args))
-                (var (gensym))
-                (rest (cdr args)))
-            `(let ((,var ,first))
-                (if ,var ,var (or ,@rest))) ))))

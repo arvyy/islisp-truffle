@@ -117,6 +117,14 @@ public abstract class ISLISPClassOf extends RootNode {
         return streamClass;
     }
 
+    @Specialization
+    LispClass doCharacter(
+        LispChar character,
+        @Cached("loadCharacterClass()") LispClass characterClass
+    ) {
+        return characterClass;
+    }
+
     @Fallback
     @CompilerDirectives.TruffleBoundary
     LispClass doFallback(Object value) {
@@ -157,6 +165,10 @@ public abstract class ISLISPClassOf extends RootNode {
 
     LispClass loadStreamClass() {
         return loadClass("<stream>");
+    }
+
+    LispClass loadCharacterClass() {
+        return loadClass("<character>");
     }
 
     LispClass loadClass(String name) {

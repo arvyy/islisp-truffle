@@ -115,6 +115,8 @@ public class ISLISPContext {
         initGlobalFunction(">", ISLISPNumericGt::makeLispFunction);
         initGlobalFunction("car", ISLISPCar::makeLispFunction);
         initGlobalFunction("cdr", ISLISPCdr::makeLispFunction);
+        initGlobalFunction("char=", ISLISPCharEqual::makeLispFunction);
+        initGlobalFunction("char<", ISLISPCharLt::makeLispFunction);
         initGlobalFunction("class-of", ISLISPClassOf::makeLispFunction);
         initGlobalFunction("cons", ISLISPCons::makeLispFunction);
         initGlobalFunction("continue-condition", ISLISPContinueCondition::makeLispFunction);
@@ -235,6 +237,7 @@ public class ISLISPContext {
         initBuiltin("<string>", "<basic-vector>");
         initBuiltin("<general-vector>", "<basic-vector>");
         initBuiltin("<stream>", "<object>");
+        initBuiltin("<character>", "<object>");
     }
 
     /**
