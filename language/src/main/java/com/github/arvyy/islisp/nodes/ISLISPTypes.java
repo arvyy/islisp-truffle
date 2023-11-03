@@ -4,6 +4,8 @@ import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.dsl.ImplicitCast;
 import com.oracle.truffle.api.dsl.TypeSystem;
 
+import java.math.BigInteger;
+
 // class cannot be final
 //CHECKSTYLE:OFF
 @TypeSystem({
@@ -24,6 +26,17 @@ public class ISLISPTypes {
 //CHECKSTYLE:ON
 
     protected ISLISPTypes() { }
+
+    /**
+     * Implicitly convert int to double.
+     *
+     * @param v int value
+     * @return double value
+     */
+    @ImplicitCast
+    public static BigInteger intToBigInt(int v) {
+        return BigInteger.valueOf(v);
+    }
 
     /**
      * Implicitly convert int to double.

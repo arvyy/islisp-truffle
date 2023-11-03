@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.parser;
 
+import java.math.BigInteger;
+
 /**
  * Possible values to be returned from Lexer.
  */
@@ -9,7 +11,7 @@ public sealed interface Token {
      * Exact number literal.
      * @param value
      */
-    record ExactNumberToken(int value) implements Token { }
+    record ExactNumberToken(BigInteger value) implements Token { }
 
     /**
      * Inexact number literal.

@@ -8,6 +8,7 @@ import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +73,11 @@ public class Reader {
         }
         if (t instanceof Token.ExactNumberToken) {
             var value = ((Token.ExactNumberToken) t).value();
-            return Optional.of(value);
+            if (value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) < 0) {
+                return Optional.of(value.intValueExact());
+            } else {
+                return Optional.of(value);
+            }
         }
         if (t instanceof Token.InexactNumberToken inexact) {
             return Optional.of(inexact.value());

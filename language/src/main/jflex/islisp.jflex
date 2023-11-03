@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.parser;
 import com.github.arvyy.islisp.parser.Token;
 import java.util.Optional;
 import java.io.IOException;
+import java.math.BigInteger;
 
 %%
 
@@ -189,19 +190,19 @@ CharacterName = newline | space | tab
   }
 
   ("#B" | "#b") {ExplicitSign}? {BinDigit}+ {
-    return new Token.ExactNumberToken(Integer.parseInt(yytext().substring(2), 2));
+    return new Token.ExactNumberToken(new BigInteger(yytext().substring(2), 2));
   }
 
   ("#o" | "#O") {ExplicitSign}? {OctDigit}+ {
-    return new Token.ExactNumberToken(Integer.parseInt(yytext().substring(2), 8));
+    return new Token.ExactNumberToken(new BigInteger(yytext().substring(2), 8));
   }
 
   {ExplicitSign}? {Digit}+ {
-    return new Token.ExactNumberToken(Integer.parseInt(yytext()));
+    return new Token.ExactNumberToken(new BigInteger(yytext()));
   }
 
   ("#x" | "#X") {ExplicitSign}? {HexDigit}+ {
-    return new Token.ExactNumberToken(Integer.parseInt(yytext().substring(2), 16));
+    return new Token.ExactNumberToken(new BigInteger(yytext().substring(2), 16));
   }
 
   {WhiteSpace} {}

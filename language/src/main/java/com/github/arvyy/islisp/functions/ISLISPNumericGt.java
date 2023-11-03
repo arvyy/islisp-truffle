@@ -10,6 +10,8 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.profiles.CountingConditionProfile;
 
+import java.math.BigInteger;
+
 /**
  * Implements numeric comparator `>`.
  */
@@ -32,6 +34,14 @@ public abstract class ISLISPNumericGt extends RootNode {
     @Specialization
     Object doInts(int a, int b) {
         if (profile.profile(a > b)) {
+            return ISLISPContext.get(this).getT();
+        }
+        return ISLISPContext.get(this).getNil();
+    }
+
+    @Specialization
+    Object doBigInts(BigInteger a, BigInteger b) {
+        if (profile.profile(a.compareTo(b) > 0)) {
             return ISLISPContext.get(this).getT();
         }
         return ISLISPContext.get(this).getNil();

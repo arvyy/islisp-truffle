@@ -9,6 +9,8 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
 
+import java.math.BigInteger;
+
 /**
  * Implements numeric subtraction function `-`.
  */
@@ -36,6 +38,11 @@ public abstract class ISLISPSubtract extends RootNode {
     @Specialization(rewriteOn = ArithmeticException.class)
     int doInts(int a, int b) {
         return Math.subtractExact(a, b);
+    }
+
+    @Specialization
+    BigInteger doBigInts(BigInteger a, BigInteger b) {
+        return a.subtract(b);
     }
 
     @Specialization

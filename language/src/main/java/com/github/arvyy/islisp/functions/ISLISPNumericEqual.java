@@ -12,6 +12,8 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.profiles.CountingConditionProfile;
 
+import java.math.BigInteger;
+
 /**
  * Implements numeric equality function `=`.
  */
@@ -38,6 +40,14 @@ public abstract class ISLISPNumericEqual extends RootNode {
     @Specialization
     Object doInts(int a, int b) {
         if (profile.profile(a == b)) {
+            return ISLISPContext.get(this).getT();
+        }
+        return ISLISPContext.get(this).getNil();
+    }
+
+    @Specialization
+    Object doBigInts(BigInteger a, BigInteger b) {
+        if (profile.profile(a.equals(b))) {
             return ISLISPContext.get(this).getT();
         }
         return ISLISPContext.get(this).getNil();

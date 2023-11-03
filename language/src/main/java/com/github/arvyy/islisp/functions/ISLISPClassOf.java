@@ -12,6 +12,8 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+import java.math.BigInteger;
+
 /**
  * Implements `class-of` function, returning given object's class.
  */
@@ -39,6 +41,13 @@ public abstract class ISLISPClassOf extends RootNode {
     LispClass doInt(
             int integer,
             @Cached("loadIntegerClass()") LispClass lispClass) {
+        return lispClass;
+    }
+
+    @Specialization
+    LispClass doBigInt(
+        BigInteger integer,
+        @Cached("loadIntegerClass()") LispClass lispClass) {
         return lispClass;
     }
 

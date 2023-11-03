@@ -12,6 +12,8 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
 
+import java.math.BigInteger;
+
 /**
  * Implements numeric adition function `+`.
  */
@@ -41,6 +43,11 @@ public abstract class ISLISPAdd extends RootNode {
     @Specialization(rewriteOn = ArithmeticException.class)
     int doInts(int a, int b) {
         return Math.addExact(a, b);
+    }
+
+    @Specialization
+    BigInteger doBigInts(BigInteger a, BigInteger b) {
+        return a.add(b);
     }
 
     @Specialization

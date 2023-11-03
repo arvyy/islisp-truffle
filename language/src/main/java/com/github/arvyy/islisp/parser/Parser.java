@@ -9,6 +9,7 @@ import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.source.SourceSection;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -246,6 +247,7 @@ public class Parser {
         }
         if (sexpr instanceof Integer
             || sexpr instanceof Double
+            || sexpr instanceof BigInteger
             || sexpr instanceof LispChar
             || sexpr instanceof String
             || sexpr instanceof LispVector
