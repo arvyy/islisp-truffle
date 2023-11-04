@@ -59,6 +59,8 @@ public class Parser {
     }
 
     SourceSection span(SourceSection a, SourceSection b) {
+        if (a == null || b == null)
+            return null;
         return a.getSource().createSection(
                 a.getStartLine(), a.getStartColumn(),
                 b.getEndLine(), b.getEndColumn()

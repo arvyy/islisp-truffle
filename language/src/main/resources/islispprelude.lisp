@@ -176,3 +176,11 @@
 (defun null (obj)
   (if obj nil t))
 
+(defmacro ignore-errors (:rest forms)
+  (if (null forms)
+      'nil
+      (let ((blockid (gensym)))
+        `(block ,blockid
+            (with-handler
+              (lambda (err) (return-from ,blockid nil))
+              ,@forms)))))
