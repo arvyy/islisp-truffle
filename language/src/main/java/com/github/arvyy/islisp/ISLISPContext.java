@@ -109,7 +109,6 @@ public class ISLISPContext {
     void initGlobalFunctions() {
         // standard
         initGlobalFunction("+", ISLISPAdd::makeLispFunction);
-        initGlobalFunction("eq", ISLISPEq::makeLispFunction);
         initGlobalFunction("-", ISLISPSubtract::makeLispFunction);
         initGlobalFunction("=", ISLISPNumericEqual::makeLispFunction);
         initGlobalFunction(">", ISLISPNumericGt::makeLispFunction);
@@ -125,6 +124,8 @@ public class ISLISPContext {
         initGlobalFunction("create-vector", ISLISPCreateVector::makeLispFunction);
         initGlobalFunction("elt", ISLISPElt::makeLispFunction);
         initGlobalFunction("error-output", ISLISPErrorOutputStream::makeLispFunction);
+        initGlobalFunction("eq", ISLISPEq::makeLispFunction);
+        initGlobalFunction("equal", ISLISPEqual::makeLispFunction);
         initGlobalFunction("format-integer", ISLISPFormatInteger::makeLispFunction);
         initGlobalFunction("format-char", ISLISPFormatChar::makeLispFunction);
         initGlobalFunction("format-object", ISLISPFormatObject::makeLispFunction);

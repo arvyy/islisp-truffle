@@ -78,6 +78,22 @@
     (format-char stream #\newline)
     (call-next-method))
 
+(defun min (first :rest xs)
+  (for ((value first (let ((x (car xs)))
+                       (if (< x value)
+                           x
+                           value)))
+        (xs xs (cdr xs)))
+       ((null xs) value)))
+
+(defun max (first :rest xs)
+  (for ((value first (let ((x (car xs)))
+                       (if (> x value)
+                           x
+                           value)))
+        (xs xs (cdr xs)))
+       ((null xs) value)))
+
 (defun /= (x1 x2)
   (not (= x1 x2)))
 
@@ -101,6 +117,39 @@
 
 (defun char<= (x1 x2)
   (or (char< x1 x2) (char= x1 x2)))
+
+(defun string< (s1 s2)
+  (block string<
+      (let ((l (min (length s1) (length s2)))
+            (shorter (< (length s1) (length s2))))
+        (for ((i 0 (+ 1 i)))
+             ((>= i l) shorter)
+          (if (char< (elt s1 i) (elt s2 i))
+            (return-from string< t))
+          (if (char> (elt s1 i) (elt s2 i))
+            (return-from string< nil))))))
+
+(defun string= (s1 s2)
+  (block string=
+      (let ((l (length s1)))
+        (if (/= (length s1) (length s2))
+          (return-from string= nil))
+        (for ((i 0 (+ 1 i)))
+             ((>= i l) t)
+          (if (char/= (elt s1 i) (elt s2 i))
+            (return-from string= nil))))))
+
+(defun string> (s1 s2)
+  (string< s2 s1))
+
+(defun string>= (s1 s2)
+  (or (string> s1 s2) (string= s1 s2)))
+
+(defun string<= (s1 s2)
+  (or (string< s1 s2) (string= s1 s2)))
+
+(defun string/= (s1 s2)
+  (not (string= s1 s2)))
 
 (defun abs (x)
   (if (< x 0)

@@ -2,10 +2,12 @@ package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.runtime.LispChar;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.nodes.Node;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -123,7 +125,13 @@ public sealed interface QuasiquoteTree {
                     new List(children.toArray(QuasiquoteTree[]::new)),
                     expressions.toArray(Object[]::new));
         }
-        if (expr instanceof Integer || expr instanceof Symbol) {
+        if (expr instanceof Integer
+            || expr instanceof BigInteger
+            || expr instanceof Symbol
+            || expr instanceof LispChar
+            || expr instanceof String
+            || expr instanceof StringBuffer
+        ) {
             return new QuasiquoteTreeAndExpressions(new Atom(expr), new Object[]{});
         }
         throw new RuntimeException();
