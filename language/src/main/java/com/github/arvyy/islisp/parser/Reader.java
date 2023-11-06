@@ -146,13 +146,26 @@ public class Reader {
             var startColumn = lexer.getColumn();
             Optional<Token> next;
             var lst = new ArrayList<Object>();
+            var periodSeen = false;
+            Object tail = null;
             while (true) {
                 next = lexer.peekToken();
                 if (next.isEmpty()) {
-                    throw new RuntimeException("Premature end of file");
+                    throw new RuntimeException("Premature end of file"); // TODO
                 }
                 var token = next.get();
+                if (token instanceof Token.PeriodToken) {
+                    if (periodSeen) {
+                        throw new RuntimeException("Bad dotted list"); //TODO
+                    }
+                    periodSeen = true;
+                    lexer.getToken();
+                    continue;
+                }
                 if (token instanceof Token.BracketCloseToken) {
+                    if (periodSeen && tail == null) {
+                        throw new RuntimeException("Bad dotted list"); // TODO
+                    }
                     lexer.getToken();
                     var endLine = lexer.getLine();
                     var endColumn = lexer.getColumn();
@@ -163,7 +176,7 @@ public class Reader {
                         sourceSectionMap.put(new EqWrapper(nilWithPos), section);
                         return Optional.of(nilWithPos);
                     } else {
-                        Object tail = ISLISPContext.get(null).getNil();
+                        tail = tail == null ? ISLISPContext.get(null).getNil() : tail;
                         for (var i = lst.size() - 1; i >= 0; i--) {
                             tail = new Pair(lst.get(i), tail);
                         }
@@ -172,7 +185,13 @@ public class Reader {
                         return Optional.of(parsedTail);
                     }
                 }
-                lst.add(readSingle().orElseThrow()); //TODO
+                if (periodSeen && tail == null) {
+                    tail = readSingle().orElseThrow(); // TODO
+                } else if (periodSeen && tail != null) {
+                    throw new RuntimeException("Bad dotted list"); //TODO
+                } else {
+                    lst.add(readSingle().orElseThrow()); //TODO
+                }
             }
         }
         if (t instanceof Token.CharToken c) {

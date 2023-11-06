@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.github.arvyy.islisp.runtime.Pair;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -31,13 +32,17 @@ public abstract class ISLISPEqual extends RootNode {
 
     @Override
     public final Object execute(VirtualFrame frame) {
-        var nil = ISLISPContext.get(this).getNil();
         if (frame.getArguments().length != 3) {
             return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 2, 2);
         }
-        var isEq = getEqCallNode().call(null, frame.getArguments()[1], frame.getArguments()[2]);
+        return isEqual(frame.getArguments()[1], frame.getArguments()[2]);
+    }
+
+    Object isEqual(Object o1, Object o2) {
+        var nil = ISLISPContext.get(this).getNil();
+        var isEq = getEqCallNode().call(null, o1, o2);
         if (isEq instanceof Symbol s && s.identityReference() == nil.identityReference()) {
-            return executeGeneric(frame.getArguments()[1], frame.getArguments()[2]);
+            return executeGeneric(o1, o2);
         } else {
             return isEq;
         }
@@ -53,6 +58,25 @@ public abstract class ISLISPEqual extends RootNode {
         } else {
             return ctx.getNil();
         }
+    }
+
+    boolean isNil(Object o) {
+        var ctx = ISLISPContext.get(this);
+        var nil = ctx.getNil();
+        if (o instanceof Symbol s && s.identityReference() == nil.identityReference()) {
+            return true;
+        }
+        return false;
+    }
+
+    @Specialization
+    Object doPairs(Pair p1, Pair p2) {
+        var ctx = ISLISPContext.get(this);
+        var nil = ctx.getNil();
+        if (isNil(isEqual(p1.car(), p2.car()))) {
+            return nil;
+        }
+        return isEqual(p1.cdr(), p2.cdr());
     }
 
     @Fallback
