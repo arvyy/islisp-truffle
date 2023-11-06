@@ -4,10 +4,7 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
-import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispOutputStream;
-import com.github.arvyy.islisp.runtime.Pair;
-import com.github.arvyy.islisp.runtime.Symbol;
+import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -82,6 +79,20 @@ public abstract class ISLISPFormatObject extends RootNode {
                 writer.write("(");
                 var first = true;
                 for (var e: Utils.readList(p)) {
+                    if (!first) {
+                        writer.write(" ");
+                    } else {
+                        first = false;
+                    }
+                    doPrint(writer, e);
+                }
+                writer.write(")");
+                return;
+            }
+            if (value instanceof LispVector v) {
+                writer.write("#(");
+                var first = true;
+                for (var e: v.values()) {
                     if (!first) {
                         writer.write(" ");
                     } else {

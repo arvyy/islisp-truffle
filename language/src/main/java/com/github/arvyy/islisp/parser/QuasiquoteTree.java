@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.parser;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispChar;
+import com.github.arvyy.islisp.runtime.LispVector;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.nodes.Node;
@@ -31,6 +32,13 @@ public sealed interface QuasiquoteTree {
      * @param children
      */
     record List(QuasiquoteTree[] children) implements QuasiquoteTree { }
+
+    /**
+     * Vector of elements, some of which aren't statically known.
+     *
+     * @param children
+     */
+    record Vector(QuasiquoteTree[] children) implements QuasiquoteTree { }
 
     /**
      * A part that needs to be unquoted.
@@ -125,6 +133,18 @@ public sealed interface QuasiquoteTree {
                     new List(children.toArray(QuasiquoteTree[]::new)),
                     expressions.toArray(Object[]::new));
         }
+        if (expr instanceof LispVector v) {
+            var expressions = new ArrayList<Object>();
+            var children = new ArrayList<QuasiquoteTree>();
+            for (var el: v.values()) {
+                var parsedChildResult = parseQuasiquoteTree(el, level, holeIndex + expressions.size());
+                expressions.addAll(Arrays.asList(parsedChildResult.expressions));
+                children.add(parsedChildResult.tree);
+            }
+            return new QuasiquoteTreeAndExpressions(
+                new Vector(children.toArray(QuasiquoteTree[]::new)),
+                expressions.toArray(Object[]::new));
+        }
         if (expr instanceof Integer
             || expr instanceof BigInteger
             || expr instanceof Symbol
@@ -156,31 +176,44 @@ public sealed interface QuasiquoteTree {
             throw new ISLISPError("Bad unquotesplicing use", node);
         }
         if (tree instanceof List l) {
-            var values = new ArrayList<Object>();
-            for (var child: l.children) {
-                if (child instanceof UnquoteSplicing us) {
-                    if (substitutionValues[us.value.index] instanceof Pair p) {
-                        for (var v: p) {
-                            values.add(v);
-                        }
-                    } else if (substitutionValues[us.value.index] instanceof Symbol s) {
-                        if (s != ISLISPContext.get(null).getNil()) {
-                            throw new ISLISPError("Unquote splicing not list", node);
-                        }
-                    } else {
-                        throw new ISLISPError("Unquote splicing not list", node);
-                    }
-                } else {
-                    values.add(evalQuasiquoteTree(child, substitutionValues, node));
-                }
-            }
             Object lispList = ISLISPContext.get(null).getNil();
+            var values = evalQuasiquoteCollectionContent(l.children, substitutionValues, node);
             for (int i = values.size() - 1; i >= 0; i--) {
                 lispList = new Pair(values.get(i), lispList);
             }
             return lispList;
         }
+        if (tree instanceof Vector v) {
+            var values =  evalQuasiquoteCollectionContent(v.children, substitutionValues, node);
+            return new LispVector(values.toArray());
+        }
         throw new ISLISPError("?", node);
+    }
+
+    private static java.util.List<Object> evalQuasiquoteCollectionContent(
+        QuasiquoteTree[] children,
+        Object[] substitutionValues,
+        Node node
+    ) {
+        var values = new ArrayList<Object>();
+        for (var child: children) {
+            if (child instanceof UnquoteSplicing us) {
+                if (substitutionValues[us.value.index] instanceof Pair p) {
+                    for (var v: p) {
+                        values.add(v);
+                    }
+                } else if (substitutionValues[us.value.index] instanceof Symbol s) {
+                    if (s != ISLISPContext.get(null).getNil()) {
+                        throw new ISLISPError("Unquote splicing not list", node);
+                    }
+                } else {
+                    throw new ISLISPError("Unquote splicing not list", node);
+                }
+            } else {
+                values.add(evalQuasiquoteTree(child, substitutionValues, node));
+            }
+        }
+        return values;
     }
 
 }

@@ -134,6 +134,7 @@ public class ISLISPContext {
         initGlobalFunction("get-output-stream-string", ISLISPGetOutputStreamString::makeLispFunction);
         initGlobalFunction("instancep", ISLISPInstancep::makeLispFunction);
         initGlobalFunction("length", ISLISPLength::makeLispFunction);
+        initGlobalFunction("list", ISLISPList::makeLispFunction);
         initGlobalFunction("property", ISLISPProperty::makeLispFunction);
         initGlobalFunction("remove-property", ISLISPRemoveProperty::makeLispFunction);
         initGlobalFunction("set-car", ISLISPSetCar::makeLispFunction);

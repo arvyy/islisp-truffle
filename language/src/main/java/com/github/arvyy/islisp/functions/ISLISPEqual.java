@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.github.arvyy.islisp.runtime.LispVector;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -77,6 +78,21 @@ public abstract class ISLISPEqual extends RootNode {
             return nil;
         }
         return isEqual(p1.cdr(), p2.cdr());
+    }
+
+    @Specialization
+    Object doVectors(LispVector v1, LispVector v2) {
+        var ctx = ISLISPContext.get(this);
+        var nil = ctx.getNil();
+        if (v1.values().length != v2.values().length) {
+            return nil;
+        }
+        for (int i = 0; i < v1.values().length; i++) {
+            if (isNil(isEqual(v1.values()[i], v2.values()[i]))) {
+                return nil;
+            }
+        }
+        return ctx.getT();
     }
 
     @Fallback
