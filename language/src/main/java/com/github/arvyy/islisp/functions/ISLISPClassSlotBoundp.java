@@ -14,22 +14,20 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.staticobject.StaticProperty;
 
-import java.util.Objects;
-
 /**
- * Function instantiated for defclass slots with :reader option.
+ * Function instantiated for defclass slots with :boundp option.
  */
-public abstract class ISLISPClassSlotReader extends RootNode {
+public abstract class ISLISPClassSlotBoundp extends RootNode {
 
     private final Symbol slot;
 
     /**
-     * Create slot reader root node.
+     * Create slot boundp root node.
      *
      * @param slot slot's name
      * @param language language reference
      */
-    public ISLISPClassSlotReader(Symbol slot, TruffleLanguage<?> language) {
+    public ISLISPClassSlotBoundp(Symbol slot, TruffleLanguage<?> language) {
         super(language);
         this.slot = slot;
     }
@@ -48,14 +46,19 @@ public abstract class ISLISPClassSlotReader extends RootNode {
             @Cached("clsObject.clazz()") StandardClass clazz,
             @Cached("lookupProperty(clazz)") StaticProperty property
     ) {
-        return Objects.requireNonNullElse(property.getObject(clsObject.data()), ISLISPContext.get(this).getNil());
+        var ctx = ISLISPContext.get(this);
+        return property.getObject(clsObject.data()) == null
+            ? ctx.getNil()
+            : ctx.getT();
     }
 
     @Specialization
     Object doUnspecialized(StandardClassObject clsObject) {
-        return Objects.requireNonNullElse(
-            lookupProperty(clsObject.clazz()).getObject(clsObject.data()),
-            ISLISPContext.get(this).getNil());
+        var property = lookupProperty(clsObject.clazz());
+        var ctx = ISLISPContext.get(this);
+        return property.getObject(clsObject.data()) == null
+            ? ctx.getNil()
+            : ctx.getT();
     }
 
     @CompilerDirectives.TruffleBoundary

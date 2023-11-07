@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.functions.ISLISPClassSlotBoundpNodeGen;
 import com.github.arvyy.islisp.functions.ISLISPClassSlotReaderNodeGen;
 import com.github.arvyy.islisp.functions.ISLISPClassSlotWriterNodeGen;
 import com.github.arvyy.islisp.runtime.*;
@@ -77,9 +78,37 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                         ISLISPDefMethodNode.MethodQualifier.none,
                         writer,
                         false,
-                        new Symbol[]{name, ISLISPContext.get(this).namedSymbol("<object>")},
+                        new Symbol[]{ISLISPContext.get(this).namedSymbol("<object>"), name},
                         false,
                         ISLISPClassSlotWriterNodeGen.create(slot.getName(), language)));
+            }
+            for (var accessor: slot.getAccessorName()) {
+                exprs.add(new ISLISPDefGenericNode(accessor, false, 1, false, null));
+                exprs.add(new ISLISPDefMethodNode(
+                    ISLISPDefMethodNode.MethodQualifier.none,
+                    accessor,
+                    false,
+                    new Symbol[]{name},
+                    false,
+                    ISLISPClassSlotReaderNodeGen.create(slot.getName(), language)));
+                exprs.add(new ISLISPDefGenericNode(accessor, true, 2, false, null));
+                exprs.add(new ISLISPDefMethodNode(
+                    ISLISPDefMethodNode.MethodQualifier.none,
+                    accessor,
+                    true,
+                    new Symbol[]{ISLISPContext.get(this).namedSymbol("<object>"), name},
+                    false,
+                    ISLISPClassSlotWriterNodeGen.create(slot.getName(), language)));
+            }
+            for (var boundp: slot.getBoundpName()) {
+                exprs.add(new ISLISPDefGenericNode(boundp, false, 1, false, null));
+                exprs.add(new ISLISPDefMethodNode(
+                    ISLISPDefMethodNode.MethodQualifier.none,
+                    boundp,
+                    false,
+                    new Symbol[]{name},
+                    false,
+                    ISLISPClassSlotBoundpNodeGen.create(slot.getName(), language)));
             }
         }
         return exprs.toArray(ISLISPExpressionNode[]::new);

@@ -69,10 +69,10 @@ public class ISLISPSignalCondition extends RootNode {
         var conditionValue = frame.getArguments()[1];
         var shouldFill = fillStacktrace.call(null, conditionValue);
         if (shouldFill != ctx.getNil()) {
-            setStacktrace.call(null, conditionValue, ISLISPCurrentStacktrace.currentStacktrace());
+            setStacktrace.call(null, ISLISPCurrentStacktrace.currentStacktrace(), conditionValue);
         }
         var continuable = frame.getArguments()[2];
-        setContinuable.call(null, conditionValue, continuable);
+        setContinuable.call(null, continuable, conditionValue);
         if (continuable != ctx.getNil()) {
             var handler = ctx.popHandler();
             try {

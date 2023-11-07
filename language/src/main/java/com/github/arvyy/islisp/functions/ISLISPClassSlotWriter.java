@@ -34,17 +34,17 @@ public abstract class ISLISPClassSlotWriter extends RootNode {
 
     @Override
     public final Object execute(VirtualFrame frame) {
-        var obj = frame.getArguments()[1];
-        var value = frame.getArguments()[2];
-        return executeGeneric(obj, value);
+        var value = frame.getArguments()[1];
+        var obj = frame.getArguments()[2];
+        return executeGeneric(value, obj);
     }
 
-    abstract Object executeGeneric(Object object, Object value);
+    abstract Object executeGeneric(Object value, Object classObject);
 
     @Specialization(guards = "clsObject.clazz() == clazz", limit = "999")
     Object doSpecialized(
-            StandardClassObject clsObject,
             Object value,
+            StandardClassObject clsObject,
             @Cached("clsObject.clazz()") StandardClass clazz,
             @Cached("lookupProperty(clazz)") StaticProperty property
     ) {
@@ -53,7 +53,7 @@ public abstract class ISLISPClassSlotWriter extends RootNode {
     }
 
     @Specialization
-    Object doUnspecialized(StandardClassObject clsObject, Object value) {
+    Object doUnspecialized(Object value, StandardClassObject clsObject) {
         lookupProperty(clsObject.clazz()).setObject(clsObject.data(), value);
         return ISLISPContext.get(this).getNil();
     }
