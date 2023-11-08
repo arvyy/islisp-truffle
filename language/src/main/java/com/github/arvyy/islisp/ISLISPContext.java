@@ -51,6 +51,7 @@ public class ISLISPContext {
     private final Map<SymbolReference, ValueReference> dynamicVars;
     private final Map<SymbolReference, ValueReference> globalVars;
     private final Map<SymbolReference, Map<SymbolReference, ValueReference>> symbolProperties;
+    private final ValueReference currentOutputStream;
 
     private HandlerChain handlerChain;
 
@@ -74,6 +75,8 @@ public class ISLISPContext {
         classes = new HashMap<>();
         setfTransformers = new HashMap<>();
         globalVars = new HashMap<>();
+        currentOutputStream = new ValueReference();
+        currentOutputStream.setValue(new LispOutputStream(env.out()));
         initBuiltinVars();
         initBuiltinClasses();
         initGlobalFunctions();
@@ -493,6 +496,10 @@ public class ISLISPContext {
     @CompilerDirectives.TruffleBoundary
     public LispClass lookupClass(String name) {
         return lookupClass(namedSymbol(name).identityReference());
+    }
+
+    public ValueReference currentOutputStreamReference() {
+        return currentOutputStream;
     }
 
     /**

@@ -196,6 +196,8 @@ public class Parser {
                     return parseWhile(parserContext, sexpr);
                 case "with-handler":
                     return parseWithHandler(parserContext, sexpr);
+                case "with-standard-output":
+                    return parseWithStandardOutput(parserContext, sexpr);
 
                 default:
             }
@@ -269,6 +271,16 @@ public class Parser {
             }
         }
         throw new ParsingException(source(sexpr), "Unrecognized form.");
+    }
+
+    private ISLISPExpressionNode parseWithStandardOutput(ParserContext parserContext, Object sexpr) {
+        var args = requireList(sexpr, 2, -1);
+        var outputstreamExpr = parseExpressionNode(parserContext, args.get(1));
+        var bodyExprs = args.stream()
+            .skip(2)
+            .map(s -> parseExpressionNode(parserContext, s))
+            .toArray(ISLISPExpressionNode[]::new);
+        return new ISLISPWithStandardOutputNode(outputstreamExpr, bodyExprs, source(sexpr));
     }
 
     private ISLISPForNode parseFor(ParserContext parserContext, Object sexpr) {
