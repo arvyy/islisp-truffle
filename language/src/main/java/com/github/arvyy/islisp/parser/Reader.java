@@ -1,10 +1,7 @@
 package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.runtime.LispChar;
-import com.github.arvyy.islisp.runtime.LispVector;
-import com.github.arvyy.islisp.runtime.Pair;
-import com.github.arvyy.islisp.runtime.Symbol;
+import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
 
@@ -118,28 +115,28 @@ public class Reader {
             sourceSectionMap.put(new EqWrapper(result), fullSection);
             return Optional.of(result);
         }
-        if (t instanceof Token.VectorBracketOpenToken) {
+        if (t instanceof Token.ArrayBracketOpenToken arr && arr.dimensions() > 1) {
             var startLine = lexer.getLine();
             var startColumn = lexer.getColumn();
-            Optional<Token> next;
-            var lst = new ArrayList<Object>();
-            while (true) {
-                next = lexer.peekToken();
-                if (next.isEmpty()) {
-                    throw new RuntimeException("Premature end of file");
-                }
-                var token = next.get();
-                if (token instanceof Token.BracketCloseToken) {
-                    lexer.getToken();
-                    var endLine = lexer.getLine();
-                    var endColumn = lexer.getColumn();
-                    var section = source.createSection(startLine, startColumn, endLine, endColumn);
-                    var vec = new LispVector(lst.toArray());
-                    sourceSectionMap.put(new EqWrapper(vec), section);
-                    return Optional.of(vec);
-                }
-                lst.add(readSingle().orElseThrow()); //TODO
-            }
+            var content = readArrayContent(arr.dimensions());
+            var array = new LispArray(content, arr.dimensions());
+            var endLine = lexer.getLine();
+            var endColumn = lexer.getColumn();
+            var section = source.createSection(startLine, startColumn, endLine, endColumn);
+            sourceSectionMap.put(new EqWrapper(array), section);
+            return Optional.of(array);
+        }
+        if (t instanceof Token.VectorBracketOpenToken
+            || (t instanceof Token.ArrayBracketOpenToken arr && arr.dimensions() == 1)
+        ) {
+            var startLine = lexer.getLine();
+            var startColumn = lexer.getColumn();
+            var vec = new LispVector(readUntilClosingBracket());
+            var endLine = lexer.getLine();
+            var endColumn = lexer.getColumn();
+            var section = source.createSection(startLine, startColumn, endLine, endColumn);
+            sourceSectionMap.put(new EqWrapper(vec), section);
+            return Optional.of(vec);
         }
         if (t instanceof Token.BracketOpenToken) {
             var startLine = lexer.getLine();
@@ -203,5 +200,43 @@ public class Reader {
             return Optional.of(str.value());
         }
         return Optional.empty();
+    }
+
+    Object[] readArrayContent(int dimensions) {
+        if (dimensions == 1) {
+            return readUntilClosingBracket();
+        }
+        var content = new ArrayList<>();
+        while (true) {
+            var next = lexer.getToken();
+            if (next.isEmpty()) {
+                throw new RuntimeException("Premature end of file");
+            }
+            var token = next.get();
+            if (token instanceof Token.BracketCloseToken) {
+                return content.toArray();
+            } else if (token instanceof Token.BracketOpenToken) {
+                content.add(readArrayContent(dimensions - 1));
+            } else {
+                throw new RuntimeException("Unexpected token " + token);
+            }
+        }
+    }
+
+    Object[] readUntilClosingBracket() {
+        Optional<Token> next;
+        var lst = new ArrayList<Object>();
+        while (true) {
+            next = lexer.peekToken();
+            if (next.isEmpty()) {
+                throw new RuntimeException("Premature end of file");
+            }
+            var token = next.get();
+            if (token instanceof Token.BracketCloseToken) {
+                lexer.getToken();
+                return lst.toArray();
+            }
+            lst.add(readSingle().orElseThrow()); //TODO
+        }
     }
 }

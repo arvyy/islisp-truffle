@@ -134,6 +134,14 @@ public abstract class ISLISPClassOf extends RootNode {
         return characterClass;
     }
 
+    @Specialization
+    LispClass doArray(
+        LispArray character,
+        @Cached("loadArrayClass()") LispClass arrayClass
+    ) {
+        return arrayClass;
+    }
+
     @Fallback
     @CompilerDirectives.TruffleBoundary
     LispClass doFallback(Object value) {
@@ -178,6 +186,10 @@ public abstract class ISLISPClassOf extends RootNode {
 
     LispClass loadCharacterClass() {
         return loadClass("<character>");
+    }
+
+    LispClass loadArrayClass() {
+        return loadClass("<general-array*>");
     }
 
     LispClass loadClass(String name) {

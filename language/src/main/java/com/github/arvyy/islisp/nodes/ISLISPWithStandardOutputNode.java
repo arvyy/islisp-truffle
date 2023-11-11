@@ -23,7 +23,11 @@ public class ISLISPWithStandardOutputNode extends ISLISPExpressionNode {
      * @param body set of expressions for the duration of which the custom output will be installed
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPWithStandardOutputNode(ISLISPExpressionNode outputExpression, ISLISPExpressionNode[] body, SourceSection sourceSection) {
+    public ISLISPWithStandardOutputNode(
+        ISLISPExpressionNode outputExpression,
+        ISLISPExpressionNode[] body,
+        SourceSection sourceSection
+    ) {
         super(sourceSection);
         this.outputExpression = outputExpression;
         this.body = body;
@@ -39,8 +43,9 @@ public class ISLISPWithStandardOutputNode extends ISLISPExpressionNode {
         //TODO signal if newValue not a stream
         ref.setValue(newValue);
         try {
-            if (body.length == 0)
+            if (body.length == 0) {
                 return ctx.getNil();
+            }
             for (var i = 0; i < body.length - 1; i++) {
                 body[i].executeGeneric(frame);
             }

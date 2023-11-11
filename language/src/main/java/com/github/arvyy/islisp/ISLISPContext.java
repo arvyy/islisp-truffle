@@ -115,6 +115,7 @@ public class ISLISPContext {
         initGlobalFunction("-", ISLISPSubtract::makeLispFunction);
         initGlobalFunction("=", ISLISPNumericEqual::makeLispFunction);
         initGlobalFunction(">", ISLISPNumericGt::makeLispFunction);
+        initGlobalFunction("aref", ISLISPAref::makeLispFunction);
         initGlobalFunction("car", ISLISPCar::makeLispFunction);
         initGlobalFunction("cdr", ISLISPCdr::makeLispFunction);
         initGlobalFunction("char=", ISLISPCharEqual::makeLispFunction);
@@ -242,6 +243,8 @@ public class ISLISPContext {
         initBuiltin("<basic-vector>", "<basic-array>");
         initBuiltin("<string>", "<basic-vector>");
         initBuiltin("<general-vector>", "<basic-vector>");
+        initBuiltin("<basic-array*>", "<basic-array>");
+        initBuiltin("<general-array*>", "<basic-array*>");
         initBuiltin("<stream>", "<object>");
         initBuiltin("<character>", "<object>");
     }
@@ -498,6 +501,9 @@ public class ISLISPContext {
         return lookupClass(namedSymbol(name).identityReference());
     }
 
+    /**
+     * @return currently active output stream reference.
+     */
     public ValueReference currentOutputStreamReference() {
         return currentOutputStream;
     }

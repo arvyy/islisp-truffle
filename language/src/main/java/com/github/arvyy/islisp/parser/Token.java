@@ -53,6 +53,12 @@ public sealed interface Token {
     record VectorBracketOpenToken() implements Token { }
 
     /**
+     * Array opener #nA(.
+     * @param dimensions dimension size (n)
+     */
+    record ArrayBracketOpenToken(int dimensions) implements Token { }
+
+    /**
      * Simple bracket open (.
      */
     record BracketOpenToken() implements Token { }

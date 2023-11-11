@@ -128,6 +128,13 @@ CharacterName = newline | space | tab
     return new Token.VectorBracketOpenToken();
   }
 
+  "#" {Digit}+ "A(" |
+  "#" {Digit}+ "a(" {
+    String match = yytext();
+    String numText = match.substring(1, match.length() - 2);
+    return new Token.ArrayBracketOpenToken(Integer.parseInt(numText));
+  }
+
   "(" {
     return new Token.BracketOpenToken();
   }

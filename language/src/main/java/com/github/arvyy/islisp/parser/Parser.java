@@ -256,6 +256,7 @@ public class Parser {
             || sexpr instanceof LispChar
             || sexpr instanceof String
             || sexpr instanceof LispVector
+            || sexpr instanceof LispArray
         ) {
             return new ISLISPLiteralNode(sexpr, null);
         }
