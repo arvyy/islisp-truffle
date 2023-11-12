@@ -168,6 +168,18 @@
 (defun consp (obj)
   (instancep obj (class <cons>)))
 
+(defun basic-array-p (obj)
+  (instancep obj (class <basic-array>)))
+
+(defun basic-array*-p (obj)
+  (instancep obj (class <basic-array*>)))
+
+(defun general-array*-p (obj)
+  (instancep obj (class <general-array*>)))
+
+(defun general-vector-p (obj)
+  (instancep obj (class <general-vector>)))
+
 (defun identity (obj) obj)
 
 (defun not (obj)

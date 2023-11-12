@@ -122,6 +122,7 @@ public class ISLISPContext {
         initGlobalFunction("char<", ISLISPCharLt::makeLispFunction);
         initGlobalFunction("class-of", ISLISPClassOf::makeLispFunction);
         initGlobalFunction("cons", ISLISPCons::makeLispFunction);
+        initGlobalFunction("create-array", ISLISPCreateArray::makeLispFunction);
         initGlobalFunction("continue-condition", ISLISPContinueCondition::makeLispFunction);
         initGlobalFunction("create-string-input-stream", ISLISPCreateStringInputStream::makeLispFunction);
         initGlobalFunction("create-string-output-stream", ISLISPCreateStringOutputStream::makeLispFunction);

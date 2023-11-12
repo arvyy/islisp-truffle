@@ -50,4 +50,19 @@ public final class Utils {
         }
         return val;
     }
+
+    /**
+     * Is given object a nil symbol.
+     *
+     * @param o any object
+     * @return true if o is nil
+     */
+    public static boolean isNil(Object o) {
+        var ctx = ISLISPContext.get(null);
+        var nil = ctx.getNil();
+        if (o instanceof Symbol s && s.identityReference() == nil.identityReference()) {
+            return true;
+        }
+        return false;
+    }
 }

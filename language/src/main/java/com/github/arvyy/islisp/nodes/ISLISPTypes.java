@@ -19,6 +19,7 @@ import java.math.BigInteger;
     String.class,
     StringBuffer.class,
     LispVector.class,
+    LispArray.class,
     int.class,
     double.class
 })

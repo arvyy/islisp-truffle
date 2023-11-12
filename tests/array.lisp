@@ -20,4 +20,13 @@
   (test-equal (aref arr 1 0) 3)
   (test-equal (aref arr 1 1) 4))
 
+(let ((arr (create-array '(2 2) 1)))
+  (test-equal (aref arr 0 0) 1)
+  (test-equal (aref arr 0 1) 1)
+  (test-equal (aref arr 1 0) 1)
+  (test-equal (aref arr 1 1) 1)
+  (test-equal (general-array*-p arr) t))
+
+(test-equal (general-vector-p (create-array '(1))) t)
+
 (format-object (standard-output) "array.lisp end" nil)

@@ -14,6 +14,8 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.RootNode;
 
+import static com.github.arvyy.islisp.Utils.isNil;
+
 /**
  * Implements `equal` function.
  */
@@ -59,15 +61,6 @@ public abstract class ISLISPEqual extends RootNode {
         } else {
             return ctx.getNil();
         }
-    }
-
-    boolean isNil(Object o) {
-        var ctx = ISLISPContext.get(this);
-        var nil = ctx.getNil();
-        if (o instanceof Symbol s && s.identityReference() == nil.identityReference()) {
-            return true;
-        }
-        return false;
     }
 
     @Specialization
