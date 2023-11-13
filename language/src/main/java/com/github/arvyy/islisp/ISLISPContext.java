@@ -8,10 +8,7 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.nodes.Node;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -142,6 +139,7 @@ public class ISLISPContext {
         initGlobalFunction("list", ISLISPList::makeLispFunction);
         initGlobalFunction("property", ISLISPProperty::makeLispFunction);
         initGlobalFunction("remove-property", ISLISPRemoveProperty::makeLispFunction);
+        initGlobalFunction("set-aref", ISLISPSetAref::makeLispFunction);
         initGlobalFunction("set-car", ISLISPSetCar::makeLispFunction);
         initGlobalFunction("set-cdr", ISLISPSetCdr::makeLispFunction);
         initGlobalFunction("set-property", ISLISPSetProperty::makeLispFunction);
@@ -215,6 +213,15 @@ public class ISLISPContext {
                 forms.get(1),
                 forms.get(2)
             ));
+        });
+        setfTransformers.put(namedSymbol("aref").identityReference(), (forms, value) -> {
+            var lst = new ArrayList<Object>();
+            lst.addAll(List.of(
+                namedSymbol("set-aref"),
+                value
+            ));
+            lst.addAll(forms.subList(1, forms.size()));
+            return Utils.listToValue(lst);
         });
     }
 
