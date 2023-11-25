@@ -53,7 +53,7 @@ public abstract class ISLISPFormatObject extends RootNode {
     void doPrint(OutputStream os, Object value, boolean escape) {
         //TODO implement escape
         var writer = new OutputStreamWriter(os);
-        doPrint(writer, value);
+        doPrint(writer, value, escape);
         try {
             writer.flush();
         } catch (IOException e) {
@@ -61,10 +61,19 @@ public abstract class ISLISPFormatObject extends RootNode {
         }
     }
 
-    void doPrint(Writer writer, Object value) {
+    void doPrint(Writer writer, Object value, boolean escape) {
         try {
+            if (value instanceof LispChar c) {
+                if (escape)
+                    writer.write("#\\");
+                writer.write(c.codepoint());
+            }
             if (value instanceof String s) {
+                if (escape)
+                    writer.write("\"");
                 writer.write(s);
+                if (escape)
+                    writer.write("\"");
                 return;
             }
             if (value instanceof Integer i) {
@@ -84,7 +93,7 @@ public abstract class ISLISPFormatObject extends RootNode {
                     } else {
                         first = false;
                     }
-                    doPrint(writer, e);
+                    doPrint(writer, e, escape);
                 }
                 writer.write(")");
                 return;
@@ -98,7 +107,7 @@ public abstract class ISLISPFormatObject extends RootNode {
                     } else {
                         first = false;
                     }
-                    doPrint(writer, e);
+                    doPrint(writer, e, escape);
                 }
                 writer.write(")");
                 return;

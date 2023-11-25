@@ -128,10 +128,12 @@ public class ISLISPContext {
         initGlobalFunction("error-output", ISLISPErrorOutputStream::makeLispFunction);
         initGlobalFunction("eq", ISLISPEq::makeLispFunction);
         initGlobalFunction("equal", ISLISPEqual::makeLispFunction);
+        initGlobalFunction("format", ISLISPFormat::makeLispFunction);
         initGlobalFunction("format-char", ISLISPFormatChar::makeLispFunction);
         initGlobalFunction("format-integer", ISLISPFormatInteger::makeLispFunction);
         initGlobalFunction("format-float", ISLISPFormatFloat::makeLispFunction);
         initGlobalFunction("format-object", ISLISPFormatObject::makeLispFunction);
+        initGlobalFunction("format-fresh-line", ISLISPFormatFreshLine::makeLispFunction);
         initGlobalFunction("gensym", ISLISPGensym::makeLispFunction);
         initGlobalFunction("get-output-stream-string", ISLISPGetOutputStreamString::makeLispFunction);
         initGlobalFunction("instancep", ISLISPInstancep::makeLispFunction);

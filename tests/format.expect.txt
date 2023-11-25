@@ -1,5 +1,15 @@
 1010
 12
 10
-a
+A
 1.2
+No result
+The result is meningitis and nothing else.
+The result is
+The results are 1 and #\a.
+Binary code 10010110
+permission 755
+You BAD FACE
+This will be split into
+two lines.
+This is a tilde: ~

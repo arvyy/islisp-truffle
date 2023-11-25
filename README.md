@@ -9,3 +9,4 @@ Extensions
 
 Omissions
 * metaclasses
+* format-tab, format-freshline

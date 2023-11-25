@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispOutputStream;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -13,40 +14,46 @@ import com.oracle.truffle.api.nodes.RootNode;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 
 /**
- * Implements `format-integer` function, that writes a given integer to output stream.
+ * Implements `format-fresh-line` function.
  */
-public abstract class ISLISPFormatInteger extends RootNode {
+public abstract class ISLISPFormatFreshLine extends RootNode {
 
-    ISLISPFormatInteger(TruffleLanguage<?> language) {
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
+    ISLISPFormatFreshLine(TruffleLanguage<?> language) {
         super(language);
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
-
-    abstract void executeGeneric(Object stream, Object integer, Object radix);
 
     @Override
     public final Object execute(VirtualFrame frame) {
-        executeGeneric(frame.getArguments()[1], frame.getArguments()[2], frame.getArguments()[3]);
+        if (frame.getArguments().length != 2) {
+            return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 1, 1);
+        }
+        executeGeneric(frame.getArguments()[1]);
         return ISLISPContext.get(this).getNil();
     }
 
+    abstract void executeGeneric(Object stream);
+
     @Specialization
-    void doProper(LispOutputStream stream, int integer, int radix) {
-        doPrint(stream.outputStream(), integer, radix);
+    void executeProper(LispOutputStream stream) {
+        doPrint(stream.outputStream());
     }
 
     @Fallback
-    void doFallback(Object stream, Object integer, Object radix) {
+    void executeFallback(Object stream) {
         throw new ISLISPError("Bad arguments", this);
     }
 
 
     @CompilerDirectives.TruffleBoundary
-    void doPrint(OutputStream os, int value, int radix) {
+    void doPrint(OutputStream os) {
         try {
-            os.write(Integer.toString(value, radix).toUpperCase().getBytes(StandardCharsets.UTF_8));
+            os.write('\n');
         } catch (IOException e) {
             throw new ISLISPError(e.getMessage(), this);
         }
@@ -58,6 +65,6 @@ public abstract class ISLISPFormatInteger extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPFormatIntegerNodeGen.create(lang).getCallTarget());
+        return new LispFunction(ISLISPFormatFreshLineNodeGen.create(lang).getCallTarget());
     }
 }
