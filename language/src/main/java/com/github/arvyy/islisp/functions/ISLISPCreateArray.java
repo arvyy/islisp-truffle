@@ -7,6 +7,7 @@ import com.github.arvyy.islisp.runtime.ArraySlice;
 import com.github.arvyy.islisp.runtime.LispArray;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Pair;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -40,6 +41,7 @@ public abstract class ISLISPCreateArray extends RootNode {
 
     DirectCallNode getCreateVectorNode() {
         if (createVectorNode == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             createVectorNode = this.insert(
                 DirectCallNode.create(
@@ -52,6 +54,7 @@ public abstract class ISLISPCreateArray extends RootNode {
     DirectCallNode getLengthNode() {
         if (lengthNode == null) {
             var ctx = ISLISPContext.get(this);
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             lengthNode = this.insert(
                 DirectCallNode.create(
                     ctx.lookupFunction(ctx.namedSymbol("length").identityReference())
@@ -87,7 +90,7 @@ public abstract class ISLISPCreateArray extends RootNode {
                 if (dimensions.car() instanceof Integer integer) {
                     dimensionsArr[i] = integer;
                 } else if (dimensions.car() instanceof BigInteger biginteger) {
-                    dimensionsArr[i] = biginteger.intValueExact();
+                    dimensionsArr[i] = bigIntValue(biginteger);
                 } else {
                     var ctx = ISLISPContext.get(this);
                     return errorSignalerNode.signalWrongType(dimensions.car(), ctx.lookupClass("<integer>"));
@@ -102,6 +105,11 @@ public abstract class ISLISPCreateArray extends RootNode {
             }
             return new LispArray(makeArrayContent(new ArraySlice<>(dimensionsArr), initValue), dimensionsSize);
         }
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    int bigIntValue(BigInteger b) {
+        return b.intValueExact();
     }
 
     Object[] makeArrayContent(ArraySlice<Integer> dimensions, Object initValue) {

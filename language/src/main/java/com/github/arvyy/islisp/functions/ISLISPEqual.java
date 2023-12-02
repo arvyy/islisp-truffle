@@ -98,6 +98,7 @@ public abstract class ISLISPEqual extends RootNode {
     @CompilerDirectives.TruffleBoundary
     DirectCallNode getEqCallNode() {
         if (eqCallNode == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
                 ctx.lookupFunction(ctx.namedSymbol("eq").identityReference())

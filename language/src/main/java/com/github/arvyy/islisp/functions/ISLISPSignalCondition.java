@@ -8,6 +8,7 @@ import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNode;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNodeGen;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.DirectCallNode;
@@ -46,17 +47,20 @@ public class ISLISPSignalCondition extends RootNode {
     public Object execute(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         if (fillStacktrace == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             var fillStacktraceFunction = ctx.lookupFunction(
                 ctx.namedSymbol("fill-stacktrace").identityReference());
             fillStacktrace = insert(DirectCallNode.create(fillStacktraceFunction.callTarget()));
         }
         if (setContinuable == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             var setContinuableFunction = ctx.lookupFunction(
                 ctx.namedSymbol("set-condition-continuable").identityReference()
             );
             setContinuable = insert(DirectCallNode.create(setContinuableFunction.callTarget()));
         }
         if (setStacktrace == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             var setStacktraceFunction = ctx.lookupFunction(
                 ctx.namedSymbol("set-condition-stacktrace").identityReference()
             );

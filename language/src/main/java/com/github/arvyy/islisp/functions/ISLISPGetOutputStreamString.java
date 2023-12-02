@@ -4,6 +4,7 @@ import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispOutputStream;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
@@ -31,18 +32,23 @@ public class ISLISPGetOutputStreamString extends RootNode {
         }
         var arg = frame.getArguments()[1];
         if (arg instanceof LispOutputStream s) {
-            if (s.outputStream() instanceof ByteArrayOutputStream out) {
-                try {
-                    var content = out.toString("UTF-8");
-                    out.reset();
-                    return content;
-                } catch (UnsupportedEncodingException e) {
-                    throw new ISLISPError(e.getMessage(), this);
-                }
-            }
-            return errorSignalerNode.signalNotStringOutputStream(arg);
+            return executeBoundary(s);
         }
         return errorSignalerNode.signalNotStringOutputStream(arg);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    Object executeBoundary(LispOutputStream s) {
+        if (s.outputStream() instanceof ByteArrayOutputStream out) {
+            try {
+                var content = out.toString("UTF-8");
+                out.reset();
+                return content;
+            } catch (UnsupportedEncodingException e) {
+                throw new ISLISPError(e.getMessage(), this);
+            }
+        }
+        return errorSignalerNode.signalNotStringOutputStream(s);
     }
 
     /**

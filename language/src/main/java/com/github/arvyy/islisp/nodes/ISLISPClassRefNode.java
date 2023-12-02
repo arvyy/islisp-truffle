@@ -30,6 +30,7 @@ public class ISLISPClassRefNode extends ISLISPExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         if (clazz == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             clazz = ISLISPContext.get(this).lookupClass(name.identityReference());
         }
         return clazz;

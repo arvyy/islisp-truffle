@@ -13,7 +13,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <graalvm.version>23.0.1</graalvm.version>
+        <graalvm.version>23.1.0</graalvm.version>
         <revision>1.0-SNAPSHOT</revision>
     </properties>
 
@@ -27,6 +27,16 @@
             <dependency>
                 <groupId>org.graalvm.truffle</groupId>
                 <artifactId>truffle-api</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.truffle</groupId>
+                <artifactId>truffle-runtime</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.polyglot</groupId>
+                <artifactId>polyglot</artifactId>
                 <version>${graalvm.version}</version>
             </dependency>
             <dependency>

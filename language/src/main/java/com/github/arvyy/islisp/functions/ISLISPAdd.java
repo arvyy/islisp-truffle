@@ -4,6 +4,7 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPTypes;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -46,6 +47,7 @@ public abstract class ISLISPAdd extends RootNode {
     }
 
     @Specialization
+    @CompilerDirectives.TruffleBoundary
     BigInteger doBigInts(BigInteger a, BigInteger b) {
         return a.add(b);
     }

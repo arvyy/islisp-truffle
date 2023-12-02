@@ -117,6 +117,7 @@ public class ISLISPErrorSignalerNode extends Node {
     @CompilerDirectives.TruffleBoundary
     DirectCallNode getSignalCallNode() {
         if (signalCallNode == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
                 ctx.lookupFunction(ctx.namedSymbol("signal-condition").identityReference())
@@ -129,6 +130,7 @@ public class ISLISPErrorSignalerNode extends Node {
     @CompilerDirectives.TruffleBoundary
     DirectCallNode getCreateCallNode() {
         if (createCallNode == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
                 ctx.lookupFunction(ctx.namedSymbol("create").identityReference())

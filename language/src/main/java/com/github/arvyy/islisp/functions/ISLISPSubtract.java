@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -41,6 +42,7 @@ public abstract class ISLISPSubtract extends RootNode {
     }
 
     @Specialization
+    @CompilerDirectives.TruffleBoundary
     BigInteger doBigInts(BigInteger a, BigInteger b) {
         return a.subtract(b);
     }

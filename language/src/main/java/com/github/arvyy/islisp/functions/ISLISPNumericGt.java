@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -40,6 +41,7 @@ public abstract class ISLISPNumericGt extends RootNode {
     }
 
     @Specialization
+    @CompilerDirectives.TruffleBoundary
     Object doBigInts(BigInteger a, BigInteger b) {
         if (profile.profile(a.compareTo(b) > 0)) {
             return ISLISPContext.get(this).getT();

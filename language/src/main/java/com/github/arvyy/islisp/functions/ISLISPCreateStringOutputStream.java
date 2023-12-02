@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispOutputStream;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
@@ -27,6 +28,11 @@ public class ISLISPCreateStringOutputStream extends RootNode {
         if (frame.getArguments().length != 1) {
             return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 0, 0);
         }
+        return executeBoundary();
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    LispOutputStream executeBoundary() {
         return new LispOutputStream(new ByteArrayOutputStream());
     }
 

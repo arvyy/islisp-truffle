@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.runtime.*;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.ImplicitCast;
 import com.oracle.truffle.api.dsl.TypeSystem;
 
@@ -35,6 +36,7 @@ public class ISLISPTypes {
      * @return double value
      */
     @ImplicitCast
+    @CompilerDirectives.TruffleBoundary
     public static BigInteger intToBigInt(int v) {
         return BigInteger.valueOf(v);
     }

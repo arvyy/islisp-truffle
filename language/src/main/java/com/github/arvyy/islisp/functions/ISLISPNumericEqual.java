@@ -4,6 +4,7 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPTypes;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -46,6 +47,7 @@ public abstract class ISLISPNumericEqual extends RootNode {
     }
 
     @Specialization
+    @CompilerDirectives.TruffleBoundary
     Object doBigInts(BigInteger a, BigInteger b) {
         if (profile.profile(a.equals(b))) {
             return ISLISPContext.get(this).getT();

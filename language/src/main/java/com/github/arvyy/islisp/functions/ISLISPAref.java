@@ -6,6 +6,7 @@ import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispArray;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispVector;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -38,7 +39,7 @@ public abstract class ISLISPAref extends RootNode {
             if (arg instanceof Integer) {
                 lookup[i] = (int) arg;
             } else if (arg instanceof BigInteger) {
-                lookup[i] = ((BigInteger) arg).intValueExact();
+                lookup[i] = bigintValue((BigInteger) arg);
             } else {
                 var ctx = ISLISPContext.get(this);
                 return errorSignalerNode.signalWrongType(arg, ctx.lookupClass("<integer>"));
@@ -49,6 +50,11 @@ public abstract class ISLISPAref extends RootNode {
             }
         }
         return executeGeneric(frame.getArguments()[1], lookup);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    int bigintValue(BigInteger arg) {
+        return arg.intValueExact();
     }
 
     abstract Object executeGeneric(Object array, int[] lookup);

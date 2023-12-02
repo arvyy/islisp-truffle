@@ -30,6 +30,7 @@ public class ISLISPFunctionRefNode extends ISLISPExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         if (function == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             function = ISLISPContext.get(this).lookupFunction(name.identityReference());
         }
         return function;

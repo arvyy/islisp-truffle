@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPThrowException;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
@@ -39,9 +40,10 @@ public class ISLISPCatchNode extends ISLISPExpressionNode {
     public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         if (eq == null) {
-            eq = DirectCallNode.create(
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            eq = this.insert(DirectCallNode.create(
                 ctx.lookupFunction(ctx.namedSymbol("eq").identityReference())
-                    .callTarget());
+                    .callTarget()));
         }
         var tagObject = tagForm.executeGeneric(frame);
         try {

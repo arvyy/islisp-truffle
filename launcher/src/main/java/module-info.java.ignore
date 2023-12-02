@@ -1,6 +1,0 @@
-module com.github.arvyy.islisp.launcher {
-    requires com.github.arvyy.islisp;
-    requires org.graalvm.truffle;
-    requires com.oracle.truffle.tools.chromeinspector;
-    exports com.github.arvyy.islisp.launcher;
-}

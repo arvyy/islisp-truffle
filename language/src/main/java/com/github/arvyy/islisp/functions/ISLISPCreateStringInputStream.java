@@ -4,6 +4,7 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispInputStream;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
@@ -39,6 +40,11 @@ public class ISLISPCreateStringInputStream extends RootNode {
             var ctx = ISLISPContext.get(this);
             return errorSignalerNode.signalWrongType(arg, ctx.lookupClass("<string>"));
         }
+        return executeBoundary(value);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    Object executeBoundary(CharSequence value) {
         try {
             return new LispInputStream(new ByteArrayInputStream(value.toString().getBytes("UTF-8")));
         } catch (UnsupportedEncodingException e) {
