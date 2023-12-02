@@ -48,4 +48,10 @@ public class ISLISPRootNode extends RootNode {
     public boolean isCaptureFramesForTrace() {
         return true;
     }
+
+    @Override
+    public boolean isCloningAllowed() {
+        return true;
+    }
+
 }

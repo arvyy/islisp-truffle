@@ -46,6 +46,7 @@ public class ISLISPDefaultHandler extends RootNode {
     /**
      * Construct LispFunction using this root node.
      * @param lang truffle language reference
+     * @param isInteractive if true, do not exit on unexpected exception
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang, boolean isInteractive) {

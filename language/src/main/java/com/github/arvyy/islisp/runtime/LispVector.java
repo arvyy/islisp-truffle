@@ -1,8 +1,9 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.oracle.truffle.api.interop.TruffleObject;
+
 /**
  * Lisp vector.
  * @param values vector content
  */
-//TODO remove and use Object[] directly?
-public record LispVector(Object[] values) { }
+public record LispVector(Object[] values) implements TruffleObject { }

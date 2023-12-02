@@ -34,6 +34,8 @@ public class Parser {
      *
      * @param language language reference
      * @param content list of top level sexprs
+     * @param isInteractive whether the execution is done as part of a repl loop.
+     *                      If true, in case of unexpected error do not exit with status code
      * @return root node
      */
     public ISLISPRootNode parseRootNode(ISLISPTruffleLanguage language, List<Object> content, boolean isInteractive) {

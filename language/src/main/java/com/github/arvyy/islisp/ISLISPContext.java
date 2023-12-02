@@ -52,6 +52,8 @@ public class ISLISPContext {
 
     private HandlerChain handlerChain;
 
+    private boolean preludeInitialized;
+
     /**
      * Create islisp context.
      *
@@ -581,4 +583,19 @@ public class ISLISPContext {
     public int gensymIndex() {
         return gensymIndex++;
     }
+
+    /**
+     * @return has prelude been loaded.
+     */
+    public boolean isPreludeInitialized() {
+        return preludeInitialized;
+    }
+
+    /**
+     * Inform that prelude had been loaded.
+     */
+    public void setPreludeInitialized() {
+        this.preludeInitialized = true;
+    }
+
 }

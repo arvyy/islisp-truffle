@@ -88,22 +88,29 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
         }
         var arguments = new Object[frame.getArguments().length - 1];
         System.arraycopy(frame.getArguments(), 1, arguments, 0, arguments.length);
-        return executeGeneric(frame, argumentTypes, arguments);
+        return executeGeneric(argumentTypes, arguments);
     }
 
-    abstract Object executeGeneric(VirtualFrame frame, LispClass[] classes, Object[] arguments);
+    abstract Object executeGeneric(LispClass[] classes, Object[] arguments);
 
     @Specialization(
             guards = "classesEqual(classes, lastClasses)",
             assumptions = "genericFunctionDescriptor.getAssumption()")
-    Object doSpecial(
-            VirtualFrame frame,
+    Object doCached(
             LispClass[] classes,
             Object[] arguments,
             @Cached(value = "classes", dimensions = 0) LispClass[] lastClasses,
             @Cached("getApplicableMethods(classes)") GenericMethodApplicableMethods applicableMethods
     ) {
         return dispatchNode.executeDispatch(applicableMethods, arguments);
+    }
+
+    @Specialization
+    Object doUncached(
+        LispClass[] classes,
+        Object[] arguments
+    ) {
+        return dispatchNode.executeDispatch(getApplicableMethods(classes), arguments);
     }
 
     GenericMethodApplicableMethods getApplicableMethods(LispClass[] classes) {
@@ -122,5 +129,10 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
     @Override
     public SourceSection getSourceSection() {
         return sourceSection;
+    }
+
+    @Override
+    public boolean isCloningAllowed() {
+        return true;
     }
 }

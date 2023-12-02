@@ -9,12 +9,14 @@ import java.util.List;
 /**
  * Represents class created through defclass.
  *
+ * @param name class name
  * @param parents parent classes
  * @param shape truffle shape to create instances from
  * @param slots defclass slots
  * @param isAbstract abstract flag
  */
 public record StandardClass(
+        String name,
         LispClass[] parents,
         StaticShape<DefaultStaticObjectFactory> shape,
         Slot[] slots,

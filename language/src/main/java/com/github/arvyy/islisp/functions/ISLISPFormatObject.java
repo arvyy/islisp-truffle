@@ -12,10 +12,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 
 /**
  * Implements `format-object` function, that writes a given object to output stream.
@@ -61,7 +58,19 @@ public abstract class ISLISPFormatObject extends RootNode {
         }
     }
 
-    void doPrint(Writer writer, Object value, boolean escape) {
+    /**
+     * Util java procedure to give same string representation as what format-object produces.
+     *
+     * @param o value
+     * @return display string
+     */
+    public static String format(Object o) {
+        var sw = new StringWriter();
+        doPrint(sw, o, false);
+        return sw.toString();
+    }
+
+    static void doPrint(Writer writer, Object value, boolean escape) {
         try {
             if (value instanceof LispChar c) {
                 if (escape) {
@@ -116,7 +125,7 @@ public abstract class ISLISPFormatObject extends RootNode {
                 return;
             }
         } catch (IOException e) {
-            throw new ISLISPError(e.getMessage(), this);
+            throw new ISLISPError(e.getMessage(), null);
         }
     }
 

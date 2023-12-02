@@ -38,21 +38,29 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
 
     @Override
     public CallTarget parse(ParsingRequest request) throws Exception {
+        var ctx = ISLISPContext.get(null);
         var sourceMap = new HashMap<EqWrapper, SourceSection>();
-        var preludeSource = Source
-            .newBuilder(
-                "islisp",
-                new InputStreamReader(ISLISPTruffleLanguage.class.getResourceAsStream("/islispprelude.lisp")),
-                "islispprelude.lisp")
-            .build();
-        var preludeContent = new Reader(preludeSource, sourceMap).readAll();
+        var content = new ArrayList<>();
+        if (ctx.isPreludeInitialized()) {
+            ctx.setPreludeInitialized();
+            var preludeSource = Source
+                .newBuilder(
+                    "islisp",
+                    new InputStreamReader(ISLISPTruffleLanguage.class.getResourceAsStream("/islispprelude.lisp")),
+                    "islispprelude.lisp")
+                .build();
+            var preludeContent = new Reader(preludeSource, sourceMap).readAll();
+            content.addAll(preludeContent);
+        }
         var userContent = new Reader(request.getSource(), sourceMap).readAll();
-        var content = new ArrayList<>(preludeContent.size() + userContent.size());
-        content.addAll(preludeContent);
         content.addAll(userContent);
         var parser = new Parser(sourceMap);
         var rootNode = parser.parseRootNode(this, content, request.getSource().isInteractive());
         return rootNode.getCallTarget();
     }
 
+    @Override
+    protected Object getLanguageView(ISLISPContext context, Object value) {
+        return new ISLISPTruffleLanguageView(context, value);
+    }
 }

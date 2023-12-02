@@ -70,11 +70,10 @@ public final class Main {
                 w.write("> ");
                 w.flush();
                 var line = r.readLine();
-                if (line == null)
+                if (line == null) {
                     break;
-                if (line.equals(",h")) {
-                    //TODO
-                } else {
+                }
+                if (!line.equals(",h")) {
                     try {
                         var source = Source.newBuilder("islisp", line, "<repl>").interactive(true).buildLiteral();
                         context.eval(source);

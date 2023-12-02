@@ -181,6 +181,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
             myslots.put(slot.getName().identityReference(), newSlot);
         }
         var newClass = new StandardClass(
+                name.name(),
                 superclasses.toArray(LispClass[]::new),
                 shapeBuilder.build(),
                 myslots.values().toArray(StandardClass.Slot[]::new),
