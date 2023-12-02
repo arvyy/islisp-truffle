@@ -41,7 +41,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
         var ctx = ISLISPContext.get(null);
         var sourceMap = new HashMap<EqWrapper, SourceSection>();
         var content = new ArrayList<>();
-        if (ctx.isPreludeInitialized()) {
+        if (!ctx.isPreludeInitialized()) {
             ctx.setPreludeInitialized();
             var preludeSource = Source
                 .newBuilder(
