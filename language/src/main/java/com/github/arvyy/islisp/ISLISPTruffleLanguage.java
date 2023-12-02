@@ -51,7 +51,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
         content.addAll(preludeContent);
         content.addAll(userContent);
         var parser = new Parser(sourceMap);
-        var rootNode = parser.parseRootNode(this, content);
+        var rootNode = parser.parseRootNode(this, content, request.getSource().isInteractive());
         return rootNode.getCallTarget();
     }
 

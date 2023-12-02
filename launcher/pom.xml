@@ -13,15 +13,16 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.graalvm.polyglot</groupId>
-            <artifactId>polyglot</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.github.arvyy.islisp</groupId>
             <artifactId>language</artifactId>
             <version>${revision}</version>
-            <scope>runtime</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.6.0</version>
         </dependency>
 
         <!--
@@ -37,59 +38,60 @@
             <version>23.0.1</version>
         </dependency>
         -->
+
     </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>copy-dependencies</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>
-                                        ${project.build.directory}
-                                    </outputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!--
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <version>3.1.1</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <transformers>
-                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                            <mainClass>com.github.arvyy.islisp.launcher.Main</mainClass>
-                                        </transformer>
-                                    </transformers>
-                                    <finalName>islisp</finalName>
-                                    <artifactSet>
-                                        <excludes>
-                                            <exclude>junit:junit</exclude>
-                                            <exclude>com.oracle.truffle:truffle-api</exclude>
-                                            <exclude>com.oracle.truffle:truffle-dsl-processor</exclude>
-                                            <exclude>com.oracle.truffle:truffle-tck</exclude>
-                                            <exclude>org.graalvm.sdk:graal-sdk</exclude>
-                                        </excludes>
-                                    </artifactSet>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    -->
-                </plugins>
-            </build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
+                                ${project.build.directory}
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.github.arvyy.islisp.launcher.Main</mainClass>
+                                </transformer>
+                            </transformers>
+                            <finalName>islisp</finalName>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>junit:junit</exclude>
+                                    <exclude>com.oracle.truffle:truffle-api</exclude>
+                                    <exclude>com.oracle.truffle:truffle-dsl-processor</exclude>
+                                    <exclude>com.oracle.truffle:truffle-tck</exclude>
+                                    <exclude>org.graalvm.sdk:graal-sdk</exclude>
+                                </excludes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
+        </plugins>
+    </build>
 
 </project>

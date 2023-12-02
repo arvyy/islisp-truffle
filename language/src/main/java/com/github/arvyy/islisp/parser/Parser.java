@@ -36,18 +36,16 @@ public class Parser {
      * @param content list of top level sexprs
      * @return root node
      */
-    public ISLISPRootNode parseRootNode(ISLISPTruffleLanguage language, List<Object> content) {
+    public ISLISPRootNode parseRootNode(ISLISPTruffleLanguage language, List<Object> content, boolean isInteractive) {
         var expressionNodes = new ArrayList<ISLISPExpressionNode>();
         var parserContext = new ParserContext();
         for (var v: content) {
             var expression = parseExpressionNode(parserContext, v, true);
             executeDefinitions(expression); // execute definitions to be available for macro procedure runs
-            filterMacros(expression).ifPresent(expressionNodes::add);
+            filterDefinitions(expression).ifPresent(expressionNodes::add);
         }
-        var ctx = ISLISPContext.get(null);
-        ctx.reset();
         var topLevelConditionHandler = new ISLISPWithHandlerNode(
-            new ISLISPLiteralNode(ISLISPDefaultHandler.makeLispFunction(language), null),
+            new ISLISPLiteralNode(ISLISPDefaultHandler.makeLispFunction(language, isInteractive), null),
             expressionNodes.toArray(ISLISPExpressionNode[]::new),
             null
         );
@@ -83,14 +81,14 @@ public class Parser {
         }
     }
 
-    Optional<ISLISPExpressionNode> filterMacros(ISLISPExpressionNode expression) {
-        if (expression instanceof ISLISPDefMacroNode) {
+    Optional<ISLISPExpressionNode> filterDefinitions(ISLISPExpressionNode expression) {
+        if (expression.isDefinitionNode()) {
             return Optional.empty();
         }
         if (expression instanceof ISLISPPrognNode) {
             var exprs = new ArrayList<ISLISPExpressionNode>();
             for (var e: ((ISLISPPrognNode) expression).getBodyNodes()) {
-                filterMacros(e).ifPresent(exprs::add);
+                filterDefinitions(e).ifPresent(exprs::add);
             }
             return Optional.of(
                     new ISLISPPrognNode(

@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
+import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNode;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNodeGen;
 import com.github.arvyy.islisp.runtime.LispFunction;
@@ -19,9 +20,12 @@ public class ISLISPDefaultHandler extends RootNode {
     @Child
     private ISLISPFunctionDispatchNode dispatchNode;
 
-    ISLISPDefaultHandler(TruffleLanguage<?> language) {
+    private final boolean isInteractive;
+
+    ISLISPDefaultHandler(TruffleLanguage<?> language, boolean isInteractive) {
         super(language);
         dispatchNode = ISLISPFunctionDispatchNodeGen.create();
+        this.isInteractive = isInteractive;
     }
 
     @Override
@@ -32,7 +36,11 @@ public class ISLISPDefaultHandler extends RootNode {
         var errorOutputFunction = ctx.lookupFunction(ctx.namedSymbol("error-output").identityReference());
         var errorOutput = dispatchNode.executeDispatch(errorOutputFunction, new Object[]{});
         dispatchNode.executeDispatch(reportConditionFunction, new Object[]{frame.getArguments()[1], errorOutput});
-        return dispatchNode.executeDispatch(exitFunction, new Object[] {1});
+        if (isInteractive) {
+            throw new ISLISPError("Uncaught ISLISP signal", this);
+        } else {
+            return dispatchNode.executeDispatch(exitFunction, new Object[] {1});
+        }
     }
 
     /**
@@ -40,7 +48,7 @@ public class ISLISPDefaultHandler extends RootNode {
      * @param lang truffle language reference
      * @return lisp function
      */
-    public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(new ISLISPDefaultHandler(lang).getCallTarget());
+    public static LispFunction makeLispFunction(TruffleLanguage<?> lang, boolean isInteractive) {
+        return new LispFunction(new ISLISPDefaultHandler(lang, isInteractive).getCallTarget());
     }
 }
