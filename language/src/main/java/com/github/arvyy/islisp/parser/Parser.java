@@ -125,7 +125,9 @@ public class Parser {
             }
             // builtins
             switch (carName) {
-                //TODO create node
+                case "assure":
+                case "the":
+                    return parseAssureNode(parserContext, sexpr);
                 case "defclass":
                     return parseDefClass(parserContext, sexpr);
                 case "defconstant":
@@ -272,6 +274,13 @@ public class Parser {
             }
         }
         throw new ParsingException(source(sexpr), "Unrecognized form.");
+    }
+
+    private ISLISPAssureNode parseAssureNode(ParserContext parserContext, Object sexpr) {
+        var args = requireList(sexpr, 3, 3);
+        var className = downcast(args.get(1), Symbol.class);
+        var expression = parseExpressionNode(parserContext, args.get(2));
+        return new ISLISPAssureNode(className, expression, source(sexpr));
     }
 
     private ISLISPExpressionNode parseWithStandardOutput(ParserContext parserContext, Object sexpr) {

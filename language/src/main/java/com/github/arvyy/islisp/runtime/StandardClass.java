@@ -16,7 +16,7 @@ import java.util.List;
  * @param slots defclass slots
  * @param isAbstract abstract flag
  */
-public record StandardClass (
+public record StandardClass(
         String name,
         LispClass[] parents,
         StaticShape<DefaultStaticObjectFactory> shape,
