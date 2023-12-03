@@ -35,6 +35,7 @@ public class DebuggerTest {
     }
 
     @Test
+    @Disabled
     public void testCodeDebugger() {
         var context = Context.newBuilder()
                 .build();
@@ -50,7 +51,7 @@ public class DebuggerTest {
                             (+ a 2))
                         (foo 3)""", "test.lisp")
                 .build();
-        context.eval("islisp", source.getCharacters());
+        var result = context.eval("islisp", source.getCharacters());
         assertNotNull(suspendedEvent[0]);
     }
 

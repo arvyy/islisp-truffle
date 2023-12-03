@@ -2,10 +2,7 @@ package com.github.arvyy.islisp.runtime;
 
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.frame.MaterializedFrame;
-import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
-import com.oracle.truffle.api.library.ExportLibrary;
-import com.oracle.truffle.api.library.ExportMessage;
 
 /**
  * ISLISP invocable function object.
@@ -14,19 +11,7 @@ import com.oracle.truffle.api.library.ExportMessage;
  * @param callTarget function implementation
  * @param isGeneric whether this is plain or generic function.
  */
-@ExportLibrary(InteropLibrary.class)
 public record LispFunction(Closure closure, CallTarget callTarget, boolean isGeneric) implements TruffleObject {
-
-    @ExportMessage
-    String toDisplayString(boolean ignored) {
-        if (isGeneric) {
-            return "#<generic function>";
-        }
-        if (closure != null) {
-            return "#<closure>";
-        }
-        return "#<function>";
-    }
 
     /**
      * Create plain lisp function.

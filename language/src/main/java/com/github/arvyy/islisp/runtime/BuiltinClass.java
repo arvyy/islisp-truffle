@@ -1,12 +1,14 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.oracle.truffle.api.interop.TruffleObject;
+
 import java.util.List;
 
 /**
  * Presents a builtin class whose instances
  * are specially handled and which cannot be subclassed by users.
  */
-public final class BuiltinClass implements LispClass {
+public final class BuiltinClass implements LispClass, TruffleObject {
 
     private final List<LispClass> parents;
     private final Symbol name;
@@ -34,4 +36,12 @@ public final class BuiltinClass implements LispClass {
     public boolean isAbstract() {
         return isAbstract;
     }
+
+    /**
+     * @return class name.
+     */
+    public String name() {
+        return name.name();
+    }
+
 }

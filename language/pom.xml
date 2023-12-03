@@ -36,13 +36,6 @@
             <artifactId>truffle-dsl-processor</artifactId>
         </dependency>
 
-        <!--
-        <dependency>
-            <groupId>org.graalvm.polyglot</groupId>
-            <artifactId>polyglot</artifactId>
-        </dependency>
-        -->
-
     </dependencies>
 
     <build>

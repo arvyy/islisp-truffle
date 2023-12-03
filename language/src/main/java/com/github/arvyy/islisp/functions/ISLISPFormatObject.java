@@ -124,6 +124,48 @@ public abstract class ISLISPFormatObject extends RootNode {
                 writer.write(")");
                 return;
             }
+            if (value instanceof StandardClass c) {
+                writer.write("#<class ");
+                writer.write(c.name());
+                writer.write(">");
+                return;
+            }
+            if (value instanceof BuiltinClass c) {
+                writer.write("#<class ");
+                writer.write(c.name());
+                writer.write(">");
+                return;
+            }
+            if (value instanceof StandardClassObject o) {
+                writer.write("#<object ");
+                writer.write(o.clazz().name());
+                writer.write(" ");
+                writer.write(o.hashCode() + "");
+                writer.write(">");
+                return;
+            }
+            if (value instanceof LispOutputStream s) {
+                writer.write("#<stream ");
+                writer.write(s.hashCode() + "");
+                writer.write(">");
+                return;
+            }
+            if (value instanceof LispInputStream s) {
+                writer.write("#<stream ");
+                writer.write(s.hashCode() + "");
+                writer.write(">");
+                return;
+            }
+            if (value instanceof LispFunction f) {
+                if (f.isGeneric()) {
+                    writer.write("#<generic-function ");
+                } else {
+                    writer.write("#<function ");
+                }
+                writer.write(f.hashCode() + "");
+                writer.write(">");
+                return;
+            }
         } catch (IOException e) {
             throw new ISLISPError(e.getMessage(), null);
         }

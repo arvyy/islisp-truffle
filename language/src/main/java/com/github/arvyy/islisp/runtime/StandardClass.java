@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.staticobject.DefaultStaticObjectFactory;
 import com.oracle.truffle.api.staticobject.StaticProperty;
 import com.oracle.truffle.api.staticobject.StaticShape;
@@ -15,13 +16,13 @@ import java.util.List;
  * @param slots defclass slots
  * @param isAbstract abstract flag
  */
-public record StandardClass(
+public record StandardClass (
         String name,
         LispClass[] parents,
         StaticShape<DefaultStaticObjectFactory> shape,
         Slot[] slots,
         boolean isAbstract
-) implements LispClass {
+) implements LispClass, TruffleObject {
 
     /**
      * Standard class' slot information.

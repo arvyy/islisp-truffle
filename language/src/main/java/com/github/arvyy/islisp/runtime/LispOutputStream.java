@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.oracle.truffle.api.interop.TruffleObject;
+
 import java.io.OutputStream;
 
 /**
@@ -7,4 +9,4 @@ import java.io.OutputStream;
  *
  * @param outputStream
  */
-public record LispOutputStream(OutputStream outputStream) { }
+public record LispOutputStream(OutputStream outputStream) implements TruffleObject { }
