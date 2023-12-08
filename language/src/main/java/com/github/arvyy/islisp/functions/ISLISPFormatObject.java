@@ -64,6 +64,7 @@ public abstract class ISLISPFormatObject extends RootNode {
      * @param o value
      * @return display string
      */
+    @CompilerDirectives.TruffleBoundary
     public static String format(Object o) {
         var sw = new StringWriter();
         doPrint(sw, o, false);

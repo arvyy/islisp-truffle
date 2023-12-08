@@ -44,13 +44,16 @@ public class Parser {
         for (var v: content) {
             var expression = parseExpressionNode(parserContext, v, true);
             executeDefinitions(expression); // execute definitions to be available for macro procedure runs
-            filterDefinitions(expression).ifPresent(expressionNodes::add);
+            //TODO following breaks debugger / instrumentation
+            //filterDefinitions(expression).ifPresent(expressionNodes::add);
+            expressionNodes.add(expression);
         }
         var topLevelConditionHandler = new ISLISPWithHandlerNode(
-            new ISLISPLiteralNode(ISLISPDefaultHandler.makeLispFunction(language, isInteractive), null),
+            new ISLISPLiteralNode(ISLISPDefaultHandler.makeLispFunction(language, isInteractive), null)
+                .markInternal(),
             expressionNodes.toArray(ISLISPExpressionNode[]::new),
             null
-        );
+        ).markInternal();
         return new ISLISPRootNode(
                 language,
                 new ISLISPExpressionNode[]{topLevelConditionHandler},

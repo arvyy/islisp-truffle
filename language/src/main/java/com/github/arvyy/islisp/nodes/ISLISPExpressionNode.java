@@ -19,6 +19,9 @@ public abstract class ISLISPExpressionNode extends Node implements Instrumentabl
     @CompilerDirectives.CompilationFinal
     private boolean isRootBody;
 
+    @CompilerDirectives.CompilationFinal
+    private boolean internal = false;
+
     /**
      * Create node with definition flag = false and source information.
      *
@@ -80,7 +83,7 @@ public abstract class ISLISPExpressionNode extends Node implements Instrumentabl
 
     @Override
     public boolean isInstrumentable() {
-        return true;
+        return !internal;
     }
 
     @Override
@@ -93,4 +96,14 @@ public abstract class ISLISPExpressionNode extends Node implements Instrumentabl
         }
         return tag == StandardTags.RootBodyTag.class && isRootBody;
     }
+
+    /**
+     * Mark node as internal and non-instrumentable.
+     * @return this
+     */
+    public ISLISPExpressionNode markInternal() {
+        internal = true;
+        return this;
+    }
+
 }

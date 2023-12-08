@@ -35,7 +35,6 @@ public class DebuggerTest {
     }
 
     @Test
-    @Disabled
     public void testCodeDebugger() {
         var context = Context.newBuilder()
                 .build();

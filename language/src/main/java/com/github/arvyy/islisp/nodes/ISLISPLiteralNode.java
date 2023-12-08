@@ -19,6 +19,7 @@ public class ISLISPLiteralNode extends ISLISPExpressionNode {
     public ISLISPLiteralNode(Object value, SourceSection sourceSection) {
         super(sourceSection);
         this.value = value;
+        markInternal();
     }
 
     @Override

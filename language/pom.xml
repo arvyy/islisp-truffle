@@ -27,12 +27,6 @@
 
         <dependency>
             <groupId>org.graalvm.truffle</groupId>
-            <artifactId>truffle-runtime</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.graalvm.truffle</groupId>
             <artifactId>truffle-dsl-processor</artifactId>
         </dependency>
 

@@ -17,5 +17,5 @@ ENV PATH=$PATH:$TOOLCHAIN_DIR/bin
 RUN make dist/islisp-static
 
 FROM alpine:3
-COPY --from=0 /app/dist/islisp /app/islisp
-ENTRYPOINT ['/app/islisp']
+COPY --from=0 /app/dist/islisp-static /app/islisp
+ENTRYPOINT ["/app/islisp"]

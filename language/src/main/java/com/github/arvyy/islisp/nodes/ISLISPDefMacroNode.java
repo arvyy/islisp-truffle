@@ -10,7 +10,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  */
 public class ISLISPDefMacroNode extends ISLISPExpressionNode {
 
-    @Child
     ISLISPDefunNode defun;
 
     /**
@@ -21,6 +20,11 @@ public class ISLISPDefMacroNode extends ISLISPExpressionNode {
     public ISLISPDefMacroNode(ISLISPDefunNode defun) {
         super(true, null);
         this.defun = defun;
+    }
+
+    @Override
+    public boolean isInstrumentable() {
+        return false;
     }
 
     @Override
