@@ -10,9 +10,17 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           architecture: x64
+          cache: 'maven'
       - name: Test
         run: |
           mvn test
       - name: Verify checkstyle
         run: |
           mvn validate
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name:
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          tags: islisp
