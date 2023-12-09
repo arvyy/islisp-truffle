@@ -73,13 +73,17 @@ public final class Main {
                 if (line == null) {
                     break;
                 }
-                if (!line.equals(",h")) {
-                    try {
-                        var source = Source.newBuilder("islisp", line, "<repl>").interactive(true).buildLiteral();
-                        context.eval(source);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                if (line.equals(",h")) {
+                    continue;
+                }
+                if (line.equals(",q")) {
+                    break;
+                }
+                try {
+                    var source = Source.newBuilder("islisp", line, "<repl>").interactive(true).buildLiteral();
+                    context.eval(source);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         } else {

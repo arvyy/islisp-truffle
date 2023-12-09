@@ -60,9 +60,16 @@ public final class Utils {
     public static boolean isNil(Object o) {
         var ctx = ISLISPContext.get(null);
         var nil = ctx.getNil();
-        if (o instanceof Symbol s && s.identityReference() == nil.identityReference()) {
-            return true;
-        }
-        return false;
+        return o instanceof Symbol s && s.identityReference() == nil.identityReference();
+    }
+
+    /**
+     * Convert java's boolean to islisp t and nil
+     */
+    public static Object booleanToSymbol(boolean b) {
+        var ctx = ISLISPContext.get(null);
+        var nil = ctx.getNil();
+        var t = ctx.getT();
+        return b ? t : nil;
     }
 }

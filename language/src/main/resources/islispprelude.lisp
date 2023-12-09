@@ -180,6 +180,9 @@
 (defun general-vector-p (obj)
   (instancep obj (class <general-vector>)))
 
+(defun streamp (obj)
+  (instancep obj (class <stream>)))
+
 (defun identity (obj) obj)
 
 (defun not (obj)

@@ -144,9 +144,11 @@ public class ISLISPContext {
         initGlobalFunction("format-fresh-line", ISLISPFormatFreshLine::makeLispFunction);
         initGlobalFunction("gensym", ISLISPGensym::makeLispFunction);
         initGlobalFunction("get-output-stream-string", ISLISPGetOutputStreamString::makeLispFunction);
+        initGlobalFunction("input-stream-p", ISLISPInputStreamp::makeLispFunction);
         initGlobalFunction("instancep", ISLISPInstancep::makeLispFunction);
         initGlobalFunction("length", ISLISPLength::makeLispFunction);
         initGlobalFunction("list", ISLISPList::makeLispFunction);
+        initGlobalFunction("output-stream-p", ISLISPOutputStreamp::makeLispFunction);
         initGlobalFunction("property", ISLISPProperty::makeLispFunction);
         initGlobalFunction("remove-property", ISLISPRemoveProperty::makeLispFunction);
         initGlobalFunction("set-aref", ISLISPSetAref::makeLispFunction);
