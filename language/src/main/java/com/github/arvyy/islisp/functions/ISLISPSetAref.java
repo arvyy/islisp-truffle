@@ -4,6 +4,7 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispArray;
+import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispVector;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -12,8 +13,6 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
-
-import java.math.BigInteger;
 
 /**
  * Implements `set-aref` function.
@@ -38,8 +37,8 @@ public abstract class ISLISPSetAref extends RootNode {
             var arg = frame.getArguments()[i + 3];
             if (arg instanceof Integer) {
                 lookup[i] = (int) arg;
-            } else if (arg instanceof BigInteger) {
-                lookup[i] = bigIntValue((BigInteger) arg);
+            } else if (arg instanceof LispBigInteger) {
+                lookup[i] = bigIntValue((LispBigInteger) arg);
             } else {
                 var ctx = ISLISPContext.get(this);
                 return errorSignalerNode.signalWrongType(arg, ctx.lookupClass("<integer>"));
@@ -53,8 +52,8 @@ public abstract class ISLISPSetAref extends RootNode {
     }
 
     @CompilerDirectives.TruffleBoundary
-    int bigIntValue(BigInteger arg) {
-        return arg.intValueExact();
+    int bigIntValue(LispBigInteger arg) {
+        return arg.data().intValueExact();
     }
 
     abstract Object executeGeneric(Object value, Object array, int[] lookup);

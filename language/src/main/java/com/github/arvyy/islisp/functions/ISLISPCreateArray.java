@@ -3,10 +3,7 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
-import com.github.arvyy.islisp.runtime.ArraySlice;
-import com.github.arvyy.islisp.runtime.LispArray;
-import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.Pair;
+import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -15,7 +12,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.RootNode;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 
 import static com.github.arvyy.islisp.Utils.isNil;
@@ -89,7 +85,7 @@ public abstract class ISLISPCreateArray extends RootNode {
             for (int i = 0; i < dimensionsSize; i++) {
                 if (dimensions.car() instanceof Integer integer) {
                     dimensionsArr[i] = integer;
-                } else if (dimensions.car() instanceof BigInteger biginteger) {
+                } else if (dimensions.car() instanceof LispBigInteger biginteger) {
                     dimensionsArr[i] = bigIntValue(biginteger);
                 } else {
                     var ctx = ISLISPContext.get(this);
@@ -108,8 +104,8 @@ public abstract class ISLISPCreateArray extends RootNode {
     }
 
     @CompilerDirectives.TruffleBoundary
-    int bigIntValue(BigInteger b) {
-        return b.intValueExact();
+    int bigIntValue(LispBigInteger b) {
+        return b.data().intValueExact();
     }
 
     Object[] makeArrayContent(ArraySlice<Integer> dimensions, Object initValue) {

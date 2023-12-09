@@ -261,13 +261,15 @@ public class Parser {
         }
         if (sexpr instanceof Integer
             || sexpr instanceof Double
-            || sexpr instanceof BigInteger
             || sexpr instanceof LispChar
             || sexpr instanceof String
             || sexpr instanceof LispVector
             || sexpr instanceof LispArray
         ) {
             return new ISLISPLiteralNode(sexpr, null);
+        }
+        if (sexpr instanceof BigInteger b) {
+            return new ISLISPLiteralNode(new LispBigInteger(b), null);
         }
         if (sexpr instanceof Symbol symbol) {
             var maybeLexicalSlot = parserContext.variables.get(symbol.identityReference());

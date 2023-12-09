@@ -93,6 +93,10 @@ public abstract class ISLISPFormatObject extends RootNode {
                 writer.write(i.toString());
                 return;
             }
+            if (value instanceof LispBigInteger b) {
+                writer.write(b.data().toString());
+                return;
+            }
             if (value instanceof Symbol s) {
                 writer.write(s.name());
                 return;

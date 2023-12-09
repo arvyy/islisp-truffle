@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPTypes;
+import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -12,8 +13,6 @@ import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
-
-import java.math.BigInteger;
 
 /**
  * Implements numeric adition function `+`.
@@ -34,9 +33,9 @@ public abstract class ISLISPAdd extends RootNode {
     @Override
     @ExplodeLoop
     public final Object execute(VirtualFrame frame) {
-        Number sum = 0;
+        Object sum = 0;
         for (int i = 1; i < frame.getArguments().length; i++) {
-            sum = (Number) executeGeneric(sum, frame.getArguments()[i]);
+            sum = executeGeneric(sum, frame.getArguments()[i]);
         }
         return sum;
     }
@@ -48,7 +47,7 @@ public abstract class ISLISPAdd extends RootNode {
 
     @Specialization
     @CompilerDirectives.TruffleBoundary
-    BigInteger doBigInts(BigInteger a, BigInteger b) {
+    LispBigInteger doBigInts(LispBigInteger a, LispBigInteger b) {
         return a.add(b);
     }
 

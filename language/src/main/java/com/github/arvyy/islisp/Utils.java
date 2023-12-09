@@ -64,7 +64,10 @@ public final class Utils {
     }
 
     /**
-     * Convert java's boolean to islisp t and nil
+     * Convert java's boolean to islisp t and nil.
+     *
+     * @param b boolean to convert
+     * @return t if b was true, nil otherwise
      */
     public static Object booleanToSymbol(boolean b) {
         var ctx = ISLISPContext.get(null);

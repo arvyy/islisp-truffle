@@ -5,8 +5,6 @@ import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.ImplicitCast;
 import com.oracle.truffle.api.dsl.TypeSystem;
 
-import java.math.BigInteger;
-
 // class cannot be final
 //CHECKSTYLE:OFF
 @TypeSystem({
@@ -21,6 +19,7 @@ import java.math.BigInteger;
     StringBuffer.class,
     LispVector.class,
     LispArray.class,
+    LispBigInteger.class,
     int.class,
     double.class
 })
@@ -30,15 +29,15 @@ public class ISLISPTypes {
     protected ISLISPTypes() { }
 
     /**
-     * Implicitly convert int to double.
+     * Implicitly convert big int to int.
      *
-     * @param v int value
-     * @return double value
+     * @param v big int value
+     * @return int value
      */
     @ImplicitCast
     @CompilerDirectives.TruffleBoundary
-    public static BigInteger intToBigInt(int v) {
-        return BigInteger.valueOf(v);
+    public static LispBigInteger intToBigInt(int v) {
+        return LispBigInteger.valueOf(v);
     }
 
     /**

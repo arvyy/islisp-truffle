@@ -2,13 +2,9 @@ package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
-import com.github.arvyy.islisp.runtime.LispChar;
-import com.github.arvyy.islisp.runtime.LispVector;
-import com.github.arvyy.islisp.runtime.Pair;
-import com.github.arvyy.islisp.runtime.Symbol;
+import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.nodes.Node;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -146,7 +142,7 @@ public sealed interface QuasiquoteTree {
                 expressions.toArray(Object[]::new));
         }
         if (expr instanceof Integer
-            || expr instanceof BigInteger
+            || expr instanceof LispBigInteger
             || expr instanceof Symbol
             || expr instanceof LispChar
             || expr instanceof String

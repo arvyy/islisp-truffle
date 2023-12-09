@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -9,8 +10,6 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
-
-import java.math.BigInteger;
 
 /**
  * Implements numeric subtraction function `-`.
@@ -43,8 +42,8 @@ public abstract class ISLISPSubtract extends RootNode {
 
     @Specialization
     @CompilerDirectives.TruffleBoundary
-    BigInteger doBigInts(BigInteger a, BigInteger b) {
-        return a.subtract(b);
+    LispBigInteger doBigInts(LispBigInteger a, LispBigInteger b) {
+        return new LispBigInteger(a.data().subtract(b.data()));
     }
 
     @Specialization

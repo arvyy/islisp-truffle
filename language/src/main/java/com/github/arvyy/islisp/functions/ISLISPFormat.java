@@ -47,6 +47,9 @@ public class ISLISPFormat extends RootNode {
     public Object execute(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         var argsLen = frame.getArguments().length;
+        if (argsLen < 3) {
+            return errorSignalerNode.signalWrongArgumentCount(argsLen - 1, 2, -1);
+        }
         String formatString;
         if (frame.getArguments()[2] instanceof String s) {
             formatString = s;
