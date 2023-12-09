@@ -3,7 +3,7 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispOutputStream;
+import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -31,14 +31,14 @@ public class ISLISPGetOutputStreamString extends RootNode {
             return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 1, 1);
         }
         var arg = frame.getArguments()[1];
-        if (arg instanceof LispOutputStream s) {
+        if (arg instanceof LispStream s) {
             return executeBoundary(s);
         }
         return errorSignalerNode.signalNotStringOutputStream(arg);
     }
 
     @CompilerDirectives.TruffleBoundary
-    Object executeBoundary(LispOutputStream s) {
+    Object executeBoundary(LispStream s) {
         if (s.outputStream() instanceof ByteArrayOutputStream out) {
             try {
                 var content = out.toString("UTF-8");

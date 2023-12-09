@@ -4,7 +4,7 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispOutputStream;
+import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -53,8 +53,8 @@ public class ISLISPFormat extends RootNode {
         } else {
             return errorSignalerNode.signalWrongType(frame.getArguments()[2], ctx.lookupClass("<string>"));
         }
-        LispOutputStream os;
-        if (frame.getArguments()[1] instanceof LispOutputStream out) {
+        LispStream os;
+        if (frame.getArguments()[1] instanceof LispStream out) {
             os = out;
         } else {
             return errorSignalerNode.signalWrongType(frame.getArguments()[1], ctx.lookupClass("<stream>"));
@@ -66,7 +66,7 @@ public class ISLISPFormat extends RootNode {
 
     //TODO granualize snippets that need boundary
     @CompilerDirectives.TruffleBoundary
-    Object executeBoundary(LispOutputStream os, String formatString, Object[] args) {
+    Object executeBoundary(LispStream os, String formatString, Object[] args) {
         var ctx = ISLISPContext.get(this);
         try {
             int argIndex = 3;
@@ -116,7 +116,7 @@ public class ISLISPFormat extends RootNode {
     }
 
     @CompilerDirectives.TruffleBoundary
-    Writer getWriter(LispOutputStream os) {
+    Writer getWriter(LispStream os) {
         return new OutputStreamWriter(os.outputStream());
     }
 

@@ -32,7 +32,7 @@ public abstract class ISLISPFormatChar extends RootNode {
     }
 
     @Specialization
-    void executeProper(LispOutputStream stream, LispChar ch) {
+    void executeProper(LispStream stream, LispChar ch) {
         doPrint(stream.outputStream(), ch.codepoint());
     }
 

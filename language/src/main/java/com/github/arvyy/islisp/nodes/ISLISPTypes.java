@@ -15,7 +15,7 @@ import java.math.BigInteger;
     Pair.class,
     StandardClassObject.class,
     Symbol.class,
-    LispOutputStream.class,
+    LispStream.class,
     LispChar.class,
     String.class,
     StringBuffer.class,

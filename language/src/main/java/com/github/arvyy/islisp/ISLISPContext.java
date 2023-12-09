@@ -49,6 +49,8 @@ public class ISLISPContext {
     private final Map<SymbolReference, ValueReference> globalVars;
     private final Map<SymbolReference, Map<SymbolReference, ValueReference>> symbolProperties;
     private final ValueReference currentOutputStream;
+    private final ValueReference currentInputStream;
+    private final ValueReference currentErrorStream;
 
     private HandlerChain handlerChain;
 
@@ -75,7 +77,11 @@ public class ISLISPContext {
         setfTransformers = new HashMap<>();
         globalVars = new HashMap<>();
         currentOutputStream = new ValueReference();
-        currentOutputStream.setValue(new LispOutputStream(env.out()));
+        currentOutputStream.setValue(new LispStream(env.out(), null));
+        currentInputStream = new ValueReference();
+        currentInputStream.setValue(new LispStream(null, env.in()));
+        currentErrorStream = new ValueReference();
+        currentErrorStream.setValue(new LispStream(env.err(), null));
         initBuiltinVars();
         initBuiltinClasses();
         initGlobalFunctions();
@@ -149,6 +155,8 @@ public class ISLISPContext {
         initGlobalFunction("set-property", ISLISPSetProperty::makeLispFunction);
         initGlobalFunction("signal-condition", ISLISPSignalCondition::makeLispFunction);
         initGlobalFunction("standard-output", ISLISPStandardOutputStream::makeLispFunction);
+        initGlobalFunction("standard-input", ISLISPStandardInputStream::makeLispFunction);
+        initGlobalFunction("error-output", ISLISPErrorOutputStream::makeLispFunction);
         initGlobalFunction("subclassp", ISLISPSubclassp::makeLispFunction);
         initGlobalFunction("vector", ISLISPVector::makeLispFunction);
         initCreateMethod();
@@ -518,6 +526,20 @@ public class ISLISPContext {
      */
     public ValueReference currentOutputStreamReference() {
         return currentOutputStream;
+    }
+
+    /**
+     * @return currently active input stream reference.
+     */
+    public ValueReference currentInputStreamReference() {
+        return currentInputStream;
+    }
+
+    /**
+     * @return currently active input stream reference.
+     */
+    public ValueReference currentErrorStreamReference() {
+        return currentErrorStream;
     }
 
     /**

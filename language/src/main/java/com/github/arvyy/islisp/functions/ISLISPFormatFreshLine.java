@@ -4,7 +4,7 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispOutputStream;
+import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -40,7 +40,7 @@ public abstract class ISLISPFormatFreshLine extends RootNode {
     abstract void executeGeneric(Object stream);
 
     @Specialization
-    void executeProper(LispOutputStream stream) {
+    void executeProper(LispStream stream) {
         doPrint(stream.outputStream());
     }
 

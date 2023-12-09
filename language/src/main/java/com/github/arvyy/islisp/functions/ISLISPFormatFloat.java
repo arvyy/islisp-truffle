@@ -3,7 +3,7 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispOutputStream;
+import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -33,7 +33,7 @@ public abstract class ISLISPFormatFloat extends RootNode {
     }
 
     @Specialization
-    void doProper(LispOutputStream stream, double f) {
+    void doProper(LispStream stream, double f) {
         doPrint(stream.outputStream(), f);
     }
 

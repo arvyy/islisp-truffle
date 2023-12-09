@@ -35,7 +35,7 @@ public abstract class ISLISPFormatObject extends RootNode {
     abstract Object executeGeneric(Object stream, Object obj, Object escape);
 
     @Specialization
-    Object doProper(LispOutputStream stream, Object obj, Object escape) {
+    Object doProper(LispStream stream, Object obj, Object escape) {
         var nil = ISLISPContext.get(this).getNil();
         doPrint(stream.outputStream(), obj, escape != nil);
         return nil;
@@ -145,13 +145,7 @@ public abstract class ISLISPFormatObject extends RootNode {
                 writer.write(">");
                 return;
             }
-            if (value instanceof LispOutputStream s) {
-                writer.write("#<stream ");
-                writer.write(s.hashCode() + "");
-                writer.write(">");
-                return;
-            }
-            if (value instanceof LispInputStream s) {
+            if (value instanceof LispStream s) {
                 writer.write("#<stream ");
                 writer.write(s.hashCode() + "");
                 writer.write(">");

@@ -199,8 +199,12 @@ public class Parser {
                     return parseUnwindProtectNode(parserContext, sexpr);
                 case "while":
                     return parseWhile(parserContext, sexpr);
+                case "with-error-output":
+                    return parseWithErrorOutput(parserContext, sexpr);
                 case "with-handler":
                     return parseWithHandler(parserContext, sexpr);
+                case "with-standard-input":
+                    return parseWithStandardInput(parserContext, sexpr);
                 case "with-standard-output":
                     return parseWithStandardOutput(parserContext, sexpr);
 
@@ -294,6 +298,26 @@ public class Parser {
             .map(s -> parseExpressionNode(parserContext, s))
             .toArray(ISLISPExpressionNode[]::new);
         return new ISLISPWithStandardOutputNode(outputstreamExpr, bodyExprs, source(sexpr));
+    }
+
+    private ISLISPExpressionNode parseWithStandardInput(ParserContext parserContext, Object sexpr) {
+        var args = requireList(sexpr, 2, -1);
+        var inputstreamExpr = parseExpressionNode(parserContext, args.get(1));
+        var bodyExprs = args.stream()
+            .skip(2)
+            .map(s -> parseExpressionNode(parserContext, s))
+            .toArray(ISLISPExpressionNode[]::new);
+        return new ISLISPWithStandardInputNode(inputstreamExpr, bodyExprs, source(sexpr));
+    }
+
+    private ISLISPExpressionNode parseWithErrorOutput(ParserContext parserContext, Object sexpr) {
+        var args = requireList(sexpr, 2, -1);
+        var outputstreamExpr = parseExpressionNode(parserContext, args.get(1));
+        var bodyExprs = args.stream()
+            .skip(2)
+            .map(s -> parseExpressionNode(parserContext, s))
+            .toArray(ISLISPExpressionNode[]::new);
+        return new ISLISPWithErrorOutputNode(outputstreamExpr, bodyExprs, source(sexpr));
     }
 
     private ISLISPForNode parseFor(ParserContext parserContext, Object sexpr) {

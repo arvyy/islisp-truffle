@@ -3,7 +3,7 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispInputStream;
+import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -46,7 +46,7 @@ public class ISLISPCreateStringInputStream extends RootNode {
     @CompilerDirectives.TruffleBoundary
     Object executeBoundary(CharSequence value) {
         try {
-            return new LispInputStream(new ByteArrayInputStream(value.toString().getBytes("UTF-8")));
+            return new LispStream(null, new ByteArrayInputStream(value.toString().getBytes("UTF-8")));
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
