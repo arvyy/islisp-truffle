@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
@@ -30,13 +31,14 @@ public class ISLISPEval extends RootNode {
                 2);
         }
         var lang = (String) frame.getArguments()[1];
+        var script = (String) frame.getArguments()[2];
+        return executeBoundary(lang, script);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    Object executeBoundary(String lang, String script) {
         var ctx = ISLISPContext.get(this);
         var env = ctx.getEnv();
-        /*
-        var filePath = (String) frame.getArguments()[2];
-        var file = env.getPublicTruffleFile(filePath);
-         */
-        var script = (String) frame.getArguments()[2];
         try {
             var source = Source.newBuilder(lang, script, "<eval>").build();
             var target = env.parsePublic(source);

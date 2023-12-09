@@ -36,8 +36,8 @@ public abstract class ISLISPTruffleObjectFields extends RootNode {
         }
         try {
             return executeGeneric(frame.getArguments()[1]);
-        } catch (Exception e) {
-            throw new ISLISPError(e.getMessage(), this);
+        } catch (UnsupportedMessageException | InvalidArrayIndexException e) {
+            throw new ISLISPError("Error fetching truffle-object fields", this);
         }
     }
 
