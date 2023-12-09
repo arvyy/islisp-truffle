@@ -17,4 +17,7 @@
 (let ((fun (eval "js" "(function(arg) { return 1 + arg; })")))
   (test-equal (funcall fun 2) 3))
 
+(let ((fun (eval "js" "(function(arr) { return arr[0]; })")))
+  (test-equal (funcall fun #(4 5 6)) 4))
+
 (format (standard-output) "evalinterop.lisp end")
