@@ -2,7 +2,9 @@ package com.github.arvyy.islisp.launcher;
 
 import org.apache.commons.cli.*;
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.PolyglotAccess;
 import org.graalvm.polyglot.Source;
+import org.graalvm.polyglot.io.IOAccess;
 
 import java.io.*;
 
@@ -42,7 +44,10 @@ public final class Main {
         var contextBuilder = Context.newBuilder()
             .in(System.in)
             .out(System.out)
-            .err(System.err);
+            .err(System.err)
+            .allowIO(IOAccess.ALL)
+            .allowNativeAccess(true)
+            .allowPolyglotAccess(PolyglotAccess.ALL);
 
         if (commandLine.hasOption(chromeDebuggerOpt)) {
             if (chromeDebuggerOpt.hasArg()) {

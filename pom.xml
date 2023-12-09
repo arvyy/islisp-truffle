@@ -30,6 +30,16 @@
                 <version>${graalvm.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.graalvm.truffle</groupId>
+                <artifactId>truffle-runtime</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.truffle</groupId>
+                <artifactId>truffle-nfi-libffi</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.graalvm.polyglot</groupId>
                 <artifactId>polyglot</artifactId>
                 <version>${graalvm.version}</version>
@@ -42,6 +52,13 @@
             <dependency>
                 <groupId>org.graalvm.polyglot</groupId>
                 <artifactId>tools</artifactId>
+                <version>${graalvm.version}</version>
+                <type>pom</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.graalvm.polyglot</groupId>
+                <artifactId>js-community</artifactId>
                 <version>${graalvm.version}</version>
                 <type>pom</type>
             </dependency>

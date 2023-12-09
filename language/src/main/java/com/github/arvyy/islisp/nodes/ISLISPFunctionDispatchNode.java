@@ -1,13 +1,14 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.runtime.LispFunction;
-import com.oracle.truffle.api.dsl.Cached;
+import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.nodes.DirectCallNode;
-import com.oracle.truffle.api.nodes.ExplodeLoop;
-import com.oracle.truffle.api.nodes.IndirectCallNode;
+import com.oracle.truffle.api.interop.ArityException;
+import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.interop.UnsupportedMessageException;
+import com.oracle.truffle.api.interop.UnsupportedTypeException;
+import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.Node;
 
 /**
@@ -35,28 +36,20 @@ public abstract class ISLISPFunctionDispatchNode extends Node {
      */
     public abstract Object executeDispatch(Object lispFunction, Object[] arguments);
 
-    @ExplodeLoop
-    @Specialization(guards = "function.callTarget() == callNode.getCallTarget()")
-    Object doDirect(
-            LispFunction function,
-            Object[] args,
-            @Cached("create(function.callTarget())") DirectCallNode callNode) {
-        var realArgs = new Object[args.length + 1];
-        realArgs[0] = function.closure();
-        System.arraycopy(args, 0, realArgs, 1, args.length);
-        return callNode.call(realArgs);
-    }
-
-    @ExplodeLoop
-    @Specialization(replaces = "doDirect")
-    Object doIndirect(
-            LispFunction function,
-            Object[] args,
-            @Cached IndirectCallNode callNode) {
-        var realArgs = new Object[args.length + 1];
-        realArgs[0] = function.closure();
-        System.arraycopy(args, 0, realArgs, 1, args.length);
-        return callNode.call(function.callTarget(), realArgs);
+    @Specialization(guards = {
+        "interopLibrary.isExecutable(o)"
+    }, limit = "3")
+    Object doInterop(
+        Object o,
+        Object[] args,
+        @CachedLibrary("o") InteropLibrary interopLibrary
+    ) {
+        try {
+            return interopLibrary.execute(o, args);
+        } catch (UnsupportedMessageException | UnsupportedTypeException | ArityException e) {
+            //TODO
+            throw new ISLISPError(e.getMessage(), this);
+        }
     }
 
     @Fallback

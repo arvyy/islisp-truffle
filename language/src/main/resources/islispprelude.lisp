@@ -183,6 +183,9 @@
 (defun streamp (obj)
   (instancep obj (class <stream>)))
 
+(defun truffle-object-p (obj)
+  (instancep obj (class <truffle-object>)))
+
 (defun identity (obj) obj)
 
 (defun not (obj)

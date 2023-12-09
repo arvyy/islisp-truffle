@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp;
 
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.PolyglotAccess;
 import org.graalvm.polyglot.Source;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -44,8 +45,9 @@ public class ExternalTest {
         }
         var output = new ByteArrayOutputStream();
         var ctxBuilder = Context.newBuilder()
-                .in(new ByteArrayInputStream(new byte[0]))
-                .out(output);
+            .in(new ByteArrayInputStream(new byte[0]))
+            .out(output)
+            .allowPolyglotAccess(PolyglotAccess.ALL);
         try (var ctx = ctxBuilder.build()) {
             ctx.eval(Source.newBuilder("islisp", lispFile.toFile()).build());
             var expected = Files.readString(resultFile);

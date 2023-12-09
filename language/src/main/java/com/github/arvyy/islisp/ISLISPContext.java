@@ -136,6 +136,7 @@ public class ISLISPContext {
         initGlobalFunction("error-output", ISLISPErrorOutputStream::makeLispFunction);
         initGlobalFunction("eq", ISLISPEq::makeLispFunction);
         initGlobalFunction("equal", ISLISPEqual::makeLispFunction);
+        initGlobalFunction("eval", ISLISPEval::makeLispFunction);
         initGlobalFunction("format", ISLISPFormat::makeLispFunction);
         initGlobalFunction("format-char", ISLISPFormatChar::makeLispFunction);
         initGlobalFunction("format-integer", ISLISPFormatInteger::makeLispFunction);
@@ -167,6 +168,7 @@ public class ISLISPContext {
         //extension
         initGlobalFunction("current-stacktrace", ISLISPCurrentStacktrace::makeLispFunction);
         initGlobalFunction("exit", ISLISPExit::makeLispFunction);
+        initGlobalFunction("truffle-object-fields", ISLISPTruffleObjectFields::makeLispFunction);
     }
 
     private void initInitializeObjectMethod() {
@@ -269,6 +271,9 @@ public class ISLISPContext {
         initBuiltin("<general-array*>", "<basic-array*>");
         initBuiltin("<stream>", "<object>");
         initBuiltin("<character>", "<object>");
+
+        //truffle interop
+        initBuiltin("<truffle-object>", "<object>");
     }
 
     /**

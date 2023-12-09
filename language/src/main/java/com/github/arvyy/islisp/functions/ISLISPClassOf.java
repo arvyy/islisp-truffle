@@ -10,6 +10,8 @@ import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.RootNode;
 
 /**
@@ -132,6 +134,17 @@ public abstract class ISLISPClassOf extends RootNode {
         return arrayClass;
     }
 
+    @Specialization(guards = {
+        "interop.hasMembers(o)"
+    }, limit = "3")
+    LispClass doTruffleInteropObject(
+        Object o,
+        @CachedLibrary("o") InteropLibrary interop,
+        @Cached("loadTruffleObjectClass()") LispClass truffleObjectClass
+    ) {
+        return truffleObjectClass;
+    }
+
     @Fallback
     @CompilerDirectives.TruffleBoundary
     LispClass doFallback(Object value) {
@@ -180,6 +193,10 @@ public abstract class ISLISPClassOf extends RootNode {
 
     LispClass loadArrayClass() {
         return loadClass("<general-array*>");
+    }
+
+    LispClass loadTruffleObjectClass() {
+        return loadClass("<truffle-object>");
     }
 
     LispClass loadClass(String name) {

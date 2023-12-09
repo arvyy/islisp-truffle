@@ -25,6 +25,19 @@
             <version>1.6.0</version>
         </dependency>
 
+        <!-- TODO is this needed for nfi?
+        <dependency>
+            <groupId>org.graalvm.truffle</groupId>
+            <artifactId>truffle-nfi-libffi</artifactId>
+        </dependency>
+        -->
+
+        <dependency>
+            <groupId>org.graalvm.polyglot</groupId>
+            <artifactId>js-community</artifactId>
+            <type>pom</type>
+        </dependency>
+
         <dependency>
             <groupId>org.graalvm.polyglot</groupId>
             <artifactId>tools</artifactId>
