@@ -274,6 +274,7 @@ public class ISLISPContext {
 
         //truffle interop
         initBuiltin("<truffle-object>", "<object>");
+        initBuiltin("<truffle-vector>", "<basic-vector>");
     }
 
     /**

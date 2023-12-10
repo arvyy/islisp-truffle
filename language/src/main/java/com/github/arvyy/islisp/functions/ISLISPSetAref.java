@@ -12,11 +12,17 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.interop.InvalidArrayIndexException;
+import com.oracle.truffle.api.interop.UnsupportedMessageException;
+import com.oracle.truffle.api.interop.UnsupportedTypeException;
+import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.RootNode;
 
 /**
  * Implements `set-aref` function.
  */
+//TODO validate array index out of bounds
 public abstract class ISLISPSetAref extends RootNode {
 
     @Child
@@ -59,7 +65,7 @@ public abstract class ISLISPSetAref extends RootNode {
     abstract Object executeGeneric(Object value, Object array, int[] lookup);
 
     @Specialization
-    Object executeArray(Object value, LispArray arr, int[] lookup) {
+    Object doArray(Object value, LispArray arr, int[] lookup) {
         if (arr.dimensions() != lookup.length) {
             //TODO
             throw new ISLISPError("Wrong dimension count", this);
@@ -73,7 +79,7 @@ public abstract class ISLISPSetAref extends RootNode {
     }
 
     @Specialization
-    Object executeVector(Object value, LispVector vec, int[] lookup) {
+    Object doVector(Object value, LispVector vec, int[] lookup) {
         if (lookup.length != 1) {
             //TODO
             throw new ISLISPError("Wrong dimension count", this);
@@ -82,7 +88,29 @@ public abstract class ISLISPSetAref extends RootNode {
         return value;
     }
 
-    //TODO string
+    @Specialization
+    Object doString(Object value, String str, int[] lookup) {
+        throw new ISLISPError("Cannot modify immutable string", this);
+    }
+
+    @Specialization(guards = "interop.hasArrayElements(o)", limit = "3")
+    Object doTruffleVector(
+        Object value,
+        Object o,
+        int[] lookup,
+        @CachedLibrary("o") InteropLibrary interop
+    ) {
+        if (lookup.length != 1) {
+            //TODO
+            throw new ISLISPError("Wrong dimension count", this);
+        }
+        try {
+            interop.writeArrayElement(o, lookup[0], value);
+            return value;
+        } catch (UnsupportedMessageException | UnsupportedTypeException | InvalidArrayIndexException e) {
+            throw new ISLISPError("Interop error", this);
+        }
+    }
 
     @Fallback
     Object fallback(Object value, Object arr, int[] lookup) {

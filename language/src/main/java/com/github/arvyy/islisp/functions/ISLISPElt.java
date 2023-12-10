@@ -10,11 +10,16 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.interop.InvalidArrayIndexException;
+import com.oracle.truffle.api.interop.UnsupportedMessageException;
+import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.RootNode;
 
 /**
  * Implements `elt` function, that returns an element in sequence for a given index.
  */
+//TODO array index out of bounds handling
 public abstract class ISLISPElt extends RootNode {
 
     @Child
@@ -52,6 +57,21 @@ public abstract class ISLISPElt extends RootNode {
     @Specialization
     Object doString(String str, int index) {
         return new LispChar(str.codePointAt(index));
+    }
+
+    @Specialization(guards = {
+        "interop.hasArrayElements(o)"
+    }, limit = "3")
+    Object doTruffleVector(
+        Object o,
+        int index,
+        @CachedLibrary("o") InteropLibrary interop
+    ) {
+        try {
+            return interop.readArrayElement(o, index);
+        } catch (UnsupportedMessageException | InvalidArrayIndexException e) {
+            throw new ISLISPError("Interop error", this);
+        }
     }
 
     @Fallback

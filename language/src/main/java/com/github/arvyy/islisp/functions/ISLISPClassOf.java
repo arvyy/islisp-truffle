@@ -135,12 +135,24 @@ public abstract class ISLISPClassOf extends RootNode {
     }
 
     @Specialization(guards = {
-        "interop.hasMembers(o)"
+        "interop.hasMembers(o)",
+        "!interop.hasArrayElements(o)"
     }, limit = "3")
     LispClass doTruffleInteropObject(
         Object o,
         @CachedLibrary("o") InteropLibrary interop,
         @Cached("loadTruffleObjectClass()") LispClass truffleObjectClass
+    ) {
+        return truffleObjectClass;
+    }
+
+    @Specialization(guards = {
+        "interop.hasArrayElements(o)"
+    }, limit = "3")
+    LispClass doTruffleInteropVector(
+        Object o,
+        @CachedLibrary("o") InteropLibrary interop,
+        @Cached("loadTruffleVectorClass()") LispClass truffleObjectClass
     ) {
         return truffleObjectClass;
     }
@@ -197,6 +209,10 @@ public abstract class ISLISPClassOf extends RootNode {
 
     LispClass loadTruffleObjectClass() {
         return loadClass("<truffle-object>");
+    }
+
+    LispClass loadTruffleVectorClass() {
+        return loadClass("<truffle-vector>");
     }
 
     LispClass loadClass(String name) {

@@ -29,7 +29,7 @@ public class ISLISPTypes {
     protected ISLISPTypes() { }
 
     /**
-     * Implicitly convert big int to int.
+     * Implicitly convert int to big int.
      *
      * @param v big int value
      * @return int value
@@ -37,6 +37,18 @@ public class ISLISPTypes {
     @ImplicitCast
     @CompilerDirectives.TruffleBoundary
     public static LispBigInteger intToBigInt(int v) {
+        return LispBigInteger.valueOf(v);
+    }
+
+    /**
+     * Implicitly convert long to big int.
+     *
+     * @param v big int value
+     * @return int value
+     */
+    @ImplicitCast
+    @CompilerDirectives.TruffleBoundary
+    public static LispBigInteger longToBigInt(long v) {
         return LispBigInteger.valueOf(v);
     }
 

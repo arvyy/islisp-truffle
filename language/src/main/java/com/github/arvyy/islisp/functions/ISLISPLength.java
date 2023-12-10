@@ -2,13 +2,18 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.nodes.ISLISPTypes;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispVector;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.interop.UnsupportedMessageException;
+import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.RootNode;
 
 /**
@@ -55,6 +60,21 @@ public abstract class ISLISPLength extends RootNode {
             v = pair.cdr();
         }
         return len;
+    }
+
+    @Specialization(guards = {
+        "interop.hasArrayElements(o)"
+    }, limit = "3")
+    Object doTruffleVector(
+        Object o,
+        @CachedLibrary("o") InteropLibrary interop
+    ) {
+        try {
+            return (int) interop.getArraySize(o);
+        } catch (UnsupportedMessageException e) {
+            //TODO
+            throw new ISLISPError("Interop error", this);
+        }
     }
 
     /**
