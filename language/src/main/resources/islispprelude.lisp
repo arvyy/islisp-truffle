@@ -202,3 +202,11 @@
             (with-handler
               (lambda (err) (return-from ,blockid nil))
               ,@forms)))))
+
+(defun reverse (list)
+  (for ((list list (cdr list))
+        (reversed () (cons (car list) reversed)))
+       ((not list) reversed)))
+
+(defun nreverse (list)
+  (reverse list))
