@@ -210,3 +210,18 @@
 
 (defun nreverse (list)
   (reverse list))
+
+(defun eql (a b)
+  (if (and (characterp a) (characterp b))
+      (char= a b)
+      (if (and (numberp a) (numberp b))
+          (= a b)
+          (eq a b))))
+
+(defun assoc (obj list)
+  (block assoc
+      (for ((list list (cdr list)))
+           ((not list) nil)
+        (let ((entry (car list)))
+          (if (eql obj (car entry))
+              (return-from assoc entry))))))

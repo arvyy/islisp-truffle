@@ -17,4 +17,8 @@
 (test-equal (reverse (list 1 2 3)) (list 3 2 1))
 (test-equal (nreverse (list 1 2 3)) (list 3 2 1))
 
+(test-equal (assoc 'a '((a . 1) (b . 2))) '(a . 1))
+(test-equal (assoc 'a '((a . 1) (a . 2))) '(a . 1))
+(test-equal (assoc 'c '((a . 1) (b . 2))) nil)
+
 (format (standard-output) "list.lisp end")
