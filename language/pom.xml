@@ -29,6 +29,12 @@
 
         <dependency>
             <groupId>org.graalvm.truffle</groupId>
+            <artifactId>truffle-nfi-libffi</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graalvm.truffle</groupId>
             <artifactId>truffle-api</artifactId>
         </dependency>
 

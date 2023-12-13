@@ -1,0 +1,22 @@
+(defmacro test-equal (expr value)
+  (let ((actual (gensym)))
+    `(let ((,actual ,expr))
+        (if (not (equal ,actual ,value))
+          (progn
+            (format-object (standard-output) ',expr t)
+            (format-char (standard-output) #\newline)
+            (format-object (standard-output) "Expect: " t)
+            (format-object (standard-output) ,value nil)
+            (format-char (standard-output) #\newline)
+            (format-object (standard-output) "Actual: " t)
+            (format-object (standard-output) ,actual nil)
+            (format-char (standard-output) #\newline)
+            (format-object (standard-output) "-------" nil)
+            (format-char (standard-output) #\newline))))))
+
+(let* ((lib (load-native-library "libm.so.6"))
+       (libm-sin (native-library-symbol lib "sin" "(DOUBLE):DOUBLE")))
+  (test-equal (> (funcall libm-sin 2.0) 0.909) t)
+  (test-equal (< (funcall libm-sin 2.0) 0.910) t))
+
+(format (standard-output) "nif.lisp end")

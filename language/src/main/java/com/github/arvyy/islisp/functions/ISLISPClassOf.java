@@ -134,6 +134,14 @@ public abstract class ISLISPClassOf extends RootNode {
         return arrayClass;
     }
 
+    @Specialization
+    LispClass doNativeLibrary(
+        LispNativeLibrary library,
+        @Cached("loadNativeLibraryClass()") LispClass libClass
+    ) {
+        return libClass;
+    }
+
     @Specialization(guards = {
         "interop.hasMembers(o)",
         "!interop.hasArrayElements(o)"
@@ -213,6 +221,10 @@ public abstract class ISLISPClassOf extends RootNode {
 
     LispClass loadTruffleVectorClass() {
         return loadClass("<truffle-vector>");
+    }
+
+    LispClass loadNativeLibraryClass() {
+        return loadClass("<truffle-native-library>");
     }
 
     LispClass loadClass(String name) {

@@ -169,6 +169,8 @@ public class ISLISPContext {
         initGlobalFunction("current-stacktrace", ISLISPCurrentStacktrace::makeLispFunction);
         initGlobalFunction("exit", ISLISPExit::makeLispFunction);
         initGlobalFunction("truffle-object-fields", ISLISPTruffleObjectFields::makeLispFunction);
+        initGlobalFunction("load-native-library", ISLISPLoadNativeLibrary::makeLispFunction);
+        initGlobalFunction("native-library-symbol", ISLISPNativeLibrarySymbol::makeLispFunction);
     }
 
     private void initInitializeObjectMethod() {
@@ -274,6 +276,7 @@ public class ISLISPContext {
 
         //truffle interop
         initBuiltin("<truffle-object>", "<object>");
+        initBuiltin("<truffle-native-library>", "<object>");
         initBuiltin("<truffle-vector>", "<basic-vector>");
     }
 

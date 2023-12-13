@@ -78,6 +78,7 @@ public abstract class ISLISPFormatObject extends RootNode {
                     writer.write("#\\");
                 }
                 writer.write(c.codepoint());
+                return;
             }
             if (value instanceof String s) {
                 if (escape) {
@@ -91,6 +92,10 @@ public abstract class ISLISPFormatObject extends RootNode {
             }
             if (value instanceof Integer i) {
                 writer.write(i.toString());
+                return;
+            }
+            if (value instanceof Double d) {
+                writer.write(d.toString());
                 return;
             }
             if (value instanceof LispBigInteger b) {

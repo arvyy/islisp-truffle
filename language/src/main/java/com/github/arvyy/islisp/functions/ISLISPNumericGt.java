@@ -2,12 +2,14 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.nodes.ISLISPTypes;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.profiles.CountingConditionProfile;
@@ -15,6 +17,7 @@ import com.oracle.truffle.api.profiles.CountingConditionProfile;
 /**
  * Implements numeric comparator `>`.
  */
+@TypeSystemReference(ISLISPTypes.class)
 public abstract class ISLISPNumericGt extends RootNode {
 
     private final CountingConditionProfile profile;
@@ -33,6 +36,14 @@ public abstract class ISLISPNumericGt extends RootNode {
 
     @Specialization
     Object doInts(int a, int b) {
+        if (profile.profile(a > b)) {
+            return ISLISPContext.get(this).getT();
+        }
+        return ISLISPContext.get(this).getNil();
+    }
+
+    @Specialization
+    Object doDoubles(double a, double b) {
         if (profile.profile(a > b)) {
             return ISLISPContext.get(this).getT();
         }

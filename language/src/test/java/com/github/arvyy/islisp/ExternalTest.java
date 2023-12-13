@@ -47,7 +47,8 @@ public class ExternalTest {
         var ctxBuilder = Context.newBuilder()
             .in(new ByteArrayInputStream(new byte[0]))
             .out(output)
-            .allowPolyglotAccess(PolyglotAccess.ALL);
+            .allowPolyglotAccess(PolyglotAccess.ALL)
+            .allowNativeAccess(true);
         try (var ctx = ctxBuilder.build()) {
             ctx.eval(Source.newBuilder("islisp", lispFile.toFile()).build());
             var expected = Files.readString(resultFile);
