@@ -32,19 +32,20 @@ public class ISLISPLoadNativeLibrary extends RootNode {
         }
         var name = frame.getArguments()[1];
         if (name instanceof String nameString) {
-            var source = Source.newBuilder(
-                "nfi",
-                nfiCode(nameString),
-                "load-native-library").build();
-            var library = ctx.getEnv().parseInternal(source);
-            return new LispNativeLibrary(library.call());
+            return executeBoundary(nameString);
         }
         return errorSignalerNode.signalWrongType(name, ctx.lookupClass("<string>"));
     }
 
     @CompilerDirectives.TruffleBoundary
-    String nfiCode(String libraryName) {
-        return "load \"" + libraryName + "\"";
+    Object executeBoundary(String name) {
+        var ctx = ISLISPContext.get(this);
+        var source = Source.newBuilder(
+            "nfi",
+            "load \"" + name + "\"",
+            "load-native-library").build();
+        var library = ctx.getEnv().parseInternal(source);
+        return new LispNativeLibrary(library.call());
     }
 
     /**
