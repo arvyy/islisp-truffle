@@ -5,6 +5,7 @@ import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispNativeLibrary;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -47,6 +48,11 @@ public abstract class ISLISPNativeLibrarySymbol extends RootNode {
         String symbol,
         String signature
     ) throws InteropException {
+        return doBoundary(library, symbol, signature);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    Object doBoundary(LispNativeLibrary library, String symbol, String signature) throws InteropException {
         var interopLibrary = InteropLibrary.getUncached();
         var signatureSource = Source
             .newBuilder("nfi", signature, "native-library-symbol")
