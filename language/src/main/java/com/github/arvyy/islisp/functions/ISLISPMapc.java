@@ -15,14 +15,14 @@ import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.RootNode;
 
 /**
- * Implements `mapl` function.
+ * Implements `mapc` function.
  */
-public abstract class ISLISPMapl extends RootNode {
+public abstract class ISLISPMapc extends RootNode {
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
-    ISLISPMapl(TruffleLanguage<?> language) {
+    ISLISPMapc(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
@@ -41,7 +41,7 @@ public abstract class ISLISPMapl extends RootNode {
             return executeGeneric(frame.getArguments()[1], lists);
         } catch (InteropException e) {
             //TODO
-            throw new ISLISPError("mapl fail", this);
+            throw new ISLISPError("mapcar fail", this);
         }
     }
 
@@ -62,7 +62,7 @@ public abstract class ISLISPMapl extends RootNode {
                 if (Utils.isNil(arg)) {
                     break outter;
                 } else if (arg instanceof Pair p) {
-                    args[i] = p;
+                    args[i] = p.car();
                     lists[i] = p.cdr();
                 } else {
                     return errorSignalerNode.signalWrongType(arg, ISLISPContext.get(this).lookupClass("<list>"));
@@ -80,7 +80,7 @@ public abstract class ISLISPMapl extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPMaplNodeGen.create(lang).getCallTarget());
+        return new LispFunction(ISLISPMapcNodeGen.create(lang).getCallTarget());
     }
 
 }

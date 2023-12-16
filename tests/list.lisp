@@ -47,4 +47,11 @@
   (mapcar #'car '((1 a) (2 b) (3 c)))
   '(1 2 3))
 
+;; taken from spec
+(let ((x 0))
+  (mapc (lambda (v)
+          (setq x (+ x v)))
+        '(3 5))
+  (test-equal x 8))
+
 (format (standard-output) "list.lisp end")
