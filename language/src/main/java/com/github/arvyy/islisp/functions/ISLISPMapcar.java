@@ -15,14 +15,14 @@ import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.RootNode;
 
 /**
- * Implements `mapl` function.
+ * Implements `mapcar` function.
  */
-public abstract class ISLISPMapl extends RootNode {
+public abstract class ISLISPMapcar extends RootNode {
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
-    ISLISPMapl(TruffleLanguage<?> language) {
+    ISLISPMapcar(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
@@ -41,7 +41,7 @@ public abstract class ISLISPMapl extends RootNode {
             return executeGeneric(frame.getArguments()[1], lists);
         } catch (InteropException e) {
             //TODO
-            throw new ISLISPError("mapl fail", this);
+            throw new ISLISPError("mapcar fail", this);
         }
     }
 
@@ -55,7 +55,8 @@ public abstract class ISLISPMapl extends RootNode {
     ) throws InteropException {
         var nil = ISLISPContext.get(this).getNil();
         Object[] args = new Object[lists.length];
-        Object returnedList = lists[0];
+        Pair head = null;
+        Pair tail = null;
         outter:
         while (true) {
             for (int i = 0; i < args.length; i++) {
@@ -63,15 +64,26 @@ public abstract class ISLISPMapl extends RootNode {
                 if (Utils.isNil(arg)) {
                     break outter;
                 } else if (arg instanceof Pair p) {
-                    args[i] = p;
+                    args[i] = p.car();
                     lists[i] = p.cdr();
                 } else {
                     return errorSignalerNode.signalWrongType(arg, ISLISPContext.get(this).lookupClass("<list>"));
                 }
             }
-            fn.execute(o, args);
+            var mappedValue = fn.execute(o, args);
+            if (head == null) {
+                head = new Pair(mappedValue, nil);
+                tail = head;
+            } else {
+                var newTail = new Pair(mappedValue, nil);
+                tail.setCdr(newTail);
+                tail = newTail;
+            }
         }
-        return returnedList;
+        if (head == null) {
+            return nil;
+        }
+        return head;
     }
 
     /**
@@ -81,7 +93,7 @@ public abstract class ISLISPMapl extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPMaplNodeGen.create(lang).getCallTarget());
+        return new LispFunction(ISLISPMapcarNodeGen.create(lang).getCallTarget());
     }
 
 }

@@ -42,4 +42,9 @@
         '(a b a c d b c))
   (test-equal k 4))
 
+;; taken from spec
+(test-equal
+  (mapcar #'car '((1 a) (2 b) (3 c)))
+  '(1 2 3))
+
 (format (standard-output) "list.lisp end")
