@@ -54,4 +54,20 @@
         '(3 5))
   (test-equal x 8))
 
+;; taken from spec
+(test-equal
+  (mapcan (lambda (x)
+            (if (> x 0)
+                (list x)))
+          '(-3 4 0 5 -2 7))
+  '(4 5 7))
+
+;; taken from spec
+(test-equal
+  (mapcon (lambda (x)
+            (if (member (car x) (cdr x))
+                (list (car x))))
+          '(a b a c d b c b c))
+  '(a b c b c))
+
 (format (standard-output) "list.lisp end")
