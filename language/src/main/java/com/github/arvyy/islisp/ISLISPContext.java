@@ -150,6 +150,7 @@ public class ISLISPContext {
         initGlobalFunction("length", ISLISPLength::makeLispFunction);
         initGlobalFunction("list", ISLISPList::makeLispFunction);
         initGlobalFunction("maplist", ISLISPMaplist::makeLispFunction);
+        initGlobalFunction("mapl", ISLISPMapl::makeLispFunction);
         initGlobalFunction("output-stream-p", ISLISPOutputStreamp::makeLispFunction);
         initGlobalFunction("property", ISLISPProperty::makeLispFunction);
         initGlobalFunction("remove-property", ISLISPRemoveProperty::makeLispFunction);

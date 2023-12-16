@@ -225,3 +225,10 @@
         (let ((entry (car list)))
           (if (eql obj (car entry))
               (return-from assoc entry))))))
+
+(defun member (obj list)
+  (block member
+      (for ((list list (cdr list)))
+           ((not list) nil)
+         (if (eql obj (car list))
+             (return-from member list)))))
