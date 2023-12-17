@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.launcher;
 import org.apache.commons.cli.*;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotAccess;
+import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.io.IOAccess;
 
@@ -71,8 +72,10 @@ public final class Main {
             var r = new BufferedReader(new InputStreamReader(System.in));
             w.write("ISLISP interpreter.\nUse ,h for help.\n\n");
             w.flush();
+            int prompt = 0;
             while (true) {
-                w.write("> ");
+                prompt++;
+                w.write("#" + prompt + "> ");
                 w.flush();
                 var line = r.readLine();
                 if (line == null) {
@@ -85,7 +88,11 @@ public final class Main {
                     break;
                 }
                 try {
-                    var source = Source.newBuilder("islisp", line, "<repl>").interactive(true).buildLiteral();
+                    var source = Source
+                        .newBuilder("islisp", line, "<repl " + "#" + prompt + ">")
+                        .interactive(true)
+                        .cached(false)
+                        .buildLiteral();
                     context.eval(source);
                 } catch (Exception e) {
                     e.printStackTrace();

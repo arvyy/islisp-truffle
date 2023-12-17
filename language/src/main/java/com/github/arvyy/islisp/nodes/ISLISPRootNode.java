@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
+import com.github.arvyy.islisp.exceptions.ISLISPInteractiveExitException;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -38,7 +39,11 @@ public class ISLISPRootNode extends RootNode {
             expressionNodes[i].executeGeneric(frame);
         }
         if (expressionNodes.length != 0) {
-            return expressionNodes[expressionNodes.length - 1].executeGeneric(frame);
+            try {
+                return expressionNodes[expressionNodes.length - 1].executeGeneric(frame);
+            } catch (ISLISPInteractiveExitException e) {
+                return e.getCondition();
+            }
         } else {
             return ISLISPContext.get(this).getNil();
         }

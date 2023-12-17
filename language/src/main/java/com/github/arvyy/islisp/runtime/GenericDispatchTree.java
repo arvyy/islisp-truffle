@@ -117,7 +117,7 @@ public class GenericDispatchTree {
 
     int collectApplicatableMethods(ArraySlice<LispClass> argTypes, CallTarget[] result, int resultIndex) {
         if (argTypes.size() == 0) {
-            result[resultIndex] = callTarget;
+            result[resultIndex] = Objects.requireNonNull(callTarget);
             return resultIndex + 1;
         }
         var nextArg = argTypes.get(0);

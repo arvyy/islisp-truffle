@@ -1,7 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.exceptions.ISLISPInteractiveExitException;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNode;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNodeGen;
 import com.github.arvyy.islisp.runtime.LispFunction;
@@ -35,9 +35,10 @@ public class ISLISPDefaultHandler extends RootNode {
         var reportConditionFunction = ctx.lookupFunction(ctx.namedSymbol("report-condition").identityReference());
         var errorOutputFunction = ctx.lookupFunction(ctx.namedSymbol("error-output").identityReference());
         var errorOutput = dispatchNode.executeDispatch(errorOutputFunction, new Object[]{});
-        dispatchNode.executeDispatch(reportConditionFunction, new Object[]{frame.getArguments()[1], errorOutput});
+        var condition = frame.getArguments()[1];
+        dispatchNode.executeDispatch(reportConditionFunction, new Object[]{condition, errorOutput});
         if (isInteractive) {
-            throw new ISLISPError("Uncaught ISLISP signal", this);
+            throw new ISLISPInteractiveExitException(condition);
         } else {
             return dispatchNode.executeDispatch(exitFunction, new Object[] {1});
         }
