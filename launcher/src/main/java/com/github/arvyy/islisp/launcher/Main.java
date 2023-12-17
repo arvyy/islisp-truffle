@@ -3,7 +3,6 @@ package com.github.arvyy.islisp.launcher;
 import org.apache.commons.cli.*;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotAccess;
-import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.io.IOAccess;
 
@@ -13,6 +12,8 @@ import java.io.*;
  * Main ISLISP interpreter entrypoint.
  */
 public final class Main {
+
+    private static final int HELP_WIDTH = 80;
 
     private Main() { }
 
@@ -40,7 +41,7 @@ public final class Main {
         if (commandLine.hasOption(helpOpt)) {
             new HelpFormatter().printHelp("islisp [FILE]", options);
             var pw = new PrintWriter(System.out);
-            new HelpFormatter().printWrapped(pw, 80, """
+            new HelpFormatter().printWrapped(pw, HELP_WIDTH, """
                 Run islisp interpreter. If FILE is provided, given FILE is evaluated and the program exits.
                 If FILE is not provided, interpreter enters repl mode.
                 """);
@@ -144,7 +145,7 @@ public final class Main {
 
     static void printReplHelp() {
         var pw = new PrintWriter(System.out);
-        new HelpFormatter().printWrapped(pw, 80, """
+        new HelpFormatter().printWrapped(pw, HELP_WIDTH, """
             ,h - This help message
             ,q - Quit
             ,l path - Load and evaluate file from given path

@@ -70,4 +70,8 @@
           '(a b a c d b c b c))
   '(a b c b c))
 
+(test-equal
+  (append '(1 2) '(3 4) '(5 6))
+  '(1 2 3 4 5 6))
+
 (format (standard-output) "list.lisp end")

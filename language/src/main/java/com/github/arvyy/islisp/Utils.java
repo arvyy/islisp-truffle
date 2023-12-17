@@ -35,6 +35,39 @@ public final class Utils {
     }
 
     /**
+     * Parse sexpr (Pair or nil) to a java array.
+     *
+     * @param v sesxpr
+     * @return java array
+     */
+    public static Object[] readListAsArray(Object v) {
+        int size = 0;
+        Object i = v;
+        while (true) {
+            if (i instanceof Pair p) {
+                size++;
+                i = p.cdr();
+            } else if (i instanceof Symbol s) {
+                if (s.identityReference() == ISLISPContext.get(null).getNil().identityReference()) {
+                    break;
+                } else {
+                    throw new RuntimeException();
+                }
+            } else {
+                throw new RuntimeException();
+            }
+        }
+
+        var data = new Object[size];
+        i = v;
+        for (int j = 0; j < data.length; j++) {
+            data[j] = ((Pair) i).car();
+            i = ((Pair) i).cdr();
+        }
+        return data;
+    }
+
+    /**
      * Convert java list to sexpr equivalent.
      *
      * @param lst java list

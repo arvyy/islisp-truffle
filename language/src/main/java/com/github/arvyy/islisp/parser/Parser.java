@@ -154,7 +154,9 @@ public class Parser {
                 case "progn":
                     return parseProgn(parserContext, sexpr, topLevel);
                 case "funcall":
-                    return parseIndirectFunCall(parserContext, sexpr);
+                    return parseIndirectFunCall(parserContext, sexpr, false);
+                case "apply":
+                    return parseIndirectFunCall(parserContext, sexpr, true);
                 case "function":
                     return parseFunctionRef(parserContext, sexpr);
                 case "lambda":
@@ -783,7 +785,7 @@ public class Parser {
         return new ISLISPDebuggerNode(source(sexpr));
     }
 
-    ISLISPExpressionNode parseIndirectFunCall(ParserContext parserContext, Object sexpr) {
+    ISLISPExpressionNode parseIndirectFunCall(ParserContext parserContext, Object sexpr, boolean lastArgRest) {
         var args = requireList(sexpr, 2, -1);
         var argNodes = new ArrayList<ISLISPExpressionNode>();
         for (Object arg : args.subList(1, args.size())) {
@@ -792,6 +794,7 @@ public class Parser {
         return new ISLISPIndirectFunctionCallNode(
                 argNodes.get(0),
                 argNodes.subList(1, argNodes.size()).toArray(ISLISPExpressionNode[]::new),
+                lastArgRest,
                 source(sexpr));
     }
 
@@ -828,6 +831,7 @@ public class Parser {
             return new ISLISPIndirectFunctionCallNode(
                     functionLookup,
                     argNodes.toArray(ISLISPExpressionNode[]::new),
+                    false,
                     source(sexpr));
         } else {
             return new ISLISPGlobalFunctionCallNode(

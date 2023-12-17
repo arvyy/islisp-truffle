@@ -35,4 +35,8 @@ public class ISLISPCallNextMethod extends RootNode {
         return dispatchNode.executeDispatch(applicables, closure.args());
     }
 
+    @Override
+    public boolean isCloningAllowed() {
+        return true;
+    }
 }

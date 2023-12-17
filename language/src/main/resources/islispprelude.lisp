@@ -232,3 +232,13 @@
            ((not list) nil)
          (if (eql obj (car list))
              (return-from member list)))))
+
+(defun append (:rest lists)
+  (flet ((append2 (lst1 lst2)
+           (for ((lst1 (reverse lst1) (cdr lst1))
+                 (lst2 lst2 (cons (car lst1) lst2)))
+                ((null lst1) lst2))))
+    ;; TODO rewrite with cond
+    (if (null lists) nil
+        (if (null (cdr lists)) (car lists)
+            (append2 (car lists) (apply #'append (cdr lists))))) ))
