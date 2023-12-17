@@ -38,7 +38,13 @@ public final class Main {
         var commandLine = parser.parse(options, args);
 
         if (commandLine.hasOption(helpOpt)) {
-            new HelpFormatter().printHelp("", options);
+            new HelpFormatter().printHelp("islisp [FILE]", options);
+            var pw = new PrintWriter(System.out);
+            new HelpFormatter().printWrapped(pw, 80, """
+                Run islisp interpreter. If FILE is provided, given FILE is evaluated and the program exits.
+                If FILE is not provided, interpreter enters repl mode.
+                """);
+            pw.flush();
             return;
         }
 
@@ -82,17 +88,26 @@ public final class Main {
                     break;
                 }
                 if (line.equals(",h")) {
+                    printReplHelp();
                     continue;
                 }
                 if (line.equals(",q")) {
                     break;
                 }
-                try {
-                    var source = Source
+
+                Source source;
+                if (line.startsWith(",l ")) {
+                    source = Source
+                        .newBuilder("islisp", new File(line.substring(3)))
+                        .build();
+                } else {
+                    source = Source
                         .newBuilder("islisp", line, "<repl " + "#" + prompt + ">")
                         .interactive(true)
                         .cached(false)
                         .buildLiteral();
+                }
+                try {
                     context.eval(source);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -125,6 +140,16 @@ public final class Main {
             .argName("h")
             .longOpt("help")
             .build();
+    }
+
+    static void printReplHelp() {
+        var pw = new PrintWriter(System.out);
+        new HelpFormatter().printWrapped(pw, 80, """
+            ,h - This help message
+            ,q - Quit
+            ,l path - Load and evaluate file from given path
+            """);
+        pw.flush();
     }
 
 }
