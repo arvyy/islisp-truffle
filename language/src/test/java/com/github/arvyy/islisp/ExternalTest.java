@@ -20,7 +20,7 @@ public class ExternalTest {
 
     @TestFactory
     public Stream<DynamicTest> externalTestsPortable() throws IOException {
-        return Files.list(Path.of("../tests"))
+        return Files.list(Path.of("../tests/portable"))
                 .filter(p -> p.getFileName().toString().endsWith(".lisp"))
                 .map(lispFile -> {
                     return DynamicTest.dynamicTest("Test " + lispFile.getFileName(), () -> executeTest(lispFile));
@@ -29,10 +29,10 @@ public class ExternalTest {
 
     @TestFactory
     public Stream<DynamicTest> externalTestsUnportable() throws IOException {
-        return Files.list(Path.of("../tests2"))
+        return Files.list(Path.of("../tests/nonportable"))
             .filter(p -> p.getFileName().toString().endsWith(".lisp"))
             .map(lispFile -> {
-                return DynamicTest.dynamicTest("Unportable test " + lispFile.getFileName(), () -> executeTest(lispFile));
+                return DynamicTest.dynamicTest("Nonportable test " + lispFile.getFileName(), () -> executeTest(lispFile));
             });
     }
 
