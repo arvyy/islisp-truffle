@@ -1,0 +1,62 @@
+<project>
+
+    <property environment="env"/>
+
+    <target name="clean">
+        <delete dir="${basedir}/dist"/>
+        <exec executable="sh">
+            <arg value="-c"/>
+            <arg value="mvn clean"/>
+        </exec>
+    </target>
+
+    <target name="dist" depends="clean">
+        <mkdir dir="${basedir}/dist"/>
+        <exec executable="sh" failonerror="true">
+            <arg value="-c"/>
+            <arg value="mvn package"/>
+        </exec>
+        <copy todir="${basedir}/dist">
+            <fileset dir="${basedir}/launcher/target" includes="*.jar"/>
+        </copy>
+    </target>
+
+    <target name="native">
+        <path id="distjars">
+            <fileset dir="${basedir}/dist">
+                <include name="*.jar"/>
+                <exclude name="*enterprise*"/>
+                <exclude name="truffle-dsl-processor*"/>
+            </fileset>
+            <!--
+            <fileset dir="${basedir}/dist">
+                <include name="language-*.jar"/>
+                <include name="launcher-*.jar"/>
+                <include name="polyglot-*.jar"/>
+                <include name="truffle-api-*.jar"/>
+                <include name="truffle-runtime-*.jar"/>
+                <include name="truffle-compiler-*.jar"/>
+                <include name="commons-cli-*.jar"/>
+                <include name="jniutils-*.jar"/>
+                <include name="nativeimage-*.jar"/>
+            </fileset>
+            -->
+
+        </path>
+
+        <pathconvert property="module-path" refid="distjars"/>
+
+        <exec executable="${env.JAVA_HOME}/bin/native-image" failonerror="true">
+            <arg value="--static"/>
+            <arg value="--libc=musl"/>
+            <arg value="--macro:truffle-svm"/>
+            <arg value="--initialize-at-build-time"/>
+            <arg value="--no-fallback"/>
+            <arg value="-p"/>
+            <arg value="${module-path}"/>
+            <arg value="com.github.arvyy.islisp.launcher.Main"/>
+            <arg value="${basedir}/dist/islisp-static"/>
+        </exec>
+    </target>
+
+</project>

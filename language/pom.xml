@@ -47,6 +47,7 @@
         <dependency>
             <groupId>org.graalvm.truffle</groupId>
             <artifactId>truffle-dsl-processor</artifactId>
+            <scope>compile</scope>
         </dependency>
 
     </dependencies>

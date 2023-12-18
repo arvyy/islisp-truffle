@@ -51,7 +51,7 @@
             </dependency>
             <dependency>
                 <groupId>org.graalvm.polyglot</groupId>
-                <artifactId>tools</artifactId>
+                <artifactId>tools-community</artifactId>
                 <version>${graalvm.version}</version>
                 <type>pom</type>
             </dependency>
