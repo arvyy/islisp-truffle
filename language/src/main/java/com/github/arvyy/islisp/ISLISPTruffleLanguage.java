@@ -12,7 +12,6 @@ import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
 
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**

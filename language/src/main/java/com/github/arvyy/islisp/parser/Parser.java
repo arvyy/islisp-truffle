@@ -30,7 +30,9 @@ public class Parser {
     }
 
     /**
-     * Parse root node from given list of sexprs.
+     * Returns root node for given sexpr. Actual sexprs aren't parsed, but are deferred by wrapping into
+     * ISLISPMacroExpansion node since parsing requires executing macros, which potentially require executing user code,
+     * which is not supposed to be executed in parse. Handles installing base condition handler.
      *
      * @param language language reference
      * @param content list of top level sexprs
@@ -39,25 +41,46 @@ public class Parser {
      * @return root node
      */
     public ISLISPRootNode parseRootNode(ISLISPTruffleLanguage language, List<Object> content, boolean isInteractive) {
-        var expressionNodes = new ArrayList<ISLISPExpressionNode>();
-        var parserContext = new ParserContext();
-        for (var v: content) {
-            var expression = parseExpressionNode(parserContext, v, true);
-            executeDefinitions(expression); // execute definitions to be available for macro procedure runs
-            //TODO following breaks debugger / instrumentation
-            //filterDefinitions(expression).ifPresent(expressionNodes::add);
-            expressionNodes.add(expression);
-        }
         var topLevelConditionHandler = new ISLISPWithHandlerNode(
             new ISLISPLiteralNode(ISLISPDefaultHandler.makeLispFunction(language, isInteractive), null)
                 .markInternal(),
-            expressionNodes.toArray(ISLISPExpressionNode[]::new),
+            new ISLISPExpressionNode[]{new ISLISPMacroExpansionNode(sourceSectionMap, content)},
             null
         ).markInternal();
         return new ISLISPRootNode(
                 language,
                 new ISLISPExpressionNode[]{topLevelConditionHandler},
-                parserContext.frameBuilder.build()
+                null
+        );
+    }
+
+    /**
+     * Perform deferred parsing, by evaluating user code and running procedural macros.
+     * The result should be spliced into AST root.
+     *
+     * @param content usercode sexprs.
+     * @return parsed truffle AST after macro expansion.
+     */
+    public ISLISPExpressionNode executeMacroExpansion(List<Object> content) {
+        var ctx = ISLISPContext.get(null);
+        var parserContext = new ParserContext();
+        var expressionNodes = new ArrayList<ISLISPExpressionNode>();
+        for (var v: content) {
+            var expression = parseExpressionNode(parserContext, v, true);
+            executeDefinitions(expression);
+            expressionNodes.add(expression);
+        }
+        var wrappingRootNode = new ISLISPRootNode(
+            ctx.getLanguage(),
+            expressionNodes.toArray(ISLISPExpressionNode[]::new),
+            parserContext.frameBuilder.build()
+        );
+        var lambda = new ISLISPLambdaNode(wrappingRootNode);
+        return new ISLISPIndirectFunctionCallNode(
+            lambda,
+            new ISLISPExpressionNode[]{},
+            false,
+            null
         );
     }
 
