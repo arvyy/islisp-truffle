@@ -1,0 +1,31 @@
+= Truffle ISLISP
+
+ISLISP language implementation on Graal's Truffle framework.
+
+CAUTION: Truffle ISLISP is WIP.
+
+== What is Truffle? Why ISLISP?
+
+https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/[Truffle framework] is an interpreter platform, it enables direct interop between languages using it, provides language-agnostic tooling (such as debugging, profiling), as well as manages decently fast performance using its partial evaluation  / JIT design. This project is an attempt at enriching Truffle's polyglot ecosystem with a Lisp entry.
+
+The reasons for choosing ISLISP:
+
+* Standardized;
+
+* Will be familiar to many lispers (it's basically a CommonLisp-lite);
+
+* Doesn't require tricky runtime concerns that could be difficult to implement without compromising Truffle's benefits (such as Scheme's continuations / TCO, CL's image model).
+
+== Download
+
+CAUTION: There are no stable versions yet, only rolling nightly Linux and Docker distributions are provided.
+
+TODO
+
+== Documentation
+
+See http:///docs/apireference.adoc[documentation reference.]
+
+== Building
+
+See http:///docs/apireference.adoc[building instructions.]

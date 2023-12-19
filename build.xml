@@ -28,20 +28,6 @@
                 <exclude name="*enterprise*"/>
                 <exclude name="truffle-dsl-processor*"/>
             </fileset>
-            <!--
-            <fileset dir="${basedir}/dist">
-                <include name="language-*.jar"/>
-                <include name="launcher-*.jar"/>
-                <include name="polyglot-*.jar"/>
-                <include name="truffle-api-*.jar"/>
-                <include name="truffle-runtime-*.jar"/>
-                <include name="truffle-compiler-*.jar"/>
-                <include name="commons-cli-*.jar"/>
-                <include name="jniutils-*.jar"/>
-                <include name="nativeimage-*.jar"/>
-            </fileset>
-            -->
-
         </path>
 
         <pathconvert property="module-path" refid="distjars"/>

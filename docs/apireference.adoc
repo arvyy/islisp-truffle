@@ -1,0 +1,53 @@
+= Truffle ISLISP reference.
+
+Given that this is ISLISP implementation, primary reference is the http://www.islisp.org/ISLisp-spec.html[ISLISP 2007 specification]. This document details extensions and omissions made with respect to spec.
+
+== Extensions
+
+=== `(debugger)`
+
+`(debugger)` enables triggering debugger breakpoint from code. Works only when ran in debug mode. Returns nil.
+
+=== Condition stacktraces
+
+Conditions get stacktrace attached upon signalling by default. Stacktrace can be inspected using generic method `(condition-stacktrace _condition_)` which returns a vector of strings. Stacktrace gather can be disabled for condition types by implementing method `(fill-stacktrace _condition-class_)` and returning nil from it. Condition stacktraces are printed during `report-condition`.
+
+=== Eval
+
+You can eval any at runtime present truffle language code using `(eval _language-code_ _source-code_)`; for example
+
+[source,lisp]
+----
+(let ((fun (eval "js" "(function(arg) { return 1 + arg; })")))
+  (funcall fun 2)) ;; => 3
+----
+
+interop language's values are mapped to most fit ISLISP type. For some values, special procedures are given, see Truffle object api.
+
+=== Truffle object interop API
+
+External objects with fields are represented as instances of `<truffle-object>` class (which is subclass of `<object>`). You can get a vector of fields (as strings) in a given object using `(truffle-object-fields _truffle-obj_)`.
+
+[source,lisp]
+----
+(let ((obj (eval "js" "{ a: 1}")))
+  (truffle-object-fields obj)) ;; => #("a")
+----
+
+TODO api for getting field value
+
+=== Native function interface
+
+TODO
+
+=== `(exit)`
+
+Application can have early exit using `(exit _exit-code_)`, where exit-code is an integer.
+
+== Omissions / spec violations.
+
+* Alot of functions are still unimplemented, most of file / stream api, math, time. Alot of erronous calls don't raise appropriate conditions. The language will remain WIP until these are done.
+
+* Format to string functions won't track if they're on fresh line / the column index.
+
+* No metaclasses

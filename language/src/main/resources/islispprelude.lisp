@@ -22,7 +22,7 @@
 
 (defclass <serious-condition> ()
     ((stacktrace :reader condition-stacktrace :writer set-condition-stacktrace)
-     (continuabl? :reader condition-continuable :writer set-condition-continuable)))
+     (continuable? :reader condition-continuable :writer set-condition-continuable)))
 
 (defclass <error> (<serious-condition>) ())
 
