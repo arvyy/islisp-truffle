@@ -26,7 +26,7 @@ jobs:
       - name: Extract built executable from docker
         run: |
           mkdir extract
-          docker run --name temp-container-name islisp /bin/true
+          docker run --name temp-container-name --entrypoint sh islisp
           docker cp temp-container-name:/app/islisp extract
           docker rm temp-container-name
       - name: Upload executable to github nightly release
