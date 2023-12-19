@@ -11,16 +11,26 @@ jobs:
           distribution: 'temurin'
           architecture: x64
           cache: 'maven'
-      - name: Test
-        run: |
-          mvn test
       - name: Verify checkstyle
         run: |
           mvn validate
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name:
-        uses: docker/build-push-action@v5
-        with:
-          push: false
-          tags: islisp
+      - name: Test
+        run: |
+          mvn test
+      - uses: actions-hub/docker/cli@master
+        env:
+          SKIP_LOGIN: true
+      - name: Build docker image
+        run: |
+          docker build . -t islisp
+      - name: Extract built executable from docker
+        run: |
+          mkdir extract
+          docker run --name temp-container-name islisp /bin/true
+          docker cp temp-container-name:/app/islisp extract
+          docker rm temp-container-name
+      - name: Upload executable to github nightly release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload nightly extract/islisp
