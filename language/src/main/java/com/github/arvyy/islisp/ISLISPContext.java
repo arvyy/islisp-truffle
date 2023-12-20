@@ -173,6 +173,8 @@ public class ISLISPContext {
         initGlobalFunction("current-stacktrace", ISLISPCurrentStacktrace::makeLispFunction);
         initGlobalFunction("exit", ISLISPExit::makeLispFunction);
         initGlobalFunction("truffle-object-fields", ISLISPTruffleObjectFields::makeLispFunction);
+        initGlobalFunction("truffle-object-field", ISLISPTruffleObjectField::makeLispFunction);
+        initGlobalFunction("set-truffle-object-field", ISLISPSetTruffleObjectField::makeLispFunction);
         initGlobalFunction("load-native-library", ISLISPLoadNativeLibrary::makeLispFunction);
         initGlobalFunction("native-library-symbol", ISLISPNativeLibrarySymbol::makeLispFunction);
     }
@@ -244,6 +246,14 @@ public class ISLISPContext {
             ));
             lst.addAll(forms.subList(1, forms.size()));
             return Utils.listToValue(lst);
+        });
+        setfTransformers.put(namedSymbol("truffle-object-field").identityReference(), (forms, value) -> {
+            return Utils.listToValue(List.of(
+                namedSymbol("set-truffle-object-field"),
+                value,
+                forms.get(1),
+                forms.get(2)
+            ));
         });
     }
 

@@ -18,14 +18,14 @@ The reasons for choosing ISLISP:
 
 == Download
 
-CAUTION: There are no stable versions yet, only rolling nightly Linux and Docker distributions are provided.
+CAUTION: There are no stable versions yet, only rolling nightly distributions are provided.
 
-TODO
+See link:https://github.com/arvyy/islisp-truffle/releases/tag/nightly[Github releases.]
 
 == Documentation
 
-See http:///docs/apireference.adoc[documentation reference.]
+See link:docs/apireference.adoc[documentation reference.]
 
 == Building
 
-See http:///docs/apireference.adoc[building instructions.]
+See link:docs/apireference.adoc[building instructions.]

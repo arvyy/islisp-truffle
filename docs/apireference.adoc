@@ -34,11 +34,32 @@ External objects with fields are represented as instances of `<truffle-object>` 
   (truffle-object-fields obj)) ;; => #("a")
 ----
 
-TODO api for getting field value
+Use `(truffle-object-field _truffle-obj_ _field_)` to read a field of a truffle value.
+
+Use `(truffle-object-set-field _value_ _truffle-obj_ _field_)` or `(setf (truffle-object-field _truffle-obj_ _field_) _value_)` to set a field value on a truffle object.
+
+[source,lisp]
+----
+(let ((obj (eval "js" "({ a: 1 })")))
+  (truffle-object-field obj "a") ;; => 1
+  (setf (truffle-object-field obj "a") 2)
+  (truffle-object-field obj "a")) ;; => 2
+----
+
+TODO: truffle interop conditions.
+
+Interop arrays are presented as objects of class `<truffle-vector>`. The class extends`<basic-vector>` therefore the common vector / sequence methods can be used.
 
 === Native function interface
 
-TODO
+Truffle NFI internal language is provided through transparent interface. First, load the dynamic library using `(load-native-library _name_)`, which will return an object represented by class `<truffle-native-library>`. To extract a binding out of the library, call `(native-library-symbol _symbol-name_ _signature_)`. See https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/NFI/[truffle documentation] regarding details on how to define signature string.
+
+[source,lisp]
+----
+(let* ((lib (load-native-library "libm.so.6"))
+       (libm-sin (native-library-symbol lib "sin" "(DOUBLE):DOUBLE")))
+  (funcall libm-sin 2.0)) ;; => ~ 0.909
+----
 
 === `(exit)`
 

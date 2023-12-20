@@ -27,4 +27,13 @@
   (setf (aref js-array 1) 5)
   (test-equal (elt js-array 1) 5))
 
+(let ((obj (eval "js" "({ a: 1 })")))
+  (test-equal (instancep obj (class <truffle-object>)) t)
+  (test-equal (truffle-object-fields obj) #("a"))
+  (test-equal (truffle-object-field obj "a") 1)
+  (set-truffle-object-field 2 obj "a")
+  (test-equal (truffle-object-field obj "a") 2)
+  (setf (truffle-object-field obj "a") 3)
+  (test-equal (truffle-object-field obj "a") 3))
+
 (format (standard-output) "evalinterop.lisp end")
