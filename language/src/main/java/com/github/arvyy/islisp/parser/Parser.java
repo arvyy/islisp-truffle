@@ -194,6 +194,8 @@ public class Parser {
                     return parseQuasiquote(parserContext, sexpr);
                 case "class":
                     return parseClassRef(parserContext, sexpr);
+                case "cond":
+                    return parseCond(parserContext, sexpr);
                 case "flet":
                     return parseFletNode(parserContext, sexpr);
                 case "for":
@@ -308,6 +310,20 @@ public class Parser {
             }
         }
         throw new ParsingException(source(sexpr), "Unrecognized form.");
+    }
+
+    private ISLISPCondNode parseCond(ParserContext parserContext, Object sexpr) {
+        var args = requireList(sexpr, -1, -1);
+        var content = args.stream()
+            .skip(1)
+            .map(clause -> {
+                return requireList(clause, 1, -1)
+                    .stream()
+                    .map(e -> parseExpressionNode(parserContext, e))
+                    .toArray(ISLISPExpressionNode[]::new);
+            })
+            .toArray(ISLISPExpressionNode[][]::new);
+        return new ISLISPCondNode(content, source(sexpr));
     }
 
     private ISLISPAssureNode parseAssureNode(ParserContext parserContext, Object sexpr) {
