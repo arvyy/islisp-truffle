@@ -196,6 +196,10 @@ public class Parser {
                     return parseClassRef(parserContext, sexpr);
                 case "cond":
                     return parseCond(parserContext, sexpr);
+                case "case":
+                    return parseCase(parserContext, sexpr);
+                case "case-using":
+                    return parseCaseUsing(parserContext, sexpr);
                 case "flet":
                     return parseFletNode(parserContext, sexpr);
                 case "for":
@@ -310,6 +314,72 @@ public class Parser {
             }
         }
         throw new ParsingException(source(sexpr), "Unrecognized form.");
+    }
+
+    private ISLISPCaseNode parseCaseUsing(ParserContext parserContext, Object sexpr) {
+        var args = requireList(sexpr, 3, -1);
+        return parseCaseHelper(
+            parserContext,
+            parseExpressionNode(parserContext, args.get(1)),
+            parseExpressionNode(parserContext, args.get(2)),
+            args.subList(3, args.size()),
+            source(sexpr)
+        );
+    }
+
+    private ISLISPCaseNode parseCase(ParserContext parserContext, Object sexpr) {
+        var ctx = ISLISPContext.get(null);
+        var args = requireList(sexpr, 2, -1);
+        return parseCaseHelper(
+            parserContext,
+            new ISLISPFunctionRefNode(ctx.namedSymbol("eql"), null),
+            parseExpressionNode(parserContext, args.get(1)),
+            args.subList(2, args.size()),
+            source(sexpr)
+        );
+    }
+
+    private ISLISPCaseNode parseCaseHelper(
+        ParserContext parserContext,
+        ISLISPExpressionNode comparatorFn,
+        ISLISPExpressionNode keyForm,
+        List<Object> cases,
+        SourceSection sourceSection
+    ) {
+        var ctx = ISLISPContext.get(null);
+        ISLISPExpressionNode[] elseExprs = null;
+        var keys = new ArrayList<Object[]>();
+        var exprs = new ArrayList<ISLISPExpressionNode[]>();
+        for (var c: cases) {
+            var caseList = requireList(c, 1, -1);
+            if (caseList.get(0) instanceof Symbol s
+                && s.identityReference() == ctx.namedSymbol("t").identityReference()
+            ) {
+                elseExprs = caseList.stream()
+                    .skip(1)
+                    .map(sexpr -> parseExpressionNode(parserContext, sexpr))
+                    .toArray(ISLISPExpressionNode[]::new);
+            } else {
+                if (elseExprs != null) {
+                    throw new ParsingException(sourceSection, "Trailing cases after 'else' case");
+                }
+                var caseKeysList = requireList(caseList.get(0), -1, -1);
+                keys.add(caseKeysList.toArray());
+                var caseExprs = caseList.stream()
+                    .skip(1)
+                    .map(sexpr -> parseExpressionNode(parserContext, sexpr))
+                    .toArray(ISLISPExpressionNode[]::new);
+                exprs.add(caseExprs);
+            }
+        }
+        return new ISLISPCaseNode(
+            keyForm,
+            comparatorFn,
+            exprs.toArray(ISLISPExpressionNode[][]::new),
+            keys.toArray(Object[][]::new),
+            elseExprs == null ? new ISLISPExpressionNode[0] : elseExprs,
+            sourceSection
+        );
     }
 
     private ISLISPCondNode parseCond(ParserContext parserContext, Object sexpr) {

@@ -42,10 +42,14 @@ public abstract class ISLISPFunctionDispatchNode extends Node {
     Object doInterop(
         Object o,
         Object[] args,
-        @CachedLibrary("o") InteropLibrary interopLibrary
+        @CachedLibrary(limit = "3") InteropLibrary interopLibrary
     ) {
         try {
-            return interopLibrary.execute(o, args);
+            var value = interopLibrary.execute(o, args);
+            if (value instanceof Boolean) {
+                throw new RuntimeException("Bad");
+            }
+            return value;
         } catch (UnsupportedMessageException | UnsupportedTypeException | ArityException e) {
             //TODO
             throw new ISLISPError(e.getMessage(), this);

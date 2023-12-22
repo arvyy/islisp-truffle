@@ -13,3 +13,7 @@
 (setf (property 'foo 'bar) "OK4")
 (print (remove-property 'foo 'bar))
 (print (property 'foo 'bar "OK5"))
+
+(if (eql 'a 'c)
+    (print "FAIL6")
+    (print "OK6"))

@@ -40,6 +40,14 @@ public abstract class ISLISPSubclassp extends RootNode {
         return result;
     }
 
+    @Specialization
+    Object doUncached(
+        LispClass clazz1,
+        LispClass clazz2
+    ) {
+        return isSubclass(clazz1, clazz2);
+    }
+
     @CompilerDirectives.TruffleBoundary
     Object isSubclass(LispClass clazz1, LispClass clazz2) {
         var t = ISLISPContext.get(this).getT();
