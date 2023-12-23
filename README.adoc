@@ -28,4 +28,4 @@ See link:docs/apireference.adoc[documentation reference.]
 
 == Building
 
-See link:docs/apireference.adoc[building instructions.]
+See link:docs/building.adoc[building instructions.]

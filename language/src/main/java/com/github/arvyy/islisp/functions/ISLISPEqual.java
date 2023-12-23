@@ -1,15 +1,15 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
+import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
-import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispVector;
-import com.github.arvyy.islisp.runtime.Pair;
-import com.github.arvyy.islisp.runtime.Symbol;
+import com.github.arvyy.islisp.nodes.ISLISPTypes;
+import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.RootNode;
@@ -19,6 +19,7 @@ import static com.github.arvyy.islisp.Utils.isNil;
 /**
  * Implements `equal` function.
  */
+@TypeSystemReference(ISLISPTypes.class)
 public abstract class ISLISPEqual extends RootNode {
 
     @Child
@@ -86,6 +87,16 @@ public abstract class ISLISPEqual extends RootNode {
             }
         }
         return ctx.getT();
+    }
+
+    @Specialization
+    Object doDoubles(double d1, double d2) {
+        return Utils.booleanToSymbol(d1 == d2);
+    }
+
+    @Specialization
+    Object doBigInts(LispBigInteger i1, LispBigInteger i2) {
+        return Utils.booleanToSymbol(i1.data().equals(i2.data()));
     }
 
     @Fallback

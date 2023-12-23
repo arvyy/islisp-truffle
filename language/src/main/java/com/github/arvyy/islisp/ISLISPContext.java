@@ -116,6 +116,7 @@ public class ISLISPContext {
         // standard
         initGlobalFunction("+", ISLISPAdd::makeLispFunction);
         initGlobalFunction("-", ISLISPSubtract::makeLispFunction);
+        initGlobalFunction("*", ISLISPMul::makeLispFunction);
         initGlobalFunction("=", ISLISPNumericEqual::makeLispFunction);
         initGlobalFunction(">", ISLISPNumericGt::makeLispFunction);
         initGlobalFunction("aref", ISLISPAref::makeLispFunction);

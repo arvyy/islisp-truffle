@@ -19,6 +19,14 @@ jobs:
       - name: Test
         run: |
           mvn test
+      - name: Package
+        run: |
+          mvn package
+      - name: Upload jar to github nightly release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload nightly language/target/islisp.jar --clobber
       - uses: actions-hub/docker/cli@master
         env:
           SKIP_LOGIN: true

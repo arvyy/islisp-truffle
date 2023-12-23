@@ -18,6 +18,7 @@ COPY . /app
 WORKDIR /app
 ENV PATH=$PATH:$TOOLCHAIN_DIR/bin
 RUN ant -v dist native
+RUN chmod +x dist/islisp-static
 
 FROM alpine:3
 COPY --from=0 /app/dist/islisp-static /app/islisp

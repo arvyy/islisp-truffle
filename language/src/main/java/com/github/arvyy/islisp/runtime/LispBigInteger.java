@@ -37,6 +37,16 @@ public record LispBigInteger(BigInteger data) implements TruffleObject {
         return new LispBigInteger(data.add(other.data));
     }
 
+    /**
+     * Numeric multiplication of this node to other.
+     *
+     * @param other number
+     * @return sum value
+     */
+    public LispBigInteger multiply(LispBigInteger other) {
+        return new LispBigInteger(data.multiply(other.data));
+    }
+
     @ExportMessage
     boolean isNumber() {
         return true;
