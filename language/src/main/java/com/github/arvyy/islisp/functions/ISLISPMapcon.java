@@ -47,11 +47,11 @@ public abstract class ISLISPMapcon extends RootNode {
 
     abstract Object executeGeneric(Object mapper, Object[] lists) throws InteropException;
 
-    @Specialization(limit = "3")
+    @Specialization
     Object doProper(
         Object o,
         Object[] lists,
-        @CachedLibrary("o") InteropLibrary fn
+        @CachedLibrary(limit = "3") InteropLibrary fn
     ) throws InteropException {
         var nil = ISLISPContext.get(this).getNil();
         Object[] args = new Object[lists.length];

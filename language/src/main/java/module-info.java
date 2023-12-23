@@ -4,5 +4,7 @@ module com.github.arvyy.islisp {
   requires jdk.unsupported;
   requires org.graalvm.polyglot;
   requires org.graalvm.truffle;
+
   provides com.oracle.truffle.api.provider.TruffleLanguageProvider with com.github.arvyy.islisp.ISLISPTruffleLanguageProvider;
+  exports com.github.arvyy.islisp.buildinfo;
 }

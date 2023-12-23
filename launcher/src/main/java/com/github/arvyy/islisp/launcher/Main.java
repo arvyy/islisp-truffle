@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp.launcher;
 
+import com.github.arvyy.islisp.buildinfo.BuildInfo;
 import org.apache.commons.cli.*;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotAccess;
@@ -7,6 +8,7 @@ import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.io.IOAccess;
 
 import java.io.*;
+import java.util.Properties;
 
 /**
  * Main ISLISP interpreter entrypoint.
@@ -28,15 +30,28 @@ public final class Main {
         var chromeDebuggerOpt = chromeDebuggerOpt();
         var dapDebuggerOpt = dapDebuggerOpt();
         var helpOpt = helpOpt();
+        var versionOpt = versionOpt();
 
         var options = new Options();
         options.addOption(chromeDebuggerOpt);
         options.addOption(dapDebuggerOpt);
         options.addOption(helpOpt);
+        options.addOption(versionOpt);
 
         var parser = DefaultParser.builder()
             .build();
         var commandLine = parser.parse(options, args);
+
+        if (commandLine.hasOption(versionOpt)) {
+            var properties = BuildInfo.getBuildProperties();
+            var pw = new PrintWriter(System.out);
+            new HelpFormatter().printWrapped(pw, HELP_WIDTH, """
+                ISLISP Truffle
+                Git commit {version}
+                """.replace("{version}", properties.getProperty("git.commit.id.full")));
+            pw.flush();
+            return;
+        }
 
         if (commandLine.hasOption(helpOpt)) {
             new HelpFormatter().printHelp("islisp [FILE]", options);
@@ -122,7 +137,7 @@ public final class Main {
 
     static Option chromeDebuggerOpt() {
         return Option.builder()
-            .argName("d")
+            .option("d")
             .longOpt("debug-chrome")
             .desc("Run in debugger mode using chrome debugger protocol")
             .build();
@@ -130,7 +145,7 @@ public final class Main {
 
     static Option dapDebuggerOpt() {
         return Option.builder()
-            .argName("dap")
+            .option("dap")
             .longOpt("debug-dap")
             .desc("Run in debugger mode using DAP")
             .build();
@@ -138,8 +153,17 @@ public final class Main {
 
     static Option helpOpt() {
         return Option.builder()
-            .argName("h")
+            .option("h")
             .longOpt("help")
+            .desc("Show help")
+            .build();
+    }
+
+    static Option versionOpt() {
+        return Option.builder()
+            .option("v")
+            .longOpt("version")
+            .desc("Show version information")
             .build();
     }
 
