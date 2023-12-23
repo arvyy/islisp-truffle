@@ -95,8 +95,9 @@ public abstract class ISLISPEqual extends RootNode {
     }
 
     @Specialization
+    @CompilerDirectives.TruffleBoundary
     Object doBigInts(LispBigInteger i1, LispBigInteger i2) {
-        return Utils.booleanToSymbol(i1.data().equals(i2.data()));
+        return Utils.booleanToSymbol(i1.data().compareTo(i2.data()) == 0);
     }
 
     @Fallback
