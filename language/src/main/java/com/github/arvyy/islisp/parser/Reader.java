@@ -102,11 +102,14 @@ public class Reader {
             var endSection = sourceSectionMap.get(new EqWrapper(value));
             var normalizedSyntaxSymbol = ISLISPContext.get(null).namedSymbol(symbolName);
             var nil = ISLISPContext.get(null).getNil();
-            var fullSection = source.createSection(
+            SourceSection fullSection = null;
+            if (quoteSection != null && endSection != null) {
+                fullSection = source.createSection(
                     quoteSection.getStartLine(),
                     quoteSection.getStartColumn(),
                     endSection.getEndLine(),
                     endSection.getEndColumn());
+            }
             var result = new Pair(
                 normalizedSyntaxSymbol,
                 new Pair(

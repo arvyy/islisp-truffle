@@ -15,6 +15,7 @@
             (format-char (standard-output) #\newline))))))
 
 (test-equal `(1 2) (list 1 2))
+(test-equal `(1 ,2) (list 1 2))
 (test-equal `(1 ,(+ 1 2)) (list 1 3))
 (test-equal `#(1 ,(+ 1 2)) (vector 1 3))
 (test-equal `#(1 ,@(progn '(2 3))) (vector 1 2 3))
