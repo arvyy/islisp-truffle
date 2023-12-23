@@ -76,6 +76,12 @@
     (format-char stream #\newline)
     (call-next-method))
 
+(defmethod report-condition ((condition <undefined-function>) (stream <stream>))
+    (format-object stream "Undefined function: " nil)
+    (format-object stream (undefined-function-name condition) nil)
+    (format-char stream #\newline)
+    (call-next-method))
+
 (defun min (first :rest xs)
   (for ((value first (let ((x (car xs)))
                        (if (< x value)

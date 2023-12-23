@@ -18,6 +18,9 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
     private final Symbol name;
     private final boolean setf;
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     @CompilerDirectives.CompilationFinal
     private LispFunction function;
 
@@ -46,6 +49,7 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
         this.setf = setf;
         this.arguments = arguments;
         this.dispatchNode = ISLISPFunctionDispatchNodeGen.create();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
 
@@ -54,6 +58,9 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
     public Object executeGeneric(VirtualFrame frame) {
         if (function == null) {
             function = ISLISPContext.get(this).lookupFunction(name.identityReference(), setf);
+            if (function == null) {
+                return errorSignalerNode.signalUndefinedFunction(name);
+            }
         }
         var argValues = new Object[arguments.length];
         for (int i = 0; i < argValues.length; i++) {

@@ -114,6 +114,22 @@ public class ISLISPErrorSignalerNode extends Node {
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
 
+    /**
+     * Signal error about undefined function.
+     *
+     * @param name variable name
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
+    public Object signalUndefinedFunction(Symbol name) {
+        var ctx = ISLISPContext.get(this);
+        var condition = getCreateCallNode().call(
+            null,
+            ctx.lookupClass(ctx.namedSymbol("<undefined-function>").identityReference()),
+            ctx.namedSymbol("name"), name
+        );
+        return getSignalCallNode().call(null, condition, ctx.getNil());
+    }
+
     @CompilerDirectives.TruffleBoundary
     DirectCallNode getSignalCallNode() {
         if (signalCallNode == null) {

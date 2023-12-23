@@ -53,10 +53,11 @@ public final class Main {
         }
 
         if (commandLine.hasOption(helpOpt)) {
-            new HelpFormatter().printHelp("islisp [FILE]", options);
+            new HelpFormatter().printHelp("islisp [OPTION ...] [FILE]", options);
             var pw = new PrintWriter(System.out);
             new HelpFormatter().printWrapped(pw, HELP_WIDTH, """
-                Run islisp interpreter. If FILE is provided, given FILE is evaluated and the program exits.
+                Run islisp interpreter.
+                If FILE is provided, given FILE is evaluated and the program exits.
                 If FILE is not provided, interpreter enters repl mode.
                 """);
             pw.flush();
@@ -138,7 +139,10 @@ public final class Main {
         return Option.builder()
             .option("d")
             .longOpt("debug-chrome")
-            .desc("Run in debugger mode using chrome debugger protocol")
+            .optionalArg(true)
+            .argName("PORT")
+            .desc("Run in debugger mode using chrome debugger protocol. " +
+                "If port not provided, defaults to 9229.")
             .build();
     }
 
@@ -146,7 +150,10 @@ public final class Main {
         return Option.builder()
             .option("dap")
             .longOpt("debug-dap")
-            .desc("Run in debugger mode using DAP")
+            .optionalArg(true)
+            .argName("PORT")
+            .desc("Run in debugger mode using DAP. " +
+                "If port not provided, defaults to 4711.")
             .build();
     }
 
@@ -154,7 +161,7 @@ public final class Main {
         return Option.builder()
             .option("h")
             .longOpt("help")
-            .desc("Show help")
+            .desc("Show help and exit.")
             .build();
     }
 
@@ -162,7 +169,7 @@ public final class Main {
         return Option.builder()
             .option("v")
             .longOpt("version")
-            .desc("Show version information")
+            .desc("Show version information and exit.")
             .build();
     }
 
