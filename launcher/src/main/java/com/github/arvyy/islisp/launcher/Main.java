@@ -8,7 +8,6 @@ import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.io.IOAccess;
 
 import java.io.*;
-import java.util.Properties;
 
 /**
  * Main ISLISP interpreter entrypoint.

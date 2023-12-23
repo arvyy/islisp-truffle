@@ -6,8 +6,14 @@ import java.util.Properties;
 /**
  * Allows introspecting meta information about the build.
  */
-public class BuildInfo {
+public final class BuildInfo {
 
+    private BuildInfo() { }
+
+    /**
+     * Retrieve build information.
+     * @return properties containing build information if any.
+     */
     public static Properties getBuildProperties() {
         var properties = new Properties();
         try {
