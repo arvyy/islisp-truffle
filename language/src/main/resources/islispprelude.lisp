@@ -65,12 +65,10 @@
 (defmethod report-condition ((condition <serious-condition>) (stream <stream>))
     (let ((stacktrace (condition-stacktrace condition)))
         (if stacktrace
-          (let ((i 0)
-                (len (length stacktrace)))
-            (while (< i len)
-              (format-object stream (elt stacktrace i) nil)
-              (format-char stream #\newline)
-              (setf i (+ i 1)))))))
+            (for ((i 0 (+ 1 i))
+                  (len (length stacktrace)))
+                 ((>= i len))
+              (format stream "~A~%" (elt stacktrace i))))))
 
 (defmethod report-condition ((condition <unbound-variable>) (stream <stream>))
     (format-object stream "Unbound variable: " nil)
@@ -238,7 +236,7 @@
            (for ((lst1 (reverse lst1) (cdr lst1))
                  (lst2 lst2 (cons (car lst1) lst2)))
                 ((null lst1) lst2))))
-    ;; TODO rewrite with cond
-    (if (null lists) nil
-        (if (null (cdr lists)) (car lists)
-            (append2 (car lists) (apply #'append (cdr lists))))) ))
+    (cond
+      ((null lists) nil)
+      ((null (cdr lists)) (car lists))
+      (t (append2 (car lists) (apply #'append (cdr lists)))))))
