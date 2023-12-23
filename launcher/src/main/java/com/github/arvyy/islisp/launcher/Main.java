@@ -130,7 +130,7 @@ public final class Main {
                     e.printStackTrace();
                 }
             }
-        } if (commandLine.getArgList().get(0).equals("-")) {
+        } else if (commandLine.getArgList().get(0).equals("-")) {
             var source = Source.newBuilder("islisp", new InputStreamReader(System.in), "<stdin>").build();
             context.eval(source);
         } else {
@@ -145,8 +145,8 @@ public final class Main {
             .longOpt("debug-chrome")
             .optionalArg(true)
             .argName("PORT")
-            .desc("Run in debugger mode using chrome debugger protocol. " +
-                "If port not provided, defaults to 9229.")
+            .desc("Run in debugger mode using chrome debugger protocol. "
+                + "If port not provided, defaults to 9229.")
             .build();
     }
 
@@ -156,8 +156,8 @@ public final class Main {
             .longOpt("debug-dap")
             .optionalArg(true)
             .argName("PORT")
-            .desc("Run in debugger mode using DAP. " +
-                "If port not provided, defaults to 4711.")
+            .desc("Run in debugger mode using DAP. "
+                + "If port not provided, defaults to 4711.")
             .build();
     }
 
