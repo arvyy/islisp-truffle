@@ -57,8 +57,9 @@ public final class Main {
             var pw = new PrintWriter(System.out);
             new HelpFormatter().printWrapped(pw, HELP_WIDTH, """
                 Run islisp interpreter.
-                If FILE is provided, given FILE is evaluated and the program exits.
-                If FILE is not provided, interpreter enters repl mode.
+                If FILE is `-`, interpreter non-interactively evaluates standard input.
+                If FILE is a path, given FILE is evaluated and the program exits.
+                If FILE is not provided, interpreter enters interactive REPL mode.
                 """);
             pw.flush();
             return;
@@ -129,6 +130,9 @@ public final class Main {
                     e.printStackTrace();
                 }
             }
+        } if (commandLine.getArgList().get(0).equals("-")) {
+            var source = Source.newBuilder("islisp", new InputStreamReader(System.in), "<stdin>").build();
+            context.eval(source);
         } else {
             var source = Source.newBuilder("islisp", new File(commandLine.getArgList().get(0))).build();
             context.eval(source);
