@@ -49,12 +49,14 @@ public class ISLISPSignalCondition extends RootNode {
         if (fillStacktrace == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var fillStacktraceFunction = ctx.lookupFunction(
+                "ROOT",
                 ctx.namedSymbol("fill-stacktrace").identityReference());
             fillStacktrace = insert(DirectCallNode.create(fillStacktraceFunction.callTarget()));
         }
         if (setContinuable == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var setContinuableFunction = ctx.lookupFunction(
+                "ROOT",
                 ctx.namedSymbol("set-condition-continuable").identityReference()
             );
             setContinuable = insert(DirectCallNode.create(setContinuableFunction.callTarget()));
@@ -62,6 +64,7 @@ public class ISLISPSignalCondition extends RootNode {
         if (setStacktrace == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var setStacktraceFunction = ctx.lookupFunction(
+                "ROOT",
                 ctx.namedSymbol("set-condition-stacktrace").identityReference()
             );
             setStacktrace = insert(DirectCallNode.create(setStacktraceFunction.callTarget()));

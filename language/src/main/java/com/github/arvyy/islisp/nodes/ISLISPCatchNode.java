@@ -42,7 +42,7 @@ public class ISLISPCatchNode extends ISLISPExpressionNode {
         if (eq == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             eq = this.insert(DirectCallNode.create(
-                ctx.lookupFunction(ctx.namedSymbol("eq").identityReference())
+                ctx.lookupFunction("ROOT", ctx.namedSymbol("eq").identityReference())
                     .callTarget()));
         }
         var tagObject = tagForm.executeGeneric(frame);

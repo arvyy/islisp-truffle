@@ -23,6 +23,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
 
     private final MethodQualifier methodQualifier;
 
+    private final String module;
     private final Symbol name;
 
     private final Symbol[] argsClassNames;
@@ -43,6 +44,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
      * @param functionNode method's body implementation node
      */
     public ISLISPDefMethodNode(
+            String module,
             MethodQualifier methodQualifier,
             Symbol name,
             boolean setf,
@@ -51,6 +53,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
             RootNode functionNode
     ) {
         super(true, functionNode.getSourceSection());
+        this.module = module;
         this.methodQualifier = Objects.requireNonNull(methodQualifier);
         this.name = name;
         this.argsClassNames = argsClassNames;
@@ -62,7 +65,8 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
-        var genericFunctionDescriptor = ctx.lookupGenericFunctionDispatchTree(name.identityReference(), setf);
+        var genericFunctionDescriptor = ctx.lookupGenericFunctionDispatchTree(
+            module, name.identityReference(), setf);
         if (argsClassNames.length != genericFunctionDescriptor.getRequiredArgCount()) {
             throw new ISLISPError("defmethod signature doesn't match defgeneric", this);
         }
@@ -71,7 +75,8 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
         }
         var classes = new LispClass[argsClassNames.length];
         for (int i = 0; i < argsClassNames.length; i++) {
-            classes[i] = ctx.lookupClass(argsClassNames[i].identityReference());
+            classes[i] = ctx.lookupClass(
+                module, argsClassNames[i].identityReference());
         }
         var callTarget = functionNode.getCallTarget();
         switch (methodQualifier) {

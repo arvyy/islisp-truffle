@@ -12,6 +12,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPClassRefNode extends ISLISPExpressionNode {
 
+    private final String module;
     private final Symbol name;
     @CompilerDirectives.CompilationFinal
     private LispClass clazz;
@@ -22,8 +23,9 @@ public class ISLISPClassRefNode extends ISLISPExpressionNode {
      * @param name class name
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPClassRefNode(Symbol name, SourceSection sourceSection) {
+    public ISLISPClassRefNode(String module, Symbol name, SourceSection sourceSection) {
         super(sourceSection);
+        this.module = module;
         this.name = name;
     }
 
@@ -31,7 +33,7 @@ public class ISLISPClassRefNode extends ISLISPExpressionNode {
     public Object executeGeneric(VirtualFrame frame) {
         if (clazz == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            clazz = ISLISPContext.get(this).lookupClass(name.identityReference());
+            clazz = ISLISPContext.get(this).lookupClass(module, name.identityReference());
         }
         return clazz;
     }

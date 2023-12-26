@@ -23,6 +23,7 @@ import java.util.List;
  */
 public class ISLISPDefClassNode extends ISLISPExpressionNode {
 
+    private final String module;
     private final Symbol name;
     private final List<Symbol> superclassName;
     private final List<SlotDefinition> slots;
@@ -43,6 +44,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
      */
     public ISLISPDefClassNode(
             TruffleLanguage<?> language,
+            String module,
             Symbol name,
             List<Symbol> superclassName,
             List<SlotDefinition> slots,
@@ -50,6 +52,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
             SourceSection sourceSection
     ) {
         super(sourceSection);
+        this.module = module;
         this.name = name;
         this.superclassName = superclassName.isEmpty()
             ? List.of(ISLISPContext.get(this).namedSymbol("<object>"))
@@ -63,8 +66,9 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
         var exprs = new ArrayList<ISLISPExpressionNode>();
         for (var slot: slots) {
             for (var reader: slot.getReaderName()) {
-                exprs.add(new ISLISPDefGenericNode(reader, false, 1, false, null));
+                exprs.add(new ISLISPDefGenericNode(module, reader, false, 1, false, null));
                 exprs.add(new ISLISPDefMethodNode(
+                        module,
                         ISLISPDefMethodNode.MethodQualifier.none,
                         reader,
                         false,
@@ -73,8 +77,9 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                         ISLISPClassSlotReaderNodeGen.create(slot.getName(), language)));
             }
             for (var writer: slot.getWriterName()) {
-                exprs.add(new ISLISPDefGenericNode(writer, false, 2, false, null));
+                exprs.add(new ISLISPDefGenericNode(module, writer, false, 2, false, null));
                 exprs.add(new ISLISPDefMethodNode(
+                        module,
                         ISLISPDefMethodNode.MethodQualifier.none,
                         writer,
                         false,
@@ -83,16 +88,18 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                         ISLISPClassSlotWriterNodeGen.create(slot.getName(), language)));
             }
             for (var accessor: slot.getAccessorName()) {
-                exprs.add(new ISLISPDefGenericNode(accessor, false, 1, false, null));
+                exprs.add(new ISLISPDefGenericNode(module, accessor, false, 1, false, null));
                 exprs.add(new ISLISPDefMethodNode(
+                    module,
                     ISLISPDefMethodNode.MethodQualifier.none,
                     accessor,
                     false,
                     new Symbol[]{name},
                     false,
                     ISLISPClassSlotReaderNodeGen.create(slot.getName(), language)));
-                exprs.add(new ISLISPDefGenericNode(accessor, true, 2, false, null));
+                exprs.add(new ISLISPDefGenericNode(module, accessor, true, 2, false, null));
                 exprs.add(new ISLISPDefMethodNode(
+                    module,
                     ISLISPDefMethodNode.MethodQualifier.none,
                     accessor,
                     true,
@@ -101,8 +108,9 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                     ISLISPClassSlotWriterNodeGen.create(slot.getName(), language)));
             }
             for (var boundp: slot.getBoundpName()) {
-                exprs.add(new ISLISPDefGenericNode(boundp, false, 1, false, null));
+                exprs.add(new ISLISPDefGenericNode(module, boundp, false, 1, false, null));
                 exprs.add(new ISLISPDefMethodNode(
+                    module,
                     ISLISPDefMethodNode.MethodQualifier.none,
                     boundp,
                     false,
@@ -131,7 +139,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
         var superclasses = new ArrayList<LispClass>();
         // collect inherited slots from parent classes
         for (var superclass: superclassName) {
-            var clazz = ctx.lookupClass(superclass.identityReference());
+            var clazz = ctx.lookupClass(module, superclass.identityReference());
             if (clazz == null) {
                 throw new ISLISPError("Class not found " + superclass.name(), this);
             }
@@ -187,7 +195,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                 myslots.values().toArray(StandardClass.Slot[]::new),
                 isAbstract
         );
-        ctx.registerClass(name.identityReference(), newClass);
+        ctx.registerClass(module, name.identityReference(), newClass);
     }
 
     @Override

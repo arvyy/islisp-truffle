@@ -42,7 +42,7 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass(ctx.namedSymbol("<arity-error>").identityReference()),
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<arity-error>").identityReference()),
             ctx.namedSymbol("actual"), actual,
             ctx.namedSymbol("required-min"), min,
             ctx.namedSymbol("required-max"), max
@@ -68,7 +68,7 @@ public class ISLISPErrorSignalerNode extends Node {
      * @return undefined object, value of which shouldn't be relied upon.
      */
     public Object signalNotAnInputStream(Object obj) {
-        var expected = ISLISPContext.get(this).lookupClass("<stream>");
+        var expected = ISLISPContext.get(this).lookupClass("ROOT", "<stream>");
         return signalDomainError("Not an input stream", obj, expected);
     }
 
@@ -79,7 +79,7 @@ public class ISLISPErrorSignalerNode extends Node {
      * @return undefined object, value of which shouldn't be relied upon.
      */
     public Object signalNotStringOutputStream(Object obj) {
-        var expected = ISLISPContext.get(this).lookupClass("<stream>");
+        var expected = ISLISPContext.get(this).lookupClass("ROOT", "<stream>");
         return signalDomainError(
             "Not an output-stream made with create-string-output-stream",
             obj,
@@ -90,7 +90,7 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass(ctx.namedSymbol("<domain-error>").identityReference()),
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<domain-error>").identityReference()),
             ctx.namedSymbol("message"), message,
             ctx.namedSymbol("object"), obj,
             ctx.namedSymbol("expected-class"), expectedClass
@@ -108,7 +108,7 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass(ctx.namedSymbol("<unbound-variable>").identityReference()),
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<unbound-variable>").identityReference()),
             ctx.namedSymbol("name"), name
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
@@ -124,7 +124,7 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass(ctx.namedSymbol("<undefined-function>").identityReference()),
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<undefined-function>").identityReference()),
             ctx.namedSymbol("name"), name
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
@@ -136,7 +136,7 @@ public class ISLISPErrorSignalerNode extends Node {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
-                ctx.lookupFunction(ctx.namedSymbol("signal-condition").identityReference())
+                ctx.lookupFunction("ROOT", ctx.namedSymbol("signal-condition").identityReference())
                     .callTarget());
             signalCallNode = insert(callNode);
         }
@@ -149,7 +149,7 @@ public class ISLISPErrorSignalerNode extends Node {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
-                ctx.lookupFunction(ctx.namedSymbol("create").identityReference())
+                ctx.lookupFunction("ROOT", ctx.namedSymbol("create").identityReference())
                     .callTarget());
             createCallNode = insert(callNode);
         }

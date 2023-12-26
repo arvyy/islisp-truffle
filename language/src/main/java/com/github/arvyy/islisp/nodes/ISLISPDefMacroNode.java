@@ -31,7 +31,9 @@ public class ISLISPDefMacroNode extends ISLISPExpressionNode {
     public Object executeGeneric(VirtualFrame frame) {
         //CompilerDirectives.transferToInterpreter();
         var ctx = ISLISPContext.get(this);
-        ctx.registerMacro(defun.name.identityReference(), new LispFunction(defun.functionNode.getCallTarget()));
+        ctx.registerMacro(
+            defun.module,
+            defun.name.identityReference(), new LispFunction(defun.functionNode.getCallTarget()));
         return defun.name;
     }
 }

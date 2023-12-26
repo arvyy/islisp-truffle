@@ -229,8 +229,7 @@ public abstract class ISLISPClassOf extends RootNode {
 
     LispClass loadClass(String name) {
         var ctx = ISLISPContext.get(this);
-        var symbol = ctx.namedSymbol(name);
-        return ctx.lookupClass(symbol.identityReference());
+        return ctx.lookupClass(name);
     }
 
     /**

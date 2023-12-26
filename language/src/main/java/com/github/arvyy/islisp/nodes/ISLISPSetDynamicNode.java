@@ -13,6 +13,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPSetDynamicNode extends ISLISPExpressionNode {
 
+    private final String module;
     private final Symbol symbol;
 
     @CompilerDirectives.CompilationFinal
@@ -28,8 +29,9 @@ public class ISLISPSetDynamicNode extends ISLISPExpressionNode {
      * @param expression value expression
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPSetDynamicNode(Symbol symbol, ISLISPExpressionNode expression, SourceSection sourceSection) {
+    public ISLISPSetDynamicNode(String module, Symbol symbol, ISLISPExpressionNode expression, SourceSection sourceSection) {
         super(sourceSection);
+        this.module = module;
         this.symbol = symbol;
         this.expression = expression;
     }
@@ -37,7 +39,7 @@ public class ISLISPSetDynamicNode extends ISLISPExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         if (valueReference == null) {
-            valueReference = ISLISPContext.get(this).lookupDynamicVar(symbol.identityReference());
+            valueReference = ISLISPContext.get(this).lookupDynamicVar(module, symbol.identityReference());
             if (valueReference == null) {
                 throw new ISLISPError("Undefined dynamic variable", this);
             }

@@ -1,6 +1,8 @@
 package com.github.arvyy.islisp.nodes;
 
+import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.parser.EqWrapper;
+import com.github.arvyy.islisp.parser.ModuleSource;
 import com.github.arvyy.islisp.parser.Parser;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -14,26 +16,30 @@ import java.util.Map;
  */
 public class ISLISPMacroExpansionNode extends ISLISPExpressionNode {
 
-    private final List<Object> source;
-    private final Map<EqWrapper, SourceSection> sourceSectionMap;
+    private final ModuleSource source;
+    private final Parser parser;
 
     /**
      * Create macro expansion node.
      * @param sourceSectionMap map containing source code locations
      * @param source top level user code
      */
-    public ISLISPMacroExpansionNode(Map<EqWrapper, SourceSection> sourceSectionMap, List<Object> source) {
+    public ISLISPMacroExpansionNode(Parser parser, ModuleSource source) {
         super(null);
+        this.parser = parser;
         this.source = source;
-        this.sourceSectionMap = sourceSectionMap;
         markInternal();
     }
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         CompilerDirectives.transferToInterpreterAndInvalidate();
-        var parser = new Parser(sourceSectionMap);
-        var replacement = parser.executeMacroExpansion(source);
+        parser.ensureRequiresLoaded(source.requires());
+        var ctx = ISLISPContext.get(this);
+        if (ctx.getModule(source.name()) == null) {
+            ctx.createModule(source.name(), source.requires(), source.provides());
+        }
+        var replacement = parser.executeMacroExpansion(source.name(), source.content());
         return replace(replacement).executeGeneric(frame);
     }
 }

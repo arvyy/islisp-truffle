@@ -133,7 +133,7 @@ public class ISLISPFormat extends RootNode {
         if (formatChar == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            var fun = ctx.lookupFunction(ctx.namedSymbol("format-char").identityReference());
+            var fun = ctx.lookupFunction("ROOT", ctx.namedSymbol("format-char").identityReference());
             formatChar = this.insert(DirectCallNode.create(fun.callTarget()));
         }
         return formatChar;
@@ -143,7 +143,7 @@ public class ISLISPFormat extends RootNode {
         if (formatInt == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            var fun = ctx.lookupFunction(ctx.namedSymbol("format-integer").identityReference());
+            var fun = ctx.lookupFunction("ROOT", ctx.namedSymbol("format-integer").identityReference());
             formatInt = this.insert(DirectCallNode.create(fun.callTarget()));
         }
         return formatInt;
@@ -153,7 +153,7 @@ public class ISLISPFormat extends RootNode {
         if (formatFloat == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            var fun = ctx.lookupFunction(ctx.namedSymbol("format-float").identityReference());
+            var fun = ctx.lookupFunction("ROOT", ctx.namedSymbol("format-float").identityReference());
             formatFloat = this.insert(DirectCallNode.create(fun.callTarget()));
         }
         return formatFloat;
@@ -163,7 +163,7 @@ public class ISLISPFormat extends RootNode {
         if (formatObject == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            var fun = ctx.lookupFunction(ctx.namedSymbol("format-object").identityReference());
+            var fun = ctx.lookupFunction("ROOT", ctx.namedSymbol("format-object").identityReference());
             formatObject = this.insert(DirectCallNode.create(fun.callTarget()));
         }
         return formatObject;
@@ -173,7 +173,7 @@ public class ISLISPFormat extends RootNode {
         if (formatFreshLine == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            var fun = ctx.lookupFunction(ctx.namedSymbol("format-fresh-line").identityReference());
+            var fun = ctx.lookupFunction("ROOT", ctx.namedSymbol("format-fresh-line").identityReference());
             formatFreshLine = this.insert(DirectCallNode.create(fun.callTarget()));
         }
         return formatFreshLine;

@@ -4,12 +4,17 @@ import com.github.arvyy.islisp.parser.EqWrapper;
 import com.github.arvyy.islisp.parser.Parser;
 import com.github.arvyy.islisp.parser.Reader;
 import com.oracle.truffle.api.CallTarget;
+import com.oracle.truffle.api.Option;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.debug.DebuggerTags;
 import com.oracle.truffle.api.instrumentation.ProvidedTags;
 import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
+import org.graalvm.options.OptionCategory;
+import org.graalvm.options.OptionDescriptors;
+import org.graalvm.options.OptionKey;
+import org.graalvm.options.OptionStability;
 
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -30,6 +35,12 @@ import java.util.HashMap;
 })
 public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
 
+    @Option(help =
+        "Paths joined by system separator, relative to which modules are resolved. " +
+        "Defaults to working dir.",
+        category = OptionCategory.USER, stability = OptionStability.STABLE)
+    public static final OptionKey<String> Sourcepath = new OptionKey<>(".");
+
     @Override
     public ISLISPContext createContext(Env env) {
         return new ISLISPContext(this, env);
@@ -37,30 +48,32 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
 
     @Override
     public CallTarget parse(ParsingRequest request) {
-        var sourceMap = new HashMap<EqWrapper, SourceSection>();
-        var userContent = new Reader(request.getSource(), sourceMap).readAll();
-        var parser = new Parser(sourceMap);
-        var rootNode = parser.parseRootNode(this, userContent, request.getSource().isInteractive());
+        var parser = new Parser();
+        var rootNode = parser.parseRootNode(this, "MAIN", request.getSource());
         return rootNode.getCallTarget();
     }
 
     @Override
     protected void initializeContext(ISLISPContext context) throws Exception {
-        var sourceMap = new HashMap<EqWrapper, SourceSection>();
         var preludeSource = Source
             .newBuilder(
                 "islisp",
                 new InputStreamReader(ISLISPTruffleLanguage.class.getResourceAsStream("/islispprelude.lisp")),
                 "islispprelude.lisp")
             .build();
-        var parser = new Parser(sourceMap);
-        var preludeContent = new Reader(preludeSource, sourceMap).readAll();
-        var rootNode = parser.parseRootNode(this, preludeContent, false);
+        var parser = new Parser();
+        var rootNode = parser.parseRootNode(this, "ROOT", preludeSource);
         rootNode.getCallTarget().call();
+        ISLISPContext.get(null).getModule("ROOT").exportAll();
     }
 
     @Override
     protected Object getLanguageView(ISLISPContext context, Object value) {
         return new ISLISPTruffleLanguageView(context, value);
+    }
+
+    @Override
+    protected OptionDescriptors getOptionDescriptors() {
+        return new ISLISPTruffleLanguageOptionDescriptors();
     }
 }
