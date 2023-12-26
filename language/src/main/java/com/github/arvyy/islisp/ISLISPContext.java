@@ -72,10 +72,24 @@ public class ISLISPContext {
         initSetfExpanders();
     }
 
+    /**
+     * Get module by name.
+     *
+     * @param module name
+     * @return module instance, or null if not defined
+     */
     public ISLISPModule getModule(String module) {
         return modules.get(module);
     }
 
+    /**
+     * Create a module and include it in the context.
+     * All necessary module's dependency should already be loaded.
+     *
+     * @param module module name
+     * @param requiredModules list of required modules, must exist.
+     * @param exports list of exports.
+     */
     public void createModule(String module, List<String> requiredModules, List<SymbolReference> exports) {
         if (modules.containsKey(module)) {
             throw new RuntimeException("Module already defined: " + module);
@@ -298,6 +312,7 @@ public class ISLISPContext {
     /**
      * Register global variable (mutable or immutable).
      *
+     * @param module module name holding the binding
      * @param symbolReference variable name
      * @param init initialization value
      * @param readonly if the variable is a constant
@@ -325,6 +340,7 @@ public class ISLISPContext {
     /**
      * Find global variable by name.
      *
+     * @param module module name holding the binding
      * @param symbolReference name
      * @return variable's value reference or null if not found
      */
@@ -337,6 +353,7 @@ public class ISLISPContext {
      * Register setf transformer for a given name. When encountering `(setf (name form ...) value)`
      * the given transformer will be used to expand it into a non-setf expression.
      *
+     * @param module module name holding the binding
      * @param symbolReference transformer name.
      * @param transformer transformer.
      */
@@ -348,6 +365,7 @@ public class ISLISPContext {
     /**
      * Find a setf transformer for a given name.
      *
+     * @param module module name holding the binding
      * @param symbolReference transformer name.
      * @return setf transformer or null if undefined
      */
@@ -359,6 +377,7 @@ public class ISLISPContext {
     /**
      * Register dynamic variable.
      *
+     * @param module module name holding the binding
      * @param symbolReference variable name.
      * @param v value reference.
      */
@@ -370,6 +389,7 @@ public class ISLISPContext {
     /**
      * Find dynamic variable value reference for a given name.
      *
+     * @param module module name holding the binding
      * @param symbolReference dynamic variable name
      * @return dynamic variable value reference
      */
@@ -381,6 +401,7 @@ public class ISLISPContext {
     /**
      * Register function into function namespace.
      *
+     * @param module module name holding the binding
      * @param symbolReference function name
      * @param function function value
      */
@@ -392,6 +413,7 @@ public class ISLISPContext {
     /**
      * Find function by name. Function can be a generic function or plain.
      *
+     * @param module module name holding the binding
      * @param symbolReference function name
      * @return function or null if undefined
      */
@@ -403,6 +425,7 @@ public class ISLISPContext {
     /**
      * Find function by name. Function can be a generic function or plain.
      *
+     * @param module module name holding the binding
      * @param symbolReference function name
      * @param setf whether function is of setf form in case it's generic.
      * @return function or null if undefined
@@ -415,6 +438,7 @@ public class ISLISPContext {
     /**
      * Register a generic function.
      *
+     * @param module module name holding the binding
      * @param symbolReference function name
      * @param setf whether it's of setf form
      * @param function function call entrypoint function implementation
@@ -434,18 +458,24 @@ public class ISLISPContext {
     /**
      * Find generic descriptor for a given generic function name.
      *
+     * @param module the module where to look for the binding
      * @param symbolReference generic function name
      * @param setf if the function is of setf form
      * @return generic function descriptor or null if undefined
      */
     @CompilerDirectives.TruffleBoundary
-    public GenericFunctionDescriptor lookupGenericFunctionDispatchTree(String module, SymbolReference symbolReference, boolean setf) {
+    public GenericFunctionDescriptor lookupGenericFunctionDispatchTree(
+        String module,
+        SymbolReference symbolReference,
+        boolean setf
+    ) {
         return modules.get(module).lookupGenericFunctionDispatchTree(symbolReference, setf);
     }
 
     /**
      * Register macro with a given name.
      *
+     * @param module the module where to look for the binding
      * @param symbolReference macro name
      * @param function macro implementation function
      */
@@ -457,6 +487,7 @@ public class ISLISPContext {
     /**
      * Find macro by given symbol reference name.
      *
+     * @param module the module where to look for the binding
      * @param symbolReference reference
      * @return macro function or null if undefined
      */
@@ -468,6 +499,7 @@ public class ISLISPContext {
     /**
      * Add a new class to context.
      *
+     * @param module the module where to look for the binding
      * @param symbolReference class name's reference
      * @param clazz class instance
      */
@@ -479,6 +511,7 @@ public class ISLISPContext {
     /**
      * Find a class by symbol reference.
      *
+     * @param module the module where to look for the binding
      * @param symbolReference class symbolic name's reference
      * @return class or null if doesn't exist
      */
@@ -490,6 +523,7 @@ public class ISLISPContext {
     /**
      * Find a class by string name.
      *
+     * @param module module name holding the binding
      * @param name class name
      * @return class or null if doesn't exit
      */
@@ -498,12 +532,23 @@ public class ISLISPContext {
         return lookupClass(module, namedSymbol(name).identityReference());
     }
 
-    //TODO rename
+    /**
+     * Find root class by name.
+     *
+     * @param name class name
+     * @return class instance or null
+     */
     public LispClass lookupClass(String name) {
         return lookupClass("ROOT", name);
     }
 
-    //TODO rename
+
+    /**
+     * Find root class by symbol.
+     *
+     * @param ref class name's symbol reference
+     * @return class instance or null
+     */
     public LispClass lookupClass(SymbolReference ref) {
         return lookupClass("ROOT", ref);
     }

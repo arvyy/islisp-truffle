@@ -18,11 +18,17 @@ public class ISLISPDefGlobalNode extends ISLISPExpressionNode {
     /**
      * Create defglobal node.
      *
+     * @param module module name whose source's this node is part of
      * @param name variable name
      * @param expression initial value
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPDefGlobalNode(String module, Symbol name, ISLISPExpressionNode expression, SourceSection sourceSection) {
+    public ISLISPDefGlobalNode(
+        String module,
+        Symbol name,
+        ISLISPExpressionNode expression,
+        SourceSection sourceSection
+    ) {
         super(true, sourceSection);
         this.module = module;
         this.name = name;

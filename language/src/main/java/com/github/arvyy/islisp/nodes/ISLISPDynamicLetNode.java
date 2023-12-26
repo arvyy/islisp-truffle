@@ -28,6 +28,7 @@ public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
     /**
      * Create dynamic-let node.
      *
+     * @param module module name whose source's this node is part of
      * @param symbols locally bound variable names
      * @param initializers initialization expression for each variable
      * @param body body of the let

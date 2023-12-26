@@ -33,6 +33,7 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
     /**
      * Create setq node for the global variable.
      *
+     * @param module module name whose source's this node is part of
      * @param name global variable name
      * @param expression value expression
      * @param sourceSection corresponding source section to this node
@@ -49,12 +50,19 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
     /**
      * Create setq node for a local / closure variable.
      *
+     * @param module module name whose source's this node is part of
      * @param frameIndex frame index
      * @param frameSlot frame slot in appropriate frame
      * @param expression value expression
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPSetqNode(String module, int frameIndex, int frameSlot, ISLISPExpressionNode expression, SourceSection sourceSection) {
+    public ISLISPSetqNode(
+        String module,
+        int frameIndex,
+        int frameSlot,
+        ISLISPExpressionNode expression,
+        SourceSection sourceSection
+    ) {
         super(sourceSection);
         this.module = module;
         this.name = null;

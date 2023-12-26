@@ -25,6 +25,7 @@ public class ISLISPDefGenericNode extends ISLISPExpressionNode {
     /**
      * Create defgeneric node.
      *
+     * @param module module name whose source's this node is part of
      * @param name generic function name
      * @param setf if function has setf form or not
      * @param requiredArgsCount required arguments count

@@ -20,6 +20,7 @@ public class ISLISPFunctionRefNode extends ISLISPExpressionNode {
 
     /**
      * Create function reference node.
+     * @param module module name whose source's this node is part of
      * @param name function name in the function namespace.
      * @param sourceSection corresponding source section to this node
      */

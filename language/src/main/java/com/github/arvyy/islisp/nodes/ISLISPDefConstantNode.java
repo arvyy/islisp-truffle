@@ -18,11 +18,17 @@ public class ISLISPDefConstantNode extends ISLISPExpressionNode {
     /**
      * Create defconstant node.
      *
+     * @param module module name whose source's this node is part of
      * @param name costant name
      * @param expression constant value
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPDefConstantNode(String module, Symbol name, ISLISPExpressionNode expression, SourceSection sourceSection) {
+    public ISLISPDefConstantNode(
+        String module,
+        Symbol name,
+        ISLISPExpressionNode expression,
+        SourceSection sourceSection
+    ) {
         super(true, sourceSection);
         this.module = module;
         this.name = name;

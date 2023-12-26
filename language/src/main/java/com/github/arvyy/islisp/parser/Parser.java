@@ -7,7 +7,6 @@ import com.github.arvyy.islisp.functions.ISLISPDefaultHandler;
 import com.github.arvyy.islisp.nodes.*;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.TruffleFile;
-import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
@@ -27,8 +26,6 @@ public class Parser {
 
     /**
      * Create parser.
-     *
-     * @param sourceSectionMap map, mapping sexpr wrapped into eqwrapper to corresponding source location
      */
     public Parser() {
         sourceSectionMap = new HashMap<>();
@@ -36,14 +33,17 @@ public class Parser {
     }
 
     /**
-     * Returns root node for given sexpr. Actual sexprs aren't parsed, but are deferred by wrapping into
-     * ISLISPMacroExpansion node since parsing requires executing macros, which potentially require executing user code,
-     * which is not supposed to be executed in parse. Handles installing base condition handler.
+     * Returns root node for given main module represented by given source.
+     * Actual code content isn't parsed, but deferred by wrapping into
+     * ISLISPMacroExpansionNode node since parsing requires executing macros,
+     * which potentially require executing user code,
+     * which is not supposed to be executed in parse.
+     * Handles installing base condition handler.
      *
      * @param language language reference
-     * @param content list of top level sexprs
-     * @param isInteractive whether the execution is done as part of a repl loop.
-     *                      If true, in case of unexpected error do not exit with status code
+     * @param module the 'main' module name that will entrypoint
+     * @param source source for the module. If source is marked as interactive,
+     *               in case of unexpected error do not exit with status code
      * @return root node
      */
     //TODO rename
@@ -90,9 +90,10 @@ public class Parser {
     }
 
     /**
-     * Perform deferred parsing, by evaluating user code and running procedural macros.
-     * The result should be spliced into AST root.
+     * Perform deferred parsing of given module, by evaluating user code and running procedural macros.
+     * All necessary module's dependencies must be already loaded.
      *
+     * @param module the name of module
      * @param content usercode sexprs.
      * @return parsed truffle AST after macro expansion.
      */
@@ -878,7 +879,14 @@ public class Parser {
                 isAbstract = !(value.identityReference().getId() == ctx.getNil().identityReference().getId());
             }
         }
-        return new ISLISPDefClassNode(ctx.getLanguage(), parserContext.module, className, parentClasses, slots, isAbstract, source(sexpr));
+        return new ISLISPDefClassNode(
+            ctx.getLanguage(),
+            parserContext.module,
+            className,
+            parentClasses,
+            slots,
+            isAbstract,
+            source(sexpr));
     }
 
     ISLISPDefGenericNode parseDefGeneric(ParserContext parserContext, Object sexpr) {
@@ -957,7 +965,12 @@ public class Parser {
         for (int i = 1; i < placeList.size(); i++) {
             args.add(parseExpressionNode(parserContext, placeList.get(i)));
         }
-        return new ISLISPGlobalFunctionCallNode(parserContext.module, name, true, args.toArray(ISLISPExpressionNode[]::new), source(sexpr));
+        return new ISLISPGlobalFunctionCallNode(
+            parserContext.module,
+            name,
+            true,
+            args.toArray(ISLISPExpressionNode[]::new),
+            source(sexpr));
     }
 
     ISLISPExpressionNode parseDirectFunctionCall(
@@ -1329,6 +1342,11 @@ public class Parser {
         return sourceSectionMap.get(new EqWrapper(sexpr));
     }
 
+    /**
+     * Loads all given modules (and all their transitive dependencies).
+     *
+     * @param requires list of modules to load
+     */
     public void ensureRequiresLoaded(List<String> requires) {
         var ctx = ISLISPContext.get(null);
         for (var req: requires) {

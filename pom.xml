@@ -85,7 +85,7 @@
                 <executions>
                     <execution>
                         <id>validate</id>
-                        <phase>none</phase>
+                        <phase>validate</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>

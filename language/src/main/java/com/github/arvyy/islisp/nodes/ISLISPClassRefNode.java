@@ -20,6 +20,7 @@ public class ISLISPClassRefNode extends ISLISPExpressionNode {
     /**
      * Create class node.
      *
+     * @param module module name whose source's this node is part of
      * @param name class name
      * @param sourceSection corresponding source section to this node
      */

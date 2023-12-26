@@ -35,6 +35,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
     /**
      * Create defclass node.
      *
+     * @param module module name whose source's this node is part of
      * @param language language reference
      * @param name class name
      * @param superclassName names of superclasses; &lt;object&gt; inferred if empty

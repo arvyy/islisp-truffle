@@ -21,6 +21,7 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
     /**
      * Create defun node.
      *
+     * @param module module name whose source's this node is part of
      * @param name function's symbol name
      * @param functionNode root node wrapping function body
      */

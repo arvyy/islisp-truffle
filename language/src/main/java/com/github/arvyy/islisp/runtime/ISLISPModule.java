@@ -5,6 +5,9 @@ import com.oracle.truffle.api.CompilerDirectives;
 
 import java.util.*;
 
+/**
+ * Encapsulate module's bindings.
+ */
 public class ISLISPModule {
 
     private final List<ISLISPModule> importedModules;
@@ -19,6 +22,9 @@ public class ISLISPModule {
     private final Map<SymbolReference, ValueReference> globalVars;
     private final Map<SymbolReference, SetfTransformer> setfTransformers;
 
+    /**
+     * Create empty module.
+     */
     public ISLISPModule() {
         exports = new HashSet<>();
         importedModules = new ArrayList<>();
@@ -33,14 +39,27 @@ public class ISLISPModule {
         globalVars = new HashMap<>();
     }
 
+    /**
+     * Append import.
+     *
+     * @param m imported module.
+     */
     public void addImport(ISLISPModule m) {
         importedModules.add(m);
     }
 
+    /**
+     * Append export.
+     *
+     * @param symbolReference exported symbol reference.
+     */
     public void addExport(SymbolReference symbolReference) {
         exports.add(symbolReference);
     }
 
+    /**
+     * Add all bindings to exported set.
+     */
     public void exportAll() {
         exports.addAll(globalFunctions.keySet());
         exports.addAll(genericFunctions.keySet());
@@ -184,7 +203,9 @@ public class ISLISPModule {
                 return setfGlobalFunctions.get(symbolReference);
             }
             for (var module: importedModules) {
-                if (module.setfGlobalFunctions.containsKey(symbolReference) && module.exports.contains(symbolReference)) {
+                if (module.setfGlobalFunctions.containsKey(symbolReference)
+                    && module.exports.contains(symbolReference)
+                ) {
                     return module.setfGlobalFunctions.get(symbolReference);
                 }
             }
@@ -240,7 +261,9 @@ public class ISLISPModule {
                 return setfGenericFunctions.get(symbolReference);
             }
             for (var module: importedModules) {
-                if (module.setfGenericFunctions.containsKey(symbolReference) && module.exports.contains(symbolReference)) {
+                if (module.setfGenericFunctions.containsKey(symbolReference)
+                    && module.exports.contains(symbolReference)
+                ) {
                     return module.setfGenericFunctions.get(symbolReference);
                 }
             }

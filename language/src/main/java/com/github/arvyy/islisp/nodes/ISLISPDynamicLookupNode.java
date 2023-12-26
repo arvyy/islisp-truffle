@@ -22,6 +22,7 @@ public class ISLISPDynamicLookupNode extends ISLISPExpressionNode {
     /**
      * Creaste dynamic variable lookup node.
      *
+     * @param module module name whose source's this node is part of
      * @param symbol variable name
      * @param sourceSection corresponding source section to this node
      */

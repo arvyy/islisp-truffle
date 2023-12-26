@@ -24,6 +24,7 @@ public class ISLISPGlobalIdentifierNode extends ISLISPExpressionNode {
     /**
      * Create global identifier lookup node.
      *
+     * @param module module name whose source's this node is part of
      * @param name variable name
      * @param sourceSection corresponding source section to this node
      */

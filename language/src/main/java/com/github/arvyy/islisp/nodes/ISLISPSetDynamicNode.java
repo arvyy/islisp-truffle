@@ -25,11 +25,17 @@ public class ISLISPSetDynamicNode extends ISLISPExpressionNode {
     /**
      * Create set-dynamic node.
      *
+     * @param module module name whose source's this node is part of
      * @param symbol dynamic variable name
      * @param expression value expression
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPSetDynamicNode(String module, Symbol symbol, ISLISPExpressionNode expression, SourceSection sourceSection) {
+    public ISLISPSetDynamicNode(
+        String module,
+        Symbol symbol,
+        ISLISPExpressionNode expression,
+        SourceSection sourceSection
+    ) {
         super(sourceSection);
         this.module = module;
         this.symbol = symbol;
