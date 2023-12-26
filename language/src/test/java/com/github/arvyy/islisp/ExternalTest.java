@@ -3,11 +3,14 @@ package com.github.arvyy.islisp;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotAccess;
 import org.graalvm.polyglot.Source;
+import org.graalvm.polyglot.io.IOAccess;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -48,10 +51,31 @@ public class ExternalTest {
             .in(new ByteArrayInputStream(new byte[0]))
             .out(output)
             .allowPolyglotAccess(PolyglotAccess.ALL)
-            .allowNativeAccess(true);
+            .allowIO(IOAccess.ALL)
+            .allowNativeAccess(true)
+            .option("islisp.Sourcepath", "../tests/util");
         try (var ctx = ctxBuilder.build()) {
             ctx.eval(Source.newBuilder("islisp", lispFile.toFile()).build());
             var expected = Files.readString(resultFile);
+            var actual = output.toString(StandardCharsets.UTF_8);
+            assertEquals(expected, actual);
+        }
+    }
+
+    @Test
+    public void moduleTest() throws IOException {
+        var srcName = "../tests/nonportable/modulestest/main.lisp";
+        var output = new ByteArrayOutputStream();
+        var ctxBuilder = Context.newBuilder()
+            .in(new ByteArrayInputStream(new byte[0]))
+            .out(output)
+            .allowPolyglotAccess(PolyglotAccess.ALL)
+            .allowIO(IOAccess.ALL)
+            .allowNativeAccess(true)
+            .option("islisp.Sourcepath", "../tests/util:../tests/nonportable/modulestest/root1:../tests/nonportable/modulestest/root2");
+        try (var ctx = ctxBuilder.build()) {
+            ctx.eval(Source.newBuilder("islisp", new File(srcName)).build());
+            var expected = "modulestest end";
             var actual = output.toString(StandardCharsets.UTF_8);
             assertEquals(expected, actual);
         }

@@ -30,12 +30,14 @@ public final class Main {
         var dapDebuggerOpt = dapDebuggerOpt();
         var helpOpt = helpOpt();
         var versionOpt = versionOpt();
+        var sourcepathOpt = sourcepathOpt();
 
         var options = new Options();
         options.addOption(chromeDebuggerOpt);
         options.addOption(dapDebuggerOpt);
         options.addOption(helpOpt);
         options.addOption(versionOpt);
+        options.addOption(sourcepathOpt);
 
         var parser = DefaultParser.builder()
             .build();
@@ -72,6 +74,10 @@ public final class Main {
             .allowIO(IOAccess.ALL)
             .allowNativeAccess(true)
             .allowPolyglotAccess(PolyglotAccess.ALL);
+
+        if (commandLine.hasOption(sourcepathOpt)) {
+            contextBuilder.option("islisp.Sourcepath", sourcepathOpt.getValue());
+        }
 
         if (commandLine.hasOption(chromeDebuggerOpt)) {
             if (chromeDebuggerOpt.hasArg()) {
@@ -174,6 +180,14 @@ public final class Main {
             .option("v")
             .longOpt("version")
             .desc("Show version information and exit.")
+            .build();
+    }
+
+    static Option sourcepathOpt() {
+        return Option.builder()
+            .option("sp")
+            .longOpt("sourcepath")
+            .desc("Source paths, separated by system path separator, relative which to search for required modules.")
             .build();
     }
 

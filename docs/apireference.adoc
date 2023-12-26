@@ -4,6 +4,47 @@ Given that this is ISLISP implementation, primary reference is the http://www.is
 
 == Extensions
 
+=== Module system
+
+Truffle ISLISP provides a very simple module system, somewhat inspired by Racket. A module is colloquial to a file that defines its source.
+
+Use `(requires _path-string_ ...)` to load modules; for example
+
+[source,lisp]
+----
+(requires "lib/foo.lisp")
+----
+
+Use `(provides _symbol_ ...)` to define module's exports that will be used by modules that required it; for example
+
+[source,lisp]
+----
+(provides public-function)
+
+(defun public-function () (internal-function)) ;; only this function will be exported
+(defun internal-function () "Hello world!")
+----
+
+The module paths are searched relative to sourcepath roots, which defaults to working directory. You can specify sourcepaths using `islisp.Sourcepath` (when using polyglot / embedding), or using `-sp` / `--sourcepath` when using standalone launcher. The value in both cases is root paths separated by system path separator.
+
+For example; given the following files
+
+[source]
+----
+root1/module1.lisp
+root2/bar/module2.lisp
+main.lisp
+----
+
+Where main.lisp starts with
+
+[source,lisp]
+----
+(requires "module1.lisp" "bar/module2.lisp")
+----
+
+The correct invocation is `islisp -sp root1:root2 main.lisp` (on linux); `islisp -sp root1;root2 main.lisp` (on windows).
+
 === `(debugger)`
 
 `(debugger)` enables triggering debugger breakpoint from code. Works only when ran in debug mode. Returns nil.

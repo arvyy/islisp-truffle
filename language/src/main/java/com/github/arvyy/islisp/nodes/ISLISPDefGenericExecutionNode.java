@@ -24,6 +24,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public abstract class ISLISPDefGenericExecutionNode extends RootNode {
 
+    private final String module;
     private final Symbol name;
     private final boolean setf;
     private final SourceSection sourceSection;
@@ -42,18 +43,21 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
     /**
      * Create defgeneric execution node.
      *
+     * @param module module name whose source's this node is part of
      * @param name generic function name
      * @param setf whether function is of setf form
      * @param language language reference
      * @param sourceSection corresponding source section to this node
      */
     public ISLISPDefGenericExecutionNode(
+        String module,
         Symbol name,
         boolean setf,
         TruffleLanguage<?> language,
         SourceSection sourceSection
     ) {
         super(language);
+        this.module = module;
         this.name = name;
         this.setf = setf;
         this.sourceSection = sourceSection;
@@ -64,6 +68,7 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
 
     protected ISLISPDefGenericExecutionNode(ISLISPDefGenericExecutionNode other) {
         super(other.getLanguage(ISLISPTruffleLanguage.class));
+        module = other.module;
         name = other.name;
         setf = other.setf;
         sourceSection = other.sourceSection;
@@ -76,7 +81,7 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
     public final Object execute(VirtualFrame frame) {
         if (genericFunctionDescriptor == null) {
             genericFunctionDescriptor = ISLISPContext.get(this)
-                    .lookupGenericFunctionDispatchTree(name.identityReference(), setf);
+                    .lookupGenericFunctionDispatchTree(module, name.identityReference(), setf);
         }
         if (frame.getArguments().length - 1 < genericFunctionDescriptor.getRequiredArgCount()) {
             throw new ISLISPError("Not enough args", this);

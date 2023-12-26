@@ -21,6 +21,7 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
     private final int frameIndex;
     private final int frameSlot;
 
+    private final String module;
     private final Symbol name;
 
     @CompilerDirectives.CompilationFinal
@@ -32,12 +33,14 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
     /**
      * Create setq node for the global variable.
      *
+     * @param module module name whose source's this node is part of
      * @param name global variable name
      * @param expression value expression
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPSetqNode(Symbol name, ISLISPExpressionNode expression, SourceSection sourceSection) {
+    public ISLISPSetqNode(String module, Symbol name, ISLISPExpressionNode expression, SourceSection sourceSection) {
         super(sourceSection);
+        this.module = module;
         this.name = name;
         this.frameIndex = -1;
         this.frameSlot = -1;
@@ -47,13 +50,21 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
     /**
      * Create setq node for a local / closure variable.
      *
+     * @param module module name whose source's this node is part of
      * @param frameIndex frame index
      * @param frameSlot frame slot in appropriate frame
      * @param expression value expression
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPSetqNode(int frameIndex, int frameSlot, ISLISPExpressionNode expression, SourceSection sourceSection) {
+    public ISLISPSetqNode(
+        String module,
+        int frameIndex,
+        int frameSlot,
+        ISLISPExpressionNode expression,
+        SourceSection sourceSection
+    ) {
         super(sourceSection);
+        this.module = module;
         this.name = null;
         this.frameIndex = frameIndex;
         this.frameSlot = frameSlot;
@@ -72,7 +83,7 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
             return value;
         } else {
             if (valueReference == null) {
-                valueReference = ISLISPContext.get(this).lookupGlobalVar(name.identityReference());
+                valueReference = ISLISPContext.get(this).lookupGlobalVar(module, name.identityReference());
             }
             if (valueReference.isReadOnly()) {
                 throw new ISLISPError("Value is readonly", this);

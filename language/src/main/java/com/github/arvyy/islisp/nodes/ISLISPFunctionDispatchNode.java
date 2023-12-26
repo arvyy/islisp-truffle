@@ -45,11 +45,7 @@ public abstract class ISLISPFunctionDispatchNode extends Node {
         @CachedLibrary(limit = "3") InteropLibrary interopLibrary
     ) {
         try {
-            var value = interopLibrary.execute(o, args);
-            if (value instanceof Boolean) {
-                throw new RuntimeException("Bad");
-            }
-            return value;
+            return interopLibrary.execute(o, args);
         } catch (UnsupportedMessageException | UnsupportedTypeException | ArityException e) {
             //TODO
             throw new ISLISPError(e.getMessage(), this);
@@ -59,7 +55,7 @@ public abstract class ISLISPFunctionDispatchNode extends Node {
     @Fallback
     Object notAFunction(Object notAFunction, Object[] args) {
         var ctx = ISLISPContext.get(this);
-        var functionClass = ctx.lookupClass(ctx.namedSymbol("<function>").identityReference());
+        var functionClass = ctx.lookupClass("ROOT", ctx.namedSymbol("<function>").identityReference());
         return errorSignalerNode.signalWrongType(notAFunction, functionClass);
     }
 

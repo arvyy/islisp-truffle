@@ -24,16 +24,19 @@ public class ISLISPDefaultHandler extends RootNode {
 
     ISLISPDefaultHandler(TruffleLanguage<?> language, boolean isInteractive) {
         super(language);
-        dispatchNode = ISLISPFunctionDispatchNodeGen.create();
         this.isInteractive = isInteractive;
+        dispatchNode = ISLISPFunctionDispatchNodeGen.create();
     }
 
     @Override
     public Object execute(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
-        var exitFunction = ctx.lookupFunction(ctx.namedSymbol("exit").identityReference());
-        var reportConditionFunction = ctx.lookupFunction(ctx.namedSymbol("report-condition").identityReference());
-        var errorOutputFunction = ctx.lookupFunction(ctx.namedSymbol("error-output").identityReference());
+        var exitFunction = ctx.lookupFunction(
+            "ROOT", ctx.namedSymbol("exit").identityReference());
+        var reportConditionFunction = ctx.lookupFunction(
+            "ROOT", ctx.namedSymbol("report-condition").identityReference());
+        var errorOutputFunction = ctx.lookupFunction(
+            "ROOT", ctx.namedSymbol("error-output").identityReference());
         var errorOutput = dispatchNode.executeDispatch(errorOutputFunction, new Object[]{});
         var condition = frame.getArguments()[1];
         dispatchNode.executeDispatch(reportConditionFunction, new Object[]{condition, errorOutput});

@@ -18,16 +18,19 @@ public class ISLISPGlobalIdentifierNode extends ISLISPExpressionNode {
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
+    private final String module;
     private final Symbol name;
 
     /**
      * Create global identifier lookup node.
      *
+     * @param module module name whose source's this node is part of
      * @param name variable name
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPGlobalIdentifierNode(Symbol name, SourceSection sourceSection) {
+    public ISLISPGlobalIdentifierNode(String module, Symbol name, SourceSection sourceSection) {
         super(sourceSection);
+        this.module = module;
         this.name = name;
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
@@ -35,7 +38,7 @@ public class ISLISPGlobalIdentifierNode extends ISLISPExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         if (valueReference == null) {
-            valueReference = ISLISPContext.get(this).lookupGlobalVar(name.identityReference());
+            valueReference = ISLISPContext.get(this).lookupGlobalVar(module, name.identityReference());
             if (valueReference == null) {
                 return errorSignalerNode.signalUnboundVariable(name);
             }

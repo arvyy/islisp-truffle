@@ -11,6 +11,7 @@ import java.util.Map;
  * Necessary parser context while doing recursive paring descent.
  */
 class ParserContext {
+    final String module;
     final int frameDepth;
     final LexicalScope<SymbolReference, VariableContext> variables;
     final LexicalScope<SymbolReference, VariableContext> localFunctions;
@@ -20,8 +21,9 @@ class ParserContext {
 
     final FrameDescriptor.Builder frameBuilder;
 
-    ParserContext() {
+    ParserContext(String module) {
         this(
+                module,
                 0,
                 new LexicalScope<>(),
                 new LexicalScope<>(),
@@ -32,6 +34,7 @@ class ParserContext {
     }
 
     ParserContext(
+            String module,
             int frameDepth,
             LexicalScope<SymbolReference, VariableContext> variables,
             LexicalScope<SymbolReference, VariableContext> localFunctions,
@@ -39,6 +42,7 @@ class ParserContext {
             LexicalScope<SymbolReference, Integer> blocks,
             LexicalScope<SymbolReference, Integer> tagbodyTags,
             FrameDescriptor.Builder frameBuilder) {
+        this.module = module;
         this.frameDepth = frameDepth;
         this.variables = variables;
         this.localFunctions = localFunctions;
@@ -50,6 +54,7 @@ class ParserContext {
 
     ParserContext pushClosureScope() {
         return new ParserContext(
+                module,
                 frameDepth + 1,
                 variables,
                 localFunctions,
@@ -61,6 +66,7 @@ class ParserContext {
 
     ParserContext pushLexicalScope(Map<SymbolReference, VariableContext> vars) {
         return new ParserContext(
+                module,
                 frameDepth,
                 new LexicalScope<>(variables, vars),
                 localFunctions,
@@ -72,6 +78,7 @@ class ParserContext {
 
     ParserContext pushLexicalFunctionScope(Map<SymbolReference, VariableContext> vars) {
         return new ParserContext(
+                module,
                 frameDepth,
                 variables,
                 new LexicalScope<>(localFunctions, vars),
@@ -84,6 +91,7 @@ class ParserContext {
     ParserContext pushBlockScope(SymbolReference blockName) {
         var newBlocks = new LexicalScope<>(blocks, Map.of(blockName, blocksIdGen.next()));
         return new ParserContext(
+                module,
                 frameDepth,
                 variables,
                 localFunctions,
@@ -100,6 +108,7 @@ class ParserContext {
         }
         var newTagbodyTags = new LexicalScope<>(tagbodyTags, map);
         return new ParserContext(
+                module,
                 frameDepth,
                 variables,
                 localFunctions,
@@ -111,6 +120,7 @@ class ParserContext {
 
     ParserContext pushFrameDescriptor() {
         return new ParserContext(
+                module,
                 frameDepth,
                 variables,
                 localFunctions,

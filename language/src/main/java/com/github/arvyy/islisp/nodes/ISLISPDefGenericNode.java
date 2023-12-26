@@ -12,6 +12,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPDefGenericNode extends ISLISPExpressionNode {
 
+    private final String module;
     private final Symbol name;
     private final boolean setf;
     private final int requiredArgsCount;
@@ -24,6 +25,7 @@ public class ISLISPDefGenericNode extends ISLISPExpressionNode {
     /**
      * Create defgeneric node.
      *
+     * @param module module name whose source's this node is part of
      * @param name generic function name
      * @param setf if function has setf form or not
      * @param requiredArgsCount required arguments count
@@ -31,6 +33,7 @@ public class ISLISPDefGenericNode extends ISLISPExpressionNode {
      * @param sourceSection corresponding source section to this node
      */
     public ISLISPDefGenericNode(
+        String module,
         Symbol name,
         boolean setf,
         int requiredArgsCount,
@@ -38,12 +41,13 @@ public class ISLISPDefGenericNode extends ISLISPExpressionNode {
         SourceSection sourceSection
     ) {
         super(true, sourceSection);
+        this.module = module;
         this.name = name;
         this.requiredArgsCount = requiredArgsCount;
         this.hasRest = hasRest;
         this.setf = setf;
         var ctx = ISLISPContext.get(this);
-        executionNode = ISLISPDefGenericExecutionNodeGen.create(name, setf, ctx.getLanguage(), sourceSection);
+        executionNode = ISLISPDefGenericExecutionNodeGen.create(module, name, setf, ctx.getLanguage(), sourceSection);
     }
 
     @Override
@@ -51,7 +55,7 @@ public class ISLISPDefGenericNode extends ISLISPExpressionNode {
         var ctx = ISLISPContext.get(this);
         var descriptor = new GenericFunctionDescriptor(requiredArgsCount, hasRest);
         var function = new LispFunction(null, executionNode.getCallTarget(), true);
-        ctx.registerGenericFunction(name.identityReference(), setf, function, descriptor);
+        ctx.registerGenericFunction(module, name.identityReference(), setf, function, descriptor);
         return name;
     }
 }

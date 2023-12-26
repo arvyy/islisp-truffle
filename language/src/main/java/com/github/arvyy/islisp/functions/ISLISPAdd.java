@@ -59,7 +59,7 @@ public abstract class ISLISPAdd extends RootNode {
     @Fallback
     Object notNumbers(Object a, Object b) {
         var ctx = ISLISPContext.get(this);
-        var numberClass = ctx.lookupClass(ctx.namedSymbol("<number>").identityReference());
+        var numberClass = ctx.lookupClass("<number>");
         return errorSignalerNode.signalWrongType(b, numberClass);
     }
 
