@@ -52,7 +52,8 @@ public class ExternalTest {
             .out(output)
             .allowPolyglotAccess(PolyglotAccess.ALL)
             .allowIO(IOAccess.ALL)
-            .allowNativeAccess(true);
+            .allowNativeAccess(true)
+            .option("islisp.Sourcepath", "../tests/util");
         try (var ctx = ctxBuilder.build()) {
             ctx.eval(Source.newBuilder("islisp", lispFile.toFile()).build());
             var expected = Files.readString(resultFile);
