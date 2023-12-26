@@ -1,5 +1,7 @@
 = ISLISP tests
 
-Tests consist of source input (ending with .lisp) and expected standard output from running it (file with same name but ending with .expect.txt). A passing test must match its standard stream output with file content. Tests inside `portable` should pass under any ISLISP compliant implementation, not just this one.
+Tests consist of source input (ending with .lisp) and expected standard output from running it (file with same name but ending with .expect.txt). A passing test must match its standard stream output with file content.
+
+Tests inside `portable` should pass under any ISLISP compliant implementation, not just this one. However, this requires minor preparation: each occurrence of `(requires "testing.lisp")` needs to be textually replaced with contents of `portable/testtemplate.lisp.txt` before running.
 
 Currently, the tests are ran from java through `mvn test`. A pure shell runner is planned.
