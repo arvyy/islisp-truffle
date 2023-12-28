@@ -100,6 +100,11 @@ public abstract class ISLISPEqual extends RootNode {
         return Utils.booleanToSymbol(i1.data().compareTo(i2.data()) == 0);
     }
 
+    @Specialization
+    Object doChars(LispChar c1, LispChar c2) {
+        return Utils.booleanToSymbol(c1.codepoint() == c2.codepoint());
+    }
+
     @Fallback
     Object doFallback(Object o1, Object o2) {
         var ctx = ISLISPContext.get(this);

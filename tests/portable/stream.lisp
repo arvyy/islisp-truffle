@@ -16,4 +16,22 @@
 (test-equal (output-stream-p (error-output)) t)
 (test-equal (input-stream-p (standard-input)) t)
 
+(let ((stream (create-string-input-stream "a")))
+  (test-equal (read-char stream) #\a)
+  (test-equal (read-char stream nil) nil))
+
+(let ((stream (create-string-input-stream "a")))
+  (test-equal (read-char stream) #\a)
+  (test-equal (read-char stream nil 'foo) 'foo))
+
+(let ((stream (create-string-input-stream "a")))
+  (test-equal (read-char stream) #\a)
+  (block exit
+    (with-handler
+      (lambda (err)
+        (test-equal (instancep err (class <end-of-stream>)) t)
+        (return-from exit nil))
+      (read-char stream t)
+      (test-equal nil t)))) ;; shouldn't get here
+
 (format (standard-output) "stream.lisp end")

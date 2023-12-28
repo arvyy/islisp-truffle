@@ -11,5 +11,7 @@ import java.io.OutputStream;
  * @param outputStream output stream, may be null
  * @param inputStream input stream, may be null
  */
-public record LispStream(OutputStream outputStream, InputStream inputStream) implements TruffleObject {
-}
+public record LispStream(
+    OutputStream outputStream,
+    InputStream inputStream
+) implements TruffleObject { }

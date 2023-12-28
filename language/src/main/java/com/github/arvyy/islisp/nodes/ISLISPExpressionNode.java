@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.dsl.ReportPolymorphism;
 import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.*;
@@ -12,6 +13,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 @TypeSystemReference(ISLISPTypes.class)
 @GenerateWrapper
+@ReportPolymorphism
 public abstract class ISLISPExpressionNode extends Node implements InstrumentableNode {
 
     private final boolean isDefinitionNode;

@@ -160,4 +160,18 @@ public class ISLISPErrorSignalerNode extends Node {
     public SourceSection getSourceSection() {
         return sourceSection;
     }
+
+    /**
+     * Signal end of stream.
+     *
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
+    public Object signalEndOfStream() {
+        var ctx = ISLISPContext.get(this);
+        var condition = getCreateCallNode().call(
+            null,
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<end-of-stream>").identityReference())
+        );
+        return getSignalCallNode().call(null, condition, ctx.getNil());
+    }
 }

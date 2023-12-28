@@ -26,6 +26,10 @@
 
 (defclass <error> (<serious-condition>) ())
 
+(defclass <stream-error> (<error>) ())
+
+(defclass <end-of-stream> (<stream-error>) ())
+
 (defclass <simple-error> (<error>)
     ((format-string :reader simple-error-format-string :initarg format-string)
      (format-arguments :reader simple-error-format-arguments :initarg simple-error-format-arguments)))
