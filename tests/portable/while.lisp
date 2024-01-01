@@ -6,3 +6,4 @@
   (while (> i 0)
     (print i)
     (setf i (- i 1))))
+(finish-output (standard-output))

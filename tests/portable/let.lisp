@@ -1,16 +1,21 @@
-(defun print (int)
-    (format-integer (standard-output) int 10)
-    (format-char (standard-output) #\newline))
+(requires "testing.lisp")
 
 (defun foo (a)
     (let ((a (+ 1 2))
           (b a))
-      (print (+ a b))))
-(foo 0)
+      (+ a b)))
+(test-equal
+    (foo 0)
+    3)
 
 (defun bar (a)
     (let* ((a (+ 1 2))
            (a (+ 1 a))
            (b a))
-      (print (+ a b))))
-(bar 0)
+      (+ a b)))
+(test-equal
+    (bar 0)
+    8)
+
+(format (standard-output) "let.lisp end")
+(finish-output (standard-output))

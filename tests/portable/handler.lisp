@@ -12,3 +12,4 @@
       (print "FAIL2"))
     (print "FAIL2")
     (print "OK2.2"))
+(finish-output (standard-output))

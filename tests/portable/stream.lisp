@@ -34,4 +34,12 @@
       (read-char stream t)
       (test-equal nil t)))) ;; shouldn't get here
 
+(let ((stream (create-string-input-stream "hello #(1 2 3) 123 #\\A")))
+  (test-equal (read stream) 'hello)
+  (test-equal (read stream) #(1 2 3))
+  (test-equal (read stream) 123)
+  (test-equal (read stream) #\A)
+  (test-equal (read stream nil "the end") "the end"))
+
 (format (standard-output) "stream.lisp end")
+(finish-output (standard-output))

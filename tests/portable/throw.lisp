@@ -7,3 +7,4 @@
        (catch 'foo
          (+ 2 (throw 'foo 1)))
        3))
+(finish-output (standard-output))

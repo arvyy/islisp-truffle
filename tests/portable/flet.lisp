@@ -7,3 +7,4 @@
         (if (= (f 7) 17)
             (print "OK1")
             (print "FAIL1"))))
+(finish-output (standard-output))

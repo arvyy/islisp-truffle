@@ -33,3 +33,4 @@
 (test-equal (string<= "aa" "a") nil)
 
 (format-object (standard-output) "string.lisp end" nil)
+(finish-output (standard-output))

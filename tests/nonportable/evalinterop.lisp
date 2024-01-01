@@ -23,3 +23,4 @@
   (test-equal (truffle-object-field obj "a") 3))
 
 (format (standard-output) "evalinterop.lisp end")
+(finish-output (standard-output))

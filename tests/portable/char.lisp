@@ -45,3 +45,4 @@
 (if (char/= #\a #\a)
     (print "FAIL11")
     (print "OK11"))
+(finish-output (standard-output))

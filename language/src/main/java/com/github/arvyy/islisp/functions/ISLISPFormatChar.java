@@ -2,7 +2,9 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
-import com.github.arvyy.islisp.runtime.*;
+import com.github.arvyy.islisp.runtime.LispChar;
+import com.github.arvyy.islisp.runtime.LispCharStream;
+import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -11,8 +13,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.Writer;
 
 /**
  * Implements `format-char` function, that writes a given character to output stream.
@@ -32,8 +33,8 @@ public abstract class ISLISPFormatChar extends RootNode {
     }
 
     @Specialization
-    void executeProper(LispStream stream, LispChar ch) {
-        doPrint(stream.outputStream(), ch.codepoint());
+    void executeProper(LispCharStream stream, LispChar ch) {
+        doPrint(stream.getOutput(), ch.codepoint());
     }
 
     @Fallback
@@ -43,9 +44,9 @@ public abstract class ISLISPFormatChar extends RootNode {
 
 
     @CompilerDirectives.TruffleBoundary
-    void doPrint(OutputStream os, int codepoint) {
+    void doPrint(Writer w, int codepoint) {
         try {
-            os.write(new String(new int[] {codepoint}, 0, 1).getBytes(StandardCharsets.UTF_8));
+            w.write(codepoint);
         } catch (IOException e) {
             throw new ISLISPError(e.getMessage(), this);
         }

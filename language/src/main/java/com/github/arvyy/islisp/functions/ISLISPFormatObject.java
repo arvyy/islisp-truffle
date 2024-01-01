@@ -35,27 +35,15 @@ public abstract class ISLISPFormatObject extends RootNode {
     abstract Object executeGeneric(Object stream, Object obj, Object escape);
 
     @Specialization
-    Object doProper(LispStream stream, Object obj, Object escape) {
+    Object doProper(LispCharStream stream, Object obj, Object escape) {
         var nil = ISLISPContext.get(this).getNil();
-        doPrint(stream.outputStream(), obj, escape != nil);
+        doPrint(stream.getOutput(), obj, escape != nil);
         return nil;
     }
 
     @Fallback
     Object doFallback(Object stream, Object obj, Object escape) {
         return errorSignalerNode.signalWrongType(stream, ISLISPContext.get(this).lookupClass("<output-stream>"));
-    }
-
-    @CompilerDirectives.TruffleBoundary
-    void doPrint(OutputStream os, Object value, boolean escape) {
-        //TODO implement escape
-        var writer = new OutputStreamWriter(os);
-        doPrint(writer, value, escape);
-        try {
-            writer.flush();
-        } catch (IOException e) {
-            throw new ISLISPError(e.getMessage(), this);
-        }
     }
 
     /**
@@ -154,7 +142,7 @@ public abstract class ISLISPFormatObject extends RootNode {
                 writer.write(">");
                 return;
             }
-            if (value instanceof LispStream s) {
+            if (value instanceof LispCharStream s) {
                 writer.write("#<stream ");
                 writer.write(s.hashCode() + "");
                 writer.write(">");

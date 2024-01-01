@@ -6,3 +6,4 @@
   (test-equal (< (funcall libm-sin 2.0) 0.910) t))
 
 (format (standard-output) "nif.lisp end")
+(finish-output (standard-output))

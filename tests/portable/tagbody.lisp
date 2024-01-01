@@ -24,3 +24,4 @@
     val))
 
 (print (foo))
+(finish-output (standard-output))

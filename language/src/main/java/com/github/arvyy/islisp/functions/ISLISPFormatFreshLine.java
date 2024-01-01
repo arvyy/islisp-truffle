@@ -3,8 +3,8 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
+import com.github.arvyy.islisp.runtime.LispCharStream;
 import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -13,7 +13,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * Implements `format-fresh-line` function.
@@ -40,8 +40,8 @@ public abstract class ISLISPFormatFreshLine extends RootNode {
     abstract void executeGeneric(Object stream);
 
     @Specialization
-    void executeProper(LispStream stream) {
-        doPrint(stream.outputStream());
+    void executeProper(LispCharStream stream) {
+        doPrint(stream.getOutput());
     }
 
     @Fallback
@@ -51,9 +51,10 @@ public abstract class ISLISPFormatFreshLine extends RootNode {
 
 
     @CompilerDirectives.TruffleBoundary
-    void doPrint(OutputStream os) {
+    void doPrint(Writer os) {
         try {
-            os.write('\n');
+            os.write("\n");
+            os.flush();
         } catch (IOException e) {
             throw new ISLISPError(e.getMessage(), this);
         }

@@ -13,7 +13,7 @@ import com.oracle.truffle.api.dsl.TypeSystem;
     Pair.class,
     StandardClassObject.class,
     Symbol.class,
-    LispStream.class,
+    LispCharStream.class,
     LispChar.class,
     String.class,
     StringBuffer.class,

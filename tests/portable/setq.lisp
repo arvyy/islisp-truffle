@@ -1,9 +1,10 @@
-(defun print (int)
-    (format-integer (standard-output) int 10)
-    (format-char (standard-output) #\newline))
+(requires "testing.lisp")
 
 (let ((foo 1))
     (setq foo 2)
-    (print foo)
+    (test-equal foo 2)
     (setf foo 3)
-    (print foo))
+    (test-equal foo 3))
+
+(format (standard-output) "end setq.lisp")
+(finish-output (standard-output))

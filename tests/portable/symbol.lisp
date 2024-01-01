@@ -17,3 +17,4 @@
 (if (eql 'a 'c)
     (print "FAIL6")
     (print "OK6"))
+(finish-output (standard-output))

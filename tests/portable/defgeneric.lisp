@@ -30,3 +30,4 @@
     (print value))
 
 (setf (foo2 10) 11)
+(finish-output (standard-output))

@@ -4,9 +4,9 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
-import com.github.arvyy.islisp.runtime.LispChar;
-import com.github.arvyy.islisp.runtime.LispCharStream;
+import com.github.arvyy.islisp.parser.Reader;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.github.arvyy.islisp.runtime.LispCharStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -16,11 +16,12 @@ import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Implements `read-char` procedure.
  */
-public abstract class ISLISPReadChar extends RootNode {
+public abstract class ISLISPRead extends RootNode {
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
@@ -28,7 +29,7 @@ public abstract class ISLISPReadChar extends RootNode {
     @Child
     DirectCallNode standardInput;
 
-    ISLISPReadChar(TruffleLanguage<?> language) {
+    ISLISPRead(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
@@ -87,18 +88,20 @@ public abstract class ISLISPReadChar extends RootNode {
         Object eosErrorP,
         Object eosValue
     ) {
+        var reader = new Reader(stream.getInput());
+        Optional<Object> maybeDatum = null;
         try {
-            var codepoint = stream.getInput().read();
-            if (codepoint != -1) {
-                return new LispChar(codepoint);
-            }
-            if (Utils.isNil(eosErrorP)) {
-                return eosValue;
-            } else {
-                return errorSignalerNode.signalEndOfStream();
-            }
+            maybeDatum = reader.readSingle();
         } catch (IOException e) {
-            throw new ISLISPError(e.getMessage(), this);
+            throw new ISLISPError(e.getMessage(), this); //TODO
+        }
+        if (maybeDatum.isPresent()) {
+            return maybeDatum.get();
+        }
+        if (Utils.isNil(eosErrorP)) {
+            return eosValue;
+        } else {
+            return errorSignalerNode.signalEndOfStream();
         }
     }
 
@@ -114,7 +117,7 @@ public abstract class ISLISPReadChar extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPReadCharNodeGen.create(lang).getCallTarget());
+        return new LispFunction(ISLISPReadNodeGen.create(lang).getCallTarget());
     }
 
 }

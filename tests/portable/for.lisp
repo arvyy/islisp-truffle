@@ -8,3 +8,4 @@
            (sum 0 (+ sum (car x))))
           ((not x) sum)
        (print (car x)))))
+(finish-output (standard-output))

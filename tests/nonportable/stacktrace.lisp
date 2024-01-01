@@ -16,3 +16,4 @@
             (return-from exit nil))
         (f1)
         (print "FAIL")))
+(finish-output (standard-output))

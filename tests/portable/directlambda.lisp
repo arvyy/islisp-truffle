@@ -3,3 +3,4 @@
     (format-char (standard-output) #\newline))
 
 (print ((lambda (a) (+ 1 a)) 2))
+(finish-output (standard-output))

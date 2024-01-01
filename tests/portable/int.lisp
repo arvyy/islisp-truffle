@@ -13,3 +13,4 @@
 
 (print #x1f)
 (print #x-1f)
+(finish-output (standard-output))

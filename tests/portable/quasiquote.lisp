@@ -16,3 +16,4 @@
 (test-equal (m2 2) (list 1 2))
 
 (format-object (standard-output) "quasiquote.lisp end" nil)
+(finish-output (standard-output))

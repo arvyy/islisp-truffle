@@ -13,3 +13,4 @@
     (if (evenp 88)
         (print "OK1")
         (print "FAIL1")))
+(finish-output (standard-output))

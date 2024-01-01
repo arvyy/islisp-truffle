@@ -8,6 +8,9 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.nodes.Node;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.function.Function;
 
@@ -61,11 +64,11 @@ public class ISLISPContext {
         symbolProperties = new HashMap<>();
         symbols = new HashMap<>();
         currentOutputStream = new ValueReference();
-        currentOutputStream.setValue(new LispStream(env.out(), null));
+        currentOutputStream.setValue(new LispCharStream(new PrintWriter(env.out(), true), null));
         currentInputStream = new ValueReference();
-        currentInputStream.setValue(new LispStream(null, env.in()));
+        currentInputStream.setValue(new LispCharStream(null, new BufferedReader(new InputStreamReader(env.in()))));
         currentErrorStream = new ValueReference();
-        currentErrorStream.setValue(new LispStream(env.err(), null));
+        currentErrorStream.setValue(new LispCharStream(new PrintWriter(env.err(), true), null));
         initBuiltinVars();
         initBuiltinClasses();
         initGlobalFunctions();
@@ -158,6 +161,7 @@ public class ISLISPContext {
         initGlobalFunction("eq", ISLISPEq::makeLispFunction);
         initGlobalFunction("equal", ISLISPEqual::makeLispFunction);
         initGlobalFunction("eval", ISLISPEval::makeLispFunction);
+        initGlobalFunction("finish-output", ISLISPFinishOutput::makeLispFunction);
         initGlobalFunction("format", ISLISPFormat::makeLispFunction);
         initGlobalFunction("format-char", ISLISPFormatChar::makeLispFunction);
         initGlobalFunction("format-integer", ISLISPFormatInteger::makeLispFunction);
@@ -178,6 +182,7 @@ public class ISLISPContext {
         initGlobalFunction("mapl", ISLISPMapl::makeLispFunction);
         initGlobalFunction("output-stream-p", ISLISPOutputStreamp::makeLispFunction);
         initGlobalFunction("property", ISLISPProperty::makeLispFunction);
+        initGlobalFunction("read", ISLISPRead::makeLispFunction);
         initGlobalFunction("read-char", ISLISPReadChar::makeLispFunction);
         initGlobalFunction("remove-property", ISLISPRemoveProperty::makeLispFunction);
         initGlobalFunction("set-aref", ISLISPSetAref::makeLispFunction);

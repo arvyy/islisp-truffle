@@ -8,3 +8,5 @@
   (print (get-output-stream-string s))
   (print (get-output-stream-string s)) ;; call second time to check it was cleared on first call
   (print "OK3"))
+
+(finish-output (standard-output))

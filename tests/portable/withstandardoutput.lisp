@@ -6,3 +6,4 @@
     (print "2"))
   (print "1")
   (print (get-output-stream-string s)))
+(finish-output (standard-output))

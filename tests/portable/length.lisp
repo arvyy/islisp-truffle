@@ -5,3 +5,4 @@
 (print (length "ab"))
 (print (length '(1 2)))
 (print (length #(1 2)))
+(finish-output (standard-output))

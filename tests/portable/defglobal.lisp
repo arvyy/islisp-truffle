@@ -21,3 +21,4 @@
             (return-from exit nil))
         unbound
         (print "FAIL4")))
+(finish-output (standard-output))

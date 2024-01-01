@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp;
 
 import com.github.arvyy.islisp.parser.Parser;
+import com.github.arvyy.islisp.runtime.LispCharStream;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Option;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -13,6 +14,7 @@ import org.graalvm.options.OptionDescriptors;
 import org.graalvm.options.OptionKey;
 import org.graalvm.options.OptionStability;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
@@ -65,6 +67,24 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
         var rootNode = parser.parseRootNode(this, "ROOT", preludeSource);
         rootNode.getCallTarget().call();
         ISLISPContext.get(null).getModule("ROOT").exportAll();
+    }
+
+    @Override
+    protected void finalizeContext(ISLISPContext context) {
+        var err = (LispCharStream) context.currentOutputStreamReference().getValue();
+        if (!err.isClosed()) {
+            try {
+                err.getOutput().flush();
+            } catch (IOException ignored) {
+            }
+        }
+        var output = (LispCharStream) context.currentOutputStreamReference().getValue();
+        if (!output.isClosed()) {
+            try {
+                output.getOutput().flush();
+            } catch (IOException ignored) {
+            }
+        }
     }
 
     @Override

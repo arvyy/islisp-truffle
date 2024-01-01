@@ -24,3 +24,4 @@
     "2")
 
 (format (standard-output) "cond.lisp end")
+(finish-output (standard-output))

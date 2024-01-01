@@ -19,3 +19,4 @@
         (format (standard-output) "FAIL")))
 
 (format (standard-output) "assure.lisp end")
+(finish-output (standard-output))

@@ -30,3 +30,4 @@
             (return-from exit nil))
         (foo1)
         (print "FAIL5")))
+(finish-output (standard-output))

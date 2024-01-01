@@ -23,3 +23,4 @@
   1)
 
 (format (standard-output) "multiply.lisp end")
+(finish-output (standard-output))

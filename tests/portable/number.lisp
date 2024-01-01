@@ -12,3 +12,4 @@
 (test-equal (= 3 (max 1 3)) t)
 
 (format-object (standard-output) "number.lisp end" nil)
+(finish-output (standard-output))

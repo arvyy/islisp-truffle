@@ -42,3 +42,4 @@
   2)
 
 (format (standard-output) "case.lisp end")
+(finish-output (standard-output))

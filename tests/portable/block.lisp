@@ -7,3 +7,4 @@
         (+ 10 (return-from x 6) 22)))
 
 (print (foo))
+(finish-output (standard-output))

@@ -2,8 +2,8 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.runtime.LispCharStream;
 import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -12,8 +12,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.Writer;
 
 /**
  * Implements `format-float` function.
@@ -33,8 +32,8 @@ public abstract class ISLISPFormatFloat extends RootNode {
     }
 
     @Specialization
-    void doProper(LispStream stream, double f) {
-        doPrint(stream.outputStream(), f);
+    void doProper(LispCharStream stream, double f) {
+        doPrint(stream.getOutput(), f);
     }
 
     @Fallback
@@ -44,9 +43,9 @@ public abstract class ISLISPFormatFloat extends RootNode {
 
 
     @CompilerDirectives.TruffleBoundary
-    void doPrint(OutputStream os, double f) {
+    void doPrint(Writer writer, double f) {
         try {
-            os.write(Double.toString(f).getBytes(StandardCharsets.UTF_8));
+            writer.write(Double.toString(f));
         } catch (IOException e) {
             throw new ISLISPError(e.getMessage(), this);
         }

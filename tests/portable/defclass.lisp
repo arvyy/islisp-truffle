@@ -36,3 +36,4 @@
   (if (bar-boundp obj)
       (print 6)
       (print 0)))
+(finish-output (standard-output))

@@ -25,3 +25,4 @@
             (print "FAIL3"))
         (let ((v (signal-condition (create (class <simple-error>) 'format-string "message") t)))
             (print v))))
+(finish-output (standard-output))

@@ -8,3 +8,4 @@
   (print (elt v1 0))
   (print (elt v2 0))
   (print (elt v3 0)))
+(finish-output (standard-output))

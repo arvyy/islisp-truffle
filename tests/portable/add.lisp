@@ -24,3 +24,4 @@
         (return-from exit nil))
       (+ 1 "2")
       (print "FAIL4")))
+(finish-output (standard-output))

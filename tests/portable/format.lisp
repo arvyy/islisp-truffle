@@ -44,3 +44,4 @@
     (format output-stream "This is a tilde: ~~")
     (format-char (standard-output) #\newline)
 )
+(finish-output (standard-output))

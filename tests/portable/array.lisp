@@ -32,3 +32,4 @@
 (test-equal (general-vector-p (create-array '(1))) t)
 
 (format-object (standard-output) "array.lisp end" nil)
+(finish-output (standard-output))
