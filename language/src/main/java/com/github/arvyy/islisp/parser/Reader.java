@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.*;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
 
@@ -33,6 +34,7 @@ public class Reader {
      * @param source source to read from
      * @param sourceSectionMap map to populate with source location information while reading
      */
+    @CompilerDirectives.TruffleBoundary
     public Reader(Source source, Map<EqWrapper, SourceSection> sourceSectionMap) {
         this.source = source;
         BufferedReader bufferedReader;
@@ -45,6 +47,7 @@ public class Reader {
         this.sourceSectionMap = sourceSectionMap;
     }
 
+    @CompilerDirectives.TruffleBoundary
     Optional<Token> peekToken() throws IOException {
         if (peekedToken != null) {
             return Optional.of(peekedToken.token());
@@ -57,6 +60,7 @@ public class Reader {
         return Optional.empty();
     }
 
+    @CompilerDirectives.TruffleBoundary
     Optional<Token> getToken() throws IOException {
         if (peekedToken != null) {
             lastToken = peekedToken;
@@ -94,6 +98,7 @@ public class Reader {
      *
      * @param reader source wrapped in reader
      */
+    @CompilerDirectives.TruffleBoundary
     public Reader(BufferedReader reader) {
         this.source = null;
         this.sourceSectionMap = null;
@@ -107,6 +112,7 @@ public class Reader {
     /**
      * @return list of all top level expressions in given source.
      */
+    @CompilerDirectives.TruffleBoundary
     public List<Object> readAll() {
         try {
             var lst = new ArrayList<Object>();
@@ -126,6 +132,7 @@ public class Reader {
      *
      * @return sexpr expression
      */
+    @CompilerDirectives.TruffleBoundary
     public Optional<Object> readSingle() throws IOException {
         Optional<Token> maybeT = getToken();
         if (maybeT.isEmpty()) {

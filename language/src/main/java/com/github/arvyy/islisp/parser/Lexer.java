@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.parser;
 
+import com.oracle.truffle.api.CompilerDirectives;
+
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
@@ -38,6 +40,7 @@ public class Lexer {
      * @return optional token
      * @throws IOException
      */
+    @CompilerDirectives.TruffleBoundary
     public Optional<TokenWithSource> readToken() throws IOException {
         skipWhitespace();
         int c;

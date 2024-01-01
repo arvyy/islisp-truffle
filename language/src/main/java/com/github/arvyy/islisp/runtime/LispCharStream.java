@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.interop.TruffleObject;
 
 import java.io.BufferedReader;
@@ -51,6 +52,7 @@ public class LispCharStream implements TruffleObject {
     /**
      * Close the stream.
      */
+    @CompilerDirectives.TruffleBoundary
     public void close() {
         closed = true;
         if (output != null) {

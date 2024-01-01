@@ -59,6 +59,7 @@ public abstract class ISLISPFormatObject extends RootNode {
         return sw.toString();
     }
 
+    @CompilerDirectives.TruffleBoundary
     static void doPrint(Writer writer, Object value, boolean escape) {
         try {
             if (value instanceof LispChar c) {

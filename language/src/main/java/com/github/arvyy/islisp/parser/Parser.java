@@ -6,6 +6,7 @@ import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.functions.ISLISPDefaultHandler;
 import com.github.arvyy.islisp.nodes.*;
 import com.github.arvyy.islisp.runtime.*;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleFile;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.source.Source;
@@ -61,6 +62,7 @@ public class Parser {
         );
     }
 
+    @CompilerDirectives.TruffleBoundary
     ModuleSource parseModuleSource(String name, Source source) {
         var reader = new Reader(source, sourceSectionMap);
         var content = reader.readAll();
@@ -98,6 +100,7 @@ public class Parser {
      * @return parsed truffle AST after macro expansion.
      */
     //TODO rename
+    @CompilerDirectives.TruffleBoundary
     public ISLISPExpressionNode executeMacroExpansion(String module, List<Object> content) {
         var ctx = ISLISPContext.get(null);
         var parserContext = new ParserContext(module);
@@ -144,23 +147,6 @@ public class Parser {
                 executeDefinitions(e);
             }
         }
-    }
-
-    Optional<ISLISPExpressionNode> filterDefinitions(ISLISPExpressionNode expression) {
-        if (expression.isDefinitionNode()) {
-            return Optional.empty();
-        }
-        if (expression instanceof ISLISPPrognNode) {
-            var exprs = new ArrayList<ISLISPExpressionNode>();
-            for (var e: ((ISLISPPrognNode) expression).getBodyNodes()) {
-                filterDefinitions(e).ifPresent(exprs::add);
-            }
-            return Optional.of(
-                    new ISLISPPrognNode(
-                            exprs.toArray(ISLISPExpressionNode[]::new),
-                            expression.getSourceSection()));
-        }
-        return Optional.of(expression);
     }
 
     ISLISPExpressionNode parseExpressionNode(ParserContext parserContext, Object sexpr) {
