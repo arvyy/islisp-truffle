@@ -4,11 +4,13 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispCharStream;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Implements `finish-output` function.
@@ -36,14 +38,19 @@ public class ISLISPFinishOutput extends RootNode {
         if (frame.getArguments()[1] instanceof LispCharStream stream) {
             var out = stream.getOutput();
             if (out != null) {
-                try {
-                    out.flush();
-                } catch (IOException ignored) {
-                }
+                flush(out);
             }
             return ctx.getNil();
         }
         return errorSignalerNode.signalWrongType(frame.getArguments()[1], ctx.lookupClass("<stream>"));
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    void flush(Writer out) {
+        try {
+            out.flush();
+        } catch (IOException ignored) {
+        }
     }
 
     /**
