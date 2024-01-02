@@ -151,8 +151,9 @@ public class ISLISPContext {
         initGlobalFunction("char<", ISLISPCharLt::makeLispFunction);
         initGlobalFunction("class-of", ISLISPClassOf::makeLispFunction);
         initGlobalFunction("cons", ISLISPCons::makeLispFunction);
-        initGlobalFunction("create-array", ISLISPCreateArray::makeLispFunction);
         initGlobalFunction("continue-condition", ISLISPContinueCondition::makeLispFunction);
+        initGlobalFunction("cos", ISLISPTrigFunctions::makeLispFunctionCos);
+        initGlobalFunction("create-array", ISLISPCreateArray::makeLispFunction);
         initGlobalFunction("create-string-input-stream", ISLISPCreateStringInputStream::makeLispFunction);
         initGlobalFunction("create-string-output-stream", ISLISPCreateStringOutputStream::makeLispFunction);
         initGlobalFunction("create-vector", ISLISPCreateVector::makeLispFunction);
@@ -189,9 +190,11 @@ public class ISLISPContext {
         initGlobalFunction("set-car", ISLISPSetCar::makeLispFunction);
         initGlobalFunction("set-cdr", ISLISPSetCdr::makeLispFunction);
         initGlobalFunction("set-property", ISLISPSetProperty::makeLispFunction);
+        initGlobalFunction("sin", ISLISPTrigFunctions::makeLispFunctionSin);
         initGlobalFunction("signal-condition", ISLISPSignalCondition::makeLispFunction);
         initGlobalFunction("standard-output", ISLISPStandardOutputStream::makeLispFunction);
         initGlobalFunction("standard-input", ISLISPStandardInputStream::makeLispFunction);
+        initGlobalFunction("tan", ISLISPTrigFunctions::makeLispFunctionTan);
         initGlobalFunction("error-output", ISLISPErrorOutputStream::makeLispFunction);
         initGlobalFunction("subclassp", ISLISPSubclassp::makeLispFunction);
         initGlobalFunction("vector", ISLISPVector::makeLispFunction);
