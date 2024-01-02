@@ -5,6 +5,7 @@ import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPTypes;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.ReportPolymorphism;
@@ -48,6 +49,7 @@ public abstract class ISLISPTrigFunctions extends RootNode {
     }
 
     @Specialization
+    @CompilerDirectives.TruffleBoundary
     Object doBigInt(LispBigInteger b) {
         return impl.compute(b.data().doubleValue());
     }
