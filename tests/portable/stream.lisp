@@ -34,6 +34,21 @@
       (read-char stream t)
       (test-equal nil t)))) ;; shouldn't get here
 
+(let ((stream (create-string-input-stream "a")))
+  (test-equal (preview-char stream) #\a)
+  (test-equal (preview-char stream) #\a)
+  (read-char stream)
+  (test-equal (preview-char stream nil) nil))
+
+
+(let ((out (create-string-output-stream)))
+  (format out "abc~%de")
+  (finish-output out)
+  (let ((stream (create-string-input-stream (get-output-stream-string out))))
+      (test-equal (read-line stream) "abc")
+      (test-equal (read-line stream) "de")
+      (test-equal (read-line stream nil) nil)))
+
 (let ((stream (create-string-input-stream "hello #(1 2 3) 123 #\\A")))
   (test-equal (read stream) 'hello)
   (test-equal (read stream) #(1 2 3))
