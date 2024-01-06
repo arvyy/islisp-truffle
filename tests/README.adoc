@@ -4,4 +4,6 @@ Tests consist of source input (ending with .lisp) and expected standard output f
 
 Tests inside `portable` should pass under any ISLISP compliant implementation, not just this one. However, this requires minor preparation: each occurrence of `(requires "testing.lisp")` needs to be textually replaced with contents of `portable/testtemplate.lisp.txt` before running.
 
-Currently, the tests are ran from java through `mvn test`. A pure shell runner is planned.
+These tests are ran using truffle-islisp using `mvn test` invocation from the root.
+
+To run portable tests using a different implementation, invoke `testrunner.sh` and pass the interpreter call command which includes `FILE` parameter that will be substituted by actual testing file at runtime. For example, `./testrunner.sh 'eisl -s FILE'`
