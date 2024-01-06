@@ -1,7 +1,7 @@
-(defun print (str)
-    (format-object (standard-output) str nil)
-    (format-char (standard-output) #\newline))
+(requires "testing.lisp")
 
-(print (if (and (= 2 2) (> 2 1)) "OK1" "FAIL1"))
-(print (if (and (= 2 2) (> 1 2)) "FAIL2" "OK2"))
+(test-equal (and (= 2 2) (> 2 1)) t)
+(test-equal (and (= 2 2) (> 1 2)) nil)
+
+(format-object (standard-output) "and.lisp end" nil)
 (finish-output (standard-output))

@@ -1,10 +1,11 @@
-(defun print (int)
-    (format-integer (standard-output) int 10)
-    (format-char (standard-output) #\newline))
+(requires "testing.lisp")
 
-(print
+(test-equal
     (+ 1
        (catch 'foo
          (+ 2 (throw 'foo 1)))
-       3))
+       3)
+    5)
+
+(format-object (standard-output) "throw.lisp end" nil)
 (finish-output (standard-output))

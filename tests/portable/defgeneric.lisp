@@ -30,4 +30,6 @@
     (print value))
 
 (setf (foo2 10) 11)
+
+(format (standard-output) "defgeneric.lisp end")
 (finish-output (standard-output))

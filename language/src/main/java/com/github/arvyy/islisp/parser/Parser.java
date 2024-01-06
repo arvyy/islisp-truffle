@@ -8,6 +8,7 @@ import com.github.arvyy.islisp.nodes.*;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleFile;
+import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
@@ -36,7 +37,7 @@ public class Parser {
     /**
      * Returns root node for given main module represented by given source.
      * Actual code content isn't parsed, but deferred by wrapping into
-     * ISLISPMacroExpansionNode node since parsing requires executing macros,
+     * ISLISPModuleNode node since parsing requires executing macros,
      * which potentially require executing user code,
      * which is not supposed to be executed in parse.
      * Handles installing base condition handler.
@@ -48,11 +49,11 @@ public class Parser {
      * @return root node
      */
     //TODO rename
-    public ISLISPRootNode parseRootNode(ISLISPTruffleLanguage language, String module, Source source) {
+    public ISLISPRootNode createMainModuleNode(ISLISPTruffleLanguage language, String module, Source source) {
         var topLevelConditionHandler = new ISLISPWithHandlerNode(
             new ISLISPLiteralNode(ISLISPDefaultHandler.makeLispFunction(language, source.isInteractive()), null)
                 .markInternal(),
-            new ISLISPExpressionNode[]{new ISLISPMacroExpansionNode(this, parseModuleSource(module, source))},
+            new ISLISPExpressionNode[]{new ISLISPModuleNode(this, parseModuleSource(module, source))},
             null
         ).markInternal();
         return new ISLISPRootNode(
@@ -91,39 +92,6 @@ public class Parser {
         return new ModuleSource(name, requires, provides, rest);
     }
 
-    /**
-     * Perform deferred parsing of given module, by evaluating user code and running procedural macros.
-     * All necessary module's dependencies must be already loaded.
-     *
-     * @param module the name of module
-     * @param content usercode sexprs.
-     * @return parsed truffle AST after macro expansion.
-     */
-    //TODO rename
-    @CompilerDirectives.TruffleBoundary
-    public ISLISPExpressionNode executeMacroExpansion(String module, List<Object> content) {
-        var ctx = ISLISPContext.get(null);
-        var parserContext = new ParserContext(module);
-        var expressionNodes = new ArrayList<ISLISPExpressionNode>();
-        for (var v: content) {
-            var expression = parseExpressionNode(parserContext, v, true);
-            executeDefinitions(expression);
-            expressionNodes.add(expression);
-        }
-        var wrappingRootNode = new ISLISPRootNode(
-            ctx.getLanguage(),
-            expressionNodes.toArray(ISLISPExpressionNode[]::new),
-            parserContext.frameBuilder.build()
-        );
-        var lambda = new ISLISPLambdaNode(wrappingRootNode);
-        return new ISLISPIndirectFunctionCallNode(
-            lambda,
-            new ISLISPExpressionNode[]{},
-            false,
-            null
-        );
-    }
-
     SourceSection span(SourceSection a, SourceSection b) {
         if (a == null || b == null) {
             return null;
@@ -134,17 +102,45 @@ public class Parser {
         );
     }
 
-    void executeDefinitions(ISLISPExpressionNode expression) {
+    /**
+     * Expand, parse, and execute given sexprs.
+     * This is deferredly called from ISLISPModuleNode, because macro expansion
+     * might require execution of user code.
+     *
+     * @param module module to which given sexprs belong
+     * @param sexprs source code as a list of sexprs
+     * @return result of last expression
+     */
+    public Object expandAndExecute(String module, List<Object> sexprs) {
+        var ctx = ISLISPContext.get(null);
+        var parserContext = new ParserContext(module);
+        Object result = ctx.getNil();
+        for (var v: sexprs) {
+            var expression = parseExpressionNode(parserContext, v, true);
+            result = executeExpression(expression, parserContext.frameBuilder.build());
+        }
+        return result;
+    }
+
+    Object executeExpression(ISLISPExpressionNode expression, FrameDescriptor fd) {
+        var root = new ISLISPRootNode(
+            null,
+            new ISLISPExpressionNode[]{expression},
+            fd);
+        return root.getCallTarget().call();
+    }
+
+    void executeDefinitions(ISLISPExpressionNode expression, FrameDescriptor fd) {
         if (expression.isDefinitionNode()) {
             var root = new ISLISPRootNode(
                     null,
                     new ISLISPExpressionNode[]{expression},
-                    null);
+                    fd);
             root.getCallTarget().call();
         }
         if (expression instanceof ISLISPPrognNode) {
             for (var e: ((ISLISPPrognNode) expression).getBodyNodes()) {
-                executeDefinitions(e);
+                executeDefinitions(e, fd);
             }
         }
     }
@@ -1357,7 +1353,7 @@ public class Parser {
             ctx.createModule(module, moduleSource.requires(), moduleSource.provides());
             new ISLISPRootNode(
                 ctx.getLanguage(),
-                new ISLISPExpressionNode[]{new ISLISPMacroExpansionNode(this, moduleSource)},
+                new ISLISPExpressionNode[]{new ISLISPModuleNode(this, moduleSource)},
                 null
             ).getCallTarget().call();
         } catch (IOException e) {

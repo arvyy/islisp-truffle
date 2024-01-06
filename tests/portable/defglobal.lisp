@@ -1,24 +1,22 @@
-(defun print (str)
-    (format-object (standard-output) str nil)
-    (format-char (standard-output) #\newline))
+(requires "testing.lisp")
 
 (defglobal foo "OK1")
-(print foo)
+(test-equal foo "OK1")
 (let ((foo "OK2"))
-    (print foo))
-(print foo)
+    (test-equal foo "OK2"))
+(test-equal foo "OK1")
 (setq foo "OK3")
-(print foo)
+(test-equal foo "OK3")
 
 
 ;; test conditions are properly raised when reading unbound variable
 (block exit
     (with-handler
         (lambda (condition)
-            (if (instancep condition (class <unbound-variable>))
-                (print "OK4")
-                (print "FAIL4"))
+            (test-equal (instancep condition (class <unbound-variable>)) t)
             (return-from exit nil))
         unbound
-        (print "FAIL4")))
+        (test-equal nil t)))
+
+(format (standard-output) "defglobal.lisp end")
 (finish-output (standard-output))

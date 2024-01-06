@@ -49,7 +49,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
     @Override
     public CallTarget parse(ParsingRequest request) {
         var parser = new Parser();
-        var rootNode = parser.parseRootNode(this, "MAIN", request.getSource());
+        var rootNode = parser.createMainModuleNode(this, "MAIN", request.getSource());
         return rootNode.getCallTarget();
     }
 
@@ -62,7 +62,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
                 "islispprelude.lisp")
             .build();
         var parser = new Parser();
-        var rootNode = parser.parseRootNode(this, "ROOT", preludeSource);
+        var rootNode = parser.createMainModuleNode(this, "ROOT", preludeSource);
         rootNode.getCallTarget().call();
         ISLISPContext.get(null).getModule("ROOT").exportAll();
     }

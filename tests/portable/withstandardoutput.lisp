@@ -1,9 +1,9 @@
-(defun print (str)
-    (format-object (standard-output) str nil))
+(requires "testing.lisp")
 
 (let ((s (create-string-output-stream)))
   (with-standard-output s
-    (print "2"))
-  (print "1")
-  (print (get-output-stream-string s)))
+    (format s "2"))
+  (test-equal (get-output-stream-string s) "2"))
+
+(format-object (standard-output) "withstandardoutput.lisp end" nil)
 (finish-output (standard-output))

@@ -32,5 +32,9 @@
 (test-equal (string<= "a" "aa") t)
 (test-equal (string<= "aa" "a") nil)
 
+;; sequence
+(test-equal (elt "789" 0) #\7)
+(test-equal (length "ab") 2)
+
 (format-object (standard-output) "string.lisp end" nil)
 (finish-output (standard-output))

@@ -9,7 +9,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 /**
  * Helper node for deferring full parsing (which requires running user code) until runtime.
  */
-public class ISLISPMacroExpansionNode extends ISLISPExpressionNode {
+public class ISLISPModuleNode extends ISLISPExpressionNode {
 
     private final ModuleSource source;
     private final Parser parser;
@@ -19,7 +19,7 @@ public class ISLISPMacroExpansionNode extends ISLISPExpressionNode {
      * @param parser reference to parser to execute proper parsing on invocation
      * @param source top level user code
      */
-    public ISLISPMacroExpansionNode(Parser parser, ModuleSource source) {
+    public ISLISPModuleNode(Parser parser, ModuleSource source) {
         super(null);
         this.parser = parser;
         this.source = source;
@@ -34,7 +34,6 @@ public class ISLISPMacroExpansionNode extends ISLISPExpressionNode {
         if (ctx.getModule(source.name()) == null) {
             ctx.createModule(source.name(), source.requires(), source.provides());
         }
-        var replacement = parser.executeMacroExpansion(source.name(), source.content());
-        return replace(replacement).executeGeneric(frame);
+        return parser.expandAndExecute(source.name(), source.content());
     }
 }

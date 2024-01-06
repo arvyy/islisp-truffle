@@ -1,6 +1,4 @@
-(defun print (int)
-    (format-integer (standard-output) int 10)
-    (format-char (standard-output) #\newline))
+(requires "testing.lisp")
 
 (defmacro incf (var value)
     `(setq ,var (+ ,var ,value)))
@@ -22,6 +20,7 @@
      point-b
       (incf val 08))
     val))
+(test-equal (foo) 15)
 
-(print (foo))
+(format-object (standard-output) "tagbody.lisp end" nil)
 (finish-output (standard-output))
