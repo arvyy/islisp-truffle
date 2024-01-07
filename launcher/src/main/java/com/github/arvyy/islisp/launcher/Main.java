@@ -143,6 +143,7 @@ public final class Main {
             var source = Source.newBuilder("islisp", new File(commandLine.getArgList().get(0))).build();
             context.eval(source);
         }
+        context.close();
     }
 
     static Option chromeDebuggerOpt() {

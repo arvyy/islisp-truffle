@@ -193,6 +193,8 @@ public class Parser {
                     return parseCatchNode(parserContext, sexpr);
                 case "throw":
                     return parseThrowNode(parserContext, sexpr);
+                case "convert":
+                    return parseConvert(parserContext, sexpr);
                 case "progn":
                     return parseProgn(parserContext, sexpr, topLevel);
                 case "funcall":
@@ -333,6 +335,17 @@ public class Parser {
             }
         }
         throw new ParsingException(source(sexpr), "Unrecognized form.");
+    }
+
+    private ISLISPConvertNode parseConvert(ParserContext parserContext, Object sexpr) {
+        var args = requireList(sexpr, 3, 3);
+        var valueExpr = parseExpressionNode(parserContext, args.get(1));
+        var className = downcast(args.get(2), Symbol.class);
+        return new ISLISPConvertNode(
+            valueExpr,
+            className,
+            source(sexpr)
+        );
     }
 
     private ISLISPCaseNode parseCaseUsing(ParserContext parserContext, Object sexpr) {
