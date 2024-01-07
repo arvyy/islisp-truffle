@@ -173,6 +173,7 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
         }
 
         @Specialization
+        @CompilerDirectives.TruffleBoundary
         Object convertChar(LispChar c) {
             return ISLISPContext.get(this).namedSymbol(new String(new int[]{c.codepoint()}, 0, 1));
         }
