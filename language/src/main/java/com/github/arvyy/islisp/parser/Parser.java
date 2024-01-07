@@ -16,6 +16,7 @@ import com.oracle.truffle.api.source.SourceSection;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -89,7 +90,7 @@ public class Parser {
             }
             rest.add(obj);
         }
-        return new ModuleSource(name, requires, provides, rest);
+        return new ModuleSource(name, source.createSection(0, source.getLength()), requires, provides, rest);
     }
 
     SourceSection span(SourceSection a, SourceSection b) {
@@ -106,20 +107,20 @@ public class Parser {
      * Expand, parse, and execute given sexprs.
      * This is deferredly called from ISLISPModuleNode, because macro expansion
      * might require execution of user code.
+     * The expanded result must be spliced into node tree using exprCallback
+     * to enable instrumentation.
      *
      * @param module module to which given sexprs belong
      * @param sexprs source code as a list of sexprs
-     * @return result of last expression
+     * @param exprCallback callback to run upon evaluation of each top level sexpr
      */
-    public Object expandAndExecute(String module, List<Object> sexprs) {
-        var ctx = ISLISPContext.get(null);
+    public void expandAndExecute(String module, List<Object> sexprs, Consumer<ISLISPExpressionNode> exprCallback) {
         var parserContext = new ParserContext(module);
-        Object result = ctx.getNil();
         for (var v: sexprs) {
             var expression = parseExpressionNode(parserContext, v, true);
-            result = executeExpression(expression, parserContext.frameBuilder.build());
+            executeExpression(expression, parserContext.frameBuilder.build());
+            exprCallback.accept(expression);
         }
-        return result;
     }
 
     Object executeExpression(ISLISPExpressionNode expression, FrameDescriptor fd) {

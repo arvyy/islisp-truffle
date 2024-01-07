@@ -17,12 +17,12 @@ public class ISLISPModuleNode extends ISLISPExpressionNode {
     /**
      * Create macro expansion node.
      * @param parser reference to parser to execute proper parsing on invocation
-     * @param source top level user code
+     * @param moduleSource top level user code
      */
-    public ISLISPModuleNode(Parser parser, ModuleSource source) {
-        super(null);
+    public ISLISPModuleNode(Parser parser, ModuleSource moduleSource) {
+        super(moduleSource.sourceSection());
         this.parser = parser;
-        this.source = source;
+        this.source = moduleSource;
         markInternal();
     }
 
@@ -34,6 +34,10 @@ public class ISLISPModuleNode extends ISLISPExpressionNode {
         if (ctx.getModule(source.name()) == null) {
             ctx.createModule(source.name(), source.requires(), source.provides());
         }
-        return parser.expandAndExecute(source.name(), source.content());
+        parser.expandAndExecute(source.name(), source.content(), expr -> {
+            // insert exprs so that they get transitively instrumented
+            insert(expr);
+        });
+        return ISLISPContext.get(this).getNil();
     }
 }
