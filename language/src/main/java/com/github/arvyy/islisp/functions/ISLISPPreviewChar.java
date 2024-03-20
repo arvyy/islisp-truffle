@@ -5,8 +5,8 @@ import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispChar;
-import com.github.arvyy.islisp.runtime.LispCharStream;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -83,15 +83,14 @@ public abstract class ISLISPPreviewChar extends RootNode {
     @Specialization
     @CompilerDirectives.TruffleBoundary
     Object doProper(
-        LispCharStream stream,
+        LispStream stream,
         Object eosErrorP,
         Object eosValue
     ) {
         try {
-            var in = stream.getInput();
-            in.mark(1);
-            var codepoint = in.read();
-            in.reset();
+            stream.mark(4);
+            var codepoint = stream.readCodepoint();
+            stream.reset();
             if (codepoint != -1) {
                 return new LispChar(codepoint);
             }

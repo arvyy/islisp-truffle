@@ -43,8 +43,20 @@ public class Reader {
         } else {
             bufferedReader = new BufferedReader(source.getReader());
         }
-        lexer = new Lexer(bufferedReader);
+        lexer = new Lexer(new LexerSourceFromReader(bufferedReader));
         this.sourceSectionMap = sourceSectionMap;
+    }
+
+    /**
+     * Create reader from given LispStream.
+     *
+     * @param stream source in a lispstream shape
+     */
+    @CompilerDirectives.TruffleBoundary
+    public Reader(LispStream stream) {
+        this.source = null;
+        this.sourceSectionMap = null;
+        lexer = new Lexer(new LexerSourceFromLispStream(stream));
     }
 
     @CompilerDirectives.TruffleBoundary
@@ -90,19 +102,6 @@ public class Reader {
 
     int getEndColumn() {
         return lastToken.endColumn();
-    }
-
-
-    /**
-     * Create reader from given java.io.Reader.
-     *
-     * @param reader source wrapped in reader
-     */
-    @CompilerDirectives.TruffleBoundary
-    public Reader(BufferedReader reader) {
-        this.source = null;
-        this.sourceSectionMap = null;
-        lexer = new Lexer(reader);
     }
 
     SourceSection section() {
@@ -255,11 +254,11 @@ public class Reader {
                     getToken();
                     var endLine = getLine();
                     var endColumn = getColumn();
-                    var section = source.createSection(startLine, startColumn, endLine, endColumn);
                     if (lst.isEmpty()) {
                         var nil = ISLISPContext.get(null).getNil();
                         var nilWithPos = new Symbol(nil.name(), nil.identityReference());
                         if (source != null) {
+                            var section = source.createSection(startLine, startColumn, endLine, endColumn);
                             sourceSectionMap.put(new EqWrapper(nilWithPos), section);
                         }
                         return Optional.of(nilWithPos);
@@ -270,6 +269,7 @@ public class Reader {
                         }
                         var parsedTail = (Pair) tail;
                         if (source != null) {
+                            var section = source.createSection(startLine, startColumn, endLine, endColumn);
                             sourceSectionMap.put(new EqWrapper(parsedTail), section);
                         }
                         return Optional.of(parsedTail);

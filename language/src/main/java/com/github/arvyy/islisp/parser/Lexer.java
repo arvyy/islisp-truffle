@@ -2,7 +2,6 @@ package com.github.arvyy.islisp.parser;
 
 import com.oracle.truffle.api.CompilerDirectives;
 
-import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -14,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public class Lexer {
 
-    private final BufferedReader reader;
+    private final LexerSource source;
     private int col;
     private int line;
     private int markedCol;
@@ -25,10 +24,10 @@ public class Lexer {
     /**
      * Create lexer from given buffered reader.
      *
-     * @param reader buffered reader
+     * @param source buffered reader
      */
-    public Lexer(BufferedReader reader) {
-        this.reader = reader;
+    public Lexer(LexerSource source) {
+        this.source = source;
         col = 0;
         line = 1;
         eol = false;
@@ -281,7 +280,7 @@ public class Lexer {
     }
 
     int readCodepoint(boolean throwEOF) throws IOException {
-        int c = reader.read();
+        int c = source.read();
         if (c == -1) {
             if (throwEOF) {
                 throw new EOFException();
@@ -361,14 +360,14 @@ public class Lexer {
     }
 
     void mark(int size) throws IOException {
-        reader.mark(size);
+        source.mark(size);
         markedCol = col;
         markedLine = line;
         markedEol = eol;
     }
 
     void reset() throws IOException {
-        reader.reset();
+        source.reset();
         col = markedCol;
         line = markedLine;
         eol = markedEol;

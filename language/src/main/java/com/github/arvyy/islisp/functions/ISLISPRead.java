@@ -6,7 +6,7 @@ import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.parser.Reader;
 import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispCharStream;
+import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -84,11 +84,11 @@ public abstract class ISLISPRead extends RootNode {
     @Specialization
     @CompilerDirectives.TruffleBoundary
     Object doProper(
-        LispCharStream stream,
+        LispStream stream,
         Object eosErrorP,
         Object eosValue
     ) {
-        var reader = new Reader(stream.getInput());
+        var reader = new Reader(stream);
         Optional<Object> maybeDatum = null;
         try {
             maybeDatum = reader.readSingle();

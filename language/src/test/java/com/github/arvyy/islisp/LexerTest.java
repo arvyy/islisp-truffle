@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp;
 
 import com.github.arvyy.islisp.parser.Lexer;
+import com.github.arvyy.islisp.parser.LexerSourceFromReader;
 import com.github.arvyy.islisp.parser.Token;
 import com.github.arvyy.islisp.parser.TokenWithSource;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ public class LexerTest {
         var input = """
             ( ) ab . "str" 12 #( #' ' ` , ,@
             """;
-        var lexer = new Lexer(new BufferedReader(new StringReader(input)));
+        var lexer = new Lexer(new LexerSourceFromReader(new BufferedReader(new StringReader(input))));
         assertEquals(
             lexer.readToken(),
             Optional.of(new TokenWithSource(new Token.BracketOpenToken(), 1, 1, 1, 1))
@@ -82,7 +83,7 @@ public class LexerTest {
             |# ignore3 
             |# 2
             """;
-        var lexer = new Lexer(new BufferedReader(new StringReader(input)));
+        var lexer = new Lexer(new LexerSourceFromReader(new BufferedReader(new StringReader(input))));
         assertEquals(
             lexer.readToken(),
             Optional.of(new TokenWithSource(new Token.ExactNumberToken(BigInteger.valueOf(1)), 2, 1, 2, 1))

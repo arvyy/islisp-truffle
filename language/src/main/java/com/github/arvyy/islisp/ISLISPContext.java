@@ -8,9 +8,7 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.nodes.Node;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -56,7 +54,7 @@ public class ISLISPContext {
      * @param language
      * @param env
      */
-    public ISLISPContext(ISLISPTruffleLanguage language, Env env) {
+    public ISLISPContext(ISLISPTruffleLanguage language, Env env) throws IOException {
         this.language = language;
         this.env = env;
         modules = new HashMap<>();
@@ -64,11 +62,11 @@ public class ISLISPContext {
         symbolProperties = new HashMap<>();
         symbols = new HashMap<>();
         currentOutputStream = new ValueReference();
-        currentOutputStream.setValue(new LispCharStream(new PrintWriter(env.out(), true), null));
+        currentOutputStream.setValue(new LispStream(null, env.out()));
         currentInputStream = new ValueReference();
-        currentInputStream.setValue(new LispCharStream(null, new BufferedReader(new InputStreamReader(env.in()))));
+        currentInputStream.setValue(new LispStream(env.in(), null));
         currentErrorStream = new ValueReference();
-        currentErrorStream.setValue(new LispCharStream(new PrintWriter(env.err(), true), null));
+        currentErrorStream.setValue(new LispStream(null, env.err()));
         initBuiltinVars();
         initBuiltinClasses();
         initGlobalFunctions();
@@ -162,6 +160,7 @@ public class ISLISPContext {
         initGlobalFunction("eq", ISLISPEq::makeLispFunction);
         initGlobalFunction("equal", ISLISPEqual::makeLispFunction);
         initGlobalFunction("eval", ISLISPEval::makeLispFunction);
+        initGlobalFunction("file-position", ISLISPFilePosition::makeLispFunction);
         initGlobalFunction("finish-output", ISLISPFinishOutput::makeLispFunction);
         initGlobalFunction("format", ISLISPFormat::makeLispFunction);
         initGlobalFunction("format-char", ISLISPFormatChar::makeLispFunction);
@@ -181,6 +180,7 @@ public class ISLISPContext {
         initGlobalFunction("mapcon", ISLISPMapcon::makeLispFunction);
         initGlobalFunction("maplist", ISLISPMaplist::makeLispFunction);
         initGlobalFunction("mapl", ISLISPMapl::makeLispFunction);
+        initGlobalFunction("open-input-file", ISLISPOpenInputFile::makeLispFunction);
         initGlobalFunction("output-stream-p", ISLISPOutputStreamp::makeLispFunction);
         initGlobalFunction("preview-char", ISLISPPreviewChar::makeLispFunction);
         initGlobalFunction("property", ISLISPProperty::makeLispFunction);
@@ -191,6 +191,7 @@ public class ISLISPContext {
         initGlobalFunction("set-aref", ISLISPSetAref::makeLispFunction);
         initGlobalFunction("set-car", ISLISPSetCar::makeLispFunction);
         initGlobalFunction("set-cdr", ISLISPSetCdr::makeLispFunction);
+        initGlobalFunction("set-file-position", ISLISPSetFilePosition::makeLispFunction);
         initGlobalFunction("set-property", ISLISPSetProperty::makeLispFunction);
         initGlobalFunction("sin", ISLISPTrigFunctions::makeLispFunctionSin);
         initGlobalFunction("signal-condition", ISLISPSignalCondition::makeLispFunction);

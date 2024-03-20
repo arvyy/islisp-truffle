@@ -1,16 +1,18 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
+import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
-import com.github.arvyy.islisp.runtime.LispCharStream;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Implements `create-string-input-stream` method.
@@ -40,12 +42,16 @@ public class ISLISPCreateStringInputStream extends RootNode {
             var ctx = ISLISPContext.get(this);
             return errorSignalerNode.signalWrongType(arg, ctx.lookupClass("<string>"));
         }
-        return executeBoundary(value);
+        try {
+            return executeBoundary(value);
+        } catch (IOException e) {
+            throw new ISLISPError(e.getMessage(), this);
+        }
     }
 
     @CompilerDirectives.TruffleBoundary
-    Object executeBoundary(CharSequence value) {
-        return new LispCharStream(null, new BufferedReader(new StringReader(value.toString())));
+    Object executeBoundary(CharSequence value) throws IOException {
+        return new LispStream(new ByteArrayInputStream(value.toString().getBytes(StandardCharsets.UTF_8)), null);
     }
 
     /**

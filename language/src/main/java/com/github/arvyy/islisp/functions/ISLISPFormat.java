@@ -3,8 +3,8 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
-import com.github.arvyy.islisp.runtime.LispCharStream;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -12,7 +12,6 @@ import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import java.io.IOException;
-import java.io.Writer;
 
 /**
  * Implements `format` function.
@@ -55,8 +54,8 @@ public class ISLISPFormat extends RootNode {
         } else {
             return errorSignalerNode.signalWrongType(frame.getArguments()[2], ctx.lookupClass("<string>"));
         }
-        LispCharStream os;
-        if (frame.getArguments()[1] instanceof LispCharStream out) {
+        LispStream os;
+        if (frame.getArguments()[1] instanceof LispStream out) {
             os = out;
         } else {
             return errorSignalerNode.signalWrongType(frame.getArguments()[1], ctx.lookupClass("<stream>"));
@@ -68,11 +67,10 @@ public class ISLISPFormat extends RootNode {
 
     //TODO granualize snippets that need boundary
     @CompilerDirectives.TruffleBoundary
-    Object executeBoundary(LispCharStream os, String formatString, Object[] args) {
+    Object executeBoundary(LispStream os, String formatString, Object[] args) {
         var ctx = ISLISPContext.get(this);
         try {
             int argIndex = 3;
-            var writer = os.getOutput();
             for (int i = 0; i < formatString.length(); i++) {
                 if (formatString.charAt(i) == '~') {
                     i++;
@@ -82,7 +80,7 @@ public class ISLISPFormat extends RootNode {
                     var c = formatString.charAt(i);
                     switch (c) {
                         case '~' -> {
-                            writeCodepoint(writer, "~".codePointAt(0));
+                            writeCodepoint(os, "~".codePointAt(0));
                         }
                         case 'A' ->
                             formatObject().call(null, os, args[argIndex++], ctx.getNil());
@@ -101,13 +99,13 @@ public class ISLISPFormat extends RootNode {
                         case 'X' ->
                             formatInt().call(null, os, args[argIndex++], 16);
                         case '%' ->
-                            writeCodepoint(writer, "\n".codePointAt(0));
+                            writeCodepoint(os, "\n".codePointAt(0));
                         case '&' ->
                             formatFreshLine().call(null, os);
                         default -> { }
                     }
                 } else {
-                    writeCodepoint(writer, formatString.codePointAt(i));
+                    writeCodepoint(os, formatString.codePointAt(i));
                 }
             }
         } catch (Exception e) {
@@ -118,10 +116,10 @@ public class ISLISPFormat extends RootNode {
     }
 
     @CompilerDirectives.TruffleBoundary
-    void writeCodepoint(Writer writer, int codePoint) throws IOException {
-        writer.write(codePoint);
+    void writeCodepoint(LispStream stream, int codePoint) throws IOException {
+        stream.writeCodepoint(codePoint);
         if (codePoint == '\n') {
-            writer.flush();
+            stream.flush();
         }
     }
 

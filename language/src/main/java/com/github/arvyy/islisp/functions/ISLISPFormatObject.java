@@ -35,9 +35,9 @@ public abstract class ISLISPFormatObject extends RootNode {
     abstract Object executeGeneric(Object stream, Object obj, Object escape);
 
     @Specialization
-    Object doProper(LispCharStream stream, Object obj, Object escape) {
+    Object doProper(LispStream stream, Object obj, Object escape) {
         var nil = ISLISPContext.get(this).getNil();
-        doPrint(stream.getOutput(), obj, escape != nil);
+        doPrint(stream, obj, escape != nil);
         return nil;
     }
 
@@ -54,109 +54,113 @@ public abstract class ISLISPFormatObject extends RootNode {
      */
     @CompilerDirectives.TruffleBoundary
     public static String format(Object o) {
-        var sw = new StringWriter();
-        doPrint(sw, o, false);
-        return sw.toString();
+        try {
+            var stream = new LispStream(null, new ByteArrayOutputStream());
+            doPrint(stream, o, false);
+            return stream.getOutputString().get();
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     @CompilerDirectives.TruffleBoundary
-    static void doPrint(Writer writer, Object value, boolean escape) {
+    static void doPrint(LispStream stream, Object value, boolean escape) {
         try {
             if (value instanceof LispChar c) {
                 if (escape) {
-                    writer.write("#\\");
+                    stream.write("#\\");
                 }
-                writer.write(c.codepoint());
+                stream.writeCodepoint(c.codepoint());
                 return;
             }
             if (value instanceof String s) {
                 if (escape) {
-                    writer.write("\"");
+                    stream.write("\"");
                 }
-                writer.write(s);
+                stream.write(s);
                 if (escape) {
-                    writer.write("\"");
+                    stream.write("\"");
                 }
                 return;
             }
             if (value instanceof Integer i) {
-                writer.write(i.toString());
+                stream.write(i.toString());
                 return;
             }
             if (value instanceof Double d) {
-                writer.write(d.toString());
+                stream.write(d.toString());
                 return;
             }
             if (value instanceof LispBigInteger b) {
-                writer.write(b.data().toString());
+                stream.write(b.data().toString());
                 return;
             }
             if (value instanceof Symbol s) {
-                writer.write(s.name());
+                stream.write(s.name());
                 return;
             }
             if (value instanceof Pair p) {
-                writer.write("(");
+                stream.write("(");
                 var first = true;
                 for (var e: Utils.readList(p)) {
                     if (!first) {
-                        writer.write(" ");
+                        stream.write(" ");
                     } else {
                         first = false;
                     }
-                    doPrint(writer, e, escape);
+                    doPrint(stream, e, escape);
                 }
-                writer.write(")");
+                stream.write(")");
                 return;
             }
             if (value instanceof LispVector v) {
-                writer.write("#(");
+                stream.write("#(");
                 var first = true;
                 for (var e: v.values()) {
                     if (!first) {
-                        writer.write(" ");
+                        stream.write(" ");
                     } else {
                         first = false;
                     }
-                    doPrint(writer, e, escape);
+                    doPrint(stream, e, escape);
                 }
-                writer.write(")");
+                stream.write(")");
                 return;
             }
             if (value instanceof StandardClass c) {
-                writer.write("#<class ");
-                writer.write(c.name());
-                writer.write(">");
+                stream.write("#<class ");
+                stream.write(c.name());
+                stream.write(">");
                 return;
             }
             if (value instanceof BuiltinClass c) {
-                writer.write("#<class ");
-                writer.write(c.name());
-                writer.write(">");
+                stream.write("#<class ");
+                stream.write(c.name());
+                stream.write(">");
                 return;
             }
             if (value instanceof StandardClassObject o) {
-                writer.write("#<object ");
-                writer.write(o.clazz().name());
-                writer.write(" ");
-                writer.write(o.hashCode() + "");
-                writer.write(">");
+                stream.write("#<object ");
+                stream.write(o.clazz().name());
+                stream.write(" ");
+                stream.write(o.hashCode() + "");
+                stream.write(">");
                 return;
             }
-            if (value instanceof LispCharStream s) {
-                writer.write("#<stream ");
-                writer.write(s.hashCode() + "");
-                writer.write(">");
+            if (value instanceof LispStream s) {
+                stream.write("#<stream ");
+                stream.write(s.hashCode() + "");
+                stream.write(">");
                 return;
             }
             if (value instanceof LispFunction f) {
                 if (f.isGeneric()) {
-                    writer.write("#<generic-function ");
+                    stream.write("#<generic-function ");
                 } else {
-                    writer.write("#<function ");
+                    stream.write("#<function ");
                 }
-                writer.write(f.hashCode() + "");
-                writer.write(">");
+                stream.write(f.hashCode() + "");
+                stream.write(">");
                 return;
             }
         } catch (IOException e) {

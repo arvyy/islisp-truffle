@@ -2,8 +2,8 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
-import com.github.arvyy.islisp.runtime.LispCharStream;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -12,7 +12,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import java.io.IOException;
-import java.io.Writer;
 
 /**
  * Implements `format-integer` function, that writes a given integer to output stream.
@@ -32,8 +31,8 @@ public abstract class ISLISPFormatInteger extends RootNode {
     }
 
     @Specialization
-    void doProper(LispCharStream stream, int integer, int radix) {
-        doPrint(stream.getOutput(), integer, radix);
+    void doProper(LispStream stream, int integer, int radix) {
+        doPrint(stream, integer, radix);
     }
 
     @Fallback
@@ -43,9 +42,9 @@ public abstract class ISLISPFormatInteger extends RootNode {
 
 
     @CompilerDirectives.TruffleBoundary
-    void doPrint(Writer os, int value, int radix) {
+    void doPrint(LispStream s, int value, int radix) {
         try {
-            os.write(Integer.toString(value, radix).toUpperCase());
+            s.write(Integer.toString(value, radix).toUpperCase());
         } catch (IOException e) {
             throw new ISLISPError(e.getMessage(), this);
         }

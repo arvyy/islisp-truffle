@@ -1,14 +1,12 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
-import com.github.arvyy.islisp.runtime.LispCharStream;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
-
-import java.io.StringWriter;
 
 /**
  * Implements `get-output-stream-string` function.
@@ -29,19 +27,17 @@ public class ISLISPGetOutputStreamString extends RootNode {
             return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 1, 1);
         }
         var arg = frame.getArguments()[1];
-        if (arg instanceof LispCharStream s) {
+        if (arg instanceof LispStream s) {
             return executeBoundary(s);
         }
         return errorSignalerNode.signalNotStringOutputStream(arg);
     }
 
     @CompilerDirectives.TruffleBoundary
-    Object executeBoundary(LispCharStream s) {
-        if (s.getOutput() instanceof StringWriter sw) {
-            var content = sw.toString();
-            var buffer = sw.getBuffer();
-            buffer.delete(0, buffer.length());
-            return content;
+    Object executeBoundary(LispStream s) {
+        var str = s.getOutputString();
+        if (str.isPresent()) {
+            return str.get();
         }
         return errorSignalerNode.signalNotStringOutputStream(s);
     }
