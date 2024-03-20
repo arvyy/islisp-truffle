@@ -30,17 +30,17 @@ public class ISLISPCreateStringOutputStream extends RootNode {
         if (frame.getArguments().length != 1) {
             return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 0, 0);
         }
+        return executeBoundary();
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    LispStream executeBoundary() {
         try {
-            return executeBoundary();
+            return new LispStream(null, new ByteArrayOutputStream());
         } catch (IOException e) {
             //TODO
             throw new ISLISPError(e.getMessage(), this);
         }
-    }
-
-    @CompilerDirectives.TruffleBoundary
-    LispStream executeBoundary() throws IOException {
-        return new LispStream(null, new ByteArrayOutputStream());
     }
 
     /**

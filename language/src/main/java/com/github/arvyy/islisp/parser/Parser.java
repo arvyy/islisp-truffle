@@ -113,14 +113,17 @@ public class Parser {
      * @param module module to which given sexprs belong
      * @param sexprs source code as a list of sexprs
      * @param exprCallback callback to run upon evaluation of each top level sexpr
+     * @return value of last expression
      */
-    public void expandAndExecute(String module, List<Object> sexprs, Consumer<ISLISPExpressionNode> exprCallback) {
+    public Object expandAndExecute(String module, List<Object> sexprs, Consumer<ISLISPExpressionNode> exprCallback) {
         var parserContext = new ParserContext(module);
+        Object last = ISLISPContext.get(null).getNil();
         for (var v: sexprs) {
             var expression = parseExpressionNode(parserContext, v, true);
-            executeExpression(expression, parserContext.frameBuilder.build());
+            last = executeExpression(expression, parserContext.frameBuilder.build());
             exprCallback.accept(expression);
         }
+        return last;
     }
 
     Object executeExpression(ISLISPExpressionNode expression, FrameDescriptor fd) {

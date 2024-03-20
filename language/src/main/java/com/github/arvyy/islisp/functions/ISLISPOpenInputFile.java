@@ -5,6 +5,7 @@ import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispStream;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -43,6 +44,7 @@ public abstract class ISLISPOpenInputFile extends RootNode {
     abstract Object executeGeneric(Object filename);
 
     @Specialization
+    @CompilerDirectives.TruffleBoundary
     Object doString(String filename) {
         var file = ISLISPContext.get(this).getEnv().getPublicTruffleFile(filename);
         try {

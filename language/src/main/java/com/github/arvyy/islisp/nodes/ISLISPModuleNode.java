@@ -34,10 +34,9 @@ public class ISLISPModuleNode extends ISLISPExpressionNode {
         if (ctx.getModule(source.name()) == null) {
             ctx.createModule(source.name(), source.requires(), source.provides());
         }
-        parser.expandAndExecute(source.name(), source.content(), expr -> {
+        return parser.expandAndExecute(source.name(), source.content(), expr -> {
             // insert exprs so that they get transitively instrumented
             insert(expr);
         });
-        return ISLISPContext.get(this).getNil();
     }
 }

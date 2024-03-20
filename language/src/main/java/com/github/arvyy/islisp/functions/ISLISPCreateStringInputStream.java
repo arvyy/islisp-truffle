@@ -42,16 +42,16 @@ public class ISLISPCreateStringInputStream extends RootNode {
             var ctx = ISLISPContext.get(this);
             return errorSignalerNode.signalWrongType(arg, ctx.lookupClass("<string>"));
         }
-        try {
-            return executeBoundary(value);
-        } catch (IOException e) {
-            throw new ISLISPError(e.getMessage(), this);
-        }
+        return executeBoundary(value);
     }
 
     @CompilerDirectives.TruffleBoundary
-    Object executeBoundary(CharSequence value) throws IOException {
-        return new LispStream(new ByteArrayInputStream(value.toString().getBytes(StandardCharsets.UTF_8)), null);
+    Object executeBoundary(CharSequence value) {
+        try {
+            return new LispStream(new ByteArrayInputStream(value.toString().getBytes(StandardCharsets.UTF_8)), null);
+        } catch (IOException e) {
+            throw new ISLISPError(e.getMessage(), this);
+        }
     }
 
     /**

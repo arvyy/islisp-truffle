@@ -6,6 +6,7 @@ import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispStream;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -39,6 +40,7 @@ public abstract class ISLISPFilePosition extends RootNode {
     abstract Object executeGeneric(Object obj);
 
     @Specialization
+    @CompilerDirectives.TruffleBoundary
     Object doProper(LispStream stream) {
         if (stream.isFileBased()) {
             try {
