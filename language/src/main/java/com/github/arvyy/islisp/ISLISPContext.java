@@ -183,6 +183,7 @@ public class ISLISPContext {
         initGlobalFunction("open-input-file", ISLISPOpenInputFile::makeLispFunction);
         initGlobalFunction("output-stream-p", ISLISPOutputStreamp::makeLispFunction);
         initGlobalFunction("preview-char", ISLISPPreviewChar::makeLispFunction);
+        initGlobalFunction("probe-file", ISLISPProbeFile::makeLispFunction);
         initGlobalFunction("property", ISLISPProperty::makeLispFunction);
         initGlobalFunction("read", ISLISPRead::makeLispFunction);
         initGlobalFunction("read-char", ISLISPReadChar::makeLispFunction);
