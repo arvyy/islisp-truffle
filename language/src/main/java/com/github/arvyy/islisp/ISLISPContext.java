@@ -169,6 +169,8 @@ public class ISLISPContext {
         initGlobalFunction("format-object", ISLISPFormatObject::makeLispFunction);
         initGlobalFunction("format-fresh-line", ISLISPFormatFreshLine::makeLispFunction);
         initGlobalFunction("gensym", ISLISPGensym::makeLispFunction);
+        initGlobalFunction("get-internal-real-time", ISLISPGetInternalRealTime::makeLispFunction);
+        initGlobalFunction("get-universal-time", ISLISPGetUniversalTime::makeLispFunction);
         initGlobalFunction("get-output-stream-string", ISLISPGetOutputStreamString::makeLispFunction);
         initGlobalFunction("input-stream-p", ISLISPInputStreamp::makeLispFunction);
         initGlobalFunction("instancep", ISLISPInstancep::makeLispFunction);

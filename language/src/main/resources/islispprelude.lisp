@@ -250,3 +250,6 @@
       ((null lists) nil)
       ((null (cdr lists)) (car lists))
       (t (append2 (car lists) (apply #'append (cdr lists)))))))
+
+(defun get-internal-run-time () (get-internal-real-time))
+(defun internal-time-units-per-second () 1000)
