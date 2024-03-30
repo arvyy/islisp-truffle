@@ -56,6 +56,7 @@ public abstract class ISLISPWriteByte extends RootNode {
     @Specialization(guards = {
         "stream.hasOutput()"
     })
+    @CompilerDirectives.TruffleBoundary
     Object doBigInt(LispBigInteger bigInteger, LispStream stream) {
         int b = bigInteger.data().intValueExact();
         return doInt(b, stream);
