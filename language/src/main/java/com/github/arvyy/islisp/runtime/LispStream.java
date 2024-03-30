@@ -16,6 +16,8 @@ public class LispStream implements TruffleObject, AutoCloseable {
 
     static final int MAX_BUFFER_SIZE = 1024;
 
+    private final boolean canRead;
+    private final boolean canWrite;
     private final InputStream input;
     private final OutputStream output;
     private final byte[] buffer;
@@ -44,6 +46,8 @@ public class LispStream implements TruffleObject, AutoCloseable {
         } else {
             buffer = new byte[MAX_BUFFER_SIZE];
         }
+        canWrite = output != null;
+        canRead = input != null;
         bufferLength = 0;
         bufferPos = 0;
         markedBufferPos = -1;
@@ -52,11 +56,15 @@ public class LispStream implements TruffleObject, AutoCloseable {
     /**
      * Create lisp from given file channel.
      * @param byteChannel file channel.
+     * @param canRead is file open for reading
+     * @param canWrite is file open for writing
      */
-    public LispStream(SeekableByteChannel byteChannel) {
+    public LispStream(SeekableByteChannel byteChannel, boolean canRead, boolean canWrite) {
         this.input = null;
         this.output = null;
         this.byteChannel = byteChannel;
+        this.canRead = canRead;
+        this.canWrite = canWrite;
         buffer = new byte[MAX_BUFFER_SIZE];
         bufferLength = 0;
         bufferPos = 0;
@@ -206,6 +214,23 @@ public class LispStream implements TruffleObject, AutoCloseable {
     }
 
     /**
+     * Write raw byte to stream.
+     * @param b unsigned byte presented as an integer
+     * @throws IOException
+     */
+    public void writeByte(int b) throws IOException {
+        if (output != null) {
+            output.write(b);
+        } else {
+            if (bufferLength != 0) {
+                byteChannel.position(byteChannel.position() - bufferLength);
+                bufferLength = 0;
+            }
+            byteChannel.write(ByteBuffer.wrap(new byte[]{(byte) b}));
+        }
+    }
+
+    /**
      * Close input and output streams.
      *
      * @throws IOException
@@ -250,7 +275,7 @@ public class LispStream implements TruffleObject, AutoCloseable {
      * @return if lispstream has output stream (doesn't check if it's closed).
      */
     public boolean hasOutput() {
-        return output != null;
+        return canWrite;
     }
 
     /**
@@ -280,7 +305,7 @@ public class LispStream implements TruffleObject, AutoCloseable {
      * @return if lispstream has input stream (doesn't check if it's closed).
      */
     public boolean hasInput() {
-        return input != null || byteChannel != null;
+        return canRead;
     }
 
     /**
@@ -311,5 +336,4 @@ public class LispStream implements TruffleObject, AutoCloseable {
         markedBufferPos = -1;
         byteChannel.position(position);
     }
-
 }

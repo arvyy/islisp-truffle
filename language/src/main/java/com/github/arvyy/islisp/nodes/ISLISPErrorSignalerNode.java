@@ -86,7 +86,15 @@ public class ISLISPErrorSignalerNode extends Node {
             expected);
     }
 
-    Object signalDomainError(String message, Object obj, LispClass expectedClass) {
+    /**
+     * Signal domain error.
+     *
+     * @param message message to show
+     * @param obj offending object
+     * @param expectedClass expected class
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
+    public Object signalDomainError(String message, Object obj, LispClass expectedClass) {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,

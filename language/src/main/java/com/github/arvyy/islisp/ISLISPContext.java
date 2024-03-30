@@ -148,6 +148,7 @@ public class ISLISPContext {
         initGlobalFunction("char=", ISLISPCharEqual::makeLispFunction);
         initGlobalFunction("char<", ISLISPCharLt::makeLispFunction);
         initGlobalFunction("class-of", ISLISPClassOf::makeLispFunction);
+        initGlobalFunction("close", ISLISPClose::makeLispFunction);
         initGlobalFunction("cons", ISLISPCons::makeLispFunction);
         initGlobalFunction("continue-condition", ISLISPContinueCondition::makeLispFunction);
         initGlobalFunction("cos", ISLISPTrigFunctions::makeLispFunctionCos);
@@ -183,6 +184,7 @@ public class ISLISPContext {
         initGlobalFunction("maplist", ISLISPMaplist::makeLispFunction);
         initGlobalFunction("mapl", ISLISPMapl::makeLispFunction);
         initGlobalFunction("open-input-file", ISLISPOpenInputFile::makeLispFunction);
+        initGlobalFunction("open-output-file", ISLISPOpenOutputFile::makeLispFunction);
         initGlobalFunction("output-stream-p", ISLISPOutputStreamp::makeLispFunction);
         initGlobalFunction("preview-char", ISLISPPreviewChar::makeLispFunction);
         initGlobalFunction("probe-file", ISLISPProbeFile::makeLispFunction);
@@ -204,6 +206,7 @@ public class ISLISPContext {
         initGlobalFunction("error-output", ISLISPErrorOutputStream::makeLispFunction);
         initGlobalFunction("subclassp", ISLISPSubclassp::makeLispFunction);
         initGlobalFunction("vector", ISLISPVector::makeLispFunction);
+        initGlobalFunction("write-byte", ISLISPWriteByte::makeLispFunction);
         initCreateMethod();
         initInitializeObjectMethod();
 

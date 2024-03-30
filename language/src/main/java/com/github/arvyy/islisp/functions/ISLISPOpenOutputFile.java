@@ -20,14 +20,14 @@ import java.nio.file.StandardOpenOption;
 import java.util.Set;
 
 /**
- * Implements `open-input-file` function.
+ * Implements `open-output-file` function.
  */
-public abstract class ISLISPOpenInputFile extends RootNode {
+public abstract class ISLISPOpenOutputFile extends RootNode {
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
-    ISLISPOpenInputFile(TruffleLanguage<?> language) {
+    ISLISPOpenOutputFile(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
@@ -48,8 +48,10 @@ public abstract class ISLISPOpenInputFile extends RootNode {
     Object doString(String filename) {
         var file = ISLISPContext.get(this).getEnv().getPublicTruffleFile(filename);
         try {
-            var channel = file.newByteChannel(Set.of(StandardOpenOption.READ));
-            return new LispStream(channel, true, false);
+            var channel = file.newByteChannel(Set.of(
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE));
+            return new LispStream(channel, false, true);
         } catch (IOException e) {
             throw new ISLISPError(e.getMessage(), this);
         }
@@ -81,7 +83,7 @@ public abstract class ISLISPOpenInputFile extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPOpenInputFileNodeGen.create(lang).getCallTarget());
+        return new LispFunction(ISLISPOpenOutputFileNodeGen.create(lang).getCallTarget());
     }
 
 }
