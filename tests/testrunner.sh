@@ -8,6 +8,7 @@ fi
 
 commandTemplate=$1
 testingRequireReplacement=$(<portable/testtemplate.lisp.txt)
+exitCode=0
 
 for f in portable/*.lisp
 do
@@ -24,6 +25,9 @@ do
     echo $(<"portable/$name.expect.txt")
     echo "Was:"
     echo $(<tmp.txt )
-    exit 1
+    echo -e "\n\n"
+    exitCode=1
   fi
 done
+
+exit $exitCode

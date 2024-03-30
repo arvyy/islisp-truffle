@@ -28,7 +28,7 @@ public record LispBigInteger(BigInteger data) implements TruffleObject {
     }
 
     /**
-     * Numeric addition of this node to other.
+     * Numeric addition of this node to the other.
      *
      * @param other number
      * @return sum value

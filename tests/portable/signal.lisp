@@ -1,28 +1,28 @@
-(defun print (str)
+(defun test-print (str)
     (format-object (standard-output) str nil)
     (format-char (standard-output) #\newline))
 
 (block exit
     (with-handler
         (lambda (c)
-            (print "FAIL1")
+            (test-print "FAIL1")
             (return-from exit nil))
-        (print "OK1")))
+        (test-print "OK1")))
 
 (block exit
     (with-handler
         (lambda (c)
-            (print "OK2")
+            (test-print "OK2")
             (return-from exit nil))
         (error "message")
-        (print "FAIL2")))
+        (test-print "FAIL2")))
 
 (block exit
     (with-handler
         (lambda (c)
-            (print "OK3.1")
+            (test-print "OK3.1")
             (continue-condition c "OK3.2")
-            (print "FAIL3"))
+            (test-print "FAIL3"))
         (let ((v (signal-condition (create (class <simple-error>) 'format-string "message") t)))
-            (print v))))
+            (test-print v))))
 (finish-output (standard-output))
