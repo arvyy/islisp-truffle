@@ -24,10 +24,31 @@
   (setf datum (read stream))
   (test-equal '(1 2 3) datum)
   (setf datum (read stream))
-  (test-equal 'a datum))
+  (test-equal 'a datum)
+  (close stream))
 
 ;; writing bytes
 (let ((out (open-output-file "../tests/nonportable/file.dat")))
   (write-byte 200 out)
   (finish-output out)
   (close out))
+
+;; reading bytes
+;; TODO
+
+;; util macros
+;; TODO ability to test if stream is closed; test if stream is closed after macro scope ended
+(let ((ran nil))
+    (with-open-input-file (stream "../tests/nonportable/file.txt")
+        (setf ran t)
+        (test-equal '(1 2 3) (read stream)))
+    (test-equal t ran))
+
+;; util macros
+;; TODO ability to test if stream is closed; test if stream is closed after macro scope ended
+(let ((ran nil))
+    (with-open-output-file (stream "../tests/nonportable/file.txt")
+        (format stream "(1 2 3)a")
+        (finish-output stream)
+        (setf ran t))
+    (test-equal t ran))

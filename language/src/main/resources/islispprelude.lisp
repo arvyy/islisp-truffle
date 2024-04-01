@@ -253,3 +253,15 @@
 
 (defun get-internal-run-time () (get-internal-real-time))
 (defun internal-time-units-per-second () 1000)
+
+(defmacro define-with-file-macro (macro-name open-function)
+    `(defmacro ,macro-name (signature :rest forms)
+        (let ((name (elt signature 0))
+              (open-args (cdr signature)))
+          `(let ((,name (funcall #',',open-function ,@open-args)))
+             (unwind-protect
+                (progn ,@forms)
+                (close ,name))))))
+
+(define-with-file-macro with-open-input-file open-input-file)
+(define-with-file-macro with-open-output-file open-output-file)
