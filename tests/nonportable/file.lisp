@@ -34,7 +34,12 @@
   (close out))
 
 ;; reading bytes
-;; TODO
+(let ((in (open-input-file "../tests/nonportable/file.dat"))
+      (b nil))
+  (setf b (read-byte in))
+  (test-equal 200 b)
+  (test-equal nil (read-byte in nil))
+  (close in))
 
 ;; util macros
 ;; TODO ability to test if stream is closed; test if stream is closed after macro scope ended

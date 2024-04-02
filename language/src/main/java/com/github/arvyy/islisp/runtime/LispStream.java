@@ -78,10 +78,11 @@ public class LispStream implements TruffleObject, AutoCloseable {
 // checkstyle goes crazy about magic numbers..
 //CHECKSTYLE:OFF
     public int readCodepoint() throws IOException {
-        byte first = readByte();
-        if (first == -1) {
+        int firstUnsigned = readByte();
+        if (firstUnsigned == -1) {
             return -1;
         }
+        byte first = (byte) firstUnsigned;
         if (((first >>> 3) & 0b11110) == 0b11110) {
             var bytes = readRemainingBytes(new byte[]{first, 0, 0, 0}, 4);
             if (bytes == null) return -1;
@@ -111,23 +112,23 @@ public class LispStream implements TruffleObject, AutoCloseable {
             if (b == -1) {
                 return null;
             }
-            array[i] = b;
+            array[i] = (byte) b;
         }
         return array;
     }
 
     /**
-     * @return next byte in inputstream, or -1 if EOF.
+     * @return next byte in inputstream, or -1 if EOF. Byte value is represented as an unsigned int.
      * @throws IOException
      */
-    public byte readByte() throws IOException {
+    public int readByte() throws IOException {
         ensureBuffer();
         if (bufferLength == 0) {
             return -1;
         }
         byte b = buffer[bufferPos];
         bufferPos++;
-        return b;
+        return Byte.toUnsignedInt(b);
     }
 
     /**
