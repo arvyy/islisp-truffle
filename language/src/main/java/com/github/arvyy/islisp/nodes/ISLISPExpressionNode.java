@@ -122,6 +122,7 @@ public abstract class ISLISPExpressionNode extends Node implements Instrumentabl
      *
      * @return parsing context active during parse of this node
      */
+    @CompilerDirectives.TruffleBoundary
     public ParserContext getParserContext() {
         if (parserContext == null && !parserContextKnown) {
             parserContextKnown = true;
@@ -154,6 +155,7 @@ public abstract class ISLISPExpressionNode extends Node implements Instrumentabl
     }
 
     @ExportMessage
+    @CompilerDirectives.TruffleBoundary
     Object getScope(Frame frame, boolean nodeEnter) {
         return new DebuggerScope(frame, getParserContext().getLocalScopeVariables());
     }
