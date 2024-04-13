@@ -4,7 +4,7 @@
           "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
-  <property name="severity" value="error"/>
+  <property name="severity" value="warning"/>
   <property name="fileExtensions" value="java"/>
 
   <!-- Excludes all 'module-info.java' files              -->

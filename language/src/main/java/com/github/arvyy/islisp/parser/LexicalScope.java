@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.parser;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A hierarchical Map, wherein if value is missing in a leaf node, it tries recursively look
@@ -50,6 +51,20 @@ public class LexicalScope<Key, Value> {
             return parent.get(key);
         }
         return Optional.empty();
+    }
+
+    /**
+     * @return keys that are part of top bindings layer.
+     */
+    public Set<Key> listLocalKeys() {
+        return myValues.keySet();
+    }
+
+    /**
+     * @return remove top layer of bindings.
+     */
+    public LexicalScope<Key, Value> getParent() {
+        return parent;
     }
 
 }

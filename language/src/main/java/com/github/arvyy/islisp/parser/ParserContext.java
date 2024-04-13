@@ -3,14 +3,14 @@ package com.github.arvyy.islisp.parser;
 import com.github.arvyy.islisp.runtime.SymbolReference;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Necessary parser context while doing recursive paring descent.
+ * Needs to be public since it gets saved under debugger node to be reused during
+ * inline parsing context from debugger.
  */
-class ParserContext {
+public class ParserContext {
     final String module;
     final int frameDepth;
     final LexicalScope<SymbolReference, VariableContext> variables;
@@ -131,7 +131,34 @@ class ParserContext {
     }
 
     static class VariableContext {
+        String name;
         int frameDepth;
         int slot;
     }
+
+    /**
+     * Build local scope variable info from the context.
+     *
+     * @return a list, where each element represents a scope, wherein each scope is a list of variables it contains.
+     * list are ordered from parent scope to child scope.
+     *
+     */
+    public List<List<LocalScopeVariable>> getLocalScopeVariables() {
+        var lst = new ArrayList<List<LocalScopeVariable>>();
+        var lexicalScope = variables;
+        while (lexicalScope != null) {
+            var scopevars = new ArrayList<LocalScopeVariable>();
+            for (var key: lexicalScope.listLocalKeys()) {
+                var value = lexicalScope.get(key).get();
+                var scopevar = new LocalScopeVariable(value.name, frameDepth - value.frameDepth, value.slot);
+                scopevars.add(scopevar);
+            }
+            if (!scopevars.isEmpty()) {
+                lst.add(scopevars);
+            }
+            lexicalScope = lexicalScope.getParent();
+        }
+        return lst;
+    }
+
 }
