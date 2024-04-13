@@ -1,6 +1,10 @@
 ;; nonportable, because string -> file resolution is implementation dependent.
 (requires "testing.lisp")
 
+(delete-file "../tests/nonportable/file.txt")
+(delete-file "../tests/nonportable/file2.txt")
+(delete-file "../tests/nonportable/file.dat")
+
 ;; writing text
 (let ((out (open-output-file "../tests/nonportable/file.txt")))
   (format out "(1 2 3)a")
@@ -42,18 +46,33 @@
   (close in))
 
 ;; util macros
-;; TODO ability to test if stream is closed; test if stream is closed after macro scope ended
-(let ((ran nil))
+(let ((ran nil)
+      (stream* nil))
     (with-open-input-file (stream "../tests/nonportable/file.txt")
         (setf ran t)
-        (test-equal '(1 2 3) (read stream)))
+        (setf stream* stream)
+        (test-equal '(1 2 3) (read stream))
+        (test-equal nil (closed-p stream)))
+    (test-equal t (closed-p stream*))
     (test-equal t ran))
 
 ;; util macros
-;; TODO ability to test if stream is closed; test if stream is closed after macro scope ended
-(let ((ran nil))
+(let ((ran nil)
+      (stream* nil))
     (with-open-output-file (stream "../tests/nonportable/file.txt")
         (format stream "(1 2 3)a")
         (finish-output stream)
-        (setf ran t))
+        (setf ran t)
+        (setf stream* stream)
+        (test-equal nil (closed-p stream)))
+    (test-equal t (closed-p stream*))
     (test-equal t ran))
+
+;; test input+output at once
+(let ((stream (open-io-file "../tests/nonportable/file2.txt"))
+      (position nil))
+  (setf position (file-position stream))
+  (format stream "test")
+  (set-file-position stream position)
+  (test-equal 'test (read stream))
+  (close stream))

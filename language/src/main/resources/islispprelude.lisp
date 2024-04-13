@@ -265,3 +265,4 @@
 
 (define-with-file-macro with-open-input-file open-input-file)
 (define-with-file-macro with-open-output-file open-output-file)
+(define-with-file-macro with-open-io-file open-io-file)

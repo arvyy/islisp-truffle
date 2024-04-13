@@ -36,7 +36,7 @@ public abstract class ISLISPOpenOutputFile extends RootNode {
     public final Object execute(VirtualFrame frame) {
         var args = frame.getArguments().length;
         if (args != 2 && args != 3) {
-            return errorSignalerNode.signalWrongArgumentCount(args - 1, 2, 3);
+            return errorSignalerNode.signalWrongArgumentCount(args - 1, 1, 2);
         }
         return executeGeneric(frame.getArguments()[1]);
     }

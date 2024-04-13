@@ -25,6 +25,7 @@ public class LispStream implements TruffleObject, AutoCloseable {
     private int bufferLength;
     private int markedBufferPos;
     private int bufferPos;
+    private boolean closed = false;
 
 
     /**
@@ -247,6 +248,7 @@ public class LispStream implements TruffleObject, AutoCloseable {
         if (byteChannel != null) {
             byteChannel.close();
         }
+        closed = true;
     }
 
     /**
@@ -336,5 +338,13 @@ public class LispStream implements TruffleObject, AutoCloseable {
         bufferLength = 0;
         markedBufferPos = -1;
         byteChannel.position(position);
+    }
+
+    /**
+     *
+     * @return true if `close` had been called.
+     */
+    public boolean isClosed() {
+        return closed;
     }
 }

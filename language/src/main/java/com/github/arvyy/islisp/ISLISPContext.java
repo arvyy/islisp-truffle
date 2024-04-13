@@ -184,6 +184,7 @@ public class ISLISPContext {
         initGlobalFunction("maplist", ISLISPMaplist::makeLispFunction);
         initGlobalFunction("mapl", ISLISPMapl::makeLispFunction);
         initGlobalFunction("open-input-file", ISLISPOpenInputFile::makeLispFunction);
+        initGlobalFunction("open-io-file", ISLISPOpenIOFile::makeLispFunction);
         initGlobalFunction("open-output-file", ISLISPOpenOutputFile::makeLispFunction);
         initGlobalFunction("output-stream-p", ISLISPOutputStreamp::makeLispFunction);
         initGlobalFunction("preview-char", ISLISPPreviewChar::makeLispFunction);
@@ -219,6 +220,8 @@ public class ISLISPContext {
         initGlobalFunction("set-truffle-object-field", ISLISPSetTruffleObjectField::makeLispFunction);
         initGlobalFunction("load-native-library", ISLISPLoadNativeLibrary::makeLispFunction);
         initGlobalFunction("native-library-symbol", ISLISPNativeLibrarySymbol::makeLispFunction);
+        initGlobalFunction("closed-p", ISLISPClosedp::makeLispFunction);
+        initGlobalFunction("delete-file", ISLISPDeleteFile::makeLispFunction);
     }
 
     private void initInitializeObjectMethod() {

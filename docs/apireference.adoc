@@ -4,6 +4,20 @@ Given that this is ISLISP implementation, primary reference is the http://www.is
 
 == Extensions
 
+=== File operation extensions
+
+Following extra functions are provided to complement standard file / stream api.
+
+`(closed-p _stream_)`
+
+Returns `t` if stream had been explicitly closed, `nil` otherwise. A `nil` result doesn't guarantee
+the stream is operable.
+
+`(delete-file _path-string_)`
+
+Deletes a file a under given path string if it exists. It's not an error if it doesn't. Returns `nil`.
+
+
 === Module system
 
 Truffle ISLISP provides a very simple module system, somewhat inspired by Racket. A module is colloquial to a file that defines its source.
