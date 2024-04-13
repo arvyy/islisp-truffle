@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp;
 
+import com.github.arvyy.islisp.nodes.ISLISPDebuggerNode;
 import com.github.arvyy.islisp.parser.Parser;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Option;
@@ -7,6 +8,7 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.debug.DebuggerTags;
 import com.oracle.truffle.api.instrumentation.ProvidedTags;
 import com.oracle.truffle.api.instrumentation.StandardTags;
+import com.oracle.truffle.api.nodes.ExecutableNode;
 import com.oracle.truffle.api.source.Source;
 import org.graalvm.options.OptionCategory;
 import org.graalvm.options.OptionDescriptors;
@@ -56,6 +58,13 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
         var parser = new Parser();
         var rootNode = parser.createMainModuleNode(this, "MAIN", request.getSource());
         return rootNode.getCallTarget();
+    }
+
+    @Override
+    public ExecutableNode parse(InlineParsingRequest request) throws Exception {
+        var parser = new Parser();
+        var debuggerNode = (ISLISPDebuggerNode) request.getLocation();
+        return parser.createInlineDebuggerEvalNode(this, debuggerNode, request.getSource());
     }
 
     @Override

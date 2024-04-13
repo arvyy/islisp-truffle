@@ -36,7 +36,7 @@ public class ISLISPLexicalIdentifierNode extends ISLISPExpressionNode {
         for (int i = 0; i < frameIndex; i++) {
             f = ((Closure) f.getArguments()[0]).frame();
         }
-        return (Object) f.getObject(frameSlot);
+        return f.getObject(frameSlot);
     }
 
     @Override

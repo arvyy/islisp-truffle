@@ -80,19 +80,13 @@ public final class Main {
         }
 
         if (commandLine.hasOption(chromeDebuggerOpt)) {
-            if (chromeDebuggerOpt.hasArg()) {
-                contextBuilder.option("inspect", chromeDebuggerOpt.getValue());
-            } else {
-                contextBuilder.option("inspect", "9229");
-            }
+            var val = commandLine.getOptionValue(chromeDebuggerOpt);
+            contextBuilder.option("inspect", val);
         }
 
         if (commandLine.hasOption(dapDebuggerOpt)) {
-            if (dapDebuggerOpt.hasArg()) {
-                contextBuilder.option("dap", dapDebuggerOpt.getValue());
-            } else {
-                contextBuilder.option("dap", "4711");
-            }
+            var val = commandLine.getOptionValue(dapDebuggerOpt);
+            contextBuilder.option("dap", val);
         }
         var context = contextBuilder.build();
 
@@ -151,9 +145,8 @@ public final class Main {
             .option("d")
             .longOpt("debug-chrome")
             .optionalArg(true)
-            .argName("PORT")
-            .desc("Run in debugger mode using chrome debugger protocol. "
-                + "If port not provided, defaults to 9229.")
+            .argName("CHROME_PORT")
+            .desc("Run in debugger mode using chrome debugger protocol.")
             .build();
     }
 
@@ -162,9 +155,8 @@ public final class Main {
             .option("dap")
             .longOpt("debug-dap")
             .optionalArg(true)
-            .argName("PORT")
-            .desc("Run in debugger mode using DAP. "
-                + "If port not provided, defaults to 4711.")
+            .argName("DAP_PORT")
+            .desc("Run in debugger mode using DAP.")
             .build();
     }
 

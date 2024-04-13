@@ -64,6 +64,30 @@ public class Parser {
         );
     }
 
+    /**
+     * Returns root node for evaluating inline
+     * during paused execution in debugger.
+     *
+     * @param language language reference
+     * @param debuggerNode debugger node at which the execution is being paused
+     * @param source custom source to eval at the context of the paused debugger node
+     * @return executable node wrapping evaluation of local parse.
+     */
+    public ISLISPRootNode createInlineDebuggerEvalNode(
+        ISLISPTruffleLanguage language,
+        ISLISPDebuggerNode debuggerNode,
+        Source source
+    ) {
+        var reader = new Reader(source, sourceSectionMap);
+        var sexprs = reader.readAll();
+        var exprs = new ArrayList<ISLISPExpressionNode>();
+        for (var sexpr: sexprs) {
+            var expression = parseExpressionNode(debuggerNode.getParserContext(), sexpr, false);
+            exprs.add(expression);
+        }
+        return new ISLISPRootNode(language, exprs.toArray(ISLISPExpressionNode[]::new), null);
+    }
+
     @CompilerDirectives.TruffleBoundary
     ModuleSource parseModuleSource(String name, Source source) {
         var reader = new Reader(source, sourceSectionMap);
@@ -485,6 +509,7 @@ public class Parser {
             var variableContext = new ParserContext.VariableContext();
             variableContext.slot = slot;
             variableContext.frameDepth = parserContext.frameDepth;
+            variableContext.name = varName.name();
             newLexicalScope.put(varName.identityReference(), variableContext);
         }
         var internalParserContext = parserContext.pushLexicalScope(newLexicalScope);
@@ -492,16 +517,21 @@ public class Parser {
             var varSpecList = requireList(variableSpec, 2, 3);
             var varName = downcast(varSpecList.get(0), Symbol.class);
             var step = varSpecList.size() == 2 ? varName : varSpecList.get(2);
-            steps.add(parseExpressionNode(internalParserContext, step));
+            var stepExpression = parseExpressionNode(internalParserContext, step);
+            stepExpression.setParserContext(internalParserContext);
+            steps.add(stepExpression);
         }
         var endTestGroup = requireList(args.get(2), 1, -1);
         var testExpr = parseExpressionNode(internalParserContext, endTestGroup.get(0));
+        testExpr.setParserContext(internalParserContext);
         var resultBody = endTestGroup.stream()
             .skip(1)
-            .map(resultExpr -> parseExpressionNode(internalParserContext, resultExpr));
+            .map(resultExpr -> parseExpressionNode(internalParserContext, resultExpr))
+            .peek(e -> e.setParserContext(internalParserContext));
         var iterationBody = args.stream()
             .skip(3)
-            .map(e -> parseExpressionNode(internalParserContext, e));
+            .map(e -> parseExpressionNode(internalParserContext, e))
+            .peek(e -> e.setParserContext(internalParserContext));
         return new ISLISPForNode(
             slots.stream().mapToInt(i -> i).toArray(),
             inits.toArray(ISLISPExpressionNode[]::new),
@@ -767,9 +797,11 @@ public class Parser {
             var callNextMethodVar = new ParserContext.VariableContext();
             callNextMethodVar.slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
             callNextMethodVar.frameDepth = 0;
+            callNextMethodVar.name = "call-next-method";
             var nextMethodPVar = new ParserContext.VariableContext();
             nextMethodPVar.slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
             nextMethodPVar.frameDepth = 0;
+            nextMethodPVar.name = "next-method-p";
             bodyParserContext = slotsAndNewContext.context.pushLexicalFunctionScope(Map.of(
                     ISLISPContext.get(null).namedSymbol("next-method-p").identityReference(), nextMethodPVar,
                     ISLISPContext.get(null).namedSymbol("call-next-method").identityReference(), callNextMethodVar
@@ -786,6 +818,7 @@ public class Parser {
                 span(
                         bodyStatements[0].getSourceSection(),
                         bodyStatements[bodyStatements.length - 1].getSourceSection()));
+        body.setParserContext(bodyParserContext);
         var ctx = ISLISPContext.get(null);
         var userDefinedFunctionNode = new ISLISPUserDefinedFunctionNode(
                 ctx.getLanguage(),
@@ -1032,6 +1065,7 @@ public class Parser {
             span(
                 bodyStatements[0].getSourceSection(),
                 bodyStatements[bodyStatements.length - 1].getSourceSection()));
+        body.setParserContext(slotsAndNewContext.context);
         var ctx = ISLISPContext.get(null);
         var userDefinedFunctionNode = new ISLISPUserDefinedFunctionNode(
             ctx.getLanguage(),
@@ -1066,6 +1100,7 @@ public class Parser {
         var body = new ISLISPPrognNode(
                 bodyStatements,
                 null);
+        body.setParserContext(slotsAndNewContext.context);
         var ctx = ISLISPContext.get(null);
         var userDefinedFunctionNode = new ISLISPUserDefinedFunctionNode(
                 ctx.getLanguage(),
@@ -1112,6 +1147,7 @@ public class Parser {
                 var variableContext = new ParserContext.VariableContext();
                 variableContext.frameDepth = parserContext.frameDepth;
                 variableContext.slot = slot;
+                variableContext.name = arg.name();
                 variables.put(arg.identityReference(), variableContext);
             } else if (state == stateNamedArgs && isRestKw) {
                 state = stateAfterRestKw;
@@ -1121,6 +1157,7 @@ public class Parser {
                 var variableContext = new ParserContext.VariableContext();
                 variableContext.frameDepth = parserContext.frameDepth;
                 variableContext.slot = restSlot;
+                variableContext.name = arg.name();
                 variables.put(arg.identityReference(), variableContext);
             } else if (state == stateAfterRestArg) {
                 throw new ParsingException(source(arg), "Multiple symbols after :rest");
@@ -1212,12 +1249,14 @@ public class Parser {
             var variableContext = new ParserContext.VariableContext();
             variableContext.slot = variableSlots[i];
             variableContext.frameDepth = parserContext.frameDepth;
+            variableContext.name = variableName.name();
             variableNameMap.put(variableName.identityReference(), variableContext);
         }
         parserContext = parserContext.pushLexicalScope(variableNameMap);
         var body = new ISLISPExpressionNode[bodyExpressions.size()];
         for (int i = 0; i < bodyExpressions.size(); i++) {
             body[i] = parseExpressionNode(parserContext, bodyExpressions.get(i));
+            body[i].setParserContext(parserContext);
         }
         return new ISLISPLetNode(variableSlots, variableInitializers, body, source(sexpr));
     }
@@ -1234,9 +1273,11 @@ public class Parser {
             var variableInitializer = variable.get(1);
             variableSlots[i] = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
             variableInitializers[i] = parseExpressionNode(parserContext, variableInitializer);
+            variableInitializers[i].setParserContext(parserContext);
             var variableContext = new ParserContext.VariableContext();
             variableContext.slot = variableSlots[i];
             variableContext.frameDepth = parserContext.frameDepth;
+            variableContext.name = variableName.name();
             parserContext = parserContext.pushLexicalScope(Map.of(variableName.identityReference(), variableContext));
         }
         var body = new ISLISPExpressionNode[bodyExpressions.size()];
@@ -1267,6 +1308,7 @@ public class Parser {
             var variableContext = new ParserContext.VariableContext();
             variableContext.slot = bindingSlots[i];
             variableContext.frameDepth = parserContext.frameDepth;
+            variableContext.name = name.name();
             if (bindingNameMap.containsKey(name.identityReference())) {
                 throw new ParsingException(source(sexpr), "Duplicate variable declaration.");
             }

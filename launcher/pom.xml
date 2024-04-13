@@ -32,12 +32,6 @@
 
         <dependency>
             <groupId>org.graalvm.polyglot</groupId>
-            <artifactId>js-community</artifactId>
-            <type>pom</type>
-        </dependency>
-
-        <dependency>
-            <groupId>org.graalvm.polyglot</groupId>
             <artifactId>tools-community</artifactId>
             <type>pom</type>
         </dependency>

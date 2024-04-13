@@ -13,7 +13,7 @@ jobs:
           cache: 'maven'
       - name: Verify checkstyle
         run: |
-          mvn validate
+          mvn -Dcheckstyle.violationSeverity=warning validate
       - name: Test
         run: |
           mvn test
