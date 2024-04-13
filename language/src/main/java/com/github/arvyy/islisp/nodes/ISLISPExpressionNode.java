@@ -6,6 +6,7 @@ import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.ReportPolymorphism;
 import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.Frame;
+import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.*;
 import com.oracle.truffle.api.interop.NodeLibrary;
@@ -155,8 +156,13 @@ public abstract class ISLISPExpressionNode extends Node implements Instrumentabl
     }
 
     @ExportMessage
-    @CompilerDirectives.TruffleBoundary
     Object getScope(Frame frame, boolean nodeEnter) {
+        return getScopeBoundary(frame.materialize());
+    }
+
+
+    @CompilerDirectives.TruffleBoundary
+    Object getScopeBoundary(MaterializedFrame frame) {
         return new DebuggerScope(frame, getParserContext().getLocalScopeVariables());
     }
 
