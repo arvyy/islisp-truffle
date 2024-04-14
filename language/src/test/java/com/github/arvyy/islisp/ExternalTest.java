@@ -61,7 +61,8 @@ public class ExternalTest {
             var expected = Files.readString(resultFile);
             var actual = output
                 .toString(StandardCharsets.UTF_8)
-                .replaceAll("\\r", "");
+                .replaceAll("\\r", "")
+                .trim();
             assertEquals(expected, actual);
         }
     }

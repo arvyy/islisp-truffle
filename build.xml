@@ -56,24 +56,24 @@
     </condition>
 
     <condition property="isMac">
-        <os family="unix" />
+        <os family="mac" />
     </condition>
 
-    <target name="init-linux">
+    <target name="init-linux" if="isUnix">
         <property name="shell.executable" value="sh" />
         <property name="shell.prefix" value="-c" />
         <property name="dist.name" value="islisp-linux" />
         <property name="dist.static-flag" value="true"/>
     </target>
 
-    <target name="init-macos">
+    <target name="init-macos" if="isMac">
         <property name="shell.executable" value="sh" />
         <property name="shell.prefix" value="-c" />
         <property name="dist.name" value="islisp-macos" />
         <property name="dist.static-flag" value="false"/>
     </target>
 
-    <target name="init-windows">
+    <target name="init-windows" if="isWindows">
         <property name="shell.executable" value="powershell" />
         <property name="shell.prefix" value="-command" />
         <property name="dist.name" value="islisp.exe" />
