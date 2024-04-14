@@ -1,8 +1,8 @@
-<project>
+<project xmlns:if="ant:if">
 
     <property environment="env"/>
 
-    <target name="clean" depends="init">
+    <target name="clean" depends="init" description="Clean built artifacts">
         <delete dir="${basedir}/dist"/>
         <exec executable="${shell.executable}">
             <arg value="${shell.prefix}"/>
@@ -10,7 +10,7 @@
         </exec>
     </target>
 
-    <target name="dist" depends="clean, init">
+    <target name="dist" depends="clean, init" description="Build and package project, artifacts are transfered to dist folder">
         <mkdir dir="${basedir}/dist"/>
         <exec executable="${shell.executable}" failonerror="true">
             <arg value="${shell.prefix}"/>
@@ -21,7 +21,7 @@
         </copy>
     </target>
 
-    <target name="native" depends="init">
+    <target name="native" depends="init" description="Build native distribution for current OS.">
         <path id="distjars">
             <fileset dir="${basedir}/dist">
                 <include name="*.jar"/>
@@ -34,7 +34,7 @@
 
         <exec executable="${env.JAVA_HOME}/bin/native-image" failonerror="true">
             <arg value="-H:+StaticExecutableWithDynamicLibC"/>
-            <arg value="--static"/>
+            <arg value="--static" if:true="${dist.static-flag}"/>
             <arg value="--macro:truffle-svm"/>
             <arg value="--initialize-at-build-time"/>
             <arg value="--no-fallback"/>
@@ -63,18 +63,21 @@
         <property name="shell.executable" value="sh" />
         <property name="shell.prefix" value="-c" />
         <property name="dist.name" value="islisp-linux" />
+        <property name="dist.static-flag" value="true"/>
     </target>
 
     <target name="init-macos">
         <property name="shell.executable" value="sh" />
         <property name="shell.prefix" value="-c" />
         <property name="dist.name" value="islisp-macos" />
+        <property name="dist.static-flag" value="false"/>
     </target>
 
     <target name="init-windows">
         <property name="shell.executable" value="powershell" />
         <property name="shell.prefix" value="-command" />
         <property name="dist.name" value="islisp.exe" />
+        <property name="dist.static-flag" value="false"/>
     </target>
 
 </project>

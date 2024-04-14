@@ -59,7 +59,9 @@ public class ExternalTest {
         try (var ctx = ctxBuilder.build()) {
             ctx.eval(Source.newBuilder("islisp", lispFile.toFile()).build());
             var expected = Files.readString(resultFile);
-            var actual = output.toString(StandardCharsets.UTF_8);
+            var actual = output
+                .toString(StandardCharsets.UTF_8)
+                .replaceAll("\\r", "");
             assertEquals(expected, actual);
         }
     }
