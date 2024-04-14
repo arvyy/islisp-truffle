@@ -81,7 +81,7 @@
     <target name="init-windows" if="isWindows">
         <property name="shell.executable" value="powershell" />
         <property name="shell.prefix" value="-command" />
-        <property name="dist.name" value="islisp.exe" />
+        <property name="dist.name" value="islisp" />
         <property name="dist.static-flag" value="false"/>
         <property name="native-image-binary" value="native-image.cmd"/>
     </target>
