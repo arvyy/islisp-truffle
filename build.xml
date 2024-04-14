@@ -32,7 +32,7 @@
 
         <pathconvert property="module-path" refid="distjars"/>
 
-        <exec executable="${env.JAVA_HOME}/bin/native-image" failonerror="true">
+        <exec executable="${env.JAVA_HOME}/bin/${native-image-binary}" failonerror="true">
             <arg value="-H:+StaticExecutableWithDynamicLibC"/>
             <arg value="--static" if:true="${dist.static-flag}"/>
             <arg value="--macro:truffle-svm"/>
@@ -45,14 +45,17 @@
         </exec>
     </target>
 
-    <target name="init" depends="init-linux, init-windows, init-macos"/>
-
     <condition property="isWindows">
         <os family="windows" />
     </condition>
 
     <condition property="isUnix">
-        <os family="unix" />
+        <and>
+            <os family="unix"/>
+            <not>
+                <os family="mac" />
+            </not>
+        </and>
     </condition>
 
     <condition property="isMac">
@@ -64,6 +67,7 @@
         <property name="shell.prefix" value="-c" />
         <property name="dist.name" value="islisp-linux" />
         <property name="dist.static-flag" value="true"/>
+        <property name="native-image-binary" value="native-image"/>
     </target>
 
     <target name="init-macos" if="isMac">
@@ -71,6 +75,7 @@
         <property name="shell.prefix" value="-c" />
         <property name="dist.name" value="islisp-macos" />
         <property name="dist.static-flag" value="false"/>
+        <property name="native-image-binary" value="native-image"/>
     </target>
 
     <target name="init-windows" if="isWindows">
@@ -78,6 +83,9 @@
         <property name="shell.prefix" value="-command" />
         <property name="dist.name" value="islisp.exe" />
         <property name="dist.static-flag" value="false"/>
+        <property name="native-image-binary" value="native-image.exe"/>
     </target>
+
+    <target name="init" depends="init-linux, init-windows, init-macos"/>
 
 </project>
