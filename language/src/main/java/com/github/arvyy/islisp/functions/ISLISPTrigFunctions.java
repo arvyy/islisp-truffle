@@ -106,7 +106,7 @@ public abstract class ISLISPTrigFunctions extends RootNode {
     }
 
     /**
-     * Construct LispFunction for cos function.
+     * Construct LispFunction for tag function.
      *
      * @param lang truffle language reference
      * @return lisp function

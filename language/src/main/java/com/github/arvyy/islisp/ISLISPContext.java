@@ -145,6 +145,7 @@ public class ISLISPContext {
         initGlobalFunction("aref", ISLISPAref::makeLispFunction);
         initGlobalFunction("car", ISLISPCar::makeLispFunction);
         initGlobalFunction("cdr", ISLISPCdr::makeLispFunction);
+        initGlobalFunction("ceiling", ISLISPRoundingFunctions::makeLispFunctionCeiling);
         initGlobalFunction("char=", ISLISPCharEqual::makeLispFunction);
         initGlobalFunction("char<", ISLISPCharLt::makeLispFunction);
         initGlobalFunction("class-of", ISLISPClassOf::makeLispFunction);
@@ -163,6 +164,7 @@ public class ISLISPContext {
         initGlobalFunction("eval", ISLISPEval::makeLispFunction);
         initGlobalFunction("file-position", ISLISPFilePosition::makeLispFunction);
         initGlobalFunction("finish-output", ISLISPFinishOutput::makeLispFunction);
+        initGlobalFunction("floor", ISLISPRoundingFunctions::makeLispFunctionFloor);
         initGlobalFunction("format", ISLISPFormat::makeLispFunction);
         initGlobalFunction("format-char", ISLISPFormatChar::makeLispFunction);
         initGlobalFunction("format-integer", ISLISPFormatInteger::makeLispFunction);
@@ -195,6 +197,7 @@ public class ISLISPContext {
         initGlobalFunction("read-char", ISLISPReadChar::makeLispFunction);
         initGlobalFunction("read-line", ISLISPReadLine::makeLispFunction);
         initGlobalFunction("remove-property", ISLISPRemoveProperty::makeLispFunction);
+        initGlobalFunction("round", ISLISPRoundingFunctions::makeLispFunctionRound);
         initGlobalFunction("set-aref", ISLISPSetAref::makeLispFunction);
         initGlobalFunction("set-car", ISLISPSetCar::makeLispFunction);
         initGlobalFunction("set-cdr", ISLISPSetCdr::makeLispFunction);
@@ -205,6 +208,7 @@ public class ISLISPContext {
         initGlobalFunction("standard-output", ISLISPStandardOutputStream::makeLispFunction);
         initGlobalFunction("standard-input", ISLISPStandardInputStream::makeLispFunction);
         initGlobalFunction("tan", ISLISPTrigFunctions::makeLispFunctionTan);
+        initGlobalFunction("truncate", ISLISPRoundingFunctions::makeLispFunctionTruncate);
         initGlobalFunction("error-output", ISLISPErrorOutputStream::makeLispFunction);
         initGlobalFunction("subclassp", ISLISPSubclassp::makeLispFunction);
         initGlobalFunction("vector", ISLISPVector::makeLispFunction);
