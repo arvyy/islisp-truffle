@@ -18,7 +18,7 @@ jobs:
         run: |
           mvn test
 
-  deploy:
+  build-jar:
     needs: [test]
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
@@ -26,13 +26,12 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v3
+      - uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '17'
-          distribution: 'temurin'
-          architecture: x64
-          cache: 'maven'
-      - name: Package
+          java-version: '22'
+          distribution: 'graalvm-community'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build jar
         run: |
           mvn package
       - name: Upload jar to github nightly release
@@ -40,20 +39,25 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload nightly language/target/islisp.jar --clobber
-      - uses: actions-hub/docker/cli@master
-        env:
-          SKIP_LOGIN: true
-      - name: Build docker image
+
+  build-linux:
+    needs: [test]
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '22'
+          distribution: 'graalvm-community'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build jar
         run: |
-          docker build . -t islisp
-      - name: Extract built executable from docker
-        run: |
-          mkdir extract
-          docker run --name temp-container-name --entrypoint sh islisp
-          docker cp temp-container-name:/app/islisp extract
-          docker rm temp-container-name
-      - name: Upload executable to github nightly release
+          ant dist native
+      - name: Upload linux binary to github nightly release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload nightly extract/islisp --clobber
+          gh release upload nightly dist/islisp-linux --clobber

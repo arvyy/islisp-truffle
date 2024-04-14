@@ -2,18 +2,18 @@
 
     <property environment="env"/>
 
-    <target name="clean">
+    <target name="clean" depends="init">
         <delete dir="${basedir}/dist"/>
-        <exec executable="sh">
-            <arg value="-c"/>
+        <exec executable="${shell.executable}">
+            <arg value="${shell.prefix}"/>
             <arg value="mvn clean"/>
         </exec>
     </target>
 
-    <target name="dist" depends="clean">
+    <target name="dist" depends="clean, init">
         <mkdir dir="${basedir}/dist"/>
-        <exec executable="sh" failonerror="true">
-            <arg value="-c"/>
+        <exec executable="${shell.executable}" failonerror="true">
+            <arg value="${shell.prefix}"/>
             <arg value="mvn package"/>
         </exec>
         <copy todir="${basedir}/dist">
@@ -21,7 +21,7 @@
         </copy>
     </target>
 
-    <target name="native">
+    <target name="native" depends="init">
         <path id="distjars">
             <fileset dir="${basedir}/dist">
                 <include name="*.jar"/>
@@ -41,8 +41,40 @@
             <arg value="-p"/>
             <arg value="${module-path}"/>
             <arg value="com.github.arvyy.islisp.launcher.Main"/>
-            <arg value="${basedir}/dist/islisp-static"/>
+            <arg value="${basedir}/dist/${dist.name}"/>
         </exec>
+    </target>
+
+    <target name="init" depends="init-linux, init-windows, init-macos"/>
+
+    <condition property="isWindows">
+        <os family="windows" />
+    </condition>
+
+    <condition property="isUnix">
+        <os family="unix" />
+    </condition>
+
+    <condition property="isMac">
+        <os family="unix" />
+    </condition>
+
+    <target name="init-linux">
+        <property name="shell.executable" value="sh" />
+        <property name="shell.prefix" value="-c" />
+        <property name="dist.name" value="islisp-linux" />
+    </target>
+
+    <target name="init-macos">
+        <property name="shell.executable" value="sh" />
+        <property name="shell.prefix" value="-c" />
+        <property name="dist.name" value="islisp-macos" />
+    </target>
+
+    <target name="init-windows">
+        <property name="shell.executable" value="powershell" />
+        <property name="shell.prefix" value="-command" />
+        <property name="dist.name" value="islisp.exe" />
     </target>
 
 </project>
