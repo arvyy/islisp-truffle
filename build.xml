@@ -83,7 +83,7 @@
         <property name="shell.prefix" value="-command" />
         <property name="dist.name" value="islisp.exe" />
         <property name="dist.static-flag" value="false"/>
-        <property name="native-image-binary" value="native-image.exe"/>
+        <property name="native-image-binary" value="native-image.cmd"/>
     </target>
 
     <target name="init" depends="init-linux, init-windows, init-macos"/>
