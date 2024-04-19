@@ -1,5 +1,6 @@
 name: Build ISLISP site
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'docs/**'
