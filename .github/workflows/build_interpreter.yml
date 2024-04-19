@@ -1,5 +1,9 @@
-name: Test ISLISP
-on: [push]
+name: Build ISLISP interpreter
+on:
+  push:
+    paths:
+      - 'launcher/**'
+      - 'language/**'
 jobs:
   test:
     runs-on: ubuntu-latest
