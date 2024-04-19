@@ -6,6 +6,13 @@ on:
       - 'docs/**'
       - 'site/**'
 jobs:
+  build_set:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-pages-artifact@v1
+        with:
+          path: 'site'
   deploy_site:
     permissions:
       pages: write
@@ -15,8 +22,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/upload-pages-artifact@v1
-        with:
-          path: 'site'
       - uses: actions/deploy-pages@v4
