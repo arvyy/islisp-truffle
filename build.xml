@@ -1,6 +1,12 @@
-<project xmlns:if="ant:if">
+<project xmlns:if="ant:if" default="help">
 
     <property environment="env"/>
+
+    <target name="help" description="Show help">
+        <echo>
+            Run `ant -p` for a list of targets.
+        </echo>
+    </target>
 
     <target name="clean" depends="init" description="Clean built artifacts">
         <delete dir="${basedir}/dist"/>
@@ -45,7 +51,21 @@
         </exec>
     </target>
 
-    <target name="build-docs" description="Build asciidoc documentation / pages">
+    <target name="build-site" description="Build site, including documentation." depends="init">
+        <mkdir dir="${basedir}/dist"/>
+        <delete dir="${basedir}/dist/site"/>
+        <exec executable="${shell.executable}" dir="docs">
+            <arg value="${shell.prefix}"/>
+            <arg value="asciidoctor apireference.adoc"/>
+        </exec>
+        <copy todir="${basedir}/dist/site">
+            <fileset dir="site"></fileset>
+        </copy>
+        <copy todir="${basedir}/dist/site">
+            <fileset dir="docs">
+                <include name="*.html"/>
+            </fileset>
+        </copy>
     </target>
 
     <condition property="isWindows">
