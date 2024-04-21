@@ -22,6 +22,7 @@ jobs:
           path: 'dist/site'
   deploy_site:
     needs: [build_site]
+    if: github.ref == 'refs/heads/master'
     permissions:
       pages: write
       id-token: write
