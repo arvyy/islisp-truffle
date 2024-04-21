@@ -1,0 +1,139 @@
+:root {
+    --bg-color: #151515;
+    --bg-color2: #212b25;
+    --text-color: #ccc;
+    --link-color: #27c2e6;
+    --heading-color: #4bbb4b;
+    --shadow-color: #4bbb9b30;
+    --border-color: #0c6f52;
+    --text-color-muted: #aaa;
+    --wip-bg-color: #9d2424;
+}
+
+html {
+    color: var(--text-color);
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.big-logo {
+    height: 100px;
+    margin: auto;
+    display: block;
+}
+
+nav {
+    display: flex;
+    align-self: stretch;
+}
+
+nav *:first-child {
+    margin-left: auto;
+}
+
+.nav-link {
+    margin: 0.5em;
+}
+
+a {
+    border-bottom: 2px solid var(--link-color);
+    background-color: #0000;
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--text-color);
+    background-color: var(--link-color);
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--bg-color);
+}
+
+main {
+    display: flex;
+    max-width: 960px;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+h1, h2 {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--heading-color);
+    margin-bottom: 0.5em;
+}
+
+.main-section {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    padding: 2em;
+    line-height: 1.5em;
+    background-color: var(--bg-color2);
+    border-bottom: 4px var(--border-color) solid;
+    border-right: 4px var(--border-color) solid;
+    box-shadow: var(--shadow-color) 0 10px 40px;
+}
+
+li {
+    margin-left: 1em;
+}
+
+li::before {
+  content: "* ";
+  color: var(--heading-color);
+}
+
+.list-group {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.list-group__title {
+    color: var(--text-color-muted);
+}
+
+.wip {
+    transform: scale(0.7) translate(0, -0.5em);
+    position: relative;
+    display: inline-block;
+    background-color: var(--wip-bg-color);
+    padding: 0.1em;
+    border-radius: 0.4em;
+    font-weight: bold;
+}
+
+.release {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.release__item {
+    margin: 2em;
+    padding: 1em;
+    flex: 1;
+    max-width: 300px;
+    border: var(--border-color) solid 1px;
+}
+
+.release__title {
+    text-align: center;
+    font-size: 1.2em;
+    color: var(--heading-color);
+}
+
+.release__coming-soon {
+    font-weight: bold;
+    font-style: italic;
+    color: var(--text-color-muted);
+}
+
+p {
+    margin-top: 1em;
+}
