@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - '.github/workflows/build_interpreter.yml'
       - 'launcher/**'
       - 'language/**'
 jobs:
