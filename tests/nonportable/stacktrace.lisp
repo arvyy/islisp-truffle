@@ -2,6 +2,7 @@
     (format-object (standard-output) str nil)
     (format-char (standard-output) #\newline))
 
+;;;;; undefined variable
 (defun f1 ()
     (+ 1
        (f2)))
@@ -16,4 +17,15 @@
             (return-from exit nil))
         (f1)
         (print "FAIL")))
+(print "")
+
+;;;;;;; division by zero
+(block exit
+    (with-handler
+        (lambda (condition)
+            (report-condition condition (standard-output))
+            (return-from exit nil))
+        (quotient 1 0)
+        (print "FAIL")))
+
 (finish-output (standard-output))

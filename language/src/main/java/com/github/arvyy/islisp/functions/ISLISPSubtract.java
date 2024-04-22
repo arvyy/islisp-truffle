@@ -1,12 +1,15 @@
 package com.github.arvyy.islisp.functions;
 
-import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.ISLISPContext;
+import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
+import com.github.arvyy.islisp.nodes.ISLISPTypes;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
@@ -14,10 +17,16 @@ import com.oracle.truffle.api.nodes.RootNode;
 /**
  * Implements numeric subtraction function `-`.
  */
+@TypeSystemReference(ISLISPTypes.class)
 public abstract class ISLISPSubtract extends RootNode {
+
+
+    @Child
+    private ISLISPErrorSignalerNode errorSignalerNode;
 
     ISLISPSubtract(TruffleLanguage<?> language) {
         super(language);
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     abstract Object executeGeneric(Object a, Object b);
@@ -53,7 +62,9 @@ public abstract class ISLISPSubtract extends RootNode {
 
     @Fallback
     Object notNumbers(Object a, Object b) {
-        throw new ISLISPError("Not numbers", this);
+        var ctx = ISLISPContext.get(this);
+        var numberClass = ctx.lookupClass("<number>");
+        return errorSignalerNode.signalWrongType(b, numberClass);
     }
 
     /**

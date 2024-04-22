@@ -26,6 +26,11 @@
 
 (defclass <error> (<serious-condition>) ())
 
+(defclass <arithmetic-error> (<error>) ())
+(defclass <division-by-zero> (<arithmetic-error>) ())
+(defclass <floating-point-overflow> (<arithmetic-error>) ())
+(defclass <floating-point-underflow> (<arithmetic-error>) ())
+
 (defclass <stream-error> (<error>) ())
 
 (defclass <end-of-stream> (<stream-error>) ())
@@ -86,6 +91,11 @@
     (format-char stream #\newline)
     (call-next-method))
 
+(defmethod report-condition ((condition <division-by-zero>) (stream <stream>))
+    (format-object stream "Division by zero" nil)
+    (format-char stream #\newline)
+    (call-next-method))
+
 (defun min (first :rest xs)
   (for ((value first (let ((x (car xs)))
                        (if (< x value)
@@ -101,6 +111,9 @@
                            value)))
         (xs xs (cdr xs)))
        ((null xs) value)))
+
+(defun reciprocal (arg)
+  (quotient 1.0 arg))
 
 (defun /= (x1 x2)
   (not (= x1 x2)))

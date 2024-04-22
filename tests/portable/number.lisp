@@ -35,6 +35,15 @@
       (+ 1 "2")
       (test-equal nil t)))
 
+;; subtraction
+(test-equal (- 1) -1)
+(test-equal (- -4.0) 4.0)
+(test-equal (- 4.0) -4.0)
+(test-equal (- 1 2) -1)
+(test-equal (- 92 43) 49)
+(test-equal (- 0.0 0.0) 0.0)
+(test-equal (- 3 4 5) -6)
+
 ;; multiplication; tests taken from spec
 (test-equal
   (* 12 3)
@@ -55,6 +64,23 @@
 (test-equal
   (*)
   1)
+
+;; division / reciprocal
+(test-equal (reciprocal 2) 0.5)
+(test-equal (quotient 10 5) 2)
+(test-equal (quotient 1 2) 0.5)
+(test-equal (quotient 2 -0.5) -4.0)
+(test-equal (quotient 2 4 8) 0.0625)
+(block exit
+    (with-handler
+      (lambda (condition)
+        (test-equal
+            (instancep condition (class <division-by-zero>))
+            t)
+        (return-from exit nil))
+      (quotient 0.0 0.0)
+      (test-equal nil t)))
+
 
 ;; trigonometry
 (test-equal
