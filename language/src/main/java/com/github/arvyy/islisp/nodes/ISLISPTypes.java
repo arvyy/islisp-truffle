@@ -16,7 +16,7 @@ import com.oracle.truffle.api.dsl.TypeSystem;
     LispStream.class,
     LispChar.class,
     String.class,
-    StringBuffer.class,
+    LispMutableString.class,
     LispVector.class,
     LispArray.class,
     LispBigInteger.class,

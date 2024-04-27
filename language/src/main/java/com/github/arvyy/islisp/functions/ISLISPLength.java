@@ -2,10 +2,7 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
-import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispVector;
-import com.github.arvyy.islisp.runtime.Pair;
-import com.github.arvyy.islisp.runtime.Symbol;
+import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -38,6 +35,11 @@ public abstract class ISLISPLength extends RootNode {
     @Specialization
     Object doString(String str) {
         return str.length();
+    }
+
+    @Specialization
+    Object doMutableString(LispMutableString s) {
+        return s.chars().length;
     }
 
     @Specialization

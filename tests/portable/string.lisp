@@ -1,5 +1,8 @@
 (requires "testing.lisp")
 
+(test-equal (create-string 3 #\1) "111")
+(test-equal (string= (create-string 3 #\1) "111") t)
+
 (test-equal (string= "abc" "abc") t)
 (test-equal (string= "abc" "abb") nil)
 (test-equal (string= "abc" "abcd") nil)

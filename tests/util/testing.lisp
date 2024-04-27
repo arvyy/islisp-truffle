@@ -3,6 +3,7 @@
     `(let ((,actual ,expr))
         (if (not (equal ,actual ,value))
           (progn
+            (format-object (standard-output) "In expression: " nil)
             (format-object (standard-output) ',expr t)
             (format-char (standard-output) #\newline)
             (format-object (standard-output) "Expect: " nil)

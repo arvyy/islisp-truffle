@@ -65,6 +65,41 @@ public abstract class ISLISPEqual extends RootNode {
     }
 
     @Specialization
+    Object doMutableStrings(LispMutableString s1, LispMutableString s2) {
+        var ctx = ISLISPContext.get(this);
+        if (s1.chars().length != s2.chars().length) {
+            return ctx.getNil();
+        }
+        int l = s1.chars().length;
+        for (int i = 0; i < l; i++) {
+            if (s1.chars()[i].codepoint() != s2.chars()[i].codepoint()) {
+                return ctx.getNil();
+            }
+        }
+        return ctx.getT();
+    }
+
+    @Specialization
+    Object doStringAndMutableString(String s1, LispMutableString s2) {
+        var ctx = ISLISPContext.get(this);
+        if (s1.length() != s2.chars().length) {
+            return ctx.getNil();
+        }
+        int l = s1.length();
+        for (int i = 0; i < l; i++) {
+            if (s1.codePointAt(i) != s2.chars()[i].codepoint()) {
+                return ctx.getNil();
+            }
+        }
+        return ctx.getT();
+    }
+
+    @Specialization
+    Object doMutableStringAndString(LispMutableString s1, String s2) {
+        return doStringAndMutableString(s2, s1);
+    }
+
+    @Specialization
     Object doPairs(Pair p1, Pair p2) {
         var ctx = ISLISPContext.get(this);
         var nil = ctx.getNil();

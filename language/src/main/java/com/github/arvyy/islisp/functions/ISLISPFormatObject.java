@@ -83,6 +83,18 @@ public abstract class ISLISPFormatObject extends RootNode {
                 }
                 return;
             }
+            if (value instanceof LispMutableString s) {
+                if (escape) {
+                    stream.write("\"");
+                }
+                for (var c: s.chars()) {
+                    stream.writeCodepoint(c.codepoint());
+                }
+                if (escape) {
+                    stream.write("\"");
+                }
+                return;
+            }
             if (value instanceof Integer i) {
                 stream.write(i.toString());
                 return;

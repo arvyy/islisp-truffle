@@ -154,6 +154,7 @@ public class ISLISPContext {
         initGlobalFunction("continue-condition", ISLISPContinueCondition::makeLispFunction);
         initGlobalFunction("cos", ISLISPTrigFunctions::makeLispFunctionCos);
         initGlobalFunction("create-array", ISLISPCreateArray::makeLispFunction);
+        initGlobalFunction("create-string", ISLISPCreateString::makeLispFunction);
         initGlobalFunction("create-string-input-stream", ISLISPCreateStringInputStream::makeLispFunction);
         initGlobalFunction("create-string-output-stream", ISLISPCreateStringOutputStream::makeLispFunction);
         initGlobalFunction("create-vector", ISLISPCreateVector::makeLispFunction);
