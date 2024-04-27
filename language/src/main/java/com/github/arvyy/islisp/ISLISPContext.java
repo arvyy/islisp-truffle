@@ -272,10 +272,16 @@ public class ISLISPContext {
     }
 
     void initSetfExpanders() {
+        // standard
         initBasicSetfExpander("car", "set-car");
         initBasicSetfExpander("cdr", "set-cdr");
         initBasicSetfExpander("property", "set-property");
         initBasicSetfExpander("aref", "set-aref");
+        initBasicSetfExpander("garef", "set-garef");
+        initBasicSetfExpander("dynamic", "set-dynamic");
+        initBasicSetfExpander("elt", "set-elt");
+
+        //extensions
         initBasicSetfExpander("truffle-object-field", "set-truffle-object-field");
     }
 

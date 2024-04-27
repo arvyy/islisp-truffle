@@ -1,4 +1,5 @@
 = Truffle ISLISP reference.
+:toc: left
 
 Given that this is ISLISP implementation, primary reference is the http://www.islisp.org/ISLisp-spec.html[ISLISP 2007 specification]. This document details extensions and omissions made with respect to spec.
 
@@ -59,13 +60,15 @@ Where main.lisp starts with
 
 The correct invocation is `islisp -sp root1:root2 main.lisp` (on linux); `islisp -sp root1;root2 main.lisp` (on windows).
 
-=== `(debugger)`
+=== Debugger
 
-`(debugger)` enables triggering debugger breakpoint from code. Works only when ran in debug mode. Returns nil.
+`(debugger)` statement enables triggering debugger breakpoint from code. Works only when ran in debug mode. Returns nil.
 
 === Condition stacktraces
 
-Conditions get stacktrace attached upon signalling by default. Stacktrace can be inspected using generic method `(condition-stacktrace _condition_)` which returns a vector of strings. Stacktrace gather can be disabled for condition types by implementing method `(fill-stacktrace _condition-class_)` and returning nil from it. Condition stacktraces are printed during `report-condition`.
+Conditions get stacktrace attached upon signalling by default. Stacktrace gather can be disabled for condition types by implementing method `(fill-stacktrace _condition-class_)` and returning nil from it.
+
+Stacktrace can be inspected using generic method `(condition-stacktrace _condition_)`. A stacktrace is a vector of elements, where each element is itself a vector. Element's vector consists of: source name, start line, start column, end line, end column. Condition stacktraces are printed during `report-condition`. Stacktrace printing can be modified by changing dynamic variable `\*stacktrace-formatter*` and assigning it a formatter function which takes output stream as the first argument, stacktrace as the second, and writes necessary presentation to the stream.
 
 === Eval
 
@@ -116,14 +119,12 @@ Truffle NFI internal language is provided through transparent interface. First, 
   (funcall libm-sin 2.0)) ;; => ~ 0.909
 ----
 
-=== `(exit)`
+=== Exit
 
 Application can have early exit using `(exit _exit-code_)`, where exit-code is an integer.
 
 == Omissions / spec violations.
 
-* Alot of functions are still unimplemented, most of file / stream api, math, time. Alot of erronous calls don't raise appropriate conditions. The language will remain WIP until these are done.
+* Alot of erronous calls don't raise appropriate conditions;
 
 * Format to string functions won't track if they're on fresh line / the column index.
-
-* No metaclasses

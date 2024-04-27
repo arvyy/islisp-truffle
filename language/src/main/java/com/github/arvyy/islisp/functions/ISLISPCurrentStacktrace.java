@@ -35,19 +35,26 @@ public class ISLISPCurrentStacktrace extends RootNode {
     public static LispVector currentStacktrace() {
         var e = new RuntimeException();
         var stacktrace = TruffleStackTrace.getStackTrace(e);
-        return new LispVector(stacktraceLines(stacktrace));
+        return stacktraceLines(stacktrace);
     }
 
     @CompilerDirectives.TruffleBoundary
-    static Object[] stacktraceLines(List<TruffleStackTraceElement> stackTraceElementList) {
+    static LispVector stacktraceLines(List<TruffleStackTraceElement> stackTraceElementList) {
         var lst = new ArrayList<Object>();
         for (var e: stackTraceElementList) {
             var source = findSourceSection(e.getLocation());
             if (source != null)  {
-                lst.add(String.format("\tat %s:%d", source.getSource().getName(), source.getStartLine()));
+                var element = new Object[]{
+                    source.getSource().getName(),
+                    source.getStartLine(),
+                    source.getStartColumn(),
+                    source.getEndLine(),
+                    source.getEndColumn()
+                };
+                lst.add(new LispVector(element));
             }
         }
-        return lst.toArray();
+        return new LispVector(lst.toArray());
     }
 
     static SourceSection findSourceSection(Node n) {

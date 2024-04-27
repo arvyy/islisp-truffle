@@ -20,6 +20,22 @@
                  (and ,@rest)
                  nil)))))
 
+(defdynamic
+    *stacktrace-formatter*
+    (lambda (stream stacktrace)
+        (for ((i 0 (+ 1 i))
+              (len (length stacktrace)))
+             ((>= i len))
+          (let* ((el (elt stacktrace i))
+                 (name (elt el 0))
+                 (start-line (elt el 1)))
+            (format stream "    at ~A:~A~%" name start-line)))))
+
+(defun print-stacktrace (stream condition)
+    (let ((stacktrace (condition-stacktrace condition)))
+        (if stacktrace
+            (funcall (dynamic *stacktrace-formatter*) stream stacktrace))))
+
 (defclass <serious-condition> ()
     ((stacktrace :reader condition-stacktrace :writer set-condition-stacktrace)
      (continuable? :reader condition-continuable :writer set-condition-continuable)))
@@ -72,29 +88,24 @@
 
 (defgeneric report-condition (condition stream))
 (defmethod report-condition ((condition <serious-condition>) (stream <stream>))
-    (let ((stacktrace (condition-stacktrace condition)))
-        (if stacktrace
-            (for ((i 0 (+ 1 i))
-                  (len (length stacktrace)))
-                 ((>= i len))
-              (format stream "~A~%" (elt stacktrace i))))))
+    nil)
 
 (defmethod report-condition ((condition <unbound-variable>) (stream <stream>))
     (format-object stream "Unbound variable: " nil)
     (format-object stream (unbound-variable-name condition) nil)
     (format-char stream #\newline)
-    (call-next-method))
+    (print-stacktrace stream condition))
 
 (defmethod report-condition ((condition <undefined-function>) (stream <stream>))
     (format-object stream "Undefined function: " nil)
     (format-object stream (undefined-function-name condition) nil)
     (format-char stream #\newline)
-    (call-next-method))
+    (print-stacktrace stream condition))
 
 (defmethod report-condition ((condition <division-by-zero>) (stream <stream>))
     (format-object stream "Division by zero" nil)
     (format-char stream #\newline)
-    (call-next-method))
+    (print-stacktrace stream condition))
 
 (defun min (first :rest xs)
   (for ((value first (let ((x (car xs)))

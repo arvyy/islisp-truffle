@@ -1,7 +1,7 @@
 Unbound variable: unbound-var
-	at stacktrace.lisp:11
-	at stacktrace.lisp:8
-	at stacktrace.lisp:18
+    at stacktrace.lisp:11
+    at stacktrace.lisp:8
+    at stacktrace.lisp:18
 
 Division by zero
-	at stacktrace.lisp:28
+    at stacktrace.lisp:28
