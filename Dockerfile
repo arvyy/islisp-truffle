@@ -1,3 +1,4 @@
+# Dockerfile for building image locally
 FROM ghcr.io/graalvm/native-image-community:22.0.0
 RUN microdnf install -y ant maven
 COPY . /app

@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - '.github/workflows/build_site.yml'
       - 'docs/**'
       - 'site/**'
 jobs:
