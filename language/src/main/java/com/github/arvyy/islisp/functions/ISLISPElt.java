@@ -5,6 +5,7 @@ import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -42,7 +43,7 @@ public abstract class ISLISPElt extends RootNode {
     Object doList(Pair p, int index) {
         var value = p;
         if (index < 0) {
-            return errorSignalerNode.signalIndexOutOfRange(index, Utils.readList(p).size());
+            return errorSignalerNode.signalIndexOutOfRange(index, getListSize(p));
         }
         for (int i = 0; i < index; i++) {
             if (value.cdr() instanceof Pair pair) {
@@ -50,7 +51,7 @@ public abstract class ISLISPElt extends RootNode {
                 continue;
             }
             if (Utils.isNil(value.cdr())) {
-                return errorSignalerNode.signalIndexOutOfRange(index,  Utils.readList(p).size());
+                return errorSignalerNode.signalIndexOutOfRange(index,  getListSize(p));
             } else {
                 var ctx = ISLISPContext.get(this);
                 return errorSignalerNode.signalDomainError(
@@ -60,6 +61,11 @@ public abstract class ISLISPElt extends RootNode {
             }
         }
         return value.car();
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    int getListSize(Pair p) {
+        return Utils.readList(p).size();
     }
 
     @Specialization
