@@ -39,5 +39,11 @@
 (test-equal (elt "789" 0) #\7)
 (test-equal (length "ab") 2)
 
+;; append
+(test-equal (string-append "12" "34") "1234")
+(test-equal (string-append "12" "" "34" "5") "12345")
+(test-equal (string-append "12" (create-string 1 #\3)) "123")
+(test-equal (string-append) "")
+
 (format-object (standard-output) "string.lisp end" nil)
 (finish-output (standard-output))

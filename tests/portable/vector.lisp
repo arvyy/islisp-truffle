@@ -9,6 +9,10 @@
 
 ;; sequence
 (test-equal (length #(1 2)) 2)
+(test-equal (elt #(1 2 3) 2) 3)
+(let ((vec (vector 1 2 3)))
+  (setf (elt vec 2) 4)
+  (test-equal vec #(1 2 4)))
 
 (format-object (standard-output) "vector.lisp end" nil)
 (finish-output (standard-output))

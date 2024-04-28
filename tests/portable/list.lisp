@@ -60,8 +60,11 @@
   (append '(1 2) '(3 4) '(5 6))
   '(1 2 3 4 5 6))
 
-(test-equal (elt '(4 5 6) 0) 4)
 (test-equal (length '(1 2)) 2)
+(test-equal (elt '(4 5 6) 0) 4)
+(let ((lst (list 1 2 3)))
+  (setf (elt lst 2) 4)
+  (test-equal lst '(1 2 4)))
 
 (format (standard-output) "list.lisp end")
 (finish-output (standard-output))

@@ -203,6 +203,7 @@ public class ISLISPContext {
         initGlobalFunction("set-aref", ISLISPSetAref::makeLispFunction);
         initGlobalFunction("set-car", ISLISPSetCar::makeLispFunction);
         initGlobalFunction("set-cdr", ISLISPSetCdr::makeLispFunction);
+        initGlobalFunction("set-elt", ISLISPSetElt::makeLispFunction);
         initGlobalFunction("set-file-position", ISLISPSetFilePosition::makeLispFunction);
         initGlobalFunction("set-property", ISLISPSetProperty::makeLispFunction);
         initGlobalFunction("sin", ISLISPTrigFunctions::makeLispFunctionSin);

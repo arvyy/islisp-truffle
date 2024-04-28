@@ -290,3 +290,21 @@
 (define-with-file-macro with-open-input-file open-input-file)
 (define-with-file-macro with-open-output-file open-output-file)
 (define-with-file-macro with-open-io-file open-io-file)
+
+(defun string-append (:rest strings)
+  (labels ((fold (acc init lst)
+              (for ((state init (funcall acc state (car lst)))
+                    (lst lst (cdr lst)))
+                    ((not lst) state))))
+    (let ((len (fold
+                 (lambda (state el) (+ state (length el)))
+                 0
+                 strings)))
+      (for ((res (create-string len) res)
+            (lst strings (cdr lst))
+            (offset 0 (+ offset (length (car lst)))))
+           ((not lst) res)
+        (for ((j 0 (+ j 1))
+              (str (car lst) str))
+             ((>= j (length str)))
+          (setf (elt res (+ offset j)) (elt str j)))))))

@@ -26,11 +26,15 @@ public abstract class ISLISPCreateString extends RootNode {
 
     @Override
     public final Object execute(VirtualFrame frame) {
-        if (frame.getArguments().length != 3) {
+        if (frame.getArguments().length != 2 && frame.getArguments().length != 3) {
             return errorSignalerNode.signalWrongArgumentCount(
-                frame.getArguments().length - 1, 2, 2);
+                frame.getArguments().length - 1, 1, 2);
         }
-        return executeGeneric(frame.getArguments()[1], frame.getArguments()[2]);
+        var count = frame.getArguments()[1];
+        var character = frame.getArguments().length == 3
+            ? frame.getArguments()[2]
+            : new LispChar('?');
+        return executeGeneric(count, character);
     }
 
     abstract Object executeGeneric(Object count, Object character);
