@@ -27,5 +27,15 @@
             (return-from exit nil))
         (quotient 1 0)
         (print "FAIL")))
+(print "")
+
+;;;;;;; index out of bounds
+(block exit
+    (with-handler
+        (lambda (condition)
+            (report-condition condition (standard-output))
+            (return-from exit nil))
+        (elt '(1 2 3) 4)
+        (print "FAIL")))
 
 (finish-output (standard-output))

@@ -196,4 +196,20 @@ public class ISLISPErrorSignalerNode extends Node {
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
+
+    /**
+     * Signal index out of range.
+     *
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
+    public Object signalIndexOutOfRange(int actual, int bounds) {
+        var ctx = ISLISPContext.get(this);
+        var condition = getCreateCallNode().call(
+            null,
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<index-out-of-range-error>").identityReference()),
+            ctx.namedSymbol("bounds"), bounds,
+            ctx.namedSymbol("actual"), actual
+        );
+        return getSignalCallNode().call(null, condition, ctx.getNil());
+    }
 }

@@ -64,6 +64,10 @@
 
 (defclass <program-error> (<error>) ())
 
+(defclass <index-out-of-range-error> (<program-error>)
+    ((bounds :reader index-out-of-range-error-bounds :initarg bounds)
+     (actual :reader index-out-of-range-error-actual :initarg actual)))
+
 (defclass <domain-error> (<program-error>)
     ((message :reader domain-error-message :initarg message)
      (object :reader domain-error-object :initarg object)
@@ -105,6 +109,12 @@
 (defmethod report-condition ((condition <division-by-zero>) (stream <stream>))
     (format-object stream "Division by zero" nil)
     (format-char stream #\newline)
+    (print-stacktrace stream condition))
+
+(defmethod report-condition ((condition <index-out-of-range-error>) (stream <stream>))
+    (format stream "Index ~D out of bounds (must be between 0 and ~D exclusive)~%"
+            (index-out-of-range-error-actual condition)
+            (index-out-of-range-error-bounds condition))
     (print-stacktrace stream condition))
 
 (defun min (first :rest xs)

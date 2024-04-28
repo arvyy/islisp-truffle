@@ -10,6 +10,14 @@
 ;; sequence
 (test-equal (length #(1 2)) 2)
 (test-equal (elt #(1 2 3) 2) 3)
+(block exit
+    (with-handler
+        (lambda (condition)
+            (test-equal (instancep condition (class <program-error>)) t)
+            (return-from exit nil))
+        (elt #(1 2 3) 4)
+        (print "FAIL")))
+
 (let ((vec (vector 1 2 3)))
   (setf (elt vec 2) 4)
   (test-equal vec #(1 2 4)))

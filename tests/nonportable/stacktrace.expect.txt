@@ -5,3 +5,6 @@ Unbound variable: unbound-var
 
 Division by zero
     at stacktrace.lisp:28
+
+Index 4 out of bounds (must be between 0 and 3 exclusive)
+    at stacktrace.lisp:38
