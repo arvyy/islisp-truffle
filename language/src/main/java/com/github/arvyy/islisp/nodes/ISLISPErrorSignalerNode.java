@@ -200,6 +200,8 @@ public class ISLISPErrorSignalerNode extends Node {
     /**
      * Signal index out of range.
      *
+     * @param actual received violating index
+     * @param bounds upper (exclusive) bound
      * @return undefined object, value of which shouldn't be relied upon.
      */
     public Object signalIndexOutOfRange(int actual, int bounds) {
