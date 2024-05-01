@@ -3,10 +3,7 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
-import com.github.arvyy.islisp.runtime.LispArray;
-import com.github.arvyy.islisp.runtime.LispBigInteger;
-import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispVector;
+import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -80,7 +77,26 @@ public abstract class ISLISPAref extends RootNode {
         return vec.values()[lookup[0]];
     }
 
-    //TODO string
+    @Specialization
+    Object executeString(String s, int[] lookup) {
+        if (lookup.length != 1) {
+            //TODO
+            throw new ISLISPError("Wrong dimension count", this);
+        }
+        var index = lookup[0];
+        var c = s.codePointAt(index);
+        return new LispChar(c);
+    }
+
+    @Specialization
+    Object executeMutableString(LispMutableString s, int[] lookup) {
+        if (lookup.length != 1) {
+            //TODO
+            throw new ISLISPError("Wrong dimension count", this);
+        }
+        var index = lookup[0];
+        return s.chars()[index];
+    }
 
     @Fallback
     Object fallback(Object arr, int[] lookup) {

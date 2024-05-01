@@ -3,10 +3,7 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
-import com.github.arvyy.islisp.runtime.LispArray;
-import com.github.arvyy.islisp.runtime.LispBigInteger;
-import com.github.arvyy.islisp.runtime.LispFunction;
-import com.github.arvyy.islisp.runtime.LispVector;
+import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -91,6 +88,17 @@ public abstract class ISLISPSetAref extends RootNode {
     @Specialization
     Object doString(Object value, String str, int[] lookup) {
         throw new ISLISPError("Cannot modify immutable string", this);
+    }
+
+    @Specialization
+    Object doMutableString(LispChar c, LispMutableString str, int[] lookup) {
+        if (lookup.length != 1) {
+            //TODO
+            throw new ISLISPError("Wrong dimension count", this);
+        }
+        var index = lookup[0];
+        str.chars()[index] = c;
+        return c;
     }
 
     @Specialization(guards = "interop.hasArrayElements(o)", limit = "3")

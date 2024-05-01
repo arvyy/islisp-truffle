@@ -341,3 +341,19 @@
          ((not next-args) dest)
       ;;(format (error-output) "i = ~A, args = ~A ~%" i next-args)
       (setf (elt dest i) (apply fn next-args)))))
+
+(defun garef (array :rest indices)
+  (if (and (not (instancep array (class <general-vector>)))
+           (not (instancep array (class <general-array*>))))
+    (signal-condition
+        (create (class <domain-error>) 'message "Unexpected type" 'object array 'expected-class (class <general-array*>))
+        nil))
+  (apply #'aref array indices))
+
+(defun set-garef (obj array :rest indices)
+  (if (and (not (instancep array (class <general-vector>)))
+           (not (instancep array (class <general-array*>))))
+    (signal-condition
+        (create (class <domain-error>) 'message "Unexpected type" 'object array 'expected-class (class <general-array*>))
+        nil))
+  (apply #'set-aref obj array indices))
