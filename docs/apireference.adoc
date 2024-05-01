@@ -64,6 +64,13 @@ The correct invocation is `islisp -sp root1:root2 main.lisp` (on linux); `islisp
 
 `(debugger)` statement enables triggering debugger breakpoint from code. Works only when ran in debug mode. Returns nil.
 
+`(trace _form ..._)` macro prints expression representation and its value to error stream, and returns the value.
+
+[code,lisp]
+----
+(trace + 1 2) ;; prints "TRACE (+ 1 2) = 3"
+----
+
 === Condition stacktraces
 
 Conditions get stacktrace attached upon signalling by default. Stacktrace gather can be disabled for condition types by implementing method `(fill-stacktrace _condition-class_)` and returning nil from it.

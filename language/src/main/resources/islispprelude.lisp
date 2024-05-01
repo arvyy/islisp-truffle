@@ -1,3 +1,9 @@
+(defmacro trace (:rest args)
+  (let ((result (gensym)))
+    `(let ((,result (,@args)))
+       (format (error-output) "TRACE ~A = ~A~%" ',args ,result)
+       ,result)))
+
 (defmacro or  (:rest args)
   (if (= 0 (length args))
       nil
@@ -318,3 +324,20 @@
               (str (car lst) str))
              ((>= j (length str)))
           (setf (elt res (+ offset j)) (elt str j)))))))
+
+(defun map-into (dest fn :rest seqs)
+  (labels ((args (index)
+             (block args
+               (if (< (length dest) index)
+                   (return-from args nil))
+               (mapcar
+                (lambda (seq)
+                  (if (<= (length seq) index)
+                      (return-from args nil)
+                      (elt seq index)))
+                seqs))))
+    (for ((i 0 (+ i 1))
+          (next-args (args 0) (args (+ 1 i))))
+         ((not next-args) dest)
+      ;;(format (error-output) "i = ~A, args = ~A ~%" i next-args)
+      (setf (elt dest i) (apply fn next-args)))))
