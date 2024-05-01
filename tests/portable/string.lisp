@@ -52,6 +52,13 @@
             (return-from exit nil))
         (elt (create-string 3) 4)
         (print "FAIL")))
+(block exit
+    (with-handler
+        (lambda (condition)
+            (test-equal (instancep condition (class <program-error>)) t)
+            (return-from exit nil))
+        (set-elt #\7 (create-string 3) 4)
+        (print "FAIL")))
 
 (test-equal (length "ab") 2)
 (test-equal (length (create-string 2 #\7)) 2)

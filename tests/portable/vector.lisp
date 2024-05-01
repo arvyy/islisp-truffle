@@ -17,6 +17,13 @@
             (return-from exit nil))
         (elt #(1 2 3) 4)
         (print "FAIL")))
+(block exit
+    (with-handler
+        (lambda (condition)
+            (test-equal (instancep condition (class <program-error>)) t)
+            (return-from exit nil))
+        (set-elt 4 (vector 1 2 3) 4)
+        (print "FAIL")))
 
 (let ((vec (vector 1 2 3)))
   (setf (elt vec 2) 4)

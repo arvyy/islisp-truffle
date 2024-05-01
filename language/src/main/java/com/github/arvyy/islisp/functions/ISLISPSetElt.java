@@ -1,8 +1,11 @@
 package com.github.arvyy.islisp.functions;
 
+import com.github.arvyy.islisp.ISLISPContext;
+import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -17,7 +20,6 @@ import com.oracle.truffle.api.nodes.RootNode;
 /**
  * Implements `set-elt` function, that sets an element in sequence for a given index.
  */
-//TODO array index out of bounds handling
 public abstract class ISLISPSetElt extends RootNode {
 
     @Child
@@ -41,15 +43,38 @@ public abstract class ISLISPSetElt extends RootNode {
     @Specialization
     Object doList(Object value, Pair p, int index) {
         var cell = p;
+        if (index < 0) {
+            return errorSignalerNode.signalIndexOutOfRange(index, getListSize(p));
+        }
         for (int i = 0; i < index; i++) {
-            cell = (Pair) cell.cdr();
+            if (cell.cdr() instanceof Pair pair) {
+                cell = pair;
+                continue;
+            }
+            if (Utils.isNil(cell.cdr())) {
+                return errorSignalerNode.signalIndexOutOfRange(index,  getListSize(p));
+            } else {
+                var ctx = ISLISPContext.get(this);
+                return errorSignalerNode.signalDomainError(
+                    "Not a proper list",
+                    cell.cdr(),
+                    ctx.lookupClass("<list>"));
+            }
         }
         cell.setCar(value);
         return value;
     }
 
+    @CompilerDirectives.TruffleBoundary
+    int getListSize(Pair p) {
+        return Utils.readList(p).size();
+    }
+
     @Specialization
     Object doVector(Object value, LispVector vec, int index) {
+        if (index < 0 || index >= vec.values().length) {
+            return errorSignalerNode.signalIndexOutOfRange(index, vec.values().length);
+        }
         vec.values()[index] = value;
         return value;
     }
@@ -61,6 +86,9 @@ public abstract class ISLISPSetElt extends RootNode {
 
     @Specialization
     Object doMutableString(LispChar c, LispMutableString str, int index) {
+        if (index < 0 || index >= str.chars().length) {
+            return errorSignalerNode.signalIndexOutOfRange(index, str.chars().length);
+        }
         str.chars()[index] = c;
         return c;
     }

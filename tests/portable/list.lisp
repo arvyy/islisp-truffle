@@ -73,6 +73,13 @@
             (return-from exit nil))
         (elt '(1 2 3) 4)
         (print "FAIL")))
+(block exit
+    (with-handler
+        (lambda (condition)
+            (test-equal (instancep condition (class <program-error>)) t)
+            (return-from exit nil))
+        (setl-elt  4 (list 1 2 3) 4)
+        (print "FAIL")))
 
 (format (standard-output) "list.lisp end")
 (finish-output (standard-output))
