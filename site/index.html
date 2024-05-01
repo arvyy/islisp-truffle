@@ -1,76 +1,52 @@
 <!DOCTYPE HTML>
 <html lang="en">
-    <head>
-        <title>Truffle ISLISP</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" type="image/x-icon" href="icon.svg">
-        <link href="https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css" rel="stylesheet">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
-        <link href="styles.css" rel="stylesheet">
-    </head>
-    <body>
-        <nav>
-            <a class="nav-link" href="apireference.html">Docs</a>
-            <a class="nav-link" href="https://github.com/arvyy/islisp-truffle/">Source code</a>
-        </nav>
-        <main>
-            <img src="icon.svg" class="big-logo">
-            <section class="main-section">
-                <h1>Truffle ISLISP</h1>
-                <a href="http://islisp.org/docs/islisp-v23.pdf">ISLISP2007 standard</a> implementation on <a href="https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/">GraalVM's Truffle framework</a>.
-            </section>
-            <section class="main-section">
-                <h2>Features</h2>
-                <div class="list-group">
-                    <div class="list-group__title">ISLISP, a spiritually CommonLisp-lite:</div>
-                    <ul>
-                        <li>Adhoc polymorphism through generic methods;</li>
-                        <li>Dynamic and lexical scoping;</li>
-                        <li>Procedural macros.</li>
-                    </ul>
-                </div>
-                <div class="list-group">
-                    <div class="list-group__title">Gains from implementing through Truffle framework:</div>
-                    <ul>
-                        <li>Fast performance<span class="wip">wip</span>;</li>
-                        <li>C FFI;</li>
-                        <li>Tooling support such as debugger through DAP or Chrome tools;</li>
-                        <li>Interop with other truffle implementations such as java, python, javascript, llvm, and more.</li>
-                    </ul>
-                </div>
-            </section>
-            <section class="main-section">
-                <h2>Downloads</h2>
-                <p>
-                    Downloads are provided through Github releases.
-                <p>
-                    Windows / Linux / MacOS links provide downloads of a standalone interpreter compiled to native binary for corresponding OS. Note, that the interpreter
-                    had been compiled to only include core ISLISP language, it doesn't include other languages like javascript, python, etc. Either
-                    build the project yourself with necessary language dependencies added, or use the jar language distribution (see below) in an environemnt geared
-                    towards truffle polyglot programming.
-                <p>
-                    Language jar link contains the core language itself. You will need to use it if you want to create customized runtime (such as, different security configuration,
-                    or different language dependencies), or if you just plainly want to use islisp scripts from java directly.
-                <p>
-                    No stable releases are yet available<span class="wip">wip</span>.
-                <p>
-                    No docker nor maven repository releases are yet available<span class="wip">wip</span>.
-
-
-                <div class="release">
-                    <div class="release__item">
-                        <h3 class="release__title">Nigtly</h3>
-                        <ul class="release__downloads">
-                            <li><a href="https://github.com/arvyy/islisp-truffle/releases/download/nightly/islisp.exe">Windows</a></li>
-                            <li><a href="https://github.com/arvyy/islisp-truffle/releases/download/nightly/islisp-linux">Linux</a></li>
-                            <li><a href="https://github.com/arvyy/islisp-truffle/releases/download/nightly/islisp-macos">MacOS</a></li>
-                            <li><a href="https://github.com/arvyy/islisp-truffle/releases/download/nightly/islisp.jar">Language jar</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </body>
+<head>
+    <title>Truffle ISLISP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="icon.svg">
+    <link href="https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+<div class="background"></div>
+<div class="content-wrap">
+    <aside class="big-logo-aside">
+        <img src="icon.svg" class="big-logo" alt="Cringe logo spelling 'TRIL', you really didn't want to see that">
+    </aside>
+    <main>
+        <section class="main-section">
+            <h1>Truffle ISLISP</h1>
+            <a href="http://islisp.org/docs/islisp-v23.pdf">ISLISP2007 standard</a> implementation on <a href="https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/">GraalVM's Truffle framework</a>.
+        </section>
+        <section class="main-section">
+            <h2>Features</h2>
+            <div class="list-group">
+                <div class="list-group__title">ISLISP, a spiritually CommonLisp-lite:</div>
+                <ul>
+                    <li>Adhoc polymorphism through generic methods;</li>
+                    <li>Dynamic and lexical scoping;</li>
+                    <li>Procedural macros.</li>
+                </ul>
+            </div>
+            <div class="list-group">
+                <div class="list-group__title">Gains from implementing through Truffle framework:</div>
+                <ul>
+                    <li>Fast performance<span class="wip">wip</span>;</li>
+                    <li>C FFI;</li>
+                    <li>Tooling support such as debugger through DAP or Chrome tools;</li>
+                    <li>Interop with other truffle implementations such as java, python, javascript, llvm, and more.</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <a href="install.html">Install</a>
+        <a href="docs.html">Docs</a>
+        <a href="https://github.com/arvyy/islisp-truffle">Source</a>
+    </footer>
+</div>
+</body>
 </html>

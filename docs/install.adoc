@@ -1,0 +1,59 @@
+# Installing & running ISLISP Truffle
+:toc: left
+
+## Install
+
+### Installing on Windows
+
+1. Click on a release from https://github.com/arvyy/islisp-truffle/releases/
+2. Download `islisp.exe` artifact, place it in convenient location eg `C:\Program files\ISLISP\islisp.exe`
+3. Optionally; add above directory to your PATH system variable https://www.wikihow.com/Change-the-PATH-Environment-Variable-on-Windows .
+
+### Installing on Linux
+
+1. Click on a release from https://github.com/arvyy/islisp-truffle/releases/
+2. Download `islisp-linux` artifact, place it in convenient location eg `/opt/islisp/islisp`
+3. You might need to execute `chmod +x islisp-linux` after downloading to make it executable.
+4. Optionally; add above directory to your PATH system variable https://www.baeldung.com/linux/path-variable .
+
+### Installing on Mac
+
+1. Click on a release from https://github.com/arvyy/islisp-truffle/releases/
+2. Download `islisp-mac` artifact, place it in `/usr/local/bin/islisp`
+3. You might need to execute `chmod +x islisp-mac` after downloading to make it executable.
+
+### Running on Docker
+
+ISLISP images are provided on docker hub https://hub.docker.com/r/arvyy/islisp/tags
+
+### Running on Java app
+
+TODO
+
+## Run
+
+Run interpreter with `-h` or `--help` option to see command line help.
+
+### Configure library source location
+
+When using `require` form, islisp searches from roots provided through `-sp <paths>` or `--sourcepath <paths>` parameter (when using standalone launcher), or `islisp.Sourcepath` context option (when embedding in java). Parameter value: set of paths, separated by system path separate (`:` on unix, `;` on windows).
+
+### Enabling debugging
+
+Provide `-d <port>` or `--debug-chrome <port>` to start debug session through chrome tools. After starting a session, a link should appear in standard output, paste it to chrome url bar to start debugging.
+
+Provide `-dap <port>` or `--debug-dap <port>` to start debug session through debugger adapter protocol (such as through VSCode).
+
+If you're using Docker, don't forget to also forward chosen ports.
+
+### Enabling profiling
+
+TODO
+
+### Execution modes
+
+Invoking interpreter with a file parameter will run said file and exit upon completion.
+
+Invoking interpreter with a `-` parameter will make it read source from standard input, execute it, and exit upon completion.
+
+Otherwise, interpreter is started in an interactive REPL mode.

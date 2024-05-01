@@ -56,7 +56,7 @@
         <delete dir="${basedir}/dist/site"/>
         <exec executable="${shell.executable}" dir="docs">
             <arg value="${shell.prefix}"/>
-            <arg value="asciidoctor apireference.adoc"/>
+            <arg value="asciidoctor apireference.adoc docs.adoc install.adoc building.adoc"/>
         </exec>
         <copy todir="${basedir}/dist/site">
             <fileset dir="site"></fileset>

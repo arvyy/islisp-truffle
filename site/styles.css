@@ -18,22 +18,49 @@ html {
 }
 
 .big-logo {
-    height: 100px;
+    height: 100%;
+    width: 100%;
+}
+
+.content-wrap {
+    position: relative;
+    display: grid;
+    padding: 1em;
+    max-width: 960px;
     margin: auto;
-    display: block;
+    padding-top: 2em;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+        "logo main"
+        "footer footer";
 }
 
-nav {
+@media(max-width: 800px) {
+    .content-wrap {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "logo"
+            "main"
+            "footer";
+    }
+    .big-logo-aside {
+        margin-bottom: 2em;
+    }
+}
+
+.big-logo-aside {
+    grid-area: logo;
+}
+
+footer {
+    grid-area: footer;
     display: flex;
-    align-self: stretch;
+    justify-content: center;
 }
 
-nav *:first-child {
-    margin-left: auto;
-}
-
-.nav-link {
-    margin: 0.5em;
+footer > * {
+    margin-right: 2em;
 }
 
 a {
@@ -48,19 +75,16 @@ a:hover {
     background-color: var(--link-color);
 }
 
-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: var(--bg-color);
+main {
+    line-height: 1.5em;
+    grid-area: main;
 }
 
-main {
-    display: flex;
-    max-width: 960px;
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
+.main-section {
+    margin-bottom: 2em;
+    padding: 1em;
+    background-color: color-mix(in srgb, var(--bg-color), transparent 20%);
+    box-shadow: 0 0 20px 10px color-mix(in srgb, var(--bg-color), transparent 20%);
 }
 
 h1, h2 {
@@ -68,17 +92,6 @@ h1, h2 {
     font-weight: bold;
     color: var(--heading-color);
     margin-bottom: 0.5em;
-}
-
-.main-section {
-    margin-top: 1em;
-    margin-bottom: 0.5em;
-    padding: 2em;
-    line-height: 1.5em;
-    background-color: var(--bg-color2);
-    border-bottom: 4px var(--border-color) solid;
-    border-right: 4px var(--border-color) solid;
-    box-shadow: var(--shadow-color) 0 10px 40px;
 }
 
 li {
@@ -109,31 +122,24 @@ li::before {
     font-weight: bold;
 }
 
-.release {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.release__item {
-    margin: 2em;
-    padding: 1em;
-    flex: 1;
-    max-width: 300px;
-    border: var(--border-color) solid 1px;
-}
-
-.release__title {
-    text-align: center;
-    font-size: 1.2em;
-    color: var(--heading-color);
-}
-
-.release__coming-soon {
-    font-weight: bold;
-    font-style: italic;
-    color: var(--text-color-muted);
-}
-
 p {
     margin-top: 1em;
+}
+
+html, body {
+    padding: 0;
+
+}
+
+.background {
+    position: fixed;
+    width: 200vw;
+    height: 200vh;
+    transform: translate(-100vw, -100vh) rotate(20deg) translate(100vw, 0);
+    background-repeat: repeat;
+    background-size: 100px;
+    background-image:
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 95 30">\
+            <rect x="-10" y="-10" fill="%23151515" width="200" height="100"></rect>\
+            <text x="0" y="20" fill="%23212b25">truffle islisp</text></svg>');
 }
