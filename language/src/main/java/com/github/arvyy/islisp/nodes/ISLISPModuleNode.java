@@ -23,7 +23,6 @@ public class ISLISPModuleNode extends ISLISPExpressionNode {
         super(moduleSource.sourceSection());
         this.parser = parser;
         this.source = moduleSource;
-        markInternal();
     }
 
     @Override

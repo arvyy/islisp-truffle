@@ -10,6 +10,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
+    <script type="text/javascript">
+        const testimonials = [{
+            text: 'Finally we have a Lisp implementation that can solve world hunger',
+            author: 'Bike'
+        }, {
+            text: 'if you don\'t really want to share it how can anyone else judge its quality',
+            author: 'fluffysnep'
+        }, {
+            text: 'Prophetic visions, duh',
+            author: 'Bike'
+        }, {
+            text: 'Truly one of the Lisps of all time',
+            author: 'gregczrk'
+        }, {
+            text: 'It probably exists',
+            author: 'mtreis86'
+        }, {
+            text: 'A Lisp like this country has never seen before',
+            author: 'raydeejay'
+        }];
+        window.addEventListener('load', () => {
+            const index = Math.floor(testimonials.length * Math.random());
+            const t = testimonials[index];
+            document.getElementsByClassName('testimonials')[0].textContent = `"${t.text}" -- ${t.author}`;
+        });
+    </script>
 </head>
 <body>
 <div class="background"></div>
@@ -48,6 +74,8 @@
         <a href="docs.html">Docs</a>
         <a href="https://github.com/arvyy/islisp-truffle">Source</a>
     </footer>
+</div>
+<div class="testimonials">
 </div>
 </body>
 </html>

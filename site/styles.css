@@ -128,11 +128,11 @@ p {
 
 html, body {
     padding: 0;
-
 }
 
 .background {
     position: fixed;
+    z-index: -1;
     width: 200vw;
     height: 200vh;
     transform: translate(-100vw, -100vh) rotate(20deg) translate(100vw, 0);
@@ -142,4 +142,18 @@ html, body {
         url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 95 30">\
             <rect x="-10" y="-10" fill="%23151515" width="200" height="100"></rect>\
             <text x="0" y="20" fill="%23212b25">truffle islisp</text></svg>');
+}
+
+.testimonials {
+    position: fixed;
+    top: calc(100vh - 2em);
+    left: 1em;
+    color: var(--text-color-muted);
+    font-style: italic;
+}
+
+@media(max-width: 800px) or (max-height: 800px) {
+    .testimonials {
+        display: none;
+    }
 }

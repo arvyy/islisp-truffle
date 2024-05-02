@@ -52,11 +52,10 @@ public class Parser {
     //TODO rename
     public ISLISPRootNode createMainModuleNode(ISLISPTruffleLanguage language, String module, Source source) {
         var topLevelConditionHandler = new ISLISPWithHandlerNode(
-            new ISLISPLiteralNode(ISLISPDefaultHandler.makeLispFunction(language, source.isInteractive()), null)
-                .markInternal(),
+            new ISLISPLiteralNode(ISLISPDefaultHandler.makeLispFunction(language, source.isInteractive()), null),
             new ISLISPExpressionNode[]{new ISLISPModuleNode(this, parseModuleSource(module, source))},
             null
-        ).markInternal();
+        );
         return new ISLISPRootNode(
                 language,
                 new ISLISPExpressionNode[]{topLevelConditionHandler},

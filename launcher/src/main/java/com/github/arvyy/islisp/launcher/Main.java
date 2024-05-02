@@ -26,22 +26,16 @@ public final class Main {
      */
     public static void main(String[] args) throws IOException, ParseException {
 
-        var chromeDebuggerOpt = chromeDebuggerOpt();
-        var dapDebuggerOpt = dapDebuggerOpt();
         var helpOpt = helpOpt();
         var versionOpt = versionOpt();
-        var sourcepathOpt = sourcepathOpt();
 
         var options = new Options();
-        options.addOption(chromeDebuggerOpt);
-        options.addOption(dapDebuggerOpt);
-        options.addOption(helpOpt);
+        //options.addOption(helpOpt);
         options.addOption(versionOpt);
-        options.addOption(sourcepathOpt);
 
         var parser = DefaultParser.builder()
             .build();
-        var commandLine = parser.parse(options, args);
+        var commandLine = parser.parse(options, args, true);
 
         if (commandLine.hasOption(versionOpt)) {
             var properties = BuildInfo.getBuildProperties();
@@ -59,6 +53,7 @@ public final class Main {
             var pw = new PrintWriter(System.out);
             new HelpFormatter().printWrapped(pw, HELP_WIDTH, """
                 Run islisp interpreter.
+                
                 If FILE is `-`, interpreter non-interactively evaluates standard input.
                 If FILE is a path, given FILE is evaluated and the program exits.
                 If FILE is not provided, interpreter enters interactive REPL mode.
@@ -66,6 +61,7 @@ public final class Main {
             pw.flush();
             return;
         }
+
 
         var contextBuilder = Context.newBuilder()
             .in(System.in)
@@ -75,22 +71,20 @@ public final class Main {
             .allowNativeAccess(true)
             .allowPolyglotAccess(PolyglotAccess.ALL);
 
-        if (commandLine.hasOption(sourcepathOpt)) {
-            contextBuilder.option("islisp.Sourcepath", sourcepathOpt.getValue());
+        String sourceArg = null;
+        for (var arg: commandLine.getArgList()) {
+            if (arg.startsWith("--")) {
+                var e = arg.substring(2).split("=");
+                var value = e.length > 1 ? e[1] : "true";
+                contextBuilder.option(e[0], value);
+            } else {
+                sourceArg = arg;
+            }
         }
 
-        if (commandLine.hasOption(chromeDebuggerOpt)) {
-            var val = commandLine.getOptionValue(chromeDebuggerOpt);
-            contextBuilder.option("inspect", val);
-        }
-
-        if (commandLine.hasOption(dapDebuggerOpt)) {
-            var val = commandLine.getOptionValue(dapDebuggerOpt);
-            contextBuilder.option("dap", val);
-        }
         var context = contextBuilder.build();
 
-        if (commandLine.getArgList().isEmpty()) {
+        if (sourceArg == null) {
             var w = new OutputStreamWriter(System.out);
             var r = new BufferedReader(new InputStreamReader(System.in));
             w.write("ISLISP interpreter.\nUse ,h for help.\n\n");
@@ -130,34 +124,14 @@ public final class Main {
                     e.printStackTrace();
                 }
             }
-        } else if (commandLine.getArgList().get(0).equals("-")) {
+        } else if ("-".equals(sourceArg)) {
             var source = Source.newBuilder("islisp", new InputStreamReader(System.in), "<stdin>").build();
             context.eval(source);
         } else {
-            var source = Source.newBuilder("islisp", new File(commandLine.getArgList().get(0))).build();
+            var source = Source.newBuilder("islisp", new File(sourceArg)).build();
             context.eval(source);
         }
         context.close();
-    }
-
-    static Option chromeDebuggerOpt() {
-        return Option.builder()
-            .option("d")
-            .longOpt("debug-chrome")
-            .optionalArg(true)
-            .argName("CHROME_PORT")
-            .desc("Run in debugger mode using chrome debugger protocol.")
-            .build();
-    }
-
-    static Option dapDebuggerOpt() {
-        return Option.builder()
-            .option("dap")
-            .longOpt("debug-dap")
-            .optionalArg(true)
-            .argName("DAP_PORT")
-            .desc("Run in debugger mode using DAP.")
-            .build();
     }
 
     static Option helpOpt() {
@@ -173,14 +147,6 @@ public final class Main {
             .option("v")
             .longOpt("version")
             .desc("Show version information and exit.")
-            .build();
-    }
-
-    static Option sourcepathOpt() {
-        return Option.builder()
-            .option("sp")
-            .longOpt("sourcepath")
-            .desc("Source paths, separated by system path separator, relative which to search for required modules.")
             .build();
     }
 

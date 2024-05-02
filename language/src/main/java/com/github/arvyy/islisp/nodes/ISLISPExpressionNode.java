@@ -111,15 +111,6 @@ public abstract class ISLISPExpressionNode extends Node implements Instrumentabl
     }
 
     /**
-     * Mark node as internal and non-instrumentable.
-     * @return this
-     */
-    public ISLISPExpressionNode markInternal() {
-        internal = true;
-        return this;
-    }
-
-    /**
      *
      * @return parsing context active during parse of this node
      */
