@@ -99,7 +99,7 @@ External objects with fields are represented as instances of `<truffle-object>` 
   (truffle-object-fields obj)) ;; => #("a")
 ----
 
-Use `(truffle-object-field _truffle-obj_ _field_)` to read a field of a truffle value.
+Use `(truffle-object-field _truffle-obj_ _field_)` to read a field of a truffle value, where field is a string name of the field.
 
 Use `(truffle-object-set-field _value_ _truffle-obj_ _field_)` or `(setf (truffle-object-field _truffle-obj_ _field_) _value_)` to set a field value on a truffle object.
 
@@ -111,9 +111,9 @@ Use `(truffle-object-set-field _value_ _truffle-obj_ _field_)` or `(setf (truffl
   (truffle-object-field obj "a")) ;; => 2
 ----
 
-TODO: truffle interop conditions.
-
 Interop arrays are presented as objects of class `<truffle-vector>`. The class extends`<basic-vector>` therefore the common vector / sequence methods can be used.
+
+Interop errors are signalled using `<truffle-interop-error>` class (which extends `<error>`). You can retrieve attached message using `(truffle-interop-error-message _interop-error-condition_)`.
 
 === Native function interface
 

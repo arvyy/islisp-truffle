@@ -2,7 +2,6 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Pair;
@@ -40,8 +39,7 @@ public abstract class ISLISPMapcar extends RootNode {
         try {
             return executeGeneric(frame.getArguments()[1], lists);
         } catch (InteropException e) {
-            //TODO
-            throw new ISLISPError("mapcar fail", this);
+            return errorSignalerNode.signalTruffleInteropError(e);
         }
     }
 

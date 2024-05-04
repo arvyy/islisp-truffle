@@ -8,3 +8,12 @@ Division by zero
 
 Index 4 out of bounds (must be between 0 and 3 exclusive)
     at stacktrace.lisp:38
+
+No next method available
+    at stacktrace.lisp:44
+    at stacktrace.lisp:45
+    at stacktrace.lisp:43
+    at stacktrace.lisp:51
+
+Error during truffle interop call: Unknown identifier: b
+    at stacktrace.lisp:62

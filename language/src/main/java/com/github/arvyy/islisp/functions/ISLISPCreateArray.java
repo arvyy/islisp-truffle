@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -92,8 +91,11 @@ public abstract class ISLISPCreateArray extends RootNode {
                     return errorSignalerNode.signalWrongType(dimensions.car(), ctx.lookupClass("<integer>"));
                 }
                 if (dimensionsArr[i] < 0) {
-                    //TODO
-                    throw new ISLISPError("Dimension < 0", this);
+                    var ctx = ISLISPContext.get(this);
+                    return errorSignalerNode.signalDomainError(
+                        "Given dimensions aren't a list of non-negative integers",
+                        dimensions,
+                        ctx.lookupClass("<list>"));
                 }
                 if (dimensions.cdr() instanceof Pair p) {
                     dimensions = p;

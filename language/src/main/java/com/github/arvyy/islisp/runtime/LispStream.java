@@ -2,7 +2,10 @@ package com.github.arvyy.islisp.runtime;
 
 import com.oracle.truffle.api.interop.TruffleObject;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;

@@ -1,7 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -16,8 +16,12 @@ import com.oracle.truffle.api.nodes.RootNode;
  */
 public abstract class ISLISPLength extends RootNode {
 
+    @Child
+    ISLISPErrorSignalerNode islispErrorSignalerNode;
+
     ISLISPLength(TruffleLanguage<?> language) {
         super(language);
+        islispErrorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override
@@ -47,7 +51,8 @@ public abstract class ISLISPLength extends RootNode {
         if (s.identityReference() == ISLISPContext.get(this).getNil().identityReference()) {
             return 0;
         } else {
-            throw new ISLISPError("Not a sequence", this);
+            var ctx = ISLISPContext.get(this);
+            return islispErrorSignalerNode.signalDomainError("Not a sequence", s, ctx.lookupClass("<list>"));
         }
     }
 
@@ -72,8 +77,7 @@ public abstract class ISLISPLength extends RootNode {
         try {
             return (int) interop.getArraySize(o);
         } catch (UnsupportedMessageException e) {
-            //TODO
-            throw new ISLISPError("Interop error", this);
+            return islispErrorSignalerNode.signalTruffleInteropError(e);
         }
     }
 

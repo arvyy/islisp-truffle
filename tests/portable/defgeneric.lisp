@@ -31,5 +31,18 @@
 
 (setf (foo2 10) 11)
 
+;; test no next-method error reporting
+(defgeneric foo3 (value))
+(defmethod foo3 ((value <number>))
+    (call-next-method))
+(block exit
+    (with-handler
+        (lambda (condition)
+            ;; can't portably test anything about condition
+            ;; since spec doesn't tell what it exactly should be
+            (return-from exit nil))
+        (foo3 1)
+        (print "FAIL")))
+
 (format (standard-output) "defgeneric.lisp end")
 (finish-output (standard-output))

@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispStream;
@@ -43,8 +42,9 @@ public class ISLISPClose extends RootNode {
     void close(LispStream stream) {
         try {
             stream.close();
-        } catch (IOException e) {
-            throw new ISLISPError(e.getMessage(), this);
+        } catch (IOException ignored) {
+            //TODO log something somehow?
+            //spec doesn't specify about any conditions here.
         }
     }
 

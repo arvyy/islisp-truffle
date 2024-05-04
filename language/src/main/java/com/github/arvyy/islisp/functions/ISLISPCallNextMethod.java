@@ -1,6 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
-import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPGenericFunctionDispatchNode;
 import com.github.arvyy.islisp.nodes.ISLISPGenericFunctionDispatchNodeGen;
 import com.github.arvyy.islisp.runtime.Closure;
@@ -14,7 +14,10 @@ import com.oracle.truffle.api.nodes.RootNode;
 public class ISLISPCallNextMethod extends RootNode {
 
     @Child
-    private ISLISPGenericFunctionDispatchNode dispatchNode;
+    ISLISPGenericFunctionDispatchNode dispatchNode;
+
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
 
     /**
      * Create call-next-method node.
@@ -23,6 +26,7 @@ public class ISLISPCallNextMethod extends RootNode {
     public ISLISPCallNextMethod(TruffleLanguage<?> language) {
         super(language);
         dispatchNode = ISLISPGenericFunctionDispatchNodeGen.create();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override
@@ -30,7 +34,7 @@ public class ISLISPCallNextMethod extends RootNode {
         var closure = (Closure) frame.getArguments()[0];
         var applicables = closure.applicableMethods();
         if (applicables.aroundMethods().size() == 0 && applicables.primaryMethods().size() == 0) {
-            throw new ISLISPError("No next method", this);
+            return errorSignalerNode.signalNoNextMethod();
         }
         return dispatchNode.executeDispatch(applicables, closure.args());
     }

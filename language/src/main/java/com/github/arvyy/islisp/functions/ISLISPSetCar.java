@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -14,8 +15,12 @@ import com.oracle.truffle.api.nodes.RootNode;
  */
 public abstract class ISLISPSetCar extends RootNode {
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     ISLISPSetCar(TruffleLanguage<?> language) {
         super(language);
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     abstract Object executeGeneric(Object arg1, Object arg2);
@@ -23,7 +28,7 @@ public abstract class ISLISPSetCar extends RootNode {
     @Override
     public final Object execute(VirtualFrame frame) {
         if (frame.getArguments().length != 3) {
-            throw new ISLISPError("Wrong arg count", this);
+            return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 2, 2);
         }
         return executeGeneric(frame.getArguments()[1], frame.getArguments()[2]);
     }

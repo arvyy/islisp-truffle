@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -167,8 +166,11 @@ public abstract class ISLISPClassOf extends RootNode {
 
     @Fallback
     @CompilerDirectives.TruffleBoundary
-    LispClass doFallback(Object value) {
-        throw new ISLISPError("Unknown class for value: " + value, this);
+    LispClass doFallback(
+        Object value,
+        @Cached("loadObjectClass()") LispClass objClass
+    ) {
+        return objClass;
     }
 
     LispClass loadIntegerClass() {
@@ -225,6 +227,10 @@ public abstract class ISLISPClassOf extends RootNode {
 
     LispClass loadNativeLibraryClass() {
         return loadClass("<truffle-native-library>");
+    }
+
+    LispClass loadObjectClass() {
+        return loadClass("<object>");
     }
 
     LispClass loadClass(String name) {

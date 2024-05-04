@@ -3,7 +3,10 @@ package com.github.arvyy.islisp.parser;
 import com.github.arvyy.islisp.runtime.SymbolReference;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Necessary parser context while doing recursive paring descent.

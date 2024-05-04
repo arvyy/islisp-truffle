@@ -1,16 +1,14 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.interop.InteropException;
 import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.UnknownIdentifierException;
-import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.RootNode;
 
@@ -34,13 +32,13 @@ public abstract class ISLISPTruffleObjectField extends RootNode {
         }
         try {
             return executeGeneric(frame.getArguments()[1], frame.getArguments()[2]);
-        } catch (UnsupportedMessageException | UnknownIdentifierException e) {
-            throw new ISLISPError("Error fetching truffle-object field", this);
+        } catch (InteropException e) {
+            return errorSignalerNode.signalTruffleInteropError(e);
         }
     }
 
     abstract Object executeGeneric(Object obj, Object member)
-        throws UnsupportedMessageException, UnknownIdentifierException;
+        throws InteropException;
 
     @Specialization(guards = {
         "interopLibrary.hasMembers(o)"
@@ -49,7 +47,7 @@ public abstract class ISLISPTruffleObjectField extends RootNode {
         Object o,
         String member,
         @CachedLibrary("o") InteropLibrary interopLibrary
-    ) throws UnsupportedMessageException, UnknownIdentifierException {
+    ) throws InteropException {
         return interopLibrary.readMember(o, member);
     }
 

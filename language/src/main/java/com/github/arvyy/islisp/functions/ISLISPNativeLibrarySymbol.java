@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispNativeLibrary;
@@ -9,7 +8,8 @@ import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.interop.*;
+import com.oracle.truffle.api.interop.InteropException;
+import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.Source;
 
@@ -33,9 +33,8 @@ public abstract class ISLISPNativeLibrarySymbol extends RootNode {
         }
         try {
             return executeGeneric(frame.getArguments()[1], frame.getArguments()[2], frame.getArguments()[3]);
-        } catch (Exception e) {
-            //TODO
-            throw new ISLISPError("Error reading native symbol", this);
+        } catch (InteropException e) {
+            return errorSignalerNode.signalTruffleInteropError(e);
         }
     }
 

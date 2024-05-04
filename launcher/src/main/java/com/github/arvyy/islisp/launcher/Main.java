@@ -53,7 +53,7 @@ public final class Main {
             var pw = new PrintWriter(System.out);
             new HelpFormatter().printWrapped(pw, HELP_WIDTH, """
                 Run islisp interpreter.
-                
+
                 If FILE is `-`, interpreter non-interactively evaluates standard input.
                 If FILE is a path, given FILE is evaluated and the program exits.
                 If FILE is not provided, interpreter enters interactive REPL mode.

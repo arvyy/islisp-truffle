@@ -4,6 +4,7 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.LispClass;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.interop.InteropException;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.source.SourceSection;
@@ -214,4 +215,37 @@ public class ISLISPErrorSignalerNode extends Node {
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
+
+    /**
+     * Signal no-next-method error.
+     *
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
+    public Object signalNoNextMethod() {
+        var ctx = ISLISPContext.get(this);
+        var condition = getCreateCallNode().call(
+            null,
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<no-next-method-error>").identityReference())
+        );
+        return getSignalCallNode().call(null, condition, ctx.getNil());
+    }
+
+    /**
+     * Signal arbitrary truffle interop error.
+     *
+     * @param interopException exception
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
+    @CompilerDirectives.TruffleBoundary
+    public Object signalTruffleInteropError(InteropException interopException) {
+        var ctx = ISLISPContext.get(this);
+        var condition = getCreateCallNode().call(
+            null,
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<truffle-interop-error>").identityReference()),
+            ctx.namedSymbol("message"), interopException.getMessage()
+        );
+        return getSignalCallNode().call(null, condition, ctx.getNil());
+    }
+
+
 }

@@ -48,6 +48,9 @@
 
 (defclass <error> (<serious-condition>) ())
 
+(defclass <truffle-interop-error> (<error>)
+    ((message :reader truffle-interop-error-message :initarg message)))
+
 (defclass <arithmetic-error> (<error>) ())
 (defclass <division-by-zero> (<arithmetic-error>) ())
 (defclass <floating-point-overflow> (<arithmetic-error>) ())
@@ -83,6 +86,8 @@
     ((actual :reader arity-error-actual-count :initarg actual)
      (required-min :reader arity-error-required-min :initarg required-min)
      (required-max :reader arity-error-required-max :initarg required-max)))
+
+(defclass <no-next-method-error> (<program-error>) ())
 
 (defclass <undefined-entity> (<program-error>) ())
 
@@ -121,6 +126,14 @@
     (format stream "Index ~D out of bounds (must be between 0 and ~D exclusive)~%"
             (index-out-of-range-error-actual condition)
             (index-out-of-range-error-bounds condition))
+    (print-stacktrace stream condition))
+
+(defmethod report-condition ((condition <no-next-method-error>) (stream <stream>))
+    (format stream "No next method available~%")
+    (print-stacktrace stream condition))
+
+(defmethod report-condition ((condition <truffle-interop-error>) (stream <stream>))
+    (format stream "Error during truffle interop call: ~A~%" (truffle-interop-error-message condition))
     (print-stacktrace stream condition))
 
 (defun min (first :rest xs)

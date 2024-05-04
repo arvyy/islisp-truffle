@@ -4,7 +4,8 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.interop.*;
+import com.oracle.truffle.api.interop.InteropException;
+import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
