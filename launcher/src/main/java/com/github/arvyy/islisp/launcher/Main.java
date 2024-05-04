@@ -53,7 +53,7 @@ public final class Main {
             var pw = new PrintWriter(System.out);
             // disable checkstyle so it doesn't complain about
             // long lines and trailing spaces in empty lines
-            //CHECKSTYLE:OFF
+            // CHECKSTYLE:OFF
             new HelpFormatter().printWrapped(pw, HELP_WIDTH, """
                 Run islisp interpreter.
 
@@ -69,7 +69,7 @@ public final class Main {
                 If FILE is a path, given FILE is evaluated and the program exits.
                 If FILE is not provided, interpreter enters interactive REPL mode.
                 """);
-            //CHECKSTYLE:ON
+            // CHECKSTYLE:ON
             pw.flush();
             return;
         }

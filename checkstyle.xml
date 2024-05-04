@@ -42,6 +42,8 @@
     <property name="message" value="Line has trailing spaces."/>
   </module>
 
+  <module name="SuppressWithPlainTextCommentFilter"/>
+
   <module name="TreeWalker">
 
     <!-- Checks for Javadoc comments.                     -->

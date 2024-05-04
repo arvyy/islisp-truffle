@@ -40,9 +40,9 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
         category = OptionCategory.USER, stability = OptionStability.STABLE)
     // ignore name casing, since Option DLS has its own ideas how the name should be done
     // which conflicts with checkstyle.
-    //CHECKSTYLE:OFF
+    // CHECKSTYLE:OFF
     public static final OptionKey<String> Sourcepath = new OptionKey<>(".");
-    //CHECKSTYLE:ON
+    // CHECKSTYLE:ON
 
     @Override
     public ISLISPContext createContext(Env env) {
