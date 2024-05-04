@@ -34,21 +34,15 @@ TODO
 
 Run interpreter with `-h` or `--help` option to see command line help.
 
-### Configure library source location
+Interpeter parses options provided in the form of `--<option>=<value>`, and transparently passes them through to truffle runtime. ISLISP specific options are as follows:
 
-When using `require` form, islisp searches from roots provided through `-sp <paths>` or `--sourcepath <paths>` parameter (when using standalone launcher), or `islisp.Sourcepath` context option (when embedding in java). Parameter value: set of paths, separated by system path separate (`:` on unix, `;` on windows).
+* `islisp.Sourcepath` -- when using `require` form, islisp searches from roots provided through this option. Option value: set of paths, separated by `:`.
 
-### Enabling debugging
+See truffle documentation for other recognizable options.
 
-Provide `-d <port>` or `--debug-chrome <port>` to start debug session through chrome tools. After starting a session, a link should appear in standard output, paste it to chrome url bar to start debugging.
+### Interpreter tools (debugger, profiler, ...)
 
-Provide `-dap <port>` or `--debug-dap <port>` to start debug session through debugger adapter protocol (such as through VSCode).
-
-If you're using Docker, don't forget to also forward chosen ports.
-
-### Enabling profiling
-
-TODO
+See https://www.graalvm.org/latest/tools/ for the list of available tools and necessary options for enabling it. ISLISP standalone interpreter by default comes with all tools included.
 
 ### Execution modes
 

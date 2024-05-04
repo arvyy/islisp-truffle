@@ -1,7 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPTypes;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
@@ -22,9 +22,13 @@ public abstract class ISLISPNumericGt extends RootNode {
 
     private final CountingConditionProfile profile;
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     ISLISPNumericGt(TruffleLanguage<?> language) {
         super(language);
         profile = CountingConditionProfile.create();
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     abstract Object executeGeneric(Object a, Object b);
@@ -59,9 +63,19 @@ public abstract class ISLISPNumericGt extends RootNode {
         return ISLISPContext.get(this).getNil();
     }
 
+    @Specialization
+    Object doFallbackFirstNotNumber(Object a, double b) {
+        return errorSignalerNode.signalWrongType(a, ISLISPContext.get(this).lookupClass("<number>"));
+    }
+
+    @Specialization
+    Object doFallbackFirstNotNumber(Object a, LispBigInteger b) {
+        return errorSignalerNode.signalWrongType(a, ISLISPContext.get(this).lookupClass("<number>"));
+    }
+
     @Fallback
-    Object notNumbers(Object a, Object b) {
-        throw new ISLISPError("Not numbers", this);
+    Object doFallbackSecondNotNumber(Object a, Object b) {
+        return errorSignalerNode.signalWrongType(b, ISLISPContext.get(this).lookupClass("<number>"));
     }
 
     /**

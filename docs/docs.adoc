@@ -1,7 +1,16 @@
 # Truffle ISLISP
+:nofooter:
+
+http://islisp.org/docs/islisp-v23.pdf[ISLISP2007 standard] implementation on https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework[GraalVM's Truffle framework].
 
 ## <<install.adoc#, Installation and running>>
 
+Downloading, installing, running interpreter.
+
 ## <<building.adoc#, Building from source>>
 
+Building interpreter from source, natively and through docker.
+
 ## <<apireference.adoc#, API reference>>
+
+Reference of extensions and violations to ISLISP spec.

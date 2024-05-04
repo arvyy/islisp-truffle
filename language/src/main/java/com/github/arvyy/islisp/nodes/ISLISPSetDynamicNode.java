@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.ValueReference;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -22,6 +21,9 @@ public class ISLISPSetDynamicNode extends ISLISPExpressionNode {
     @Child
     ISLISPExpressionNode expression;
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     /**
      * Create set-dynamic node.
      *
@@ -40,6 +42,7 @@ public class ISLISPSetDynamicNode extends ISLISPExpressionNode {
         this.module = module;
         this.symbol = symbol;
         this.expression = expression;
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override
@@ -47,11 +50,11 @@ public class ISLISPSetDynamicNode extends ISLISPExpressionNode {
         if (valueReference == null) {
             valueReference = ISLISPContext.get(this).lookupDynamicVar(module, symbol.identityReference());
             if (valueReference == null) {
-                throw new ISLISPError("Undefined dynamic variable", this);
+                return errorSignalerNode.signalUnboundVariable(symbol);
             }
         }
         if (valueReference.getValue() == null) {
-            throw new ISLISPError("Undefined dynamic variable", this);
+            return errorSignalerNode.signalUnboundVariable(symbol);
         }
         var value = expression.executeGeneric(frame);
         valueReference.setValue(value);

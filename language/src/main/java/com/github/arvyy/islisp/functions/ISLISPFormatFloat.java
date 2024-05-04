@@ -1,7 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -18,35 +18,44 @@ import java.io.IOException;
  */
 public abstract class ISLISPFormatFloat extends RootNode {
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     ISLISPFormatFloat(TruffleLanguage<?> language) {
         super(language);
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
-    abstract void executeGeneric(Object stream, Object f);
+    abstract Object executeGeneric(Object stream, Object f);
 
     @Override
     public final Object execute(VirtualFrame frame) {
-        executeGeneric(frame.getArguments()[1], frame.getArguments()[2]);
-        return ISLISPContext.get(this).getNil();
+        return executeGeneric(frame.getArguments()[1], frame.getArguments()[2]);
     }
 
     @Specialization
-    void doProper(LispStream stream, double f) {
-        doPrint(stream, f);
+    Object doProper(LispStream stream, double f) {
+        return doPrint(stream, f);
+    }
+
+    @Specialization
+    Object doFallbackNonStream(Object stream, double f) {
+        return errorSignalerNode.signalWrongType(stream, ISLISPContext.get(this).lookupClass("<stream>"));
     }
 
     @Fallback
-    void doFallback(Object stream, Object f) {
-        throw new ISLISPError("Bad arguments", this);
+    Object doFallbackNonFloat(Object stream, Object f) {
+        return errorSignalerNode.signalWrongType(f, ISLISPContext.get(this).lookupClass("<float>"));
     }
 
 
     @CompilerDirectives.TruffleBoundary
-    void doPrint(LispStream stream, double f) {
+    Object doPrint(LispStream stream, double f) {
         try {
             stream.write(Double.toString(f));
+            return ISLISPContext.get(this).getNil();
         } catch (IOException e) {
-            throw new ISLISPError(e.getMessage(), this);
+            return errorSignalerNode.signalIOError(e);
         }
     }
 

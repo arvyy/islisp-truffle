@@ -38,9 +38,8 @@ public class LispStream implements TruffleObject, AutoCloseable {
      *
      * @param input input stream, can be null.
      * @param output output stream, can be null.
-     * @throws IOException
      */
-    public LispStream(InputStream input, OutputStream output) throws IOException {
+    public LispStream(InputStream input, OutputStream output) {
         this.input = input;
         this.output = output;
         byteChannel = null;

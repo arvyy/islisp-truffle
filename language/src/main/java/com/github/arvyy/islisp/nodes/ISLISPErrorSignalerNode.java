@@ -9,6 +9,8 @@ import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.source.SourceSection;
 
+import java.io.IOException;
+
 /**
  * Helper class to signal errors from primitive / native forms.
  */
@@ -248,4 +250,20 @@ public class ISLISPErrorSignalerNode extends Node {
     }
 
 
+    /**
+     * Signal arbitrary IO error.
+     *
+     * @param exception IOException exception
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
+    @CompilerDirectives.TruffleBoundary
+    public Object signalIOError(IOException exception) {
+        var ctx = ISLISPContext.get(this);
+        var condition = getCreateCallNode().call(
+            null,
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<io-error>").identityReference()),
+            ctx.namedSymbol("message"), exception.getMessage()
+        );
+        return getSignalCallNode().call(null, condition, ctx.getNil());
+    }
 }

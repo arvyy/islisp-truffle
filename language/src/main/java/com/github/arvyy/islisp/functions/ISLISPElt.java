@@ -10,9 +10,8 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.interop.InteropException;
 import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.InvalidArrayIndexException;
-import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.RootNode;
 
@@ -102,8 +101,8 @@ public abstract class ISLISPElt extends RootNode {
     ) {
         try {
             return interop.readArrayElement(o, index);
-        } catch (UnsupportedMessageException | InvalidArrayIndexException e) {
-            throw new ISLISPError("Interop error", this);
+        } catch (InteropException e) {
+            return errorSignalerNode.signalTruffleInteropError(e);
         }
     }
 

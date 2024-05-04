@@ -1,6 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
-import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Pair;
@@ -40,7 +40,7 @@ public abstract class ISLISPSetCdr extends RootNode {
 
     @Fallback
     Object fallback(Object arg1, Object arg2) {
-        throw new ISLISPError("Not a pair", this);
+        return errorSignalerNode.signalWrongType(arg2, ISLISPContext.get(this).lookupClass("<pair>"));
     }
 
     /**

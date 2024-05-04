@@ -1,6 +1,5 @@
 package com.github.arvyy.islisp.functions;
 
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispStream;
@@ -10,7 +9,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 /**
  * Implements `create-string-output-stream`.
@@ -35,12 +33,7 @@ public class ISLISPCreateStringOutputStream extends RootNode {
 
     @CompilerDirectives.TruffleBoundary
     LispStream executeBoundary() {
-        try {
-            return new LispStream(null, new ByteArrayOutputStream());
-        } catch (IOException e) {
-            //TODO
-            throw new ISLISPError(e.getMessage(), this);
-        }
+        return new LispStream(null, new ByteArrayOutputStream());
     }
 
     /**

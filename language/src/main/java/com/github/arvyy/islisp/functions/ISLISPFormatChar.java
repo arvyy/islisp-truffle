@@ -1,7 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispChar;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispStream;
@@ -19,35 +19,44 @@ import java.io.IOException;
  */
 public abstract class ISLISPFormatChar extends RootNode {
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     ISLISPFormatChar(TruffleLanguage<?> language) {
         super(language);
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
-    abstract void executeGeneric(Object stream, Object ch);
+    abstract Object executeGeneric(Object stream, Object ch);
 
     @Override
     public final Object execute(VirtualFrame frame) {
-        executeGeneric(frame.getArguments()[1], frame.getArguments()[2]);
-        return ISLISPContext.get(this).getNil();
+        return executeGeneric(frame.getArguments()[1], frame.getArguments()[2]);
     }
 
     @Specialization
-    void executeProper(LispStream stream, LispChar ch) {
-        doPrint(stream, ch.codepoint());
+    Object doProper(LispStream stream, LispChar ch) {
+        return doPrint(stream, ch.codepoint());
+    }
+
+    @Specialization
+    Object doFallbackNonStream(Object stream, LispChar c) {
+        return errorSignalerNode.signalWrongType(stream, ISLISPContext.get(this).lookupClass("<stream>"));
     }
 
     @Fallback
-    void executeFallback(Object stream, Object c) {
-        throw new ISLISPError("Bad arguments", this);
+    Object doFallbackNonChar(Object stream, Object c) {
+        return errorSignalerNode.signalWrongType(c, ISLISPContext.get(this).lookupClass("<char>"));
     }
 
 
     @CompilerDirectives.TruffleBoundary
-    void doPrint(LispStream s, int codepoint) {
+    Object doPrint(LispStream s, int codepoint) {
         try {
             s.writeCodepoint(codepoint);
+            return ISLISPContext.get(this).getNil();
         } catch (IOException e) {
-            throw new ISLISPError(e.getMessage(), this);
+            return errorSignalerNode.signalIOError(e);
         }
     }
 

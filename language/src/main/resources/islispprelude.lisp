@@ -51,6 +51,9 @@
 (defclass <truffle-interop-error> (<error>)
     ((message :reader truffle-interop-error-message :initarg message)))
 
+(defclass <io-error> (<error>)
+    ((message :reader io-error-message :initarg message)))
+
 (defclass <arithmetic-error> (<error>) ())
 (defclass <division-by-zero> (<arithmetic-error>) ())
 (defclass <floating-point-overflow> (<arithmetic-error>) ())
@@ -134,6 +137,10 @@
 
 (defmethod report-condition ((condition <truffle-interop-error>) (stream <stream>))
     (format stream "Error during truffle interop call: ~A~%" (truffle-interop-error-message condition))
+    (print-stacktrace stream condition))
+
+(defmethod report-condition ((condition <io-error>) (stream <stream>))
+    (format stream "IO error: ~A~%" (io-error-message condition))
     (print-stacktrace stream condition))
 
 (defun min (first :rest xs)

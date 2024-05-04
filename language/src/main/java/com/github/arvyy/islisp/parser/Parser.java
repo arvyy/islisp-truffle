@@ -1421,7 +1421,7 @@ public class Parser {
 
     TruffleFile locateModuleSourceFile(String module) {
         var env = ISLISPContext.get(null).getEnv();
-        for (var rootPath: env.getOptions().get(ISLISPTruffleLanguage.Sourcepath).split(env.getPathSeparator())) {
+        for (var rootPath: env.getOptions().get(ISLISPTruffleLanguage.Sourcepath).split(":")) {
             var root = env.getPublicTruffleFile(rootPath);
             var resolved = root.resolve(module);
             if (resolved.exists()) {

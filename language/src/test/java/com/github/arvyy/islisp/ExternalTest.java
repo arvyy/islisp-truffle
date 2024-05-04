@@ -73,13 +73,12 @@ public class ExternalTest {
     public void moduleTest() throws IOException {
         var srcName = "../tests/nonportable/modulestest/main.lisp";
         var output = new ByteArrayOutputStream();
-        var isWindows = System.getProperty("os.name").startsWith("Windows");
         var sourcePath = List.of(
             "../tests/util",
             "../tests/nonportable/modulestest/root1",
             "../tests/nonportable/modulestest/root2")
             .stream()
-            .collect(Collectors.joining(isWindows ? ";" : ":"));
+            .collect(Collectors.joining(":"));
         var ctxBuilder = Context.newBuilder()
             .in(new ByteArrayInputStream(new byte[0]))
             .out(output)

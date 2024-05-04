@@ -2,7 +2,6 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.interop.InteropException;
 import com.oracle.truffle.api.interop.InteropLibrary;
@@ -26,6 +25,9 @@ public class ISLISPCaseNode extends ISLISPExpressionNode {
 
     @Child
     ISLISPExpressionNode comparisonFnExpression;
+
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
 
     @Children
     private ISLISPExpressionNode[] expressions;
@@ -52,6 +54,7 @@ public class ISLISPCaseNode extends ISLISPExpressionNode {
         SourceSection sourceSection
     ) {
         super(sourceSection);
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
         this.comparisonFnExpression = comparisonFnExpression;
         this.elseCase = elseCase;
         var offsetsLst = new ArrayList<Integer>();
@@ -82,7 +85,7 @@ public class ISLISPCaseNode extends ISLISPExpressionNode {
                         break;
                     }
                 } catch (InteropException e) {
-                    throw new ISLISPError("Interop error in case", this);
+                    return errorSignalerNode.signalTruffleInteropError(e);
                 }
             }
             if (!matched) {

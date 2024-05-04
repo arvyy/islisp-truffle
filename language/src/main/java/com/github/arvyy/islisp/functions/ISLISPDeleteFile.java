@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -61,8 +60,7 @@ public abstract class ISLISPDeleteFile extends RootNode {
         try {
             return doString(interopLibrary.asString(o));
         } catch (UnsupportedMessageException e) {
-            //TODO
-            throw new ISLISPError(e.getMessage(), this);
+            return errorSignalerNode.signalTruffleInteropError(e);
         }
     }
 

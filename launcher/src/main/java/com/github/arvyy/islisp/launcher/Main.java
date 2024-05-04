@@ -51,13 +51,25 @@ public final class Main {
         if (commandLine.hasOption(helpOpt)) {
             new HelpFormatter().printHelp("islisp [OPTION ...] [FILE]", options);
             var pw = new PrintWriter(System.out);
+            // disable checkstyle so it doesn't complain about
+            // long lines and trailing spaces in empty lines
+            //CHECKSTYLE:OFF
             new HelpFormatter().printWrapped(pw, HELP_WIDTH, """
                 Run islisp interpreter.
 
+                Options are each of form --<option>=<value>, and are transparently passed to truffle runtime.
+                
+                ISLISP specific options:
+                * islisp.Sourcepath - when using `require` form, islisp searches from roots provided through this option.
+                Option value: set of paths, separated by `:`.
+                
+                For other options see truffle documentation.
+                
                 If FILE is `-`, interpreter non-interactively evaluates standard input.
                 If FILE is a path, given FILE is evaluated and the program exits.
                 If FILE is not provided, interpreter enters interactive REPL mode.
                 """);
+            //CHECKSTYLE:ON
             pw.flush();
             return;
         }
