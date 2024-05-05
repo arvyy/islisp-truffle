@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispVector;
@@ -37,7 +36,7 @@ public abstract class ISLISPTruffleObjectFields extends RootNode {
         try {
             return executeGeneric(frame.getArguments()[1]);
         } catch (UnsupportedMessageException | InvalidArrayIndexException e) {
-            throw new ISLISPError("Error fetching truffle-object fields", this);
+            return errorSignalerNode.signalTruffleInteropError(e);
         }
     }
 

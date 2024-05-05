@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.functions.ISLISPClassSlotBoundpNodeGen;
 import com.github.arvyy.islisp.functions.ISLISPClassSlotReaderNodeGen;
 import com.github.arvyy.islisp.functions.ISLISPClassSlotWriterNodeGen;
@@ -32,6 +31,9 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
     @Children
     private final ISLISPExpressionNode[] slotDefMethods;
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     /**
      * Create defclass node.
      *
@@ -61,6 +63,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
         this.slots = slots;
         this.isAbstract = isAbstract;
         slotDefMethods = buildSlotFunctionNodes(language);
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     private ISLISPExpressionNode[] buildSlotFunctionNodes(TruffleLanguage<?> language) {
@@ -142,7 +145,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
         for (var superclass: superclassName) {
             var clazz = ctx.lookupClass(module, superclass.identityReference());
             if (clazz == null) {
-                throw new ISLISPError("Class not found " + superclass.name(), this);
+                errorSignalerNode.signalUndefinedClass(superclass);
             }
             superclasses.add(clazz);
             if (clazz instanceof StandardClass standardClass) {

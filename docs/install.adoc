@@ -5,30 +5,33 @@
 
 ### Installing on Windows
 
-1. Click on a release from https://github.com/arvyy/islisp-truffle/releases/
-2. Download `islisp.exe` artifact, place it in convenient location eg `C:\Program files\ISLISP\islisp.exe`
-3. Optionally; add above directory to your PATH system variable https://www.wikihow.com/Change-the-PATH-Environment-Variable-on-Windows .
+. Click on a release from https://github.com/arvyy/islisp-truffle/releases/
+. Download `islisp.exe` artifact, place it in convenient location eg `C:\Program files\ISLISP\islisp.exe`
+. Optionally; add above directory to your PATH system variable https://www.wikihow.com/Change-the-PATH-Environment-Variable-on-Windows .
 
 ### Installing on Linux
 
-1. Click on a release from https://github.com/arvyy/islisp-truffle/releases/
-2. Download `islisp-linux` artifact, place it in convenient location eg `/opt/islisp/islisp`
-3. You might need to execute `chmod +x islisp-linux` after downloading to make it executable.
-4. Optionally; add above directory to your PATH system variable https://www.baeldung.com/linux/path-variable .
+. Click on a release from https://github.com/arvyy/islisp-truffle/releases/
+. Download `islisp-linux` artifact, place it in convenient location eg `/opt/islisp/islisp`
+. You might need to execute `chmod +x islisp-linux` after downloading to make it executable.
+. Optionally; add above directory to your PATH system variable https://www.baeldung.com/linux/path-variable .
 
 ### Installing on Mac
 
-1. Click on a release from https://github.com/arvyy/islisp-truffle/releases/
-2. Download `islisp-mac` artifact, place it in `/usr/local/bin/islisp`
-3. You might need to execute `chmod +x islisp-mac` after downloading to make it executable.
+. Click on a release from https://github.com/arvyy/islisp-truffle/releases/
+. Download `islisp-mac` artifact, place it in `/usr/local/bin/islisp`
+. You might need to execute `chmod +x islisp-mac` after downloading to make it executable.
 
 ### Running on Docker
 
 ISLISP images are provided on docker hub https://hub.docker.com/r/arvyy/islisp/tags
 
-### Running on Java app
+### Installing in Polyglot context
 
-TODO
+One of the advantages of truffle framework is its support for interop between languages. However, the interpreter binary is statically compiled and does not include any other language by default. To include other languages, either:
+
+. Add necessary language's maven dependencies to launcher/pom.xml and build from source;
+. Download and unpack a release of one of other truffle's languages, eg https://github.com/oracle/graaljs/releases/ . Download `islisp.jar` artifact from `https://github.com/arvyy/islisp-truffle/releases/`. Put `islisp.jar` into a directory that contains java modules, in graaljs example this would be `modules` folder. Finally, run the other language launcher with necessary flags to enable polyglot programming and thus make ISLISP language accessible; in graaljs example this would be running `node --polyglot`.
 
 ## Run
 

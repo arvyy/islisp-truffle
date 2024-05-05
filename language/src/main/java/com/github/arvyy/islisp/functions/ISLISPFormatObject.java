@@ -2,7 +2,6 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -38,8 +37,12 @@ public abstract class ISLISPFormatObject extends RootNode {
     @Specialization
     Object doProper(LispStream stream, Object obj, Object escape) {
         var nil = ISLISPContext.get(this).getNil();
-        doPrint(stream, obj, escape != nil);
-        return nil;
+        try {
+            doPrint(stream, obj, escape != nil);
+            return nil;
+        } catch (IOException e) {
+            return errorSignalerNode.signalIOError(e);
+        }
     }
 
     @Fallback
@@ -65,119 +68,115 @@ public abstract class ISLISPFormatObject extends RootNode {
     }
 
     @CompilerDirectives.TruffleBoundary
-    static void doPrint(LispStream stream, Object value, boolean escape) {
-        try {
-            if (value instanceof LispChar c) {
-                if (escape) {
-                    stream.write("#\\");
-                }
+    static void doPrint(LispStream stream, Object value, boolean escape) throws IOException {
+        if (value instanceof LispChar c) {
+            if (escape) {
+                stream.write("#\\");
+            }
+            stream.writeCodepoint(c.codepoint());
+            return;
+        }
+        if (value instanceof String s) {
+            if (escape) {
+                stream.write("\"");
+            }
+            stream.write(s);
+            if (escape) {
+                stream.write("\"");
+            }
+            return;
+        }
+        if (value instanceof LispMutableString s) {
+            if (escape) {
+                stream.write("\"");
+            }
+            for (var c: s.chars()) {
                 stream.writeCodepoint(c.codepoint());
-                return;
             }
-            if (value instanceof String s) {
-                if (escape) {
-                    stream.write("\"");
-                }
-                stream.write(s);
-                if (escape) {
-                    stream.write("\"");
-                }
-                return;
+            if (escape) {
+                stream.write("\"");
             }
-            if (value instanceof LispMutableString s) {
-                if (escape) {
-                    stream.write("\"");
-                }
-                for (var c: s.chars()) {
-                    stream.writeCodepoint(c.codepoint());
-                }
-                if (escape) {
-                    stream.write("\"");
-                }
-                return;
-            }
-            if (value instanceof Integer i) {
-                stream.write(i.toString());
-                return;
-            }
-            if (value instanceof Double d) {
-                stream.write(d.toString());
-                return;
-            }
-            if (value instanceof LispBigInteger b) {
-                stream.write(b.data().toString());
-                return;
-            }
-            if (value instanceof Symbol s) {
-                stream.write(s.name());
-                return;
-            }
-            if (value instanceof Pair p) {
-                stream.write("(");
-                var first = true;
-                for (var e: Utils.readList(p)) {
-                    if (!first) {
-                        stream.write(" ");
-                    } else {
-                        first = false;
-                    }
-                    doPrint(stream, e, escape);
-                }
-                stream.write(")");
-                return;
-            }
-            if (value instanceof LispVector v) {
-                stream.write("#(");
-                var first = true;
-                for (var e: v.values()) {
-                    if (!first) {
-                        stream.write(" ");
-                    } else {
-                        first = false;
-                    }
-                    doPrint(stream, e, escape);
-                }
-                stream.write(")");
-                return;
-            }
-            if (value instanceof StandardClass c) {
-                stream.write("#<class ");
-                stream.write(c.name());
-                stream.write(">");
-                return;
-            }
-            if (value instanceof BuiltinClass c) {
-                stream.write("#<class ");
-                stream.write(c.name());
-                stream.write(">");
-                return;
-            }
-            if (value instanceof StandardClassObject o) {
-                stream.write("#<object ");
-                stream.write(o.clazz().name());
-                stream.write(" ");
-                stream.write(o.hashCode() + "");
-                stream.write(">");
-                return;
-            }
-            if (value instanceof LispStream s) {
-                stream.write("#<stream ");
-                stream.write(s.hashCode() + "");
-                stream.write(">");
-                return;
-            }
-            if (value instanceof LispFunction f) {
-                if (f.isGeneric()) {
-                    stream.write("#<generic-function ");
+            return;
+        }
+        if (value instanceof Integer i) {
+            stream.write(i.toString());
+            return;
+        }
+        if (value instanceof Double d) {
+            stream.write(d.toString());
+            return;
+        }
+        if (value instanceof LispBigInteger b) {
+            stream.write(b.data().toString());
+            return;
+        }
+        if (value instanceof Symbol s) {
+            stream.write(s.name());
+            return;
+        }
+        if (value instanceof Pair p) {
+            stream.write("(");
+            var first = true;
+            for (var e: Utils.readList(p)) {
+                if (!first) {
+                    stream.write(" ");
                 } else {
-                    stream.write("#<function ");
+                    first = false;
                 }
-                stream.write(f.hashCode() + "");
-                stream.write(">");
-                return;
+                doPrint(stream, e, escape);
             }
-        } catch (IOException e) {
-            throw new ISLISPError(e.getMessage(), null);
+            stream.write(")");
+            return;
+        }
+        if (value instanceof LispVector v) {
+            stream.write("#(");
+            var first = true;
+            for (var e: v.values()) {
+                if (!first) {
+                    stream.write(" ");
+                } else {
+                    first = false;
+                }
+                doPrint(stream, e, escape);
+            }
+            stream.write(")");
+            return;
+        }
+        if (value instanceof StandardClass c) {
+            stream.write("#<class ");
+            stream.write(c.name());
+            stream.write(">");
+            return;
+        }
+        if (value instanceof BuiltinClass c) {
+            stream.write("#<class ");
+            stream.write(c.name());
+            stream.write(">");
+            return;
+        }
+        if (value instanceof StandardClassObject o) {
+            stream.write("#<object ");
+            stream.write(o.clazz().name());
+            stream.write(" ");
+            stream.write(o.hashCode() + "");
+            stream.write(">");
+            return;
+        }
+        if (value instanceof LispStream s) {
+            stream.write("#<stream ");
+            stream.write(s.hashCode() + "");
+            stream.write(">");
+            return;
+        }
+        if (value instanceof LispFunction f) {
+            if (f.isGeneric()) {
+                stream.write("#<generic-function ");
+            } else {
+                stream.write("#<function ");
+            }
+            stream.write(f.hashCode() + "");
+            stream.write(">");
+            return;
         }
     }
 

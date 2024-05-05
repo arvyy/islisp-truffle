@@ -46,7 +46,7 @@ public abstract class ISLISPFilePosition extends RootNode {
             try {
                 return new LispBigInteger(BigInteger.valueOf(stream.getFilePosition()));
             } catch (IOException e) {
-                throw new ISLISPError(e.getMessage(), this);
+                return errorSignalerNode.signalIOError(e);
             }
         }
         throw new ISLISPError("file-position called on non-file stream", this);

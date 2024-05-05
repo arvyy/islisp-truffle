@@ -17,3 +17,9 @@ No next method available
 
 Error during truffle interop call: Unknown identifier: b
     at stacktrace.lisp:62
+
+Undefined entity <doesntexist> in namespace class
+    at stacktrace.lisp:72
+
+Cannot convert A to #<class <list>>
+    at stacktrace.lisp:82

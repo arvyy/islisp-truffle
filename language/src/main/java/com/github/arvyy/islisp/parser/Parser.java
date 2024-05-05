@@ -369,6 +369,7 @@ public class Parser {
         var valueExpr = parseExpressionNode(parserContext, args.get(1));
         var className = downcast(args.get(2), Symbol.class);
         return new ISLISPConvertNode(
+            parserContext.module,
             valueExpr,
             className,
             source(sexpr)

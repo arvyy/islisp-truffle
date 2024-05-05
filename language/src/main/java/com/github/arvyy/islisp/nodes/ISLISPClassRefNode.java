@@ -17,6 +17,9 @@ public class ISLISPClassRefNode extends ISLISPExpressionNode {
     @CompilerDirectives.CompilationFinal
     private LispClass clazz;
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     /**
      * Create class node.
      *
@@ -28,6 +31,7 @@ public class ISLISPClassRefNode extends ISLISPExpressionNode {
         super(sourceSection);
         this.module = module;
         this.name = name;
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override
@@ -35,6 +39,9 @@ public class ISLISPClassRefNode extends ISLISPExpressionNode {
         if (clazz == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             clazz = ISLISPContext.get(this).lookupClass(module, name.identityReference());
+            if (clazz == null) {
+                return errorSignalerNode.signalUndefinedClass(name);
+            }
         }
         return clazz;
     }

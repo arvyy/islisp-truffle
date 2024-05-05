@@ -2,7 +2,6 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.parser.Reader;
 import com.github.arvyy.islisp.runtime.LispFunction;
@@ -93,7 +92,7 @@ public abstract class ISLISPRead extends RootNode {
         try {
             maybeDatum = reader.readSingle();
         } catch (IOException e) {
-            throw new ISLISPError(e.getMessage(), this); //TODO
+            return errorSignalerNode.signalIOError(e);
         }
         if (maybeDatum.isPresent()) {
             return maybeDatum.get();

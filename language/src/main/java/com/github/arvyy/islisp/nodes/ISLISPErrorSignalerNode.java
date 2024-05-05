@@ -120,7 +120,8 @@ public class ISLISPErrorSignalerNode extends Node {
         var condition = getCreateCallNode().call(
             null,
             ctx.lookupClass("ROOT", ctx.namedSymbol("<unbound-variable>").identityReference()),
-            ctx.namedSymbol("name"), name
+            ctx.namedSymbol("name"), name,
+            ctx.namedSymbol("namespace"), ctx.namedSymbol("variable")
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
@@ -136,7 +137,25 @@ public class ISLISPErrorSignalerNode extends Node {
         var condition = getCreateCallNode().call(
             null,
             ctx.lookupClass("ROOT", ctx.namedSymbol("<undefined-function>").identityReference()),
-            ctx.namedSymbol("name"), name
+            ctx.namedSymbol("name"), name,
+            ctx.namedSymbol("namespace"), ctx.namedSymbol("function")
+        );
+        return getSignalCallNode().call(null, condition, ctx.getNil());
+    }
+
+    /**
+     * Signal error about undefined class.
+     *
+     * @param name class name
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
+    public Object signalUndefinedClass(Symbol name) {
+        var ctx = ISLISPContext.get(this);
+        var condition = getCreateCallNode().call(
+            null,
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<undefined-entity>").identityReference()),
+            ctx.namedSymbol("name"), name,
+            ctx.namedSymbol("namespace"), ctx.namedSymbol("class")
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
@@ -263,6 +282,24 @@ public class ISLISPErrorSignalerNode extends Node {
             null,
             ctx.lookupClass("ROOT", ctx.namedSymbol("<io-error>").identityReference()),
             ctx.namedSymbol("message"), exception.getMessage()
+        );
+        return getSignalCallNode().call(null, condition, ctx.getNil());
+    }
+
+    /**
+     * Signal unknown conversion in the `(convert) form.
+     *
+     * @param value instance trying to be converted
+     * @param to target class
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
+    public Object signalUnknownConversion(Object value, Object to) {
+        var ctx = ISLISPContext.get(this);
+        var condition = getCreateCallNode().call(
+            null,
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<conversion-error>").identityReference()),
+            ctx.namedSymbol("value"), value,
+            ctx.namedSymbol("to"), to
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }

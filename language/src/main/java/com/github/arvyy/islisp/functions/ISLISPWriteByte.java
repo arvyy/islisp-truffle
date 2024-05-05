@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
@@ -49,8 +48,7 @@ public abstract class ISLISPWriteByte extends RootNode {
                 b,
                 intClass);
         }
-        writeBoundary(b, stream);
-        return ISLISPContext.get(this).getNil();
+        return writeBoundary(b, stream);
     }
 
     @Specialization(guards = {
@@ -69,11 +67,12 @@ public abstract class ISLISPWriteByte extends RootNode {
     }
 
     @CompilerDirectives.TruffleBoundary
-    void writeBoundary(int b, LispStream stream) {
+    Object writeBoundary(int b, LispStream stream) {
         try {
             stream.writeByte(b);
+            return ISLISPContext.get(this).getNil();
         } catch (IOException e) {
-            throw new ISLISPError(e.getMessage(), this);
+            return errorSignalerNode.signalIOError(e);
         }
     }
 

@@ -47,7 +47,7 @@ public abstract class ISLISPSetFilePosition extends RootNode {
                 stream.setFilePosition(position);
                 return new LispBigInteger(BigInteger.valueOf(stream.getFilePosition()));
             } catch (IOException e) {
-                throw new ISLISPError(e.getMessage(), this);
+                return errorSignalerNode.signalIOError(e);
             }
         }
         throw new ISLISPError("set-file-position called on non-file stream", this);
@@ -61,7 +61,7 @@ public abstract class ISLISPSetFilePosition extends RootNode {
                 stream.setFilePosition(position.data().longValue());
                 return new LispBigInteger(BigInteger.valueOf(stream.getFilePosition()));
             } catch (IOException e) {
-                throw new ISLISPError(e.getMessage(), this);
+                return errorSignalerNode.signalIOError(e);
             }
         }
         throw new ISLISPError("set-file-position called on non-file stream", this);

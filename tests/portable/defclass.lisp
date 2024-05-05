@@ -1,3 +1,4 @@
+;; TODO rename testsuite to be about "class" more generally
 (requires "testing.lisp")
 
 (defclass <foo> ()
@@ -30,6 +31,17 @@
   (test-equal (bar-boundp obj) nil)
   (setf (bar obj) 6)
   (test-equal (bar-boundp obj) t))
+
+;; check class lookup error
+(block exit
+    (with-handler
+        (lambda (condition)
+            (test-equal (instancep condition (class <undefined-entity>)) t)
+            (test-equal (undefined-entity-name condition) '<doesntexist>)
+            (test-equal (undefined-entity-namespace condition) 'class)
+            (return-from exit nil))
+        (class <doesntexist>)
+        (format (standard-output) "FAIL~%")))
 
 (format (standard-output) "defclass.lisp end")
 (finish-output (standard-output))

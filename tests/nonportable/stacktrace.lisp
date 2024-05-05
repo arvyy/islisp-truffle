@@ -63,4 +63,24 @@
         (print "FAIL")))
 (print "")
 
+;;;;;; undefined class error
+(block exit
+    (with-handler
+        (lambda (condition)
+            (report-condition condition (standard-output))
+            (return-from exit nil))
+        (class <doesntexist>)
+        (print "FAIL")))
+(print "")
+
+;;;;;; undefined conversion error
+(block exit
+    (with-handler
+        (lambda (condition)
+            (report-condition condition (standard-output))
+            (return-from exit nil))
+        (convert #\A <list>)
+        (print "FAIL")))
+(print "")
+
 (finish-output (standard-output))

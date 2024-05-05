@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispStream;
@@ -32,30 +31,30 @@ public abstract class ISLISPFormatFreshLine extends RootNode {
         if (frame.getArguments().length != 2) {
             return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 1, 1);
         }
-        executeGeneric(frame.getArguments()[1]);
-        return ISLISPContext.get(this).getNil();
+        return executeGeneric(frame.getArguments()[1]);
     }
 
-    abstract void executeGeneric(Object stream);
+    abstract Object executeGeneric(Object stream);
 
     @Specialization
-    void executeProper(LispStream stream) {
-        doPrint(stream);
+    Object executeProper(LispStream stream) {
+        return doPrint(stream);
     }
 
     @Fallback
-    void executeFallback(Object stream) {
-        throw new ISLISPError("Bad arguments", this);
+    Object executeFallback(Object stream) {
+        return errorSignalerNode.signalWrongType(stream, ISLISPContext.get(this).lookupClass("<stream>"));
     }
 
 
     @CompilerDirectives.TruffleBoundary
-    void doPrint(LispStream stream) {
+    Object doPrint(LispStream stream) {
         try {
             stream.write("\n");
             stream.flush();
+            return ISLISPContext.get(this).getNil();
         } catch (IOException e) {
-            throw new ISLISPError(e.getMessage(), this);
+            return errorSignalerNode.signalIOError(e);
         }
     }
 

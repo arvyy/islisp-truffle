@@ -2,7 +2,6 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.LispChar;
 import com.github.arvyy.islisp.runtime.LispVector;
 import com.github.arvyy.islisp.runtime.Pair;
@@ -25,15 +24,31 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
     @Child
     AbstractConverterNode converterNode;
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
+    final String module;
+    final Symbol className;
+
     /**
      * Create convert node.
+     *
+     * @param module module in which the node resides
      * @param valueExpression expression yielding object to be converted
      * @param className symbol denoting class name
      * @param sourceSection matching source section
      */
-    public ISLISPConvertNode(ISLISPExpressionNode valueExpression, Symbol className, SourceSection sourceSection) {
+    public ISLISPConvertNode(
+        String module,
+        ISLISPExpressionNode valueExpression,
+        Symbol className,
+        SourceSection sourceSection
+    ) {
         super(sourceSection);
+        this.className = className;
+        this.module = module;
         this.valueExpression = valueExpression;
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
         switch (className.name().toLowerCase()) {
             case "<character>":
                 converterNode = ISLISPConvertNodeFactory.ToCharConverterNodeGen.create();
@@ -57,13 +72,17 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
                 converterNode = ISLISPConvertNodeFactory.ToListConverterNodeGen.create();
                 break;
             default:
-                throw new ISLISPError("Unrecognized convert target class: " + className.name(), this);
         }
     }
 
     @Override
     public final Object executeGeneric(VirtualFrame frame) {
         var value = valueExpression.executeGeneric(frame);
+        if (converterNode == null) {
+            return errorSignalerNode.signalUnknownConversion(
+                value,
+                ISLISPContext.get(this).lookupClass(module, className.name()));
+        }
         return converterNode.execute(value);
     }
 
@@ -100,8 +119,9 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
 
         @Fallback
         Object fallback(Object value) {
-            //TODO
-            throw new ISLISPError("Unknown conversion", this);
+            return errorSignalerNode.signalUnknownConversion(
+                value,
+                ISLISPContext.get(this).lookupClass("<float>"));
         }
     }
 
@@ -140,8 +160,9 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
 
         @Fallback
         Object fallback(Object value) {
-            //TODO
-            throw new ISLISPError("Unknown conversion", this);
+            return errorSignalerNode.signalUnknownConversion(
+                value,
+                ISLISPContext.get(this).lookupClass("<list>"));
         }
     }
 
@@ -159,8 +180,9 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
 
         @Fallback
         Object fallback(Object value) {
-            //TODO
-            throw new ISLISPError("Unknown conversion", this);
+            return errorSignalerNode.signalUnknownConversion(
+                value,
+                ISLISPContext.get(this).lookupClass("<character>"));
         }
 
     }
@@ -185,8 +207,9 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
 
         @Fallback
         Object fallback(Object value) {
-            //TODO
-            throw new ISLISPError("Unknown conversion", this);
+            return errorSignalerNode.signalUnknownConversion(
+                value,
+                ISLISPContext.get(this).lookupClass("<symbol>"));
         }
 
     }
@@ -219,8 +242,9 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
 
         @Fallback
         Object fallback(Object value) {
-            //TODO
-            throw new ISLISPError("Unknown conversion", this);
+            return errorSignalerNode.signalUnknownConversion(
+                value,
+                ISLISPContext.get(this).lookupClass("<general-vector>"));
         }
 
     }
@@ -251,8 +275,9 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
 
         @Fallback
         Object fallback(Object value) {
-            //TODO
-            throw new ISLISPError("Unknown conversion", this);
+            return errorSignalerNode.signalUnknownConversion(
+                value,
+                ISLISPContext.get(this).lookupClass("<string>"));
         }
 
     }
@@ -277,8 +302,9 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
 
         @Fallback
         Object fallback(Object value) {
-            //TODO
-            throw new ISLISPError("Unknown conversion", this);
+            return errorSignalerNode.signalUnknownConversion(
+                value,
+                ISLISPContext.get(this).lookupClass("<integer>"));
         }
 
     }

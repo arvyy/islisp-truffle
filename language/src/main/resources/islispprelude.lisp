@@ -76,6 +76,10 @@
 
 (defclass <program-error> (<error>) ())
 
+(defclass <conversion-error> (<error>)
+    ((value :reader conversion-error-value :initarg value)
+     (to :reader conversion-error-to :initarg to)))
+
 (defclass <index-out-of-range-error> (<program-error>)
     ((bounds :reader index-out-of-range-error-bounds :initarg bounds)
      (actual :reader index-out-of-range-error-actual :initarg actual)))
@@ -92,7 +96,9 @@
 
 (defclass <no-next-method-error> (<program-error>) ())
 
-(defclass <undefined-entity> (<program-error>) ())
+(defclass <undefined-entity> (<program-error>)
+    ((name :reader undefined-entity-name :initarg name)
+     (namespace :reader undefined-entity-namespace :initarg namespace)))
 
 (defclass <unbound-variable> (<undefined-entity>)
     ((name :reader unbound-variable-name :initarg name)))
@@ -107,6 +113,10 @@
 (defgeneric report-condition (condition stream))
 (defmethod report-condition ((condition <serious-condition>) (stream <stream>))
     nil)
+
+(defmethod report-condition ((condition <undefined-entity>) (stream <stream>))
+    (format stream "Undefined entity ~A in namespace ~A~%" (undefined-entity-name condition) (undefined-entity-namespace condition))
+    (print-stacktrace stream condition))
 
 (defmethod report-condition ((condition <unbound-variable>) (stream <stream>))
     (format-object stream "Unbound variable: " nil)
@@ -129,6 +139,10 @@
     (format stream "Index ~D out of bounds (must be between 0 and ~D exclusive)~%"
             (index-out-of-range-error-actual condition)
             (index-out-of-range-error-bounds condition))
+    (print-stacktrace stream condition))
+
+(defmethod report-condition ((condition <conversion-error>) (stream <stream>))
+    (format stream "Cannot convert ~A to ~A~%" (conversion-error-value condition) (conversion-error-to condition))
     (print-stacktrace stream condition))
 
 (defmethod report-condition ((condition <no-next-method-error>) (stream <stream>))

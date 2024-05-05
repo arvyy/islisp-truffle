@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -37,7 +36,7 @@ public abstract class ISLISPSetTruffleObjectField extends RootNode {
                 frame.getArguments()[2],
                 frame.getArguments()[3]);
         } catch (InteropException e) {
-            throw new ISLISPError("Error writing truffle-object field", this);
+            return errorSignalerNode.signalTruffleInteropError(e);
         }
     }
 

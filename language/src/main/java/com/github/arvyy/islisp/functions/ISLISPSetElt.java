@@ -106,7 +106,7 @@ public abstract class ISLISPSetElt extends RootNode {
             interop.writeArrayElement(o, index, value);
             return value;
         } catch (UnsupportedMessageException | InvalidArrayIndexException | UnsupportedTypeException e) {
-            throw new ISLISPError("Interop error", this);
+            return errorSignalerNode.signalTruffleInteropError(e);
         }
     }
 

@@ -40,10 +40,6 @@ public abstract class ISLISPAref extends RootNode {
                 var ctx = ISLISPContext.get(this);
                 return errorSignalerNode.signalWrongType(arg, ctx.lookupClass("<integer>"));
             }
-            if (lookup[i] < 0) {
-                //TODO
-                throw new ISLISPError("Negative array index", this);
-            }
         }
         return executeGeneric(frame.getArguments()[1], lookup);
     }

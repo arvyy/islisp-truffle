@@ -65,7 +65,6 @@ public class ISLISPFormat extends RootNode {
         return executeBoundary(os, formatString, args);
     }
 
-    //TODO granualize snippets that need boundary
     @CompilerDirectives.TruffleBoundary
     Object executeBoundary(LispStream os, String formatString, Object[] args) {
         var ctx = ISLISPContext.get(this);
@@ -108,8 +107,8 @@ public class ISLISPFormat extends RootNode {
                     writeCodepoint(os, formatString.codePointAt(i));
                 }
             }
-        } catch (Exception e) {
-            throw new ISLISPError(e.getMessage(), this);
+        } catch (IOException e) {
+            return errorSignalerNode.signalIOError(e);
         }
 
         return ctx.getNil();

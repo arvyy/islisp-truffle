@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispStream;
@@ -53,7 +52,7 @@ public abstract class ISLISPOpenOutputFile extends RootNode {
                 StandardOpenOption.CREATE));
             return new LispStream(channel, false, true);
         } catch (IOException e) {
-            throw new ISLISPError(e.getMessage(), this);
+            return errorSignalerNode.signalIOError(e);
         }
     }
 
@@ -67,8 +66,7 @@ public abstract class ISLISPOpenOutputFile extends RootNode {
         try {
             return doString(interopLibrary.asString(o));
         } catch (UnsupportedMessageException e) {
-            //TODO
-            throw new ISLISPError(e.getMessage(), this);
+            return errorSignalerNode.signalTruffleInteropError(e);
         }
     }
 
