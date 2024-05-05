@@ -118,6 +118,17 @@
     (format stream "Undefined entity ~A in namespace ~A~%" (undefined-entity-name condition) (undefined-entity-namespace condition))
     (print-stacktrace stream condition))
 
+(defmethod report-condition ((condition <arity-error>) (stream <stream>))
+    (let ((actual (arity-error-actual-count condition))
+          (min (arity-error-required-min condition))
+          (max (arity-error-required-max condition)))
+      (cond
+        ((= max min) (format stream "Expected ~A args; received ~A~%" min actual))
+        ((and (/= max -1) (> min 0)) (format stream "Expected between ~A and ~A args; received ~A~%" min max actual))
+        ((> min 0) (format stream "Expected at least ~A args; received ~A~%" min actual))
+        (t (format stream "Expected at most ~A args; received ~A~%" max actual))))
+    (print-stacktrace stream condition))
+
 (defmethod report-condition ((condition <unbound-variable>) (stream <stream>))
     (format-object stream "Unbound variable: " nil)
     (format-object stream (unbound-variable-name condition) nil)

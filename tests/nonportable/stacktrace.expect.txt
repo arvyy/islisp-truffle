@@ -23,3 +23,7 @@ Undefined entity <doesntexist> in namespace class
 
 Cannot convert A to #<class <list>>
     at stacktrace.lisp:82
+
+Expected 1 args; received 2
+    at stacktrace.lisp:92
+    at stacktrace.lisp:93

@@ -4,6 +4,7 @@ import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.nodes.Node;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
@@ -20,7 +21,7 @@ public class GenericDispatchTree {
     private int size;
     private CallTarget callTarget;
     private LispClass clazz;
-    private ArraySlice<GenericDispatchTree> children;
+    private ArrayList<GenericDispatchTree> children;
 
     /**
      * Create generic dispatch tree.
@@ -29,7 +30,7 @@ public class GenericDispatchTree {
         size = 0;
         callTarget = null;
         clazz = null;
-        children = new ArraySlice<>(new GenericDispatchTree[0]);
+        children = new ArrayList<>(3);
     }
 
     /**
@@ -62,24 +63,20 @@ public class GenericDispatchTree {
                 var newNode = new GenericDispatchTree();
                 newNode.clazz = nextArg;
                 newNode.addMethod(argTypes.drop(1), pCallTarget, node);
-                children = children.add(newNode);
-                //children.sort(Comparator.comparing(tree -> tree.clazz, this::compareClassSpecificities));
-                Arrays.sort(children.els(), Comparator.comparing(tree -> tree.clazz, this::compareClassSpecificities));
+                insertNewDispatchTreeBranch(newNode);
             }
         }
     }
 
-    private int compareClassSpecificities(LispClass cls1, LispClass cls2) {
-        if (cls1 == cls2) {
-            return 0;
+    void insertNewDispatchTreeBranch(GenericDispatchTree branch) {
+        int index = children.size();
+        for (int i = 0; i < children.size(); i++) {
+            if (isSubclassOf(branch.clazz, children.get(i).clazz)) {
+                index = i;
+                break;
+            }
         }
-        if (isSubclassOf(cls1, cls2)) {
-            return -1;
-        }
-        if (isSubclassOf(cls2, cls1)) {
-            return 1;
-        }
-        return cls1.hashCode() - cls2.hashCode();
+        children.add(index, branch);
     }
 
     private boolean isSubclassOf(LispClass cls1, LispClass cls2) {

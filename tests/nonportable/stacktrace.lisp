@@ -83,4 +83,16 @@
         (print "FAIL")))
 (print "")
 
+;;;;;; wrong arg count
+(block exit
+    (with-handler
+        (lambda (condition)
+            (report-condition condition (standard-output))
+            (return-from exit nil))
+        (let ((fn (lambda (a) a)))
+          (funcall fn 1 2))
+        (print "FAIL")))
+(print "")
+
+
 (finish-output (standard-output))
