@@ -123,6 +123,9 @@ public class ISLISPContext {
      * @return popped handler
      */
     public LispFunction popHandler() {
+        if (handlerChain == null) {
+            return null;
+        }
         var f = handlerChain.handler();
         handlerChain = handlerChain.rest();
         return f;

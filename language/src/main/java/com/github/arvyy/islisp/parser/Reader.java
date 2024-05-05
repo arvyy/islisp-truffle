@@ -7,6 +7,7 @@ import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
 
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class Reader {
         } else {
             bufferedReader = new BufferedReader(source.getReader());
         }
-        lexer = new Lexer(new LexerSourceFromReader(bufferedReader));
+        lexer = new Lexer(new LexerSourceFromReader(bufferedReader, source));
         this.sourceSectionMap = sourceSectionMap;
     }
 
@@ -89,18 +90,26 @@ public class Reader {
     }
 
     int getLine() {
+        if (lastToken == null)
+            return 1;
         return lastToken.startLine();
     }
 
     int getColumn() {
+        if (lastToken == null)
+            return 1;
         return lastToken.startColumn();
     }
 
     int getEndLine() {
+        if (lastToken == null)
+            return 1;
         return lastToken.endLine();
     }
 
     int getEndColumn() {
+        if (lastToken == null)
+            return 1;
         return lastToken.endColumn();
     }
 
@@ -121,8 +130,10 @@ public class Reader {
                 maybeValue = readSingle();
             }
             return lst;
+        } catch (EOFException eof) {
+            throw new ParsingException(section(), "Unexpected end of file");
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read", e); //TODO
+            throw new ParsingException(section(), "Failed to read; " + e.getMessage());
         }
     }
 
@@ -177,7 +188,8 @@ public class Reader {
                 symbolName = "unquote";
             }
             var quoteSection = section();
-            var value = readSingle().orElseThrow();
+            var value = readSingle().orElseThrow(() ->
+                    new ParsingException(section(), "Unexpected end of file"));
             var normalizedSyntaxSymbol = ISLISPContext.get(null).namedSymbol(symbolName);
             var nil = ISLISPContext.get(null).getNil();
             SourceSection fullSection = null;
@@ -236,12 +248,12 @@ public class Reader {
             while (true) {
                 next = peekToken();
                 if (next.isEmpty()) {
-                    throw new RuntimeException("Premature end of file"); // TODO
+                    throw new ParsingException(section(), "Unexpected end of file");
                 }
                 var token = next.get();
                 if (token instanceof Token.PeriodToken) {
                     if (periodSeen) {
-                        throw new RuntimeException("Bad dotted list"); //TODO
+                        throw new ParsingException(section(), "Malformed dotted list");
                     }
                     periodSeen = true;
                     getToken();
@@ -249,7 +261,7 @@ public class Reader {
                 }
                 if (token instanceof Token.BracketCloseToken) {
                     if (periodSeen && tail == null) {
-                        throw new RuntimeException("Bad dotted list"); // TODO
+                        throw new ParsingException(section(), "Malformed dotted list");
                     }
                     getToken();
                     var endLine = getLine();
@@ -276,11 +288,13 @@ public class Reader {
                     }
                 }
                 if (periodSeen && tail == null) {
-                    tail = readSingle().orElseThrow(); // TODO
+                    // orElseThrow shouldn't ever be invoked at this point.
+                    tail = readSingle().orElseThrow();
                 } else if (periodSeen && tail != null) {
-                    throw new RuntimeException("Bad dotted list"); //TODO
+                    throw new ParsingException(section(), "Malformed dotted list");
                 } else {
-                    lst.add(readSingle().orElseThrow()); //TODO
+                    // orElseThrow shouldn't ever be invoked at this point.
+                    lst.add(readSingle().orElseThrow());
                 }
             }
         }
@@ -305,7 +319,7 @@ public class Reader {
         while (true) {
             var next = getToken();
             if (next.isEmpty()) {
-                throw new RuntimeException("Premature end of file");
+                throw new ParsingException(section(), "Unexpected end of file");
             }
             var token = next.get();
             if (token instanceof Token.BracketCloseToken) {
@@ -313,7 +327,7 @@ public class Reader {
             } else if (token instanceof Token.BracketOpenToken) {
                 content.add(readArrayContent(dimensions - 1));
             } else {
-                throw new RuntimeException("Unexpected token " + token);
+                throw new ParsingException(section(), "Unexpected token: " + token.toString());
             }
         }
     }
@@ -324,14 +338,14 @@ public class Reader {
         while (true) {
             next = peekToken();
             if (next.isEmpty()) {
-                throw new RuntimeException("Premature end of file");
+                throw new ParsingException(section(), "Unexpected end of file");
             }
             var token = next.get();
             if (token instanceof Token.BracketCloseToken) {
                 getToken();
                 return lst.toArray();
             }
-            lst.add(readSingle().orElseThrow()); //TODO
+            readSingle().ifPresent(lst::add);
         }
     }
 }

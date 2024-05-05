@@ -5,8 +5,6 @@ import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.nodes.Node;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Objects;
 
 /**

@@ -82,6 +82,12 @@ public class ISLISPSignalCondition extends RootNode {
         setContinuable.call(null, continuable, conditionValue);
         if (continuable != ctx.getNil()) {
             var handler = ctx.popHandler();
+            // it's possible no handler is active, in which case treat it same as non-continuable.
+            // (eg., in a case when islisp function was returned from eval, and then called
+            // from a different truffle language / context)
+            if (handler == null) {
+                throw new ISLISPNonContinuableCondition(conditionValue);
+            }
             try {
                 dispatchNode.executeDispatch(handler, new Object[]{conditionValue});
                 throw new ISLISPError("Condition handler returned normally", this);

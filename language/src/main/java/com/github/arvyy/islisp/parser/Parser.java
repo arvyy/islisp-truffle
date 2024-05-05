@@ -157,21 +157,6 @@ public class Parser {
         return root.getCallTarget().call();
     }
 
-    void executeDefinitions(ISLISPExpressionNode expression, FrameDescriptor fd) {
-        if (expression.isDefinitionNode()) {
-            var root = new ISLISPRootNode(
-                    null,
-                    new ISLISPExpressionNode[]{expression},
-                    fd);
-            root.getCallTarget().call();
-        }
-        if (expression instanceof ISLISPPrognNode) {
-            for (var e: ((ISLISPPrognNode) expression).getBodyNodes()) {
-                executeDefinitions(e, fd);
-            }
-        }
-    }
-
     ISLISPExpressionNode parseExpressionNode(ParserContext parserContext, Object sexpr) {
         return parseExpressionNode(parserContext, sexpr, false);
     }
@@ -659,7 +644,14 @@ public class Parser {
                 for (var e: it) {
                     args.add(e);
                 }
-                var transformedSexpr = maybeMacro.callTarget().call(args.toArray());
+                Object transformedSexpr;
+                try {
+                    transformedSexpr = maybeMacro.callTarget().call(args.toArray());
+                } catch (Exception e) {
+                    throw new ParsingException(
+                        source(form),
+                        "Unexpected error during macro expansion; " + e.getMessage());
+                }
                 if (transformedSexpr instanceof Pair tp && !single) {
                     var parts = Utils.readList(tp);
                     var newParts = parts.stream()
@@ -1393,7 +1385,7 @@ public class Parser {
         for (var req: requires) {
             if (ctx.getModule(req) == null) {
                 if (moduleLoadInProgress.contains(req)) {
-                    throw new RuntimeException("Cyclical import detected");
+                    throw new ParsingException(null, "Cyclical import detected");
                 }
                 moduleLoadInProgress.add(req);
                 loadModule(req);
@@ -1416,7 +1408,9 @@ public class Parser {
                 null
             ).getCallTarget().call();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load module source", e);
+            throw new ParsingException(
+                null,
+                "Failed to load module source for " + module + ". " + e.getMessage());
         }
     }
 
@@ -1429,7 +1423,7 @@ public class Parser {
                 return resolved;
             }
         }
-        throw new RuntimeException("Failed to find module source");
+        throw new ParsingException(null, "Failed to find module source for " + module + ".");
     }
 
     static class SlotsAndNewContext {

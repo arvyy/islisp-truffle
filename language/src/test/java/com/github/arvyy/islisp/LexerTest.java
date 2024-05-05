@@ -21,7 +21,7 @@ public class LexerTest {
         var input = """
             ( ) ab . "str" 12 #( #' ' ` , ,@
             """;
-        var lexer = new Lexer(new LexerSourceFromReader(new BufferedReader(new StringReader(input))));
+        var lexer = new Lexer(new LexerSourceFromReader(new BufferedReader(new StringReader(input)), null));
         assertEquals(
             lexer.readToken(),
             Optional.of(new TokenWithSource(new Token.BracketOpenToken(), 1, 1, 1, 1))
@@ -83,7 +83,7 @@ public class LexerTest {
             |# ignore3 
             |# 2
             """;
-        var lexer = new Lexer(new LexerSourceFromReader(new BufferedReader(new StringReader(input))));
+        var lexer = new Lexer(new LexerSourceFromReader(new BufferedReader(new StringReader(input)), null));
         assertEquals(
             lexer.readToken(),
             Optional.of(new TokenWithSource(new Token.ExactNumberToken(BigInteger.valueOf(1)), 2, 1, 2, 1))

@@ -103,7 +103,8 @@ public class Lexer {
                     return Optional.of(new TokenWithSource(
                         new Token.ArrayBracketOpenToken(dimensions), startLine, startCol, line, col));
                 } else {
-                    throw new RuntimeException("Bad array definition"); //TODO
+                    var section = source.lexemeSourceSection(line, col).orElse(null);
+                    throw new ParsingException(section, "Bad array literal.");
                 }
             }
             if (c == '\\') {
@@ -150,7 +151,8 @@ public class Lexer {
             var identifier = readIdentifierToken();
             return Optional.of(new TokenWithSource(identifier, startLine, startCol, line, col));
         }
-        throw new RuntimeException("Unrecognized lexeme: " + Character.toString(c)); //TODO
+        var section = source.lexemeSourceSection(line, col).orElse(null);
+        throw new ParsingException(section, "Unrecognized lexeme: " + Character.toString(c));
     }
 
     private Token.StringToken readStringLiteral() throws IOException {
@@ -172,7 +174,8 @@ public class Lexer {
                         continue;
                     default:
                 }
-                throw new RuntimeException("Unknown escape"); //TODO
+                var section = source.lexemeSourceSection(line, col).orElse(null);
+                throw new ParsingException(section, "Unknown string escape: " + Character.toString(c));
             }
             sb.appendCodePoint(c);
         }
