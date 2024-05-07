@@ -1,10 +1,8 @@
 package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.nodes.ControlFlowException;
-import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.ArrayList;
@@ -69,6 +67,7 @@ public sealed interface QuasiquoteTree {
     /**
      * Parse sexpr into quasiquote tree.
      *
+     * @param sourceSection source section spanning the quasiquote tree
      * @param expr sexpr
      * @return quasiquote tree and expressions
      */
@@ -85,7 +84,12 @@ public sealed interface QuasiquoteTree {
         return new QuasiquoteTreeAndExpressions(tree, parsed.expressions);
     }
 
-    private static QuasiquoteTreeAndExpressions parseQuasiquoteTree(SourceSection sourceSection, Object expr, int level, int holeIndex) {
+    private static QuasiquoteTreeAndExpressions parseQuasiquoteTree(
+        SourceSection sourceSection,
+        Object expr,
+        int level,
+        int holeIndex
+    ) {
         if (expr instanceof Pair p) {
             if (p.car() instanceof Symbol s) {
                 Object rest;
@@ -104,7 +108,9 @@ public sealed interface QuasiquoteTree {
                     case "unquote":
                         rest = ((Pair) p.cdr()).car();
                         if (level < 1) {
-                            throw new ParsingException(sourceSection, "Unexpected " + (isSplicing ? "unquote-splicing" : "unquote"));
+                            throw new ParsingException(
+                                sourceSection,
+                                "Unexpected " + (isSplicing ? "unquote-splicing" : "unquote"));
                         }
                         if (level == 1) {
                             var hole = new Hole(holeIndex);
@@ -210,13 +216,23 @@ public sealed interface QuasiquoteTree {
         return values;
     }
 
+    /**
+     * Exception signalling unquote-splicing didn't produce a list.
+     * Caught in ISLISPQuasiquoteNode to produce proper condition signalling.
+     */
     class UnquoteSpliceNotAListException extends ControlFlowException {
         private final Object value;
 
+        /**
+         * @param value evaluated quasiquote-splice hole that didn't yield a list.
+         */
         public UnquoteSpliceNotAListException(Object value) {
             this.value = value;
         }
 
+        /**
+         * @return evaluated quasiquote-splice hole that didn't yield a list.
+         */
         public Object getValue() {
             return value;
         }
