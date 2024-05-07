@@ -303,4 +303,20 @@ public class ISLISPErrorSignalerNode extends Node {
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
+
+    /**
+     * Signal attempt to reassign immutable binding.
+     *
+     * @param bindingName binding that is immutable but was tried to reassign
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
+    public Object signalImmutableBindingError(Symbol bindingName) {
+        var ctx = ISLISPContext.get(this);
+        var condition = getCreateCallNode().call(
+            null,
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<immutable-binding-error>").identityReference()),
+            ctx.namedSymbol("binding"), bindingName
+        );
+        return getSignalCallNode().call(null, condition, ctx.getNil());
+    }
 }

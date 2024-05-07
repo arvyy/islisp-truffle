@@ -85,6 +85,9 @@
 
 (defclass <program-error> (<error>) ())
 
+(defclass <immutable-binding-error> (<program-error>)
+    ((binding :reader immutable-binding-name :initarg binding)))
+
 (defclass <conversion-error> (<error>)
     ((value :reader conversion-error-value :initarg value)
      (to :reader conversion-error-to :initarg to)))
@@ -175,6 +178,10 @@
 
 (defmethod report-condition ((condition <io-error>) (stream <stream>))
     (format stream "IO error: ~A~%" (io-error-message condition))
+    (print-stacktrace stream condition))
+
+(defmethod report-condition ((condition <immutable-binding-error>) (stream <stream>))
+    (format stream "Attempted to change immutable binding ~A~%" (immutable-binding-name condition))
     (print-stacktrace stream condition))
 
 (defun min (first :rest xs)

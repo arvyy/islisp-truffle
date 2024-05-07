@@ -27,3 +27,6 @@ Cannot convert A to #<class <list>>
 Expected 1 args; received 2
     at stacktrace.lisp:92
     at stacktrace.lisp:93
+
+Attempted to change immutable binding shouldbeimmutable
+    at stacktrace.lisp:104

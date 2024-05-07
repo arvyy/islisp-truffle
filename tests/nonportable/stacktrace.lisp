@@ -94,5 +94,16 @@
         (print "FAIL")))
 (print "")
 
+;;;;;; immutable binding error
+(defconstant shouldbeimmutable "foo")
+(block exit
+    (with-handler
+        (lambda (condition)
+            (report-condition condition (standard-output))
+            (return-from exit nil))
+        (setq shouldbeimmutable "bar")
+        (print "FAIL")))
+(print "")
+
 
 (finish-output (standard-output))

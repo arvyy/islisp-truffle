@@ -90,26 +90,30 @@ public class Reader {
     }
 
     int getLine() {
-        if (lastToken == null)
+        if (lastToken == null) {
             return 1;
+        }
         return lastToken.startLine();
     }
 
     int getColumn() {
-        if (lastToken == null)
+        if (lastToken == null) {
             return 1;
+        }
         return lastToken.startColumn();
     }
 
     int getEndLine() {
-        if (lastToken == null)
+        if (lastToken == null) {
             return 1;
+        }
         return lastToken.endLine();
     }
 
     int getEndColumn() {
-        if (lastToken == null)
+        if (lastToken == null) {
             return 1;
+        }
         return lastToken.endColumn();
     }
 

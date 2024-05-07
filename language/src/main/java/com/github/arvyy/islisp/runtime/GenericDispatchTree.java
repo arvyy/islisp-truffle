@@ -1,6 +1,6 @@
 package com.github.arvyy.islisp.runtime;
 
-import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.parser.ParsingException;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.nodes.Node;
 
@@ -43,7 +43,7 @@ public class GenericDispatchTree {
         size++;
         if (argTypes.size() == 0) {
             if (this.callTarget != null) {
-                throw new ISLISPError("Duplicate generic implementation", node); //TODO
+                throw new ParsingException(node.getSourceSection(), "Duplicate generic implementation");
             }
             this.callTarget = pCallTarget;
         } else {
