@@ -1214,7 +1214,7 @@ public class Parser {
     }
 
     ISLISPQuasiquoteNode parseQuasiquote(ParserContext parserContext, Object sexpr) {
-        var qq = QuasiquoteTree.parseQuasiquoteTree(sexpr);
+        var qq = QuasiquoteTree.parseQuasiquoteTree(source(sexpr), sexpr);
         var childNodes = new ISLISPExpressionNode[qq.expressions().length];
         for (var i = 0; i < childNodes.length; i++) {
             childNodes[i] = parseExpressionNode(parserContext, qq.expressions()[i]);

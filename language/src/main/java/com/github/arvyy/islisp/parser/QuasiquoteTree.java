@@ -3,7 +3,9 @@ package com.github.arvyy.islisp.parser;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.*;
+import com.oracle.truffle.api.nodes.ControlFlowException;
 import com.oracle.truffle.api.nodes.Node;
+import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,8 +72,8 @@ public sealed interface QuasiquoteTree {
      * @param expr sexpr
      * @return quasiquote tree and expressions
      */
-    static QuasiquoteTreeAndExpressions parseQuasiquoteTree(Object expr) {
-        return parseQuasiquoteTree(expr, 0, 0);
+    static QuasiquoteTreeAndExpressions parseQuasiquoteTree(SourceSection sourceSection, Object expr) {
+        return parseQuasiquoteTree(sourceSection, expr, 0, 0);
     }
 
     private static QuasiquoteTreeAndExpressions rewrap(QuasiquoteTreeAndExpressions parsed, Symbol s) {
@@ -83,7 +85,7 @@ public sealed interface QuasiquoteTree {
         return new QuasiquoteTreeAndExpressions(tree, parsed.expressions);
     }
 
-    private static QuasiquoteTreeAndExpressions parseQuasiquoteTree(Object expr, int level, int holeIndex) {
+    private static QuasiquoteTreeAndExpressions parseQuasiquoteTree(SourceSection sourceSection, Object expr, int level, int holeIndex) {
         if (expr instanceof Pair p) {
             if (p.car() instanceof Symbol s) {
                 Object rest;
@@ -92,9 +94,9 @@ public sealed interface QuasiquoteTree {
                     case "quasiquote":
                         rest = ((Pair) p.cdr()).car();
                         if (level > 0) {
-                            return rewrap(parseQuasiquoteTree(rest, level + 1, holeIndex), s);
+                            return rewrap(parseQuasiquoteTree(sourceSection, rest, level + 1, holeIndex), s);
                         } else {
-                            return parseQuasiquoteTree(rest, level + 1, holeIndex);
+                            return parseQuasiquoteTree(sourceSection, rest, level + 1, holeIndex);
                         }
                     case "unquote-splicing":
                         isSplicing = true;
@@ -102,7 +104,7 @@ public sealed interface QuasiquoteTree {
                     case "unquote":
                         rest = ((Pair) p.cdr()).car();
                         if (level < 1) {
-                            throw new RuntimeException("Unquote outside of quasiquote");
+                            throw new ParsingException(sourceSection, "Unexpected " + (isSplicing ? "unquote-splicing" : "unquote"));
                         }
                         if (level == 1) {
                             var hole = new Hole(holeIndex);
@@ -112,7 +114,7 @@ public sealed interface QuasiquoteTree {
                                 return new QuasiquoteTreeAndExpressions(new Unquote(hole), new Object[]{rest});
                             }
                         } else {
-                            return rewrap(parseQuasiquoteTree(rest, level - 1, holeIndex), s);
+                            return rewrap(parseQuasiquoteTree(sourceSection, rest, level - 1, holeIndex), s);
                         }
                      default:
                 }
@@ -121,7 +123,7 @@ public sealed interface QuasiquoteTree {
             var expressions = new ArrayList<Object>();
             var children = new ArrayList<QuasiquoteTree>();
             for (var v: p) {
-                var parsedChildResult = parseQuasiquoteTree(v, level, holeIndex + expressions.size());
+                var parsedChildResult = parseQuasiquoteTree(sourceSection, v, level, holeIndex + expressions.size());
                 expressions.addAll(Arrays.asList(parsedChildResult.expressions));
                 children.add(parsedChildResult.tree);
             }
@@ -133,7 +135,7 @@ public sealed interface QuasiquoteTree {
             var expressions = new ArrayList<Object>();
             var children = new ArrayList<QuasiquoteTree>();
             for (var el: v.values()) {
-                var parsedChildResult = parseQuasiquoteTree(el, level, holeIndex + expressions.size());
+                var parsedChildResult = parseQuasiquoteTree(sourceSection, el, level, holeIndex + expressions.size());
                 expressions.addAll(Arrays.asList(parsedChildResult.expressions));
                 children.add(parsedChildResult.tree);
             }
@@ -150,7 +152,7 @@ public sealed interface QuasiquoteTree {
         ) {
             return new QuasiquoteTreeAndExpressions(new Atom(expr), new Object[]{});
         }
-        throw new RuntimeException();
+        throw new ParsingException(sourceSection, "Unrecognized quasi-quote form.");
     }
 
     /**
@@ -158,58 +160,66 @@ public sealed interface QuasiquoteTree {
      *
      * @param tree quasiquote tree
      * @param substitutionValues values to be substituted
-     * @param node node from which this execution is done; used in case of an error
      * @return evaluated value
      */
-    static Object evalQuasiquoteTree(QuasiquoteTree tree, Object[] substitutionValues, Node node) {
+    static Object evalQuasiquoteTree(QuasiquoteTree tree, Object[] substitutionValues) {
         if (tree instanceof Atom a) {
             return a.value;
         }
         if (tree instanceof Unquote u) {
             return substitutionValues[u.value.index];
         }
-        if (tree instanceof UnquoteSplicing) {
-            throw new ISLISPError("Bad unquotesplicing use", node);
-        }
         if (tree instanceof List l) {
             Object lispList = ISLISPContext.get(null).getNil();
-            var values = evalQuasiquoteCollectionContent(l.children, substitutionValues, node);
+            var values = evalQuasiquoteCollectionContent(l.children, substitutionValues);
             for (int i = values.size() - 1; i >= 0; i--) {
                 lispList = new Pair(values.get(i), lispList);
             }
             return lispList;
         }
         if (tree instanceof Vector v) {
-            var values =  evalQuasiquoteCollectionContent(v.children, substitutionValues, node);
+            var values =  evalQuasiquoteCollectionContent(v.children, substitutionValues);
             return new LispVector(values.toArray());
         }
-        throw new ISLISPError("?", node);
+        return ISLISPContext.get(null).getNil();
     }
 
     private static java.util.List<Object> evalQuasiquoteCollectionContent(
         QuasiquoteTree[] children,
-        Object[] substitutionValues,
-        Node node
+        Object[] substitutionValues
     ) {
         var values = new ArrayList<Object>();
         for (var child: children) {
             if (child instanceof UnquoteSplicing us) {
-                if (substitutionValues[us.value.index] instanceof Pair p) {
+                var substitution = substitutionValues[us.value.index];
+                if (substitution instanceof Pair p) {
                     for (var v: p) {
                         values.add(v);
                     }
-                } else if (substitutionValues[us.value.index] instanceof Symbol s) {
+                } else if (substitution instanceof Symbol s) {
                     if (s != ISLISPContext.get(null).getNil()) {
-                        throw new ISLISPError("Unquote splicing not list", node);
+                        throw new UnquoteSpliceNotAListException(substitution);
                     }
                 } else {
-                    throw new ISLISPError("Unquote splicing not list", node);
+                    throw new UnquoteSpliceNotAListException(substitution);
                 }
             } else {
-                values.add(evalQuasiquoteTree(child, substitutionValues, node));
+                values.add(evalQuasiquoteTree(child, substitutionValues));
             }
         }
         return values;
+    }
+
+    class UnquoteSpliceNotAListException extends ControlFlowException {
+        private final Object value;
+
+        public UnquoteSpliceNotAListException(Object value) {
+            this.value = value;
+        }
+
+        public Object getValue() {
+            return value;
+        }
     }
 
 }
