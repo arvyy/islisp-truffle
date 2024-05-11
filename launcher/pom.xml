@@ -32,7 +32,7 @@
 
         <dependency>
             <groupId>org.graalvm.polyglot</groupId>
-            <artifactId>tools-community</artifactId>
+            <artifactId>tools</artifactId>
             <type>pom</type>
         </dependency>
 
@@ -58,5 +58,44 @@
             </plugin>
         </plugins>
     </build>
+
+      <profiles>
+    <profile>
+      <id>native</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.graalvm.buildtools</groupId>
+            <artifactId>native-maven-plugin</artifactId>
+            <version>0.10.1</version>
+            <extensions>true</extensions>
+            <executions>
+              <execution>
+                <id>build-native</id>
+                <goals>
+                  <goal>compile-no-fork</goal>
+                </goals>
+                <phase>package</phase>
+              </execution>
+              <execution>
+                <id>test-native</id>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <phase>test</phase>
+              </execution>
+            </executions>
+            <configuration>
+                <imageName>islisp</imageName>
+                <mainClass>com.github.arvyy.islisp.launcher.Main</mainClass>
+                <buildArgs>
+                    <buildArg>--initialize-at-build-time</buildArg>
+                </buildArgs>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

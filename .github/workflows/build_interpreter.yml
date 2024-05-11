@@ -26,7 +26,7 @@ jobs:
 
   build-jar:
     needs: [test]
-    if: github.ref == 'refs/heads/master'
+    if: ${{ startsWith(github.ref, 'refs/heads/master') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -34,8 +34,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '22.0.0'
-          distribution: 'graalvm-community'
+          java-version: '22.0.1'
+          distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build jar
         run: |
@@ -48,7 +48,7 @@ jobs:
 
   build-linux:
     needs: [test]
-    if: github.ref == 'refs/heads/master'
+    if: ${{ startsWith(github.ref, 'refs/heads/master') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -56,17 +56,18 @@ jobs:
       - uses: actions/checkout@v4
       - uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '22.0.0'
-          distribution: 'graalvm-community'
+          java-version: '22.0.1'
+          distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build jar
         run: |
-          ant dist native
+          mvn -Pnative -DskipTests=true package
       - name: Upload linux binary to github nightly release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload nightly dist/islisp-linux --clobber
+          mv launcher/target/islisp islisp-linux
+          gh release upload nightly islisp-linux --clobber
       - uses: actions/upload-artifact@v2
         with:
           name: islisp-linux
@@ -74,7 +75,7 @@ jobs:
 
   build-windows:
     needs: [test]
-    if: github.ref == 'refs/heads/master'
+    if: ${{ startsWith(github.ref, 'refs/heads/master') }}
     runs-on: windows-latest
     permissions:
       contents: write
@@ -82,21 +83,22 @@ jobs:
       - uses: actions/checkout@v4
       - uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '22.0.0'
-          distribution: 'graalvm-community'
+          java-version: '22.0.1'
+          distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build jar
         run: |
-          ant dist native
+          mvn -Pnative -DskipTests=true package
       - name: Upload windows binary to github nightly release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload nightly dist/islisp.exe --clobber
+          mv launcher/target/islisp.exe islisp.exe
+          gh release upload nightly islisp.exe --clobber
 
   build-macos:
     needs: [test]
-    if: github.ref == 'refs/heads/master'
+    if: ${{ startsWith(github.ref, 'refs/heads/master') }}
     runs-on: macos-latest
     permissions:
       contents: write
@@ -104,21 +106,22 @@ jobs:
       - uses: actions/checkout@v4
       - uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '22.0.0'
-          distribution: 'graalvm-community'
+          java-version: '22.0.1'
+          distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build jar
         run: |
-          ant dist native
+          mvn -Pnative -DskipTests=true package
       - name: Upload macos binary to github nightly release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload nightly dist/islisp-macos --clobber
+          mv launcher/target/islisp islisp-macos
+          gh release upload nightly islisp-macos --clobber
 
   publish-docker:
     needs: [build-linux]
-    if: github.ref == 'refs/heads/master'
+    if: ${{ startsWith(github.ref, 'refs/heads/master') }}
     runs-on: ubuntu-latest
     environment: 'Docker hub'
     steps:
