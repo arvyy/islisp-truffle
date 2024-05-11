@@ -19,11 +19,11 @@ jobs:
           sudo apt-get -y install asciidoctor
       - name: 'Build docs'
         run: |
-          cd docs
-          asciidoctor *.adoc
-          cd site
-          bash copycontent.sh
-          hugo
+          cd docs;
+          asciidoctor *.adoc;
+          cd site;
+          bash copycontent.sh;
+          hugo;
       - uses: actions/upload-pages-artifact@v3
         with:
           path: 'docs/site/public'
