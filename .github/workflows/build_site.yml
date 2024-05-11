@@ -13,8 +13,6 @@ jobs:
       - uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: '0.121.0'
-      - name: Build
-        run: hugo --minify
       - name: 'Install dependencies'
         run: |
           sudo apt-get update
