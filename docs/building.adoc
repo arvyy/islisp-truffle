@@ -21,11 +21,9 @@ Prerequisites:
 
 * Graal VM
 
-* Apache Ant
-
 * Apache Maven
 
-Execute `ant dist native`. Upon success, you should find the output `dist/islisp-static`.
+Execute `mvn -Pnative package`. Upon success, you should find the output `launcher/target/islisp`.
 
 == Docker
 

@@ -5,25 +5,29 @@ on:
     paths:
       - '.github/workflows/build_site.yml'
       - 'docs/**'
-      - 'site/**'
 jobs:
   build_site:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.121.0'
       - name: 'Install dependencies'
         run: |
-          sudo apt-get  update
-          sudo apt-get -y install asciidoctor ant
+          sudo apt-get update
+          sudo apt-get -y install asciidoctor
       - name: 'Build docs'
         run: |
-          ant build-site
+          cd docs/site
+          bash copycontent.sh;
+          hugo;
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: 'dist/site'
+          path: 'docs/site/public'
   deploy_site:
     needs: [build_site]
-    if: github.ref == 'refs/heads/master'
+    if: ${{ startsWith(github.ref, 'refs/heads/master') }}
     permissions:
       pages: write
       id-token: write

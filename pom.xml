@@ -13,8 +13,8 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <graalvm.version>24.0.0</graalvm.version>
-        <revision>1.0-SNAPSHOT</revision>
+        <graalvm.version>24.0.1</graalvm.version>
+        <revision>0.0.1-local</revision>
     </properties>
 
     <modules>
@@ -51,14 +51,14 @@
             </dependency>
             <dependency>
                 <groupId>org.graalvm.polyglot</groupId>
-                <artifactId>tools-community</artifactId>
+                <artifactId>tools</artifactId>
                 <version>${graalvm.version}</version>
                 <type>pom</type>
             </dependency>
 
             <dependency>
                 <groupId>org.graalvm.polyglot</groupId>
-                <artifactId>js-community</artifactId>
+                <artifactId>js</artifactId>
                 <version>${graalvm.version}</version>
                 <type>pom</type>
             </dependency>
