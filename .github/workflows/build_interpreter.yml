@@ -71,7 +71,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: islisp-linux
-          path: dist/islisp-linux
+          path: islisp-linux
 
   build-windows:
     needs: [test]
@@ -129,7 +129,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: islisp-linux
-          path: dist
+          path: .
       - uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
