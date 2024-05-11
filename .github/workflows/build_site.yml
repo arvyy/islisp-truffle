@@ -5,12 +5,16 @@ on:
     paths:
       - '.github/workflows/build_site.yml'
       - 'docs/**'
-      - 'site/**'
 jobs:
   build_site:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.119.0'
+      - name: Build
+        run: hugo --minify
       - name: 'Install dependencies'
         run: |
           sudo apt-get update
@@ -19,11 +23,12 @@ jobs:
         run: |
           cd docs
           asciidoctor *.adoc
-          cd ..
-          cp docs/*.html site
+          cd site
+          bash copycontent.sh
+          hugo
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: 'site'
+          path: 'docs/site/public'
   deploy_site:
     needs: [build_site]
     if: ${{ startsWith(github.ref, 'refs/heads/master') }}

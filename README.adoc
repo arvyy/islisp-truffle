@@ -1,6 +1,6 @@
 = Truffle ISLISP
 
-image::site/icon.svg[]
+image::docs/site/static/icon.svg[]
 
 https://arvyy.github.io/islisp-truffle/
 

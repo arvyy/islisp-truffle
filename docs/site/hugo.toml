@@ -1,0 +1,5 @@
+languageCode = 'en-us'
+title = 'ISLISP Truffle'
+ignoreFiles = [ "_frontmatter/*" ]
+[security.exec]
+allow = ["^asciidoctor$"]

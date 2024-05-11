@@ -8,6 +8,9 @@
     --border-color: #0c6f52;
     --text-color-muted: #aaa;
     --wip-bg-color: #9d2424;
+
+    --code-bg-color: #444;
+    --code-color: white;
 }
 
 html {
@@ -22,7 +25,7 @@ html {
     width: 100%;
 }
 
-.content-wrap {
+.home-page .content-wrap {
     position: relative;
     display: grid;
     padding: 1em;
@@ -36,8 +39,16 @@ html {
         "footer footer";
 }
 
+.content-page .content-wrap {
+    position: relative;
+    padding: 1em;
+    max-width: 960px;
+    margin: auto;
+    padding-top: 2em;
+}
+
 @media(max-width: 800px) {
-    .content-wrap {
+    .home-page .content-wrap {
         grid-template-columns: 1fr;
         grid-template-areas:
             "logo"
@@ -77,14 +88,17 @@ a:hover {
 
 main {
     line-height: 1.5em;
-    grid-area: main;
-}
-
-.main-section {
-    margin-bottom: 2em;
     padding: 1em;
     background-color: color-mix(in srgb, var(--bg-color), transparent 20%);
     box-shadow: 0 0 20px 10px color-mix(in srgb, var(--bg-color), transparent 20%);
+}
+
+.home-page main {
+    grid-area: main;
+}
+
+section {
+    margin-bottom: 2em;
 }
 
 h1, h2 {
@@ -92,6 +106,15 @@ h1, h2 {
     font-weight: bold;
     color: var(--heading-color);
     margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+h3 {
+    font-size: 1em;
+    font-weight: bold;
+    color: var(--heading-color);
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
 }
 
 li {
@@ -156,4 +179,40 @@ html, body {
     .testimonials {
         display: none;
     }
+}
+
+nav {
+    max-width: 960px;
+    margin: auto;
+}
+
+.nav-list {
+    display: flex;
+    flex-direction: columns;
+}
+
+.nav-list__item::before {
+    content: none;
+}
+
+/* asiidoctor concerns */
+
+li > p {
+    display: inline;
+}
+
+code {
+    font-family: monospace;
+    line-height: 14px;
+    font-size: 12px;
+    color: var(--code-color);
+    background: var(--code-bg-color);
+    display: inline-block;
+    padding: 0.5em;
+    border-radius: 4px;
+}
+
+.sect2 {
+    padding-bottom: 1em;
+    border-bottom: 1px solid var(--heading-color);
 }
