@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp.parser;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.source.SourceSection;
 
 /**
@@ -22,6 +23,7 @@ public class ParsingException extends RuntimeException {
         this.reason = reason;
     }
 
+    @CompilerDirectives.TruffleBoundary
     private static String makeMessage(SourceSection sourceSection, String reason) {
         if (sourceSection == null) {
             return String.format("Failed to parse (source information unavailable). %s", reason);
