@@ -78,7 +78,8 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                         false,
                         new Symbol[]{name},
                         false,
-                        ISLISPClassSlotReaderNodeGen.create(slot.getName(), language)));
+                        ISLISPClassSlotReaderNodeGen.create(slot.getName(), language),
+                        getSourceSection()));
             }
             for (var writer: slot.getWriterName()) {
                 exprs.add(new ISLISPDefGenericNode(module, writer, false, 2, false, null));
@@ -89,7 +90,8 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                         false,
                         new Symbol[]{ISLISPContext.get(this).namedSymbol("<object>"), name},
                         false,
-                        ISLISPClassSlotWriterNodeGen.create(slot.getName(), language)));
+                        ISLISPClassSlotWriterNodeGen.create(slot.getName(), language),
+                        getSourceSection()));
             }
             for (var accessor: slot.getAccessorName()) {
                 exprs.add(new ISLISPDefGenericNode(module, accessor, false, 1, false, null));
@@ -100,7 +102,8 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                     false,
                     new Symbol[]{name},
                     false,
-                    ISLISPClassSlotReaderNodeGen.create(slot.getName(), language)));
+                    ISLISPClassSlotReaderNodeGen.create(slot.getName(), language),
+                    getSourceSection()));
                 exprs.add(new ISLISPDefGenericNode(module, accessor, true, 2, false, null));
                 exprs.add(new ISLISPDefMethodNode(
                     module,
@@ -109,7 +112,8 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                     true,
                     new Symbol[]{ISLISPContext.get(this).namedSymbol("<object>"), name},
                     false,
-                    ISLISPClassSlotWriterNodeGen.create(slot.getName(), language)));
+                    ISLISPClassSlotWriterNodeGen.create(slot.getName(), language),
+                    getSourceSection()));
             }
             for (var boundp: slot.getBoundpName()) {
                 exprs.add(new ISLISPDefGenericNode(module, boundp, false, 1, false, null));
@@ -120,7 +124,8 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                     false,
                     new Symbol[]{name},
                     false,
-                    ISLISPClassSlotBoundpNodeGen.create(slot.getName(), language)));
+                    ISLISPClassSlotBoundpNodeGen.create(slot.getName(), language),
+                    getSourceSection()));
             }
         }
         return exprs.toArray(ISLISPExpressionNode[]::new);

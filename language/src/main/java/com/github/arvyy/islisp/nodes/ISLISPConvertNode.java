@@ -223,12 +223,24 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
 
         @Specialization
         Object convertList(Pair p) {
-            return new LispVector(Utils.readListAsArray(p));
+            try {
+                return new LispVector(Utils.readListAsArray(p));
+            } catch (Utils.NotAList e) {
+                return errorSignalerNode.signalUnknownConversion(
+                    p,
+                    ISLISPContext.get(this).lookupClass("<list>"));
+            }
         }
 
         @Specialization
         Object convertList(Symbol s) {
-            return new LispVector(Utils.readListAsArray(s));
+            try {
+                return new LispVector(Utils.readListAsArray(s));
+            } catch (Utils.NotAList e) {
+                return errorSignalerNode.signalUnknownConversion(
+                    s,
+                    ISLISPContext.get(this).lookupClass("<list>"));
+            }
         }
 
         @Specialization

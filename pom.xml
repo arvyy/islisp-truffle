@@ -25,6 +25,11 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.github.arvyy.islisp</groupId>
+                <artifactId>language</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.graalvm.truffle</groupId>
                 <artifactId>truffle-api</artifactId>
                 <version>${graalvm.version}</version>

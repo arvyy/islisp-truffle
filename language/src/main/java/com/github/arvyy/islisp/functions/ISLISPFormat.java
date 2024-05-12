@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispStream;
@@ -74,7 +73,8 @@ public class ISLISPFormat extends RootNode {
                 if (formatString.charAt(i) == '~') {
                     i++;
                     if (i >= formatString.length()) {
-                        throw new ISLISPError("Unexpected end of format string", this);
+                        writeCodepoint(os, "~".codePointAt(0));
+                        continue;
                     }
                     var c = formatString.charAt(i);
                     switch (c) {

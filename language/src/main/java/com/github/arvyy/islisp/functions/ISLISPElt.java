@@ -2,13 +2,14 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
+import com.github.arvyy.islisp.nodes.ISLISPTypes;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.interop.InteropException;
 import com.oracle.truffle.api.interop.InteropLibrary;
@@ -18,6 +19,7 @@ import com.oracle.truffle.api.nodes.RootNode;
 /**
  * Implements `elt` function, that returns an element in sequence for a given index.
  */
+@TypeSystemReference(ISLISPTypes.class)
 public abstract class ISLISPElt extends RootNode {
 
     @Child
@@ -42,7 +44,13 @@ public abstract class ISLISPElt extends RootNode {
     Object doList(Pair p, int index) {
         var value = p;
         if (index < 0) {
-            return errorSignalerNode.signalIndexOutOfRange(index, getListSize(p));
+            try {
+                return errorSignalerNode.signalIndexOutOfRange(index, getListSize(p));
+            } catch (Utils.NotAList e) {
+                return errorSignalerNode.signalWrongType(
+                    p,
+                    ISLISPContext.get(this).lookupClass("<list>"));
+            }
         }
         for (int i = 0; i < index; i++) {
             if (value.cdr() instanceof Pair pair) {
@@ -50,7 +58,13 @@ public abstract class ISLISPElt extends RootNode {
                 continue;
             }
             if (Utils.isNil(value.cdr())) {
-                return errorSignalerNode.signalIndexOutOfRange(index,  getListSize(p));
+                try {
+                    return errorSignalerNode.signalIndexOutOfRange(index,  getListSize(p));
+                } catch (Utils.NotAList e) {
+                    return errorSignalerNode.signalWrongType(
+                        p,
+                        ISLISPContext.get(this).lookupClass("<list>"));
+                }
             } else {
                 var ctx = ISLISPContext.get(this);
                 return errorSignalerNode.signalDomainError(
@@ -63,7 +77,7 @@ public abstract class ISLISPElt extends RootNode {
     }
 
     @CompilerDirectives.TruffleBoundary
-    int getListSize(Pair p) {
+    int getListSize(Pair p) throws Utils.NotAList {
         return Utils.readList(p).size();
     }
 
@@ -106,9 +120,18 @@ public abstract class ISLISPElt extends RootNode {
         }
     }
 
+    @Specialization
+    Object fallback(Object seq, LispBigInteger index) {
+        return errorSignalerNode.signalWrongType(
+            seq,
+            ISLISPContext.get(this).lookupClass("<list>"));
+    }
+
     @Fallback
     Object fallback(Object seq, Object index) {
-        throw new ISLISPError("Bad sequence or index", this);
+        return errorSignalerNode.signalWrongType(
+            index,
+            ISLISPContext.get(this).lookupClass("<integer>"));
     }
 
     /**

@@ -2,13 +2,13 @@ package com.github.arvyy.islisp;
 
 import com.github.arvyy.islisp.functions.*;
 import com.github.arvyy.islisp.nodes.ISLISPDefGenericExecutionNodeGen;
+import com.github.arvyy.islisp.parser.ParsingException;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.nodes.Node;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -54,7 +54,7 @@ public class ISLISPContext {
      * @param language
      * @param env
      */
-    public ISLISPContext(ISLISPTruffleLanguage language, Env env) throws IOException {
+    public ISLISPContext(ISLISPTruffleLanguage language, Env env) {
         this.language = language;
         this.env = env;
         modules = new HashMap<>();
@@ -93,13 +93,13 @@ public class ISLISPContext {
      */
     public void createModule(String module, List<String> requiredModules, List<SymbolReference> exports) {
         if (modules.containsKey(module)) {
-            throw new RuntimeException("Module already defined: " + module);
+            throw new ParsingException(null, "Module already defined: " + module);
         }
         var m = new ISLISPModule();
         m.addImport(modules.get("ROOT"));
         for (var req: requiredModules) {
             if (!modules.containsKey(req)) {
-                throw new RuntimeException("No module found: " + req);
+                throw new ParsingException(null, "No module found: " + req);
             }
             m.addImport(modules.get(req));
         }

@@ -39,13 +39,9 @@ public class ISLISPEval extends RootNode {
     Object executeBoundary(String lang, String script) {
         var ctx = ISLISPContext.get(this);
         var env = ctx.getEnv();
-        try {
-            var source = Source.newBuilder(lang, script, "<eval>").build();
-            var target = env.parsePublic(source);
-            return target.call();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        var source = Source.newBuilder(lang, script, "<eval>").build();
+        var target = env.parsePublic(source);
+        return target.call();
     }
 
     /**

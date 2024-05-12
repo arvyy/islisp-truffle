@@ -1,11 +1,12 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
+import com.github.arvyy.islisp.parser.ParsingException;
 import com.github.arvyy.islisp.runtime.LispClass;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
+import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.Objects;
 
@@ -43,6 +44,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
      * @param argsClassNames parameters' types to use in resolution
      * @param hasRest does method have :rest argument
      * @param functionNode method's body implementation node
+     * @param sourceSection relevant source section.
      */
     public ISLISPDefMethodNode(
             String module,
@@ -51,9 +53,10 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
             boolean setf,
             Symbol[] argsClassNames,
             boolean hasRest,
-            RootNode functionNode
+            RootNode functionNode,
+            SourceSection sourceSection
     ) {
-        super(true, functionNode.getSourceSection());
+        super(true, sourceSection);
         this.module = module;
         this.methodQualifier = Objects.requireNonNull(methodQualifier);
         this.name = name;
@@ -69,10 +72,12 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
         var genericFunctionDescriptor = ctx.lookupGenericFunctionDispatchTree(
             module, name.identityReference(), setf);
         if (argsClassNames.length != genericFunctionDescriptor.getRequiredArgCount()) {
-            throw new ISLISPError("defmethod signature doesn't match defgeneric", this);
+            throw new ParsingException(getSourceSection(),
+                "defmethod signature doesn't match defgeneric signature");
         }
         if (hasRest != genericFunctionDescriptor.hasRest()) {
-            throw new ISLISPError("defmethod signature doesn't match defgeneric", this);
+            throw new ParsingException(getSourceSection(),
+                "defmethod signature doesn't match defgeneric signature");
         }
         var classes = new LispClass[argsClassNames.length];
         for (int i = 0; i < argsClassNames.length; i++) {

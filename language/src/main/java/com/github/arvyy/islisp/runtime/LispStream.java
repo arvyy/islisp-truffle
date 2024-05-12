@@ -156,10 +156,12 @@ public class LispStream implements TruffleObject, AutoCloseable {
 
     /**
      * Return to position that was active when "mark" was called.
+     *
+     * @throws IOException if reset is attempted without existing mark.
      */
-    public void reset() {
+    public void reset() throws IOException {
         if (markedBufferPos == -1) {
-            throw new RuntimeException(); //TODO
+            throw new IOException("Stream reset without existing mark");
         }
         bufferPos = markedBufferPos;
         markedBufferPos = -1;

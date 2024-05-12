@@ -653,7 +653,12 @@ public class Parser {
                         "Unexpected error during macro expansion; " + e.getMessage());
                 }
                 if (transformedSexpr instanceof Pair tp && !single) {
-                    var parts = Utils.readList(tp);
+                    List<Object> parts;
+                    try {
+                        parts = Utils.readList(tp);
+                    } catch (Utils.NotAList e) {
+                        throw new ParsingException(source(form), "Macro transformer returned not a list");
+                    }
                     var newParts = parts.stream()
                             .map(part -> macroExpand(module, part, false))
                             .collect(Collectors.toList());
@@ -831,7 +836,8 @@ public class Parser {
                 setf,
                 paramTypes.toArray(Symbol[]::new),
                 slotsAndNewContext.restArgsSlot != -1,
-                rootNode);
+                rootNode,
+                source(sexpr));
     }
 
     ISLISPDefClassNode parseDefClass(ParserContext parserContext, Object sexpr) {
@@ -1348,7 +1354,14 @@ public class Parser {
 
     List<Object> requireList(Object value, int minLength, int maxLength) throws ParsingException {
         if (value instanceof Pair || (value instanceof Symbol s && s.name().equals("nil"))) {
-            var lst = Utils.readList(value);
+            List<Object> lst;
+            try {
+                lst = Utils.readList(value);
+            } catch (Utils.NotAList e) {
+                throw new ParsingException(
+                    source(value),
+                    "Failed to read a list literal");
+            }
             if (minLength >= 0 && minLength == maxLength && lst.size() != minLength) {
                 throw new ParsingException(
                     source(value),

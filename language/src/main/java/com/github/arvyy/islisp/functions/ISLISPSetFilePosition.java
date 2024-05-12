@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
@@ -50,7 +49,10 @@ public abstract class ISLISPSetFilePosition extends RootNode {
                 return errorSignalerNode.signalIOError(e);
             }
         }
-        throw new ISLISPError("set-file-position called on non-file stream", this);
+        return errorSignalerNode.signalDomainError(
+            "set-file-position called on non-file stream",
+            stream,
+            ISLISPContext.get(this).lookupClass("<stream>"));
     }
 
     @Specialization
@@ -64,7 +66,10 @@ public abstract class ISLISPSetFilePosition extends RootNode {
                 return errorSignalerNode.signalIOError(e);
             }
         }
-        throw new ISLISPError("set-file-position called on non-file stream", this);
+        return errorSignalerNode.signalDomainError(
+            "set-file-position called on non-file stream",
+            stream,
+            ISLISPContext.get(this).lookupClass("<stream>"));
     }
 
     @Fallback

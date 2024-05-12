@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.ArityException;
@@ -47,8 +46,7 @@ public abstract class ISLISPFunctionDispatchNode extends Node {
         try {
             return interopLibrary.execute(o, args);
         } catch (UnsupportedMessageException | UnsupportedTypeException | ArityException e) {
-            //TODO
-            throw new ISLISPError(e.getMessage(), this);
+            return errorSignalerNode.signalTruffleInteropError(e);
         }
     }
 

@@ -13,6 +13,7 @@ import com.oracle.truffle.api.nodes.RootNode;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Implements `format-object` function, that writes a given object to output stream.
@@ -115,18 +116,28 @@ public abstract class ISLISPFormatObject extends RootNode {
             return;
         }
         if (value instanceof Pair p) {
-            stream.write("(");
-            var first = true;
-            for (var e: Utils.readList(p)) {
-                if (!first) {
-                    stream.write(" ");
-                } else {
-                    first = false;
+            try {
+                List<Object> lst = Utils.readList(p);
+                stream.write("(");
+                var first = true;
+                for (var e : lst) {
+                    if (!first) {
+                        stream.write(" ");
+                    } else {
+                        first = false;
+                    }
+                    doPrint(stream, e, escape);
                 }
-                doPrint(stream, e, escape);
+                stream.write(")");
+                return;
+            } catch (Utils.NotAList ignored) {
+                stream.write("(");
+                doPrint(stream, p.car(), escape);
+                stream.write(" . ");
+                doPrint(stream, p.cdr(), escape);
+                stream.write(")");
+                return;
             }
-            stream.write(")");
-            return;
         }
         if (value instanceof LispVector v) {
             stream.write("#(");

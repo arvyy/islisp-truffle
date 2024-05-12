@@ -1,4 +1,4 @@
-package com.github.arvyy.islisp;
+package com.github.arvyy.islisp.test;
 
 import com.github.arvyy.islisp.parser.Lexer;
 import com.github.arvyy.islisp.parser.LexerSourceFromReader;

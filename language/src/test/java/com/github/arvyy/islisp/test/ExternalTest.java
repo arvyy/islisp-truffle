@@ -1,4 +1,4 @@
-package com.github.arvyy.islisp;
+package com.github.arvyy.islisp.test;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotAccess;

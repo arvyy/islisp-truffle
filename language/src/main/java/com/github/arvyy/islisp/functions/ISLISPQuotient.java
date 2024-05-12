@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPTypes;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
@@ -88,7 +87,7 @@ public abstract class ISLISPQuotient extends RootNode {
         if (divisorIsZero) {
             return errorSignalerNode.signalDivisionByZero();
         } else {
-            throw new ISLISPError(e.getMessage(), this);
+            throw e;
         }
     }
 

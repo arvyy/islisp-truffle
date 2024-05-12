@@ -60,7 +60,11 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
                 <configuration>
-                    <argLine>-ea -Dgraalvm.locatorDisabled=true --add-opens org.graalvm.sdk/org.graalvm.polyglot=ALL-UNNAMED --add-exports java.base/jdk.internal.module=ALL-UNNAMED</argLine>
+                    <argLine>
+                        -ea
+                        --add-opens org.graalvm.truffle/com.oracle.truffle.polyglot=ALL-UNNAMED
+                        --add-exports java.base/jdk.internal.module=ALL-UNNAMED
+                    </argLine>
                 </configuration>
             </plugin>
             <plugin>

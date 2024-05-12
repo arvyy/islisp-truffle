@@ -2,7 +2,6 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPTruffleLanguage;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.functions.ISLISPClassOf;
 import com.github.arvyy.islisp.functions.ISLISPClassOfNodeGen;
 import com.github.arvyy.islisp.runtime.GenericFunctionDescriptor;
@@ -38,6 +37,9 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
     @Child
     ISLISPGenericFunctionDispatchNode dispatchNode;
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     DirectCallNode classOfCall;
 
     /**
@@ -62,12 +64,14 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
         this.setf = setf;
         this.sourceSection = sourceSection;
         this.classOf = ISLISPClassOfNodeGen.create(language);
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
         classOfCall = DirectCallNode.create(classOf.getCallTarget());
         dispatchNode = ISLISPGenericFunctionDispatchNodeGen.create();
     }
 
     protected ISLISPDefGenericExecutionNode(ISLISPDefGenericExecutionNode other) {
         super(other.getLanguage(ISLISPTruffleLanguage.class));
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
         module = other.module;
         name = other.name;
         setf = other.setf;
@@ -83,8 +87,13 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
             genericFunctionDescriptor = ISLISPContext.get(this)
                     .lookupGenericFunctionDispatchTree(module, name.identityReference(), setf);
         }
-        if (frame.getArguments().length - 1 < genericFunctionDescriptor.getRequiredArgCount()) {
-            throw new ISLISPError("Not enough args", this);
+        var argCount = frame.getArguments().length - 1;
+        if (argCount < genericFunctionDescriptor.getRequiredArgCount()
+            || (argCount > genericFunctionDescriptor.getRequiredArgCount() && !genericFunctionDescriptor.hasRest())
+        ) {
+            var min = genericFunctionDescriptor.getRequiredArgCount();
+            var max = genericFunctionDescriptor.hasRest() ? -1 : min;
+            return errorSignalerNode.signalWrongArgumentCount(argCount, min, max);
         }
         var argumentTypes = new LispClass[genericFunctionDescriptor.getRequiredArgCount()];
         for (int i = 1; i <= genericFunctionDescriptor.getRequiredArgCount(); i++) {

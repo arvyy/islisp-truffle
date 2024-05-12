@@ -1,4 +1,4 @@
-package com.github.arvyy.islisp;
+package com.github.arvyy.islisp.test;
 
 import com.oracle.truffle.api.debug.Breakpoint;
 import com.oracle.truffle.api.debug.Debugger;

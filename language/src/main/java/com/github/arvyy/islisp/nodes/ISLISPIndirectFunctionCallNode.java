@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
+import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.StandardTags;
@@ -19,6 +20,9 @@ public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
 
     @Child
     private ISLISPFunctionDispatchNode dispatchNode;
+
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
 
     private final boolean lastArgRest;
 
@@ -41,6 +45,7 @@ public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
         this.fn = fn;
         this.arguments = arguments;
         this.lastArgRest = lastArgRest;
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
         dispatchNode = ISLISPFunctionDispatchNodeGen.create();
     }
 
@@ -48,9 +53,15 @@ public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
     public Object executeGeneric(VirtualFrame frame) {
         Object[] argValues;
         if (lastArgRest) {
-            var restArgValues = Utils.readListAsArray(
-                arguments[arguments.length - 1].executeGeneric(frame)
-            );
+            Object[] restArgValues;
+            var restValue = arguments[arguments.length - 1].executeGeneric(frame);
+            try {
+                restArgValues = Utils.readListAsArray(restValue);
+            } catch (Utils.NotAList ignored) {
+                return errorSignalerNode.signalWrongType(
+                    restValue,
+                    ISLISPContext.get(this).lookupClass("<list>"));
+            }
             argValues = new Object[restArgValues.length + arguments.length - 1];
             for (int i = 0; i < argValues.length - 1; i++) {
                 argValues[i] = arguments[i].executeGeneric(frame);

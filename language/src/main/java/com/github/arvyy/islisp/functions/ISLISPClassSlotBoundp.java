@@ -1,14 +1,12 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.StandardClass;
 import com.github.arvyy.islisp.runtime.StandardClassObject;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Cached;
-import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
@@ -69,11 +67,6 @@ public abstract class ISLISPClassSlotBoundp extends RootNode {
             }
         }
         return null;
-    }
-
-    @Fallback
-    Object doFallback(Object o) {
-        throw new ISLISPError("Bad parameter", this);
     }
 
 }

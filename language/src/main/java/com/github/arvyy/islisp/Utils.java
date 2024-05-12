@@ -14,12 +14,22 @@ public final class Utils {
     private Utils() { }
 
     /**
+     * Exception signalling given object wasn't a list.
+     */
+    public static class NotAList extends Exception {
+        @Override
+        public synchronized Throwable fillInStackTrace() {
+            return this;
+        }
+    }
+
+    /**
      * Parse sexpr (Pair or nil) to a java list.
      *
      * @param v sesxpr
      * @return java list
      */
-    public static List<Object> readList(Object v) {
+    public static List<Object> readList(Object v) throws NotAList {
         if (v instanceof Pair p) {
             var lst = new ArrayList<Object>();
             for (var el : p) {
@@ -31,7 +41,7 @@ public final class Utils {
                 return List.of();
             }
         }
-        throw new RuntimeException();
+        throw new NotAList();
     }
 
     /**
@@ -40,7 +50,7 @@ public final class Utils {
      * @param v sesxpr
      * @return java array
      */
-    public static Object[] readListAsArray(Object v) {
+    public static Object[] readListAsArray(Object v) throws NotAList {
         int size = 0;
         Object i = v;
         while (true) {
@@ -51,10 +61,10 @@ public final class Utils {
                 if (s.identityReference() == ISLISPContext.get(null).getNil().identityReference()) {
                     break;
                 } else {
-                    throw new RuntimeException();
+                    throw new NotAList();
                 }
             } else {
-                throw new RuntimeException();
+                throw new NotAList();
             }
         }
 

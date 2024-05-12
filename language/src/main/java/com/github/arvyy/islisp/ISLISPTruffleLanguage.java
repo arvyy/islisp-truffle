@@ -15,7 +15,6 @@ import org.graalvm.options.OptionDescriptors;
 import org.graalvm.options.OptionKey;
 import org.graalvm.options.OptionStability;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
@@ -46,11 +45,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
 
     @Override
     public ISLISPContext createContext(Env env) {
-        try {
-            return new ISLISPContext(this, env);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return new ISLISPContext(this, env);
     }
 
     @Override

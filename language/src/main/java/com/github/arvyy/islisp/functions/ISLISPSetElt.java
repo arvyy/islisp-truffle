@@ -2,7 +2,6 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
-import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -44,7 +43,13 @@ public abstract class ISLISPSetElt extends RootNode {
     Object doList(Object value, Pair p, int index) {
         var cell = p;
         if (index < 0) {
-            return errorSignalerNode.signalIndexOutOfRange(index, getListSize(p));
+            try {
+                return errorSignalerNode.signalIndexOutOfRange(index, getListSize(p));
+            } catch (Utils.NotAList e) {
+                return errorSignalerNode.signalWrongType(
+                    p,
+                    ISLISPContext.get(this).lookupClass("<list>"));
+            }
         }
         for (int i = 0; i < index; i++) {
             if (cell.cdr() instanceof Pair pair) {
@@ -52,7 +57,13 @@ public abstract class ISLISPSetElt extends RootNode {
                 continue;
             }
             if (Utils.isNil(cell.cdr())) {
-                return errorSignalerNode.signalIndexOutOfRange(index,  getListSize(p));
+                try {
+                    return errorSignalerNode.signalIndexOutOfRange(index,  getListSize(p));
+                } catch (Utils.NotAList e) {
+                    return errorSignalerNode.signalWrongType(
+                        p,
+                        ISLISPContext.get(this).lookupClass("<list>"));
+                }
             } else {
                 var ctx = ISLISPContext.get(this);
                 return errorSignalerNode.signalDomainError(
@@ -66,7 +77,7 @@ public abstract class ISLISPSetElt extends RootNode {
     }
 
     @CompilerDirectives.TruffleBoundary
-    int getListSize(Pair p) {
+    int getListSize(Pair p) throws Utils.NotAList {
         return Utils.readList(p).size();
     }
 
@@ -81,7 +92,10 @@ public abstract class ISLISPSetElt extends RootNode {
 
     @Specialization
     Object doString(Object obj, String str, int index) {
-        throw new ISLISPError("Can't mutate string", this);
+        return errorSignalerNode.signalDomainError(
+            "Cannot change immutable value",
+            str,
+            ISLISPContext.get(this).lookupClass("<string>"));
     }
 
     @Specialization
@@ -112,7 +126,7 @@ public abstract class ISLISPSetElt extends RootNode {
 
     @Fallback
     Object fallback(Object value, Object seq, Object index) {
-        throw new ISLISPError("Bad sequence or index", this);
+        return errorSignalerNode.signalWrongType(seq, ISLISPContext.get(this).lookupClass("<list>"));
     }
 
     /**
