@@ -85,6 +85,7 @@
                     <generateGitPropertiesFilename>${project.build.outputDirectory}/com/github/arvyy/islisp/buildinfo/git-islisp-lang.properties</generateGitPropertiesFilename>
                     <includeOnlyProperties>
                         <includeOnlyProperty>git.commit.id.full</includeOnlyProperty>
+                        <includeOnlyProperty>git.tags</includeOnlyProperty>
                     </includeOnlyProperties>
                     <commitIdGenerationMode>full</commitIdGenerationMode>
                 </configuration>

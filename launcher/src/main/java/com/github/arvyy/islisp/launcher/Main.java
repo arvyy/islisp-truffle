@@ -40,10 +40,14 @@ public final class Main {
         if (commandLine.hasOption(versionOpt)) {
             var properties = BuildInfo.getBuildProperties();
             var pw = new PrintWriter(System.out);
-            new HelpFormatter().printWrapped(pw, HELP_WIDTH, """
-                ISLISP Truffle
-                Git commit {version}
-                """.replace("{version}", properties.getProperty("git.commit.id.full")));
+            var sb = new StringBuilder("ISLISP Truffle");
+            var tag = properties.getProperty("git.tags");
+            if (tag != null) {
+                sb.append(" ").append(tag);
+            } else {
+                sb.append("\nGit commit ").append(properties.getProperty("git.commit.id.full"));
+            }
+            new HelpFormatter().printWrapped(pw, HELP_WIDTH, sb.toString());
             pw.flush();
             return;
         }
