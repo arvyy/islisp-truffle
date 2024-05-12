@@ -58,10 +58,7 @@ public abstract class ISLISPSetAref extends RootNode {
     @Specialization
     Object doArray(Object value, LispArray arr, int[] lookup) {
         if (arr.dimensions() != lookup.length) {
-            return errorSignalerNode.signalDomainError(
-                "Expected dimension size " + arr.dimensions() + "; received" + lookup.length,
-                arr,
-                ISLISPContext.get(this).lookupClass("<basic-array*>"));
+            return signalWrongDimension(arr, arr.dimensions(), lookup.length);
         }
         Object[] obj = arr.data();
         for (var i = 0; i < lookup.length - 1; i++) {
@@ -82,10 +79,7 @@ public abstract class ISLISPSetAref extends RootNode {
     @Specialization
     Object doVector(Object value, LispVector vec, int[] lookup) {
         if (lookup.length != 1) {
-            return errorSignalerNode.signalDomainError(
-                "Expected dimension size 1; received" + lookup.length,
-                vec,
-                ISLISPContext.get(this).lookupClass("<basic-vector>"));
+            return signalWrongDimension(vec, 1, lookup.length);
         }
         var index = lookup[0];
         if (index < 0 || index >= vec.values().length) {
@@ -106,10 +100,7 @@ public abstract class ISLISPSetAref extends RootNode {
     @Specialization
     Object doMutableString(LispChar c, LispMutableString str, int[] lookup) {
         if (lookup.length != 1) {
-            return errorSignalerNode.signalDomainError(
-                "Expected dimension size 1; received" + lookup.length,
-                str,
-                ISLISPContext.get(this).lookupClass("<string>"));
+            return signalWrongDimension(str, 1, lookup.length);
         }
         var index = lookup[0];
         str.chars()[index] = c;
@@ -124,10 +115,7 @@ public abstract class ISLISPSetAref extends RootNode {
         @CachedLibrary("o") InteropLibrary interop
     ) {
         if (lookup.length != 1) {
-            return errorSignalerNode.signalDomainError(
-                "Expected dimension size 1; received" + lookup.length,
-                o,
-                ISLISPContext.get(this).lookupClass("<string>"));
+            return signalWrongDimension(o, 1, lookup.length);
         }
         try {
             interop.writeArrayElement(o, lookup[0], value);
@@ -141,6 +129,14 @@ public abstract class ISLISPSetAref extends RootNode {
     Object fallback(Object value, Object arr, int[] lookup) {
         var ctx = ISLISPContext.get(this);
         return errorSignalerNode.signalWrongType(arr, ctx.lookupClass("<basic-array>"));
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    Object signalWrongDimension(Object obj, int expected, int actual) {
+        return errorSignalerNode.signalDomainError(
+            "Expected dimension size " + expected + "; received " + actual,
+            obj,
+            ISLISPContext.get(this).lookupClass("<basic-array>"));
     }
 
     /**
