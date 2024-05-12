@@ -25,6 +25,8 @@ jobs:
   create-release:
     needs: [test]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Create release
         env:
@@ -33,7 +35,7 @@ jobs:
         run: |
           gh release create "$tag" \
               --repo="$GITHUB_REPOSITORY" \
-              --title="${GITHUB_REPOSITORY#*/} ${tag#v}"
+              --title="${tag}"
 
   build-jar:
     needs: [create-release]
@@ -50,7 +52,7 @@ jobs:
       - name: Build jar
         run: |
           mvn -Drevision=${{ github.ref_name }} package
-      - name: Upload jar to github nightly release
+      - name: Upload jar to github ${{ github.ref_name }} release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -71,12 +73,12 @@ jobs:
       - name: Build jar
         run: |
           mvn -Drevision=${{ github.ref_name }}-Pnative -DskipTests=true package
-      - name: Upload linux binary to github nightly release
+      - name: Upload linux binary to github ${{ github.ref_name }} release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mv launcher/target/islisp islisp-linux
-          gh release upload nightly islisp-linux --clobber
+          gh release upload ${{ github.ref_name }} islisp-linux --clobber
       - uses: actions/upload-artifact@v2
         with:
           name: islisp-linux
@@ -97,12 +99,12 @@ jobs:
       - name: Build jar
         run: |
           mvn -Drevision=${{ github.ref_name }} -Pnative -DskipTests=true package
-      - name: Upload windows binary to github nightly release
+      - name: Upload windows binary to github ${{ github.ref_name }} release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mv launcher/target/islisp.exe islisp.exe
-          gh release upload nightly islisp.exe --clobber
+          gh release upload ${{ github.ref_name }} islisp.exe --clobber
 
   build-macos:
     needs: [create-release]
@@ -119,12 +121,12 @@ jobs:
       - name: Build jar
         run: |
           mvn -Drevision=${{ github.ref_name }} -Pnative -DskipTests=true package
-      - name: Upload macos binary to github nightly release
+      - name: Upload macos binary to github ${{ github.ref_name }} release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mv launcher/target/islisp islisp-macos
-          gh release upload nightly islisp-macos --clobber
+          gh release upload ${{ github.ref_name }} islisp-macos --clobber
 
   publish-docker:
     needs: [build-linux]
