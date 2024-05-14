@@ -21,6 +21,7 @@
 . Click on a release from https://github.com/arvyy/islisp-truffle/releases/
 . Download `islisp-mac` artifact, place it in `/usr/local/bin/islisp`
 . You might need to execute `chmod +x islisp-mac` after downloading to make it executable.
+. You might need to execute `sudo xattr -r -d com.apple.quarantine islisp-macos` to remove the quarantine attribute (macOS Catalina and later).
 
 ### Running on Docker
 
