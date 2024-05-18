@@ -115,7 +115,6 @@
       <property name="ignoreNumbers" value="-1, 0, 1, 2, 3, 4, 8, 10, 16, 255, 1000"/>
     </module>
     <module name="MissingSwitchDefault"/>
-    <module name="MultipleVariableDeclarations"/>
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
 
