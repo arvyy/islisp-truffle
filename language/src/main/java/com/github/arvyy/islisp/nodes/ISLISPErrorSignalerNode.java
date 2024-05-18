@@ -33,6 +33,79 @@ public class ISLISPErrorSignalerNode extends Node {
     @Child
     DirectCallNode createCallNode;
 
+    @CompilerDirectives.CompilationFinal
+    Symbol sActual, sRequiredMin, sRequiredMax, sMessage, sObject, sExpectedClass;
+
+    @CompilerDirectives.CompilationFinal
+    LispClass cArityError, cDomainError;
+
+    Symbol sActual() {
+        if (sActual == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            sActual = ISLISPContext.get(this).namedSymbol("actual");
+        }
+        return sActual;
+    }
+
+    Symbol sRequiredMin() {
+        if (sRequiredMin == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            sRequiredMin = ISLISPContext.get(this).namedSymbol("required-min");
+        }
+        return sRequiredMin;
+    }
+
+    Symbol sRequiredMax() {
+        if (sRequiredMax == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            sRequiredMax = ISLISPContext.get(this).namedSymbol("required-max");
+        }
+        return sRequiredMax;
+    }
+
+    Symbol sMessage() {
+        if (sMessage == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            sMessage = ISLISPContext.get(this).namedSymbol("message");
+        }
+        return sMessage;
+    }
+
+    Symbol sObject() {
+        if (sObject == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            sObject = ISLISPContext.get(this).namedSymbol("object");
+        }
+        return sObject;
+    }
+
+    Symbol sExpectedClass() {
+        if (sExpectedClass == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            sExpectedClass = ISLISPContext.get(this).namedSymbol("expected-class");
+        }
+        return sExpectedClass;
+    }
+
+    LispClass cArityError() {
+        if (cArityError == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            var ctx = ISLISPContext.get(this);
+            cArityError = ctx.lookupClass("ROOT", ctx.namedSymbol("<arity-error>").identityReference());
+        }
+        return cArityError;
+    }
+
+    LispClass cDomainError() {
+        if (cDomainError == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            var ctx = ISLISPContext.get(this);
+            cDomainError = ctx.lookupClass("ROOT", ctx.namedSymbol("<domain-error>").identityReference());
+        }
+        return cDomainError;
+    }
+
+
     /**
      * Signal error about wrong count of supplied arguments.
      *
@@ -45,10 +118,10 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass("ROOT", ctx.namedSymbol("<arity-error>").identityReference()),
-            ctx.namedSymbol("actual"), actual,
-            ctx.namedSymbol("required-min"), min,
-            ctx.namedSymbol("required-max"), max
+            cArityError(),
+            sActual(), actual,
+            sRequiredMin(), min,
+            sRequiredMax(), max
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
@@ -101,10 +174,10 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass("ROOT", ctx.namedSymbol("<domain-error>").identityReference()),
-            ctx.namedSymbol("message"), message,
-            ctx.namedSymbol("object"), obj,
-            ctx.namedSymbol("expected-class"), expectedClass
+            cDomainError(),
+            sMessage(), message,
+            sObject(), obj,
+            sExpectedClass(), expectedClass
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }

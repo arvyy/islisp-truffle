@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
@@ -33,6 +34,7 @@ public record LispBigInteger(BigInteger data) implements TruffleObject {
      * @param other number
      * @return sum value
      */
+    @CompilerDirectives.TruffleBoundary
     public LispBigInteger add(LispBigInteger other) {
         return new LispBigInteger(data.add(other.data));
     }

@@ -61,6 +61,7 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
     @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
         if (function == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             function = ISLISPContext.get(this).lookupFunction(
                 module, name.identityReference(), setf);
             if (function == null) {

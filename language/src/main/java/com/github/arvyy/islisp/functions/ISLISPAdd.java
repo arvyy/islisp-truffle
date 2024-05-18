@@ -3,22 +3,30 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPTypes;
+import com.github.arvyy.islisp.nodes.ISLISPTypesGen;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
+import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 /**
  * Implements numeric adition function `+`.
  */
 @TypeSystemReference(ISLISPTypes.class)
-public abstract class ISLISPAdd extends RootNode {
+public class ISLISPAdd extends RootNode {
+
+    @Override
+    public boolean isCloningAllowed() {
+        return true;
+    }
 
     @Child
     private ISLISPErrorSignalerNode errorSignalerNode;
@@ -28,39 +36,68 @@ public abstract class ISLISPAdd extends RootNode {
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
-    abstract Object executeGeneric(Object a, Object b);
-
     @Override
-    @ExplodeLoop
-    public final Object execute(VirtualFrame frame) {
-        Object sum = 0;
-        for (int i = 1; i < frame.getArguments().length; i++) {
-            sum = executeGeneric(sum, frame.getArguments()[i]);
+    public Object execute(VirtualFrame frame) {
+        int sum = 0;
+        var args = frame.getArguments();
+        var l = args.length;
+        for (int i = 1; i < l; i++) {
+            try {
+                sum = Math.addExact(sum, ISLISPTypesGen.expectInteger(args[i]));
+            } catch (ArithmeticException ignored) {
+                return continueWithBigInts(frame, i, ISLISPTypesGen.asImplicitLispBigInteger(sum));
+            } catch (UnexpectedResultException ignored) {
+                Object v = args[i];
+                if (ISLISPTypesGen.isDouble(v)) {
+                    return continueWithDoubles(frame, i, ISLISPTypesGen.asImplicitDouble(sum));
+                } else if (ISLISPTypesGen.isLispBigInteger(v)) {
+                    return continueWithBigInts(frame, i, ISLISPTypesGen.asImplicitLispBigInteger(sum));
+                } else {
+                    return signalError(v);
+                }
+            }
         }
         return sum;
     }
 
-    @Specialization(rewriteOn = ArithmeticException.class)
-    int doInts(int a, int b) {
-        return Math.addExact(a, b);
+    Object continueWithBigInts(VirtualFrame frame, int index, LispBigInteger prevSum) {
+        var sum = prevSum;
+        var args = frame.getArguments();
+        var l = args.length;
+        for (int i = index; i < l; i++) {
+            try {
+                sum = sum.add(ISLISPTypesGen.asImplicitLispBigInteger(args[i]));
+            } catch (IllegalArgumentException ignored) {
+                Object v = args[i];
+                if (ISLISPTypesGen.isDouble(v)) {
+                    return continueWithDoubles(frame, i, ISLISPTypesGen.asImplicitDouble(sum));
+                } else {
+                    return signalError(v);
+                }
+            }
+        }
+        return sum;
     }
 
-    @Specialization
-    @CompilerDirectives.TruffleBoundary
-    LispBigInteger doBigInts(LispBigInteger a, LispBigInteger b) {
-        return a.add(b);
+    Object continueWithDoubles(VirtualFrame frame, int index, double prevSum) {
+        var sum = prevSum;
+        var args = frame.getArguments();
+        var l = args.length;
+        for (int i = index; i < l; i++) {
+            try {
+                sum += ISLISPTypesGen.asImplicitDouble(args[i]);
+            } catch (IllegalArgumentException ignored) {
+                Object v = args[i];
+                return signalError(v);
+            }
+        }
+        return sum;
     }
 
-    @Specialization
-    double doDoubles(double a, double b) {
-        return a + b;
-    }
-
-    @Fallback
-    Object notNumbers(Object a, Object b) {
+    Object signalError(Object value) {
         var ctx = ISLISPContext.get(this);
         var numberClass = ctx.lookupClass("<number>");
-        return errorSignalerNode.signalWrongType(b, numberClass);
+        return errorSignalerNode.signalWrongType(value, numberClass);
     }
 
     /**
@@ -69,7 +106,7 @@ public abstract class ISLISPAdd extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPAddNodeGen.create(lang).getCallTarget());
+        return new LispFunction(new ISLISPAdd(lang).getCallTarget());
     }
 
 }
