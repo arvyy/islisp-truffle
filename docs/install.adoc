@@ -42,6 +42,8 @@ Interpeter parses options provided in the form of `--<option>=<value>`, and tran
 
 * `islisp.Sourcepath` -- when using `require` form, islisp searches from roots provided through this option. Option value: set of paths, separated by `:`.
 
+Use `--experimental-options` to enable experimental options.
+
 See truffle documentation for other recognizable options.
 
 ### Interpreter tools (debugger, profiler, ...)

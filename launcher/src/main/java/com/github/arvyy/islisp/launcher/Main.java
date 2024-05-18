@@ -67,6 +67,8 @@ public final class Main {
                 * islisp.Sourcepath - when using `require` form, islisp searches from roots provided through this option.
                 Option value: set of paths, separated by `:`.
                 
+                Use `--experimental-options` to enable experimental options.
+                
                 For other options see truffle documentation.
                 
                 If FILE is `-`, interpreter non-interactively evaluates standard input.
@@ -89,6 +91,10 @@ public final class Main {
 
         String sourceArg = null;
         for (var arg: commandLine.getArgList()) {
+            if ("--experimental-options".equals(arg)) {
+                contextBuilder.allowExperimentalOptions(true);
+                continue;
+            }
             if (arg.startsWith("--")) {
                 var e = arg.substring(2).split("=");
                 var value = e.length > 1 ? e[1] : "true";
