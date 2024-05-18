@@ -7,6 +7,7 @@
         <groupId>com.github.arvyy.islisp</groupId>
         <artifactId>parent</artifactId>
         <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>launcher</artifactId>
 
@@ -50,7 +51,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>
-                                ${project.build.directory}
+                                ${project.build.directory}/deps
                             </outputDirectory>
                         </configuration>
                     </execution>
@@ -59,43 +60,43 @@
         </plugins>
     </build>
 
-      <profiles>
-    <profile>
-      <id>native</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.graalvm.buildtools</groupId>
-            <artifactId>native-maven-plugin</artifactId>
-            <version>0.10.1</version>
-            <extensions>true</extensions>
-            <executions>
-              <execution>
-                <id>build-native</id>
-                <goals>
-                  <goal>compile-no-fork</goal>
-                </goals>
-                <phase>package</phase>
-              </execution>
-              <execution>
-                <id>test-native</id>
-                <goals>
-                  <goal>test</goal>
-                </goals>
-                <phase>test</phase>
-              </execution>
-            </executions>
-            <configuration>
-                <imageName>islisp</imageName>
-                <mainClass>com.github.arvyy.islisp.launcher.Main</mainClass>
-                <buildArgs>
-                    <buildArg>--initialize-at-build-time</buildArg>
-                </buildArgs>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+    <profiles>
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>0.10.1</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>compile-no-fork</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                            <execution>
+                                <id>test-native</id>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <phase>test</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <imageName>islisp</imageName>
+                            <mainClass>com.github.arvyy.islisp.launcher.Main</mainClass>
+                            <buildArgs>
+                                <buildArg>--initialize-at-build-time</buildArg>
+                            </buildArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

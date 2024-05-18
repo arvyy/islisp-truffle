@@ -1,0 +1,1 @@
+$JAVA_HOME/bin/java -p ../launcher/target/deps:../launcher/target/launcher-0.0.1-local.jar -m com.github.arvyy.islisp.launcher/com.github.arvyy.islisp.launcher.Main $1
