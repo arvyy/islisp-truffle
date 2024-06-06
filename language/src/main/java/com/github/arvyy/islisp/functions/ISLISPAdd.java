@@ -7,10 +7,13 @@ import com.github.arvyy.islisp.nodes.ISLISPTypesGen;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.TruffleLanguage;
+import com.oracle.truffle.api.TruffleSafepoint;
 import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import com.oracle.truffle.api.source.Source;
+import com.oracle.truffle.api.source.SourceSection;
 
 /**
  * Implements numeric adition function `+`.
@@ -32,6 +35,19 @@ public class ISLISPAdd extends RootNode {
     }
 
     @Override
+    public String getName() {
+        return "+";
+    }
+
+    @Override
+    public SourceSection getSourceSection() {
+        return Source.newBuilder("islisp", "", ISLISPAdd.class.getSimpleName())
+            .internal(true)
+            .build()
+            .createSection(1);
+    }
+
+    @Override
     public Object execute(VirtualFrame frame) {
         int sum = 0;
         var args = frame.getArguments();
@@ -39,6 +55,7 @@ public class ISLISPAdd extends RootNode {
         for (int i = 1; i < l; i++) {
             try {
                 sum = Math.addExact(sum, ISLISPTypesGen.expectInteger(args[i]));
+                TruffleSafepoint.poll(this);
             } catch (ArithmeticException ignored) {
                 return continueWithBigInts(frame, i, ISLISPTypesGen.asImplicitLispBigInteger(sum));
             } catch (UnexpectedResultException ignored) {
@@ -62,6 +79,7 @@ public class ISLISPAdd extends RootNode {
         for (int i = index; i < l; i++) {
             try {
                 sum = sum.add(ISLISPTypesGen.asImplicitLispBigInteger(args[i]));
+                TruffleSafepoint.poll(this);
             } catch (IllegalArgumentException ignored) {
                 Object v = args[i];
                 if (ISLISPTypesGen.isDouble(v)) {
@@ -81,6 +99,7 @@ public class ISLISPAdd extends RootNode {
         for (int i = index; i < l; i++) {
             try {
                 sum += ISLISPTypesGen.asImplicitDouble(args[i]);
+                TruffleSafepoint.poll(this);
             } catch (IllegalArgumentException ignored) {
                 Object v = args[i];
                 return signalError(v);

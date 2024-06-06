@@ -7,11 +7,16 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
+import com.oracle.truffle.api.source.SourceSection;
 
 /**
- * Root node that wraps all the top level statements.
+ * Root node that wraps all the top level statements as well as user-defined functions.
  */
 public class ISLISPRootNode extends RootNode {
+
+    private String name;
+
+    private SourceSection sourceSection;
 
     @Children
     private final ISLISPExpressionNode[] expressionNodes;
@@ -30,6 +35,28 @@ public class ISLISPRootNode extends RootNode {
     ) {
         super(language, frameDescriptor);
         this.expressionNodes = expressionNodes;
+    }
+
+    /**
+     * Set root node's name
+     * @param name name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setSourceSection(SourceSection sourceSection) {
+        this.sourceSection = sourceSection;
+    }
+
+    @Override
+    public SourceSection getSourceSection() {
+        return sourceSection;
     }
 
     @Override

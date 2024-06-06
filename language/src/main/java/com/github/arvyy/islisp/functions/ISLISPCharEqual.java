@@ -9,6 +9,8 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
+import com.oracle.truffle.api.source.Source;
+import com.oracle.truffle.api.source.SourceSection;
 
 /**
  * Implements `char=` function.
@@ -21,6 +23,19 @@ public abstract class ISLISPCharEqual extends RootNode {
     ISLISPCharEqual(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
+    }
+
+    @Override
+    public String getName() {
+        return "char=";
+    }
+
+    @Override
+    public SourceSection getSourceSection() {
+        return Source.newBuilder("islisp", "", ISLISPCharEqual.class.getSimpleName())
+            .internal(true)
+            .build()
+            .createSection(1);
     }
 
     @Override

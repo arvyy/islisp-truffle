@@ -15,6 +15,8 @@ import com.oracle.truffle.api.interop.InteropException;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.RootNode;
+import com.oracle.truffle.api.source.Source;
+import com.oracle.truffle.api.source.SourceSection;
 
 /**
  * Implements `elt` function, that returns an element in sequence for a given index.
@@ -25,9 +27,43 @@ public abstract class ISLISPElt extends RootNode {
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
+    @CompilerDirectives.CompilationFinal
+    LispClass cList, cInteger;
+
     ISLISPElt(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
+    }
+
+    @Override
+    public String getName() {
+        return "elt";
+    }
+
+    @Override
+    public SourceSection getSourceSection() {
+        return Source.newBuilder("islisp", "", ISLISPElt.class.getSimpleName())
+            .internal(true)
+            .build()
+            .createSection(1);
+    }
+
+    LispClass cList() {
+        if (cList == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            var ctx = ISLISPContext.get(this);
+            cList = ctx.lookupClass("ROOT", ctx.namedSymbol("<list>").identityReference());
+        }
+        return cList;
+    }
+
+    LispClass cInteger() {
+        if (cInteger == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            var ctx = ISLISPContext.get(this);
+            cInteger = ctx.lookupClass("ROOT", ctx.namedSymbol("<integer>").identityReference());
+        }
+        return cInteger;
     }
 
     @Override
@@ -49,7 +85,7 @@ public abstract class ISLISPElt extends RootNode {
             } catch (Utils.NotAList e) {
                 return errorSignalerNode.signalWrongType(
                     p,
-                    ISLISPContext.get(this).lookupClass("<list>"));
+                    cList());
             }
         }
         for (int i = 0; i < index; i++) {
@@ -63,14 +99,13 @@ public abstract class ISLISPElt extends RootNode {
                 } catch (Utils.NotAList e) {
                     return errorSignalerNode.signalWrongType(
                         p,
-                        ISLISPContext.get(this).lookupClass("<list>"));
+                        cList());
                 }
             } else {
-                var ctx = ISLISPContext.get(this);
                 return errorSignalerNode.signalDomainError(
                     "Not a proper list",
                     value.cdr(),
-                    ctx.lookupClass("<list>"));
+                    cList());
             }
         }
         return value.car();
@@ -124,14 +159,14 @@ public abstract class ISLISPElt extends RootNode {
     Object fallback(Object seq, LispBigInteger index) {
         return errorSignalerNode.signalWrongType(
             seq,
-            ISLISPContext.get(this).lookupClass("<list>"));
+            cList());
     }
 
     @Fallback
     Object fallback(Object seq, Object index) {
         return errorSignalerNode.signalWrongType(
             index,
-            ISLISPContext.get(this).lookupClass("<integer>"));
+            cInteger());
     }
 
     /**

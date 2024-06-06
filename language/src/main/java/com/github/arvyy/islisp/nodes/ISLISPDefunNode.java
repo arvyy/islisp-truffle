@@ -15,7 +15,6 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
     final String module;
     final Symbol name;
 
-    @Child
     ISLISPRootNode functionNode;
 
     /**

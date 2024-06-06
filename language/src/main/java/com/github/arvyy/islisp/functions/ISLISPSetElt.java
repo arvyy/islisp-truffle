@@ -15,6 +15,8 @@ import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.interop.UnsupportedTypeException;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.RootNode;
+import com.oracle.truffle.api.source.Source;
+import com.oracle.truffle.api.source.SourceSection;
 
 /**
  * Implements `set-elt` function, that sets an element in sequence for a given index.
@@ -27,6 +29,19 @@ public abstract class ISLISPSetElt extends RootNode {
     ISLISPSetElt(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
+    }
+
+    @Override
+    public String getName() {
+        return "set-elt";
+    }
+
+    @Override
+    public SourceSection getSourceSection() {
+        return Source.newBuilder("islisp", "", ISLISPSetElt.class.getSimpleName())
+            .internal(true)
+            .build()
+            .createSection(1);
     }
 
     @Override

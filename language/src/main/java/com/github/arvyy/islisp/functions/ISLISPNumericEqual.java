@@ -13,6 +13,8 @@ import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.profiles.CountingConditionProfile;
+import com.oracle.truffle.api.source.Source;
+import com.oracle.truffle.api.source.SourceSection;
 
 /**
  * Implements numeric equality function `=`.
@@ -28,6 +30,19 @@ public abstract class ISLISPNumericEqual extends RootNode {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
         profile = CountingConditionProfile.create();
+    }
+
+    @Override
+    public String getName() {
+        return "=";
+    }
+
+    @Override
+    public SourceSection getSourceSection() {
+        return Source.newBuilder("islisp", "", ISLISPNumericEqual.class.getSimpleName())
+            .internal(true)
+            .build()
+            .createSection(1);
     }
 
     abstract Object executeGeneric(Object a, Object b);

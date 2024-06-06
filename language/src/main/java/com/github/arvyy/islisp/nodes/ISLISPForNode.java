@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
+import com.oracle.truffle.api.TruffleSafepoint;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
@@ -74,6 +75,7 @@ public class ISLISPForNode extends ISLISPExpressionNode {
             for (int i = 0; i < variableSlots.length; i++) {
                 frame.setObject(variableSlots[i], newValues[i]);
             }
+            TruffleSafepoint.poll(this);
         }
         if (resultBody.length == 0) {
             return nil;

@@ -56,11 +56,13 @@ public class Parser {
             new ISLISPExpressionNode[]{new ISLISPModuleNode(this, parseModuleSource(module, source))},
             null
         );
-        return new ISLISPRootNode(
+        var root = new ISLISPRootNode(
                 language,
                 new ISLISPExpressionNode[]{topLevelConditionHandler},
                 null
         );
+        root.setName("main");
+        return root;
     }
 
     /**
@@ -1112,6 +1114,8 @@ public class Parser {
                 ctx.getLanguage(),
                 new ISLISPExpressionNode[]{userDefinedFunctionNode},
                 parserContext.frameBuilder.build());
+        rootNode.setName(name.name());
+        rootNode.setSourceSection(source(sexpr));
         return new ISLISPDefunNode(parserContext.module, name, rootNode);
     }
 

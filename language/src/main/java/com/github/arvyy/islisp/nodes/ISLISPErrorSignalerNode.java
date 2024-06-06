@@ -34,10 +34,10 @@ public class ISLISPErrorSignalerNode extends Node {
     DirectCallNode createCallNode;
 
     @CompilerDirectives.CompilationFinal
-    Symbol sActual, sRequiredMin, sRequiredMax, sMessage, sObject, sExpectedClass;
+    Symbol sActual, sRequiredMin, sRequiredMax, sMessage, sObject, sExpectedClass, sBounds;
 
     @CompilerDirectives.CompilationFinal
-    LispClass cArityError, cDomainError;
+    LispClass cArityError, cDomainError, cIndexOutOfRangeError, cTruffleInteropError;
 
     Symbol sActual() {
         if (sActual == null) {
@@ -87,6 +87,14 @@ public class ISLISPErrorSignalerNode extends Node {
         return sExpectedClass;
     }
 
+    Symbol sBounds() {
+        if (sBounds == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            sBounds = ISLISPContext.get(this).namedSymbol("bounds");
+        }
+        return sBounds;
+    }
+
     LispClass cArityError() {
         if (cArityError == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
@@ -103,6 +111,24 @@ public class ISLISPErrorSignalerNode extends Node {
             cDomainError = ctx.lookupClass("ROOT", ctx.namedSymbol("<domain-error>").identityReference());
         }
         return cDomainError;
+    }
+
+    LispClass cIndexOutOfRangeError() {
+        if (cIndexOutOfRangeError == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            var ctx = ISLISPContext.get(this);
+            cIndexOutOfRangeError = ctx.lookupClass("ROOT", ctx.namedSymbol("<index-out-of-range-error>").identityReference());
+        }
+        return cIndexOutOfRangeError;
+    }
+
+    LispClass cTruffleInteropError() {
+        if (cTruffleInteropError == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            var ctx = ISLISPContext.get(this);
+            cTruffleInteropError = ctx.lookupClass("ROOT", ctx.namedSymbol("<truffle-interop-error>").identityReference());
+        }
+        return cTruffleInteropError;
     }
 
 
@@ -303,9 +329,9 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass("ROOT", ctx.namedSymbol("<index-out-of-range-error>").identityReference()),
-            ctx.namedSymbol("bounds"), bounds,
-            ctx.namedSymbol("actual"), actual
+            cIndexOutOfRangeError(),
+            sBounds(), bounds,
+            sActual(), actual
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
@@ -335,8 +361,8 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass("ROOT", ctx.namedSymbol("<truffle-interop-error>").identityReference()),
-            ctx.namedSymbol("message"), interopException.getMessage()
+            cTruffleInteropError(),
+            sMessage(), interopException.getMessage()
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
