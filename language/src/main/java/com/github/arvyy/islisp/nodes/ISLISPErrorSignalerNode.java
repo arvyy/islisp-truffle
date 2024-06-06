@@ -117,7 +117,9 @@ public class ISLISPErrorSignalerNode extends Node {
         if (cIndexOutOfRangeError == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            cIndexOutOfRangeError = ctx.lookupClass("ROOT", ctx.namedSymbol("<index-out-of-range-error>").identityReference());
+            cIndexOutOfRangeError = ctx.lookupClass(
+                "ROOT",
+                ctx.namedSymbol("<index-out-of-range-error>").identityReference());
         }
         return cIndexOutOfRangeError;
     }
@@ -126,7 +128,9 @@ public class ISLISPErrorSignalerNode extends Node {
         if (cTruffleInteropError == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            cTruffleInteropError = ctx.lookupClass("ROOT", ctx.namedSymbol("<truffle-interop-error>").identityReference());
+            cTruffleInteropError = ctx.lookupClass(
+                "ROOT",
+                ctx.namedSymbol("<truffle-interop-error>").identityReference());
         }
         return cTruffleInteropError;
     }

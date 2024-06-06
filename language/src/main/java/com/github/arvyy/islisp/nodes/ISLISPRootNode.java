@@ -38,7 +38,7 @@ public class ISLISPRootNode extends RootNode {
     }
 
     /**
-     * Set root node's name
+     * Set root node's name.
      * @param name name
      */
     public void setName(String name) {
@@ -50,6 +50,10 @@ public class ISLISPRootNode extends RootNode {
         return name;
     }
 
+    /**
+     * Set source section (can be internal java) for the root node.
+     * @param sourceSection source section.
+     */
     public void setSourceSection(SourceSection sourceSection) {
         this.sourceSection = sourceSection;
     }

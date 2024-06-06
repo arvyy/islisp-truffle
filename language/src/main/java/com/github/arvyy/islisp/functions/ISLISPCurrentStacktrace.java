@@ -43,7 +43,7 @@ public class ISLISPCurrentStacktrace extends RootNode {
         var lst = new ArrayList<Object>();
         for (var e: stackTraceElementList) {
             var source = findSourceSection(e.getLocation());
-            if (source != null)  {
+            if (source != null && !source.getSource().isInternal())  {
                 var element = new Object[]{
                     source.getSource().getName(),
                     source.getStartLine(),

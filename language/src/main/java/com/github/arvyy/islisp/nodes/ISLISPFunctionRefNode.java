@@ -18,6 +18,9 @@ public class ISLISPFunctionRefNode extends ISLISPExpressionNode {
     @CompilerDirectives.CompilationFinal
     private LispFunction function;
 
+    @Child
+    ISLISPErrorSignalerNode errorSignalerNode;
+
     /**
      * Create function reference node.
      * @param module module name whose source's this node is part of
@@ -28,6 +31,7 @@ public class ISLISPFunctionRefNode extends ISLISPExpressionNode {
         super(sourceSection);
         this.module = module;
         this.name = name;
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override
@@ -35,6 +39,9 @@ public class ISLISPFunctionRefNode extends ISLISPExpressionNode {
         if (function == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             function = ISLISPContext.get(this).lookupFunction(module, name.identityReference());
+            if (function == null) {
+                return errorSignalerNode.signalUndefinedFunction(name);
+            }
         }
         return function;
     }
