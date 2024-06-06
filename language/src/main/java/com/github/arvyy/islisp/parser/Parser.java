@@ -1099,7 +1099,7 @@ public class Parser {
                 .toArray(ISLISPExpressionNode[]::new);
         var body = new ISLISPPrognNode(
                 bodyStatements,
-                null);
+                source(sexpr));
         body.setParserContext(slotsAndNewContext.context);
         var ctx = ISLISPContext.get(null);
         var userDefinedFunctionNode = new ISLISPUserDefinedFunctionNode(
