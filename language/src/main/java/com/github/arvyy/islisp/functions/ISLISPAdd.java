@@ -6,6 +6,7 @@ import com.github.arvyy.islisp.nodes.ISLISPTypes;
 import com.github.arvyy.islisp.nodes.ISLISPTypesGen;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleSafepoint;
 import com.oracle.truffle.api.dsl.TypeSystemReference;
@@ -40,6 +41,7 @@ public class ISLISPAdd extends RootNode {
     }
 
     @Override
+    @CompilerDirectives.TruffleBoundary
     public SourceSection getSourceSection() {
         return Source.newBuilder("islisp", "", ISLISPAdd.class.getSimpleName())
             .internal(true)

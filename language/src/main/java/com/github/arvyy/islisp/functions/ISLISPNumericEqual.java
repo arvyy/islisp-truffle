@@ -38,6 +38,7 @@ public abstract class ISLISPNumericEqual extends RootNode {
     }
 
     @Override
+    @CompilerDirectives.TruffleBoundary
     public SourceSection getSourceSection() {
         return Source.newBuilder("islisp", "", ISLISPNumericEqual.class.getSimpleName())
             .internal(true)

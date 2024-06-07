@@ -4,6 +4,7 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispChar;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -31,6 +32,7 @@ public abstract class ISLISPCharEqual extends RootNode {
     }
 
     @Override
+    @CompilerDirectives.TruffleBoundary
     public SourceSection getSourceSection() {
         return Source.newBuilder("islisp", "", ISLISPCharEqual.class.getSimpleName())
             .internal(true)

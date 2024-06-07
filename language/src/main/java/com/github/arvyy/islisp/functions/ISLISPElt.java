@@ -41,6 +41,7 @@ public abstract class ISLISPElt extends RootNode {
     }
 
     @Override
+    @CompilerDirectives.TruffleBoundary
     public SourceSection getSourceSection() {
         return Source.newBuilder("islisp", "", ISLISPElt.class.getSimpleName())
             .internal(true)

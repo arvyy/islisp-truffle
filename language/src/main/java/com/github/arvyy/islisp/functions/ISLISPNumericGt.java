@@ -39,6 +39,7 @@ public abstract class ISLISPNumericGt extends RootNode {
     }
 
     @Override
+    @CompilerDirectives.TruffleBoundary
     public SourceSection getSourceSection() {
         return Source.newBuilder("islisp", "", ISLISPNumericGt.class.getSimpleName())
             .internal(true)
