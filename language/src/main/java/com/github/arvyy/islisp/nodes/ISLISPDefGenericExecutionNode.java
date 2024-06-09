@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.ISLISPTruffleLanguage;
 import com.github.arvyy.islisp.functions.ISLISPClassOf;
 import com.github.arvyy.islisp.functions.ISLISPClassOfNodeGen;
 import com.github.arvyy.islisp.runtime.GenericFunctionDescriptor;
