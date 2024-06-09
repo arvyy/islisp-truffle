@@ -85,7 +85,6 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
     }
 
     @Override
-    @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
         var argCount = frame.getArguments().length - 1;
         var hasRest = restArgumentsSlot >= 0;

@@ -9,6 +9,7 @@ import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.instrumentation.Tag;
+import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
 /**
@@ -75,6 +76,7 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
     }
 
     @Override
+    @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
         if (name == null) {
             Frame f = frame;

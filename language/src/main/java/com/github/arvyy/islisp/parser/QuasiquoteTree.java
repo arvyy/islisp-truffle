@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.*;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.nodes.ControlFlowException;
 import com.oracle.truffle.api.source.SourceSection;
 
@@ -168,6 +169,7 @@ public sealed interface QuasiquoteTree {
      * @param substitutionValues values to be substituted
      * @return evaluated value
      */
+    @CompilerDirectives.TruffleBoundary
     static Object evalQuasiquoteTree(QuasiquoteTree tree, Object[] substitutionValues) {
         if (tree instanceof Atom a) {
             return a.value;

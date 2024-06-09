@@ -90,4 +90,8 @@ public class ISLISPRootNode extends RootNode {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "ISLISPRootNode: " + name;
+    }
 }

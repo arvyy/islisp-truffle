@@ -30,14 +30,19 @@ public class ISLISPWhileNode extends ISLISPExpressionNode {
     }
 
     @Override
-    @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
         var nil = ISLISPContext.get(this).getNil();
         while (nil != test.executeGeneric(frame)) {
-            for (var e: body) {
-                e.executeGeneric(frame);
-            }
+            executeBody(frame);
         }
         return nil;
     }
+
+    @ExplodeLoop
+    void executeBody(VirtualFrame frame) {
+        for (var i = 0; i < body.length; i++) {
+            body[i].executeGeneric(frame);
+        }
+    }
+
 }

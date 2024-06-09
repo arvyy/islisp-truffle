@@ -9,6 +9,8 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.RootNode;
+import com.oracle.truffle.api.source.Source;
+import com.oracle.truffle.api.source.SourceSection;
 
 import java.io.IOException;
 
@@ -38,6 +40,20 @@ public class ISLISPFormat extends RootNode {
     ISLISPFormat(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
+    }
+
+    @Override
+    public String getName() {
+        return "format";
+    }
+
+    @Override
+    @CompilerDirectives.TruffleBoundary
+    public SourceSection getSourceSection() {
+        return Source.newBuilder("islisp", "", ISLISPFormat.class.getSimpleName())
+            .internal(true)
+            .build()
+            .createSection(1);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.github.arvyy.islisp.Utils;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.instrumentation.Tag;
+import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
 /**
@@ -50,6 +51,7 @@ public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
     }
 
     @Override
+    @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
         Object[] argValues;
         if (lastArgRest) {
@@ -63,14 +65,15 @@ public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
                     ISLISPContext.get(this).lookupClass("<list>"));
             }
             argValues = new Object[restArgValues.length + arguments.length - 1];
-            for (int i = 0; i < argValues.length - 1; i++) {
+            for (int i = 0; i < arguments.length - 1; i++) {
                 argValues[i] = arguments[i].executeGeneric(frame);
             }
             System.arraycopy(restArgValues, 0, argValues, arguments.length - 1, restArgValues.length);
         } else {
             argValues = new Object[arguments.length];
             for (int i = 0; i < argValues.length; i++) {
-                argValues[i] = arguments[i].executeGeneric(frame);
+                var argument = arguments[i];
+                argValues[i] = argument.executeGeneric(frame);
             }
         }
         var functionValue = fn.executeGeneric(frame);

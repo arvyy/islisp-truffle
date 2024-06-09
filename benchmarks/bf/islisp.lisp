@@ -86,6 +86,7 @@
                  (setf std-input-pointer (+ 1 std-input-pointer))
                  (setf instruction-pointer (+ 1 instruction-pointer))))))))))
 
+(defun do-main ()
 
 (interpret "
 >>>+[[-]>>[-]++>+>+++++++[<++++>>++<-]++>>+>+>+++++[>++>++++++<<-]+>>>,<++[[>[
@@ -100,7 +101,7 @@ http://www.hevanet.com/cristofd/brainfuck/]
 "
 
 "
-++++++++++> +<+[
+++++> +<+[
     >[>+>+<<-]++>>[<<+>>-]>>>[-]++>[-]+
     >>>+[[-]++++++>>>]<<<[[<++++++++<++>>-]+<.<[>----<-]<]
     <<[>>>>>[>>>[-]+++++++++<[>-<-]+++++++++>[-[<->-]+[<<<]]<[>+<-]>]<<-]<<-
@@ -111,3 +112,9 @@ http://www.hevanet.com/cristofd/brainfuck/]!
 ")
 
 
+)
+
+(for ((i 0 (+ i 1)))
+     ((> i 1000))
+  (format (standard-output) "Run ~A~%" i)
+  (do-main))

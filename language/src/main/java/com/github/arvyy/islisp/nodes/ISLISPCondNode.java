@@ -2,6 +2,8 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
+import com.oracle.truffle.api.CompilerAsserts;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
@@ -17,6 +19,7 @@ public class ISLISPCondNode extends ISLISPExpressionNode {
     @Children
     private ISLISPExpressionNode[] content;
 
+    @CompilerDirectives.CompilationFinal(dimensions = 1)
     private final int[] offsets;
 
     /**
@@ -49,16 +52,15 @@ public class ISLISPCondNode extends ISLISPExpressionNode {
                 ? content.length
                 : offsets[i + 1];
             var testValue = content[start].executeGeneric(frame);
-            if (Utils.isNil(testValue)) {
-                continue;
+            if (!Utils.isNil(testValue)) {
+                if (start + 1 == end) {
+                    return testValue;
+                }
+                for (int j = start + 1; j < end - 1; j++) {
+                    content[j].executeGeneric(frame);
+                }
+                return content[end - 1].executeGeneric(frame);
             }
-            if (start + 1 == end) {
-                return testValue;
-            }
-            for (int j = start + 1; j < end - 1; j++) {
-                content[j].executeGeneric(frame);
-            }
-            return content[end - 1].executeGeneric(frame);
         }
         return nil;
     }

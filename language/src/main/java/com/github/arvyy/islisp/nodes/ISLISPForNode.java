@@ -1,9 +1,11 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleSafepoint;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
+import com.oracle.truffle.api.profiles.CountingConditionProfile;
 import com.oracle.truffle.api.source.SourceSection;
 
 /**
@@ -11,6 +13,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPForNode extends ISLISPExpressionNode {
 
+    @CompilerDirectives.CompilationFinal(dimensions = 1)
     private final int[] variableSlots;
 
     @Children
@@ -27,6 +30,8 @@ public class ISLISPForNode extends ISLISPExpressionNode {
 
     @Children
     ISLISPExpressionNode[] resultBody;
+
+    private final CountingConditionProfile conditionProfile;
 
     /**
      * Create for node.
@@ -55,34 +60,50 @@ public class ISLISPForNode extends ISLISPExpressionNode {
         this.body = body;
         this.testExpression = testExpression;
         this.resultBody = resultBody;
+        conditionProfile = CountingConditionProfile.create();
     }
 
     @Override
-    @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
         var nil = ISLISPContext.get(this).getNil();
-        for (int i = 0; i < variableSlots.length; i++) {
-            frame.setObject(variableSlots[i], variableInitializers[i].executeGeneric(frame));
-        }
-        while (testExpression.executeGeneric(frame) == nil) {
-            for (int i = 0; i < body.length; i++) {
-                body[i].executeGeneric(frame);
-            }
-            Object[] newValues = new Object[variableSlots.length];
-            for (int i = 0; i < variableSlots.length; i++) {
-                newValues[i] = variableStepExpressions[i].executeGeneric(frame);
-            }
-            for (int i = 0; i < variableSlots.length; i++) {
-                frame.setObject(variableSlots[i], newValues[i]);
-            }
+        initVariableSlots(frame);
+        Object[] newValues = new Object[variableSlots.length];
+        while (conditionProfile.profile(testExpression.executeGeneric(frame) == nil)) {
+            runIteration(frame, newValues);
             TruffleSafepoint.poll(this);
         }
         if (resultBody.length == 0) {
             return nil;
         }
+        return runResultStatements(frame);
+    }
+
+    @ExplodeLoop
+    void initVariableSlots(VirtualFrame frame) {
+        for (int i = 0; i < variableSlots.length; i++) {
+            frame.setObject(variableSlots[i], variableInitializers[i].executeGeneric(frame));
+        }
+    }
+
+    @ExplodeLoop
+    void runIteration(VirtualFrame frame, Object[] newValues) {
+        for (int i = 0; i < body.length; i++) {
+            body[i].executeGeneric(frame);
+        }
+        for (int i = 0; i < variableSlots.length; i++) {
+            newValues[i] = variableStepExpressions[i].executeGeneric(frame);
+        }
+        for (int i = 0; i < variableSlots.length; i++) {
+            frame.setObject(variableSlots[i], newValues[i]);
+        }
+    }
+
+    @ExplodeLoop
+    Object runResultStatements(VirtualFrame frame) {
         for (int i = 0; i < resultBody.length - 1; i++) {
             resultBody[i].executeGeneric(frame);
         }
         return resultBody[resultBody.length - 1].executeGeneric(frame);
     }
+
 }
