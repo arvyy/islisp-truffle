@@ -8,7 +8,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  */
 public class ISLISPLambdaNode extends ISLISPExpressionNode {
 
-    @Child
     ISLISPRootNode functionNode;
 
     /**

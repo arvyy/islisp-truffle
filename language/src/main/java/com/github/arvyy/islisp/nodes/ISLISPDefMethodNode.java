@@ -31,7 +31,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
 
     private final boolean hasRest;
     private final boolean setf;
-    @Child
+
     private RootNode functionNode;
 
     /**

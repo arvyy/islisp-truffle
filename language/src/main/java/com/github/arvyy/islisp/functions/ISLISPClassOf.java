@@ -23,6 +23,7 @@ public abstract class ISLISPClassOf extends RootNode {
 
     ISLISPClassOf(TruffleLanguage<?> language) {
         super(language);
+        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     abstract Object executeGeneric(Object value);
@@ -67,7 +68,7 @@ public abstract class ISLISPClassOf extends RootNode {
 
     @Specialization
     LispClass doStringBuffer(
-        StringBuffer str,
+        LispMutableString str,
         @Cached("loadStringClass()") LispClass lispClass
     ) {
         return lispClass;
@@ -86,6 +87,14 @@ public abstract class ISLISPClassOf extends RootNode {
             @Cached("loadNullClass()") LispClass nullClass,
             @Cached("loadSymbolClass()") LispClass symbolClass) {
         return symbol.name().equals("NIL") ? nullClass : symbolClass;
+    }
+
+    @Specialization
+    LispClass doSymbol(
+        Pair pair,
+        @Cached("loadPairClass()") LispClass pairClass
+    ) {
+        return pairClass;
     }
 
     @Specialization
@@ -188,6 +197,9 @@ public abstract class ISLISPClassOf extends RootNode {
     LispClass loadSymbolClass() {
         return loadClass("<symbol>");
     }
+    LispClass loadPairClass() {
+        return loadClass("<cons>");
+    }
 
     LispClass loadBuiltinClass() {
         return loadClass("<built-in-class>");
@@ -235,7 +247,8 @@ public abstract class ISLISPClassOf extends RootNode {
 
     LispClass loadClass(String name) {
         var ctx = ISLISPContext.get(this);
-        return ctx.lookupClass(name);
+        var clazz = ctx.lookupClass(name);
+        return clazz;
     }
 
     /**

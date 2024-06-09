@@ -831,6 +831,7 @@ public class Parser {
                 ctx.getLanguage(),
                 new ISLISPExpressionNode[]{userDefinedFunctionNode},
                 parserContext.frameBuilder.build());
+        rootNode.setName(name.toString());
         return new ISLISPDefMethodNode(
                 parserContext.module,
                 methodQualifier,
@@ -1079,6 +1080,7 @@ public class Parser {
             ctx.getLanguage(),
             new ISLISPExpressionNode[]{userDefinedFunctionNode},
             parserContext.frameBuilder.build());
+        rootNode.setName("(anonymous)");
         return new ISLISPLambdaNode(rootNode);
     }
 

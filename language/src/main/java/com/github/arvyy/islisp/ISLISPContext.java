@@ -321,6 +321,7 @@ public class ISLISPContext {
         initBuiltin("<symbol>", "<object>");
         initBuiltin("<list>", "<object>");
         initBuiltin("<null>", "<symbol>", "<list>");
+        initBuiltin("<cons>", "<list>");
         initBuiltin("<integer>", "<number>");
         initBuiltin("<float>", "<number>");
         initBuiltin("<built-in-class>", "<object>");

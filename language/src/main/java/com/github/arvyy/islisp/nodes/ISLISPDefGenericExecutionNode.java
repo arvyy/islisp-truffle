@@ -40,6 +40,7 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
+    @Child
     DirectCallNode classOfCall;
 
     /**
@@ -69,21 +70,10 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
         dispatchNode = ISLISPGenericFunctionDispatchNodeGen.create();
     }
 
-    protected ISLISPDefGenericExecutionNode(ISLISPDefGenericExecutionNode other) {
-        super(other.getLanguage(ISLISPTruffleLanguage.class));
-        errorSignalerNode = new ISLISPErrorSignalerNode(this);
-        module = other.module;
-        name = other.name;
-        setf = other.setf;
-        sourceSection = other.sourceSection;
-        classOf = other.classOf;
-        classOfCall = other.classOfCall;
-        dispatchNode = other.dispatchNode;
-    }
-
     @Override
     public final Object execute(VirtualFrame frame) {
         if (genericFunctionDescriptor == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             genericFunctionDescriptor = ISLISPContext.get(this)
                     .lookupGenericFunctionDispatchTree(module, name.identityReference(), setf);
         }
@@ -113,7 +103,7 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
     Object doCached(
             LispClass[] classes,
             Object[] arguments,
-            @Cached(value = "classes", dimensions = 0) LispClass[] lastClasses,
+            @Cached(value = "classes", dimensions = 1) LispClass[] lastClasses,
             @Cached("getApplicableMethods(classes)") GenericMethodApplicableMethods applicableMethods
     ) {
         return dispatchNode.executeDispatch(applicableMethods, arguments);

@@ -18,7 +18,6 @@ public class ISLISPDefGenericNode extends ISLISPExpressionNode {
     private final int requiredArgsCount;
     private final boolean hasRest;
 
-    @Child
     private ISLISPDefGenericExecutionNode executionNode;
 
 
