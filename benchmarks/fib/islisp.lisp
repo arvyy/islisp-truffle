@@ -5,5 +5,5 @@
 
 (let ((n 0))
     (for ((i 0 (+ i 1)))
-         ((>= i 1000) (format (standard-output) "~A~%" n))
+         ((>= i 100) (format (standard-output) "~A~%" n))
       (setf n (+ n (fib 30)))))

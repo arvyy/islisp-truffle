@@ -109,6 +109,5 @@ http://www.hevanet.com/cristofd/brainfuck/]!
 )
 
 (do ((i 0 (+ i 1)))
-    ((> i 1000))
-  (format t "Run ~A~%" i)
+    ((> i 100))
   (do-main))

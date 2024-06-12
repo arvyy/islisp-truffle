@@ -115,6 +115,5 @@ http://www.hevanet.com/cristofd/brainfuck/]!
 )
 
 (for ((i 0 (+ i 1)))
-     ((> i 1000))
-  (format (standard-output) "Run ~A~%" i)
+     ((> i 100))
   (do-main))
