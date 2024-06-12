@@ -9,6 +9,9 @@ import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleSafepoint;
+import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.ReportPolymorphism;
+import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
@@ -20,7 +23,8 @@ import com.oracle.truffle.api.source.SourceSection;
  * Implements numeric adition function `+`.
  */
 @TypeSystemReference(ISLISPTypes.class)
-public class ISLISPAdd extends RootNode {
+@ReportPolymorphism
+public abstract class ISLISPAdd extends RootNode {
 
     @Override
     public boolean isCloningAllowed() {
@@ -49,8 +53,53 @@ public class ISLISPAdd extends RootNode {
             .createSection(1);
     }
 
-    @Override
-    public Object execute(VirtualFrame frame) {
+    @Specialization(
+        guards = { "isSingleNumber(frame)" }
+    )
+    Object doSingleNumber(VirtualFrame frame) {
+        return frame.getArguments()[1];
+    }
+
+    static boolean isSingleNumber(VirtualFrame frame) {
+        var args = frame.getArguments();
+        return args.length == 2 &&
+            (ISLISPTypesGen.isImplicitLispBigInteger(args[1])
+                || ISLISPTypesGen.isImplicitDouble(args[1]));
+    }
+
+    @Specialization(
+        rewriteOn = { ArithmeticException.class },
+        guards = { "isTwoInts(frame)" }
+    )
+    Object doTwoInts(VirtualFrame frame) {
+        var args = frame.getArguments();
+        return Math.addExact((int) args[1], (int) args[2]);
+    }
+
+    static boolean isTwoInts(VirtualFrame frame) {
+        var args = frame.getArguments();
+        return args.length == 3
+            && ISLISPTypesGen.isInteger(args[1])
+            && ISLISPTypesGen.isInteger(args[2]);
+    }
+
+    @Specialization(
+        guards = { "isTwoDoubles(frame)" }
+    )
+    Object doTwoDoubles(VirtualFrame frame) {
+        var args = frame.getArguments();
+        return ISLISPTypesGen.asImplicitDouble(args[1]) + ISLISPTypesGen.asImplicitDouble(args[2]);
+    }
+
+    static boolean isTwoDoubles(VirtualFrame frame) {
+        var args = frame.getArguments();
+        return args.length == 3
+            && ISLISPTypesGen.isImplicitDouble(args[1])
+            && ISLISPTypesGen.isImplicitDouble(args[2]);
+    }
+
+    @Fallback
+    Object doFallback(VirtualFrame frame) {
         int sum = 0;
         var args = frame.getArguments();
         var l = args.length;
@@ -122,7 +171,7 @@ public class ISLISPAdd extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(new ISLISPAdd(lang).getCallTarget());
+        return new LispFunction(ISLISPAddNodeGen.create(lang).getCallTarget());
     }
 
 }
