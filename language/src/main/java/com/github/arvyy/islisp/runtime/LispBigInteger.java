@@ -40,6 +40,16 @@ public record LispBigInteger(BigInteger data) implements TruffleObject {
     }
 
     /**
+     * Numeric negation.
+     *
+     * @return negated value
+     */
+    @CompilerDirectives.TruffleBoundary
+    public LispBigInteger negate() {
+        return new LispBigInteger(data.negate());
+    }
+
+    /**
      * Numeric multiplication of this node to other.
      *
      * @param other number

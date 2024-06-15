@@ -2,7 +2,7 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.profiles.ConditionProfile;
+import com.oracle.truffle.api.profiles.CountingConditionProfile;
 import com.oracle.truffle.api.source.SourceSection;
 
 /**
@@ -10,7 +10,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPIfNode extends ISLISPExpressionNode {
 
-    private final ConditionProfile conditionProfile;
+    private final CountingConditionProfile conditionProfile;
 
     @Child
     private ISLISPExpressionNode testExpr;
@@ -36,7 +36,7 @@ public class ISLISPIfNode extends ISLISPExpressionNode {
             SourceSection sourceSection
     ) {
         super(sourceSection);
-        conditionProfile = ConditionProfile.createCountingProfile();
+        conditionProfile = CountingConditionProfile.create();
         this.testExpr = testExpr;
         this.truthyExpr = truthyExpr;
         this.falsyExpr = falsyExpr;

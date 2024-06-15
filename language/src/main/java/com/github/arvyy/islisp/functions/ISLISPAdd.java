@@ -62,8 +62,8 @@ public abstract class ISLISPAdd extends RootNode {
 
     static boolean isSingleNumber(VirtualFrame frame) {
         var args = frame.getArguments();
-        return args.length == 2 &&
-            (ISLISPTypesGen.isImplicitLispBigInteger(args[1])
+        return args.length == 2
+            && (ISLISPTypesGen.isImplicitLispBigInteger(args[1])
                 || ISLISPTypesGen.isImplicitDouble(args[1]));
     }
 
