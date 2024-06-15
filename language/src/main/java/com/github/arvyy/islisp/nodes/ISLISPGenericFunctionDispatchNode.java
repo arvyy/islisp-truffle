@@ -26,7 +26,7 @@ public abstract class ISLISPGenericFunctionDispatchNode extends Node {
 
     @ExplodeLoop
     @Specialization(
-        guards = { "applicableMethodsArg.equals(applicableMethods)" }
+        guards = { "applicableMethodsEqual(applicableMethodsArg, applicableMethods)" }
     )
     Object doCached(
         GenericMethodApplicableMethods applicableMethodsArg,
@@ -65,6 +65,25 @@ public abstract class ISLISPGenericFunctionDispatchNode extends Node {
             }
             return result;
         }
+    }
+
+    boolean applicableMethodsEqual(GenericMethodApplicableMethods m1, GenericMethodApplicableMethods m2) {
+        return arraySliceEqual(m1.primaryMethods(), m2.primaryMethods())
+            && arraySliceEqual(m1.aroundMethods(), m2.aroundMethods())
+            && arraySliceEqual(m1.beforeMethods(), m2.beforeMethods())
+            && arraySliceEqual(m1.afterMethods(), m2.afterMethods());
+    }
+
+    boolean arraySliceEqual(ArraySlice s1, ArraySlice s2) {
+        if (s1.size() != s2.size()) {
+            return false;
+        }
+        for (var i = 0; i < s1.size(); i++) {
+            if (s1.get(i) != s2.get(i)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Specialization
