@@ -79,6 +79,7 @@ public class ISLISPContext {
      * @param module name
      * @return module instance, or null if not defined
      */
+    @CompilerDirectives.TruffleBoundary
     public ISLISPModule getModule(String module) {
         return modules.get(module);
     }
