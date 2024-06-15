@@ -53,7 +53,7 @@ public class ISLISPDefGenericNode extends ISLISPExpressionNode {
     public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         var descriptor = new GenericFunctionDescriptor(requiredArgsCount, hasRest);
-        var function = new LispFunction(null, executionNode.getCallTarget(), true);
+        var function = new LispFunction(null, executionNode.getCallTarget(), true, false);
         ctx.registerGenericFunction(module, name.identityReference(), setf, function, descriptor);
         return name;
     }

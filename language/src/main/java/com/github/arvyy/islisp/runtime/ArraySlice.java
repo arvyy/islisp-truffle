@@ -82,4 +82,28 @@ public record ArraySlice<T>(T[] els, int start, int end) {
         }
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ArraySlice o) {
+            if (end - start != o.end - o.start) {
+                return false;
+            }
+            for (var i = 0; i < end - start; i++) {
+                if (!get(i).equals(o.get(i))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        var arr = new Object[size()];
+        for (int i = 0; i < size(); i++) {
+            arr[i] = get(i);
+        }
+        return Arrays.hashCode(arr);
+    }
 }

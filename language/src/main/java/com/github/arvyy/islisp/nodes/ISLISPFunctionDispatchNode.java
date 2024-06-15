@@ -38,10 +38,10 @@ public abstract class ISLISPFunctionDispatchNode extends Node {
     @Specialization(guards = {
         "interopLibrary.isExecutable(o)"
     }, limit = "3")
-    Object doInterop(
+    Object doCached(
         Object o,
         Object[] args,
-        @CachedLibrary(limit = "3") InteropLibrary interopLibrary
+        @CachedLibrary("o") InteropLibrary interopLibrary
     ) {
         try {
             return interopLibrary.execute(o, args);
@@ -51,10 +51,19 @@ public abstract class ISLISPFunctionDispatchNode extends Node {
     }
 
     @Fallback
-    Object notAFunction(Object notAFunction, Object[] args) {
-        var ctx = ISLISPContext.get(this);
-        var functionClass = ctx.lookupClass("ROOT", ctx.namedSymbol("<function>").identityReference());
-        return errorSignalerNode.signalWrongType(notAFunction, functionClass);
+    Object doUncached(Object o, Object[] args) {
+        var interopLibrary = InteropLibrary.getUncached();
+        if (interopLibrary.isExecutable(o)) {
+            try {
+                return interopLibrary.execute(o, args);
+            } catch (UnsupportedMessageException | UnsupportedTypeException | ArityException e) {
+                return errorSignalerNode.signalTruffleInteropError(e);
+            }
+        } else {
+            var ctx = ISLISPContext.get(this);
+            var functionClass = ctx.lookupClass("ROOT", ctx.namedSymbol("<function>").identityReference());
+            return errorSignalerNode.signalWrongType(o, functionClass);
+        }
     }
 
 }

@@ -176,7 +176,12 @@ public abstract class ISLISPElt extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPEltNodeGen.create(lang).getCallTarget());
+        var callTarget = ISLISPEltNodeGen.create(lang).getCallTarget();
+        return new LispFunction(
+            new Closure(null, null, null),
+            callTarget,
+            false,
+            true);
     }
 
 }

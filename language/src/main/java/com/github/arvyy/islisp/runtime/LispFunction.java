@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.RootCallTarget;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.ReportPolymorphism;
@@ -20,16 +21,22 @@ import com.oracle.truffle.api.source.SourceSection;
  * @param closure necessary context to be passed when calling.
  * @param callTarget function implementation
  * @param isGeneric whether this is plain or generic function.
+ * @param inline whether this function should be inlined when called directly.
  */
 @ExportLibrary(InteropLibrary.class)
-public record LispFunction(Closure closure, RootCallTarget callTarget, boolean isGeneric) implements TruffleObject {
+public record LispFunction(
+    Closure closure,
+    CallTarget callTarget,
+    boolean isGeneric,
+    boolean inline
+) implements TruffleObject {
 
     /**
      * Create plain lisp function.
      * @param callTarget call target
      */
-    public LispFunction(RootCallTarget callTarget) {
-        this(new Closure(null, null, null), callTarget, false);
+    public LispFunction(CallTarget callTarget) {
+        this(new Closure(null, null, null), callTarget, false, false);
     }
 
     /**
@@ -37,8 +44,8 @@ public record LispFunction(Closure closure, RootCallTarget callTarget, boolean i
      * @param frame materialized closure frame
      * @param callTarget call target
      */
-    public LispFunction(MaterializedFrame frame, RootCallTarget callTarget) {
-        this(new Closure(frame, null, null), callTarget, false);
+    public LispFunction(MaterializedFrame frame, CallTarget callTarget) {
+        this(new Closure(frame, null, null), callTarget, false, false);
     }
 
     /**
@@ -48,8 +55,8 @@ public record LispFunction(Closure closure, RootCallTarget callTarget, boolean i
      * @param args initial invocation arguments
      * @param callTarget call target
      */
-    public LispFunction(GenericMethodApplicableMethods nextMethods, Object[] args, RootCallTarget callTarget) {
-        this(new Closure(null, nextMethods, args), callTarget, true);
+    public LispFunction(GenericMethodApplicableMethods nextMethods, Object[] args, CallTarget callTarget) {
+        this(new Closure(null, nextMethods, args), callTarget, true, false);
     }
 
     /**
@@ -57,18 +64,21 @@ public record LispFunction(Closure closure, RootCallTarget callTarget, boolean i
      * @param closure closure
      * @param callTarget call target
      */
-    public LispFunction(Closure closure, RootCallTarget callTarget) {
-        this(closure, callTarget, false);
+    public LispFunction(Closure closure, CallTarget callTarget) {
+        this(closure, callTarget, false, false);
     }
 
     @ExportMessage
     boolean hasSourceLocation() {
-        return true;
+        return callTarget instanceof RootCallTarget;
     }
 
     @ExportMessage
     SourceSection getSourceLocation() {
-        return callTarget.getRootNode().getSourceSection();
+        if (callTarget instanceof RootCallTarget r) {
+            return r.getRootNode().getSourceSection();
+        }
+        return null;
     }
 
     @ExportMessage
@@ -84,12 +94,25 @@ public record LispFunction(Closure closure, RootCallTarget callTarget, boolean i
         static Object doDirect(
             LispFunction function,
             Object[] args,
-            @Cached("function.callTarget()") RootCallTarget prevCallTarget,
-            @Cached("create(function.callTarget())") DirectCallNode callNode) {
+            @Cached("function.callTarget()") CallTarget prevCallTarget,
+            @Cached("createDirectCallNode(function)") DirectCallNode callNode) {
             var realArgs = new Object[args.length + 1];
             realArgs[0] = function.closure();
             System.arraycopy(args, 0, realArgs, 1, args.length);
             return callNode.call(realArgs);
+        }
+
+        static DirectCallNode createDirectCallNode(LispFunction fun) {
+            var node = DirectCallNode.create(fun.callTarget());
+            // generic calls have good chance that they're only used with same
+            // type on call site (probably)
+            if (fun.isGeneric) {
+                node.cloneCallTarget();
+            }
+            if (fun.inline) {
+                node.forceInlining();
+            }
+            return node;
         }
 
         @ExplodeLoop

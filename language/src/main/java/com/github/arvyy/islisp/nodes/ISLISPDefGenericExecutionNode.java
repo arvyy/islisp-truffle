@@ -7,6 +7,7 @@ import com.github.arvyy.islisp.runtime.GenericFunctionDescriptor;
 import com.github.arvyy.islisp.runtime.GenericMethodApplicableMethods;
 import com.github.arvyy.islisp.runtime.LispClass;
 import com.github.arvyy.islisp.runtime.Symbol;
+import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Cached;
@@ -98,12 +99,13 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
 
     @Specialization(
             guards = "classesEqual(classes, lastClasses)",
-            assumptions = "genericFunctionDescriptor.getAssumption()")
+            assumptions = "genericFunctionDidntChange")
     Object doCached(
-            LispClass[] classes,
-            Object[] arguments,
-            @Cached(value = "classes", dimensions = 1) LispClass[] lastClasses,
-            @Cached("getApplicableMethods(classes)") GenericMethodApplicableMethods applicableMethods
+        LispClass[] classes,
+        Object[] arguments,
+        @Cached(value = "classes", dimensions = 1) LispClass[] lastClasses,
+        @Cached("getApplicableMethods(classes)") GenericMethodApplicableMethods applicableMethods,
+        @Cached("genericFunctionDescriptor.getAssumption()") Assumption genericFunctionDidntChange
     ) {
         return dispatchNode.executeDispatch(applicableMethods, arguments);
     }
