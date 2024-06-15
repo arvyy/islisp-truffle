@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPTypes;
+import com.github.arvyy.islisp.runtime.Closure;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -101,7 +102,11 @@ public abstract class ISLISPNumericGt extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPNumericGtNodeGen.create(lang).getCallTarget());
+        var callTarget = ISLISPNumericGtNodeGen.create(lang).getCallTarget();
+        return new LispFunction(new Closure(null, null, null),
+            callTarget,
+            false,
+            true);
     }
 
 }

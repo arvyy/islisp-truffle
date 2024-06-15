@@ -203,27 +203,35 @@
 (defun reciprocal (arg)
   (quotient 1.0 arg))
 
+(declaim (inline /=))
 (defun /= (x1 x2)
   (not (= x1 x2)))
 
+(declaim (inline >=))
 (defun >= (x1 x2)
   (or (> x1 x2) (= x1 x2)))
 
+(declaim (inline <))
 (defun < (x1 x2)
   (> x2 x1))
 
+(declaim (inline <=))
 (defun <= (x1 x2)
   (or (< x1 x2) (= x1 x2)))
 
+(declaim (inline char/=))
 (defun char/= (x1 x2)
   (not (char= x1 x2)))
 
+(declaim (inline char>=))
 (defun char>= (x1 x2)
   (or (char> x1 x2) (char= x1 x2)))
 
+(declaim (inline char>))
 (defun char> (x1 x2)
   (char< x2 x1))
 
+(declaim (inline char<=))
 (defun char<= (x1 x2)
   (or (char< x1 x2) (char= x1 x2)))
 
@@ -248,58 +256,76 @@
           (if (char/= (elt s1 i) (elt s2 i))
             (return-from string= nil))))))
 
+(declaim (inline string>))
 (defun string> (s1 s2)
   (string< s2 s1))
 
+(declaim (inline string>=))
 (defun string>= (s1 s2)
   (or (string> s1 s2) (string= s1 s2)))
 
+(declaim (inline string<=))
 (defun string<= (s1 s2)
   (or (string< s1 s2) (string= s1 s2)))
 
+(declaim (inline string/=))
 (defun string/= (s1 s2)
   (not (string= s1 s2)))
 
+(declaim (inline abs))
 (defun abs (x)
   (if (< x 0)
       (- x)
       x))
 
+(declaim (inline numberp))
 (defun numberp (obj)
   (instancep obj (class <number>)))
 
+(declaim (inline integerp))
 (defun integerp (obj)
   (instancep obj (class <integer>)))
 
+(declaim (inline characterp))
 (defun characterp (obj)
   (instancep obj (class <character>)))
 
+(declaim (inline consp))
 (defun consp (obj)
   (instancep obj (class <cons>)))
 
+(declaim (inline basic-array-p))
 (defun basic-array-p (obj)
   (instancep obj (class <basic-array>)))
 
+(declaim (inline basic-array*-p))
 (defun basic-array*-p (obj)
   (instancep obj (class <basic-array*>)))
 
+(declaim (inline general-array*-p))
 (defun general-array*-p (obj)
   (instancep obj (class <general-array*>)))
 
+(declaim (inline general-vector-p))
 (defun general-vector-p (obj)
   (instancep obj (class <general-vector>)))
 
+(declaim (inline streamp))
 (defun streamp (obj)
   (instancep obj (class <stream>)))
 
+(declaim (inline truffle-object-p))
 (defun truffle-object-p (obj)
   (instancep obj (class <truffle-object>)))
 
+(declaim (inline identity))
 (defun identity (obj) obj)
 
+(declaim (inline not))
 (defun not (obj)
   (if obj nil t))
 
+(declaim (inline null))
 (defun null (obj)
   (if obj nil t))
 
@@ -317,6 +343,7 @@
         (reversed () (cons (car list) reversed)))
        ((not list) reversed)))
 
+(declaim (inline nreverse))
 (defun nreverse (list)
   (reverse list))
 

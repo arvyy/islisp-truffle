@@ -5,6 +5,10 @@ Given that this is ISLISP implementation, primary reference is the http://www.is
 
 == Extensions
 
+=== Declaim
+
+Functions can be marked for inlining using `(declaim (inline _symbol..._))` form.
+
 === File operation extensions
 
 Following extra functions are provided to complement standard file / stream api.

@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
+import com.github.arvyy.islisp.runtime.Closure;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -34,7 +35,12 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
-        ctx.registerFunction(module, name.identityReference(), new LispFunction(functionNode.getCallTarget()));
+        var fun = new LispFunction(
+            new Closure(null, null, null),
+            functionNode.getCallTarget(),
+            false,
+            ctx.getModule(module).shouldInline(name.identityReference()));
+        ctx.registerFunction(module, name.identityReference(), fun);
         return name;
     }
 

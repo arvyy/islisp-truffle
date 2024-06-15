@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.runtime;
 
 import com.github.arvyy.islisp.SetfTransformer;
+import com.github.arvyy.islisp.parser.Declaration;
 import com.oracle.truffle.api.CompilerDirectives;
 
 import java.util.*;
@@ -21,6 +22,7 @@ public class ISLISPModule {
     private final Map<SymbolReference, ValueReference> dynamicVars;
     private final Map<SymbolReference, ValueReference> globalVars;
     private final Map<SymbolReference, SetfTransformer> setfTransformers;
+    private final List<Declaration> declarations;
 
     /**
      * Create empty module.
@@ -37,6 +39,7 @@ public class ISLISPModule {
         classes = new HashMap<>();
         setfTransformers = new HashMap<>();
         globalVars = new HashMap<>();
+        declarations = new ArrayList<>();
     }
 
     /**
@@ -340,4 +343,31 @@ public class ISLISPModule {
         return null;
     }
 
+    /**
+     * Add list of declarations.
+     *
+     * @param decls list of declarations
+     */
+    @CompilerDirectives.TruffleBoundary
+    public void addDeclarations(List<Declaration> decls) {
+        declarations.addAll(decls);
+    }
+
+    /**
+     * Check if given symbol had declarations for being inlined.
+     *
+     * @param symbolReference symbol for a function name
+     * @return if definition for the function should mark it as inlined.
+     */
+    @CompilerDirectives.TruffleBoundary
+    public boolean shouldInline(SymbolReference symbolReference) {
+        for (var decl: declarations) {
+            if (decl instanceof Declaration.Inline inline) {
+                if (inline.name().equals(symbolReference)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

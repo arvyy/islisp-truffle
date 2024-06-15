@@ -184,6 +184,7 @@ public class Parser {
             }
             // builtins
             switch (carName) {
+                // standard
                 case "assure":
                 case "the":
                     return parseAssureNode(parserContext, sexpr);
@@ -273,6 +274,10 @@ public class Parser {
                     return parseWithStandardInput(parserContext, sexpr);
                 case "with-standard-output":
                     return parseWithStandardOutput(parserContext, sexpr);
+
+                // custom
+                case "declaim":
+                    return parseDeclaim(parserContext, sexpr);
 
                 default:
             }
@@ -1347,6 +1352,21 @@ public class Parser {
             cleanups[i] = parseExpressionNode(parserContext, args.get(i + 2));
         }
         return new ISLISPUnwindProtectNode(body, cleanups, source(sexpr));
+    }
+
+    ISLISPDeclaimNode parseDeclaim(ParserContext context, Object sexpr) {
+        var lst = new ArrayList<Declaration>();
+        var args = requireList(sexpr, 1, -1);
+        for (var arg: args.subList(1, args.size())) {
+            var declarationSexpr = requireList(arg, 1, -1);
+            if (declarationSexpr.get(0) instanceof Symbol s && s.name().equalsIgnoreCase("inline")) {
+                for (int i = 1; i < declarationSexpr.size(); i++) {
+                    var symbolRef = downcast(declarationSexpr.get(i), Symbol.class).identityReference();
+                    lst.add(new Declaration.Inline(symbolRef));
+                }
+            }
+        }
+        return new ISLISPDeclaimNode(context.module, lst, source(sexpr));
     }
 
     <T> T downcast(Object value, Class<T> clazz) throws ParsingException {
