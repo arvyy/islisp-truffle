@@ -12,6 +12,7 @@ import com.oracle.truffle.api.instrumentation.GenerateWrapper;
 import com.oracle.truffle.api.instrumentation.ProbeNode;
 import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.instrumentation.Tag;
+import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.source.SourceSection;
 
 /**
@@ -32,6 +33,9 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
 
     @Child
     private ISLISPErrorSignalerNode errorSignalerNode;
+
+    @Children
+    private ISLISPFrameSetter[] namedArgumentSetters;
 
     private final int[] namedArgumentSlots;
     private final int restArgumentsSlot;
@@ -73,6 +77,10 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
         if (callNextMethodSlot >= 0) {
             callNextMethod = new ISLISPCallNextMethod(language);
         }
+        namedArgumentSetters = new ISLISPFrameSetter[namedArgumentSlots.length];
+        for (int i = 0; i < namedArgumentSetters.length; i++) {
+            namedArgumentSetters[i] = ISLISPFrameSetterNodeGen.create();
+        }
     }
 
     protected ISLISPUserDefinedFunctionNode() {
@@ -101,11 +109,7 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
             var closure = (Closure) frame.getArguments()[0];
             frame.setObject(hasNextMethodSlot, new LispFunction(closure, hasNextMethod.getCallTarget()));
         }
-        for (var i = 0; i < namedArgumentSlots.length; i++) {
-            int slot = namedArgumentSlots[i];
-            var arg = frame.getArguments()[i + 1];
-            frame.setObject(slot, arg);
-        }
+        initNamedArgumentSlots(frame);
         if (hasRest) {
             Object value = ISLISPContext.get(this).getNil();
             for (int i = frame.getArguments().length - 1; i >= namedArgumentSlots.length + 1; i--) {
@@ -114,6 +118,15 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
             frame.setObject(restArgumentsSlot, value);
         }
         return body.executeGeneric(frame);
+    }
+
+    @ExplodeLoop
+    private void initNamedArgumentSlots(VirtualFrame frame) {
+        for (var i = 0; i < namedArgumentSlots.length; i++) {
+            int slot = namedArgumentSlots[i];
+            var arg = frame.getArguments()[i + 1];
+            namedArgumentSetters[i].execute(frame, arg, slot);
+        }
     }
 
     @Override

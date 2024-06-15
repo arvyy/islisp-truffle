@@ -5,14 +5,11 @@ import com.github.arvyy.islisp.runtime.Closure;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.ValueReference;
 import com.oracle.truffle.api.CompilerDirectives;
-import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.instrumentation.Tag;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
-import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.source.SourceSection;
 
 /**
@@ -37,7 +34,7 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
     ISLISPErrorSignalerNode errorSignalerNode;
 
     @Child
-    FrameSetter frameSetter;
+    ISLISPFrameSetter frameSetter;
 
     /**
      * Create setq node for the global variable.
@@ -79,7 +76,7 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
         this.frameIndex = frameIndex;
         this.frameSlot = frameSlot;
         this.expression = expression;
-        frameSetter = ISLISPSetqNodeFactory.FrameSetterNodeGen.create();
+        frameSetter = ISLISPFrameSetterNodeGen.create();
     }
 
     @Override
@@ -111,33 +108,6 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
             return true;
         }
         return super.hasTag(tag);
-    }
-
-    @TypeSystemReference(ISLISPTypes.class)
-    abstract static class FrameSetter extends Node {
-
-        abstract Object execute(Frame frame, Object value, int slot);
-
-        @Specialization(limit = "1")
-        int doInt(Frame frame, int value, int slot) {
-            frame.setInt(slot, value);
-            return value;
-        }
-
-        @Specialization(limit = "1")
-        double doDouble(Frame frame, double value, int slot) {
-            frame.setDouble(slot, value);
-            return value;
-        }
-
-        @Specialization(replaces = {
-            "doInt", "doDouble"
-        })
-        Object doObject(Frame frame, Object value, int slot) {
-            frame.setObject(slot, value);
-            return value;
-        }
-
     }
 
 }

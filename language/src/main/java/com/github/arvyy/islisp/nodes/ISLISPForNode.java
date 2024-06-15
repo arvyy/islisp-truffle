@@ -53,6 +53,10 @@ public class ISLISPForNode extends ISLISPExpressionNode {
         repeatNode.variableStepExpressions = variableStepExpressions;
         repeatNode.body = body;
         repeatNode.testExpression = testExpression;
+        repeatNode.frameSetters = new ISLISPFrameSetter[variableInitializers.length];
+        for (int i = 0; i < repeatNode.frameSetters.length; i++) {
+            repeatNode.frameSetters[i] = ISLISPFrameSetterNodeGen.create();
+        }
         loopNode = Truffle.getRuntime().createLoopNode(repeatNode);
     }
 
@@ -84,6 +88,9 @@ public class ISLISPForNode extends ISLISPExpressionNode {
         ISLISPExpressionNode[] variableStepExpressions;
 
         @Children
+        ISLISPFrameSetter[] frameSetters;
+
+        @Children
         ISLISPExpressionNode[] body;
 
         @Child
@@ -102,7 +109,7 @@ public class ISLISPForNode extends ISLISPExpressionNode {
         @ExplodeLoop
         void initVariableSlots(VirtualFrame frame) {
             for (int i = 0; i < variableSlots.length; i++) {
-                frame.setObject(variableSlots[i], variableInitializers[i].executeGeneric(frame));
+                frameSetters[i].execute(frame, variableInitializers[i].executeGeneric(frame), variableSlots[i]);
             }
         }
 
@@ -115,7 +122,7 @@ public class ISLISPForNode extends ISLISPExpressionNode {
                 newValues[i] = variableStepExpressions[i].executeGeneric(frame);
             }
             for (int i = 0; i < variableSlots.length; i++) {
-                frame.setObject(variableSlots[i], newValues[i]);
+                frameSetters[i].execute(frame, newValues[i], variableSlots[i]);
             }
         }
     }

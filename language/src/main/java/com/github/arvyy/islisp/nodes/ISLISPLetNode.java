@@ -16,6 +16,9 @@ public class ISLISPLetNode extends ISLISPExpressionNode {
     ISLISPExpressionNode[] variableInitializers;
 
     @Children
+    ISLISPFrameSetter[] frameSetters;
+
+    @Children
     ISLISPExpressionNode[] body;
 
     /**
@@ -36,13 +39,17 @@ public class ISLISPLetNode extends ISLISPExpressionNode {
         this.variableSlots = variableSlots;
         this.variableInitializers = variableInitializers;
         this.body = body;
+        frameSetters = new ISLISPFrameSetter[variableSlots.length];
+        for (int i = 0; i < frameSetters.length; i++) {
+            frameSetters[i] = ISLISPFrameSetterNodeGen.create();
+        }
     }
 
     @Override
     @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
         for (int i = 0; i < variableSlots.length; i++) {
-            frame.setObject(variableSlots[i], variableInitializers[i].executeGeneric(frame));
+            frameSetters[i].execute(frame, variableInitializers[i].executeGeneric(frame), variableSlots[i]);
         }
         if (body.length == 0) {
             return ISLISPContext.get(this).getNil();
