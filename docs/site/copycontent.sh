@@ -7,3 +7,6 @@ for doc in *.adoc ; do
     cat $doc >> site/content/$doc
   fi
 done
+
+mkdir site/static/benchmarks
+cp -r images site/static/benchmarks/images

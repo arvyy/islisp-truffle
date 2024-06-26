@@ -1,8 +1,17 @@
 export ISLISP="sh islisp.sh"
+SBCL_NAME="$(sbcl --noinform --non-interactive --eval '(format t "~A ~A~%" (lisp-implementation-type) (lisp-implementation-version))')"
+ISLISP_NAME="ISLISP $(git rev-parse --short HEAD)"
 
-export SBCL_NAME="$(sbcl --noinform --non-interactive --eval '(format t "~A ~A~%" (lisp-implementation-type) (lisp-implementation-version))')"
-export ISLISP_NAME="ISLISP $(git rev-parse --short HEAD)"
+function run_benchmark() {
+  #hyperfine "sbcl --script src/$1/cl.lisp" "\$ISLISP src/$1/islisp.lisp" \
+  #  --runs 3 \
+  #  --export-json results/$1.json \
+  #  -n "$SBCL_NAME" \
+  #  -n "$ISLISP_NAME"
 
-hyperfine 'sbcl --script fib/cl.lisp' '$ISLISP fib/islisp.lisp' --runs 3 --export-json fib.json -n "$SBCL_NAME" -n "$ISLISP_NAME"
-hyperfine 'sbcl --script bf/cl.lisp' '$ISLISP bf/islisp.lisp' --runs 3 --export-json bf.json -n "$SBCL_NAME" -n "$ISLISP_NAME"
-hyperfine 'sbcl --script dyndispatch/cl.lisp' '$ISLISP dyndispatch/islisp.lisp' --runs 3 --export-json dyndispatch.json -n "$SBCL_NAME" -n "$ISLISP_NAME"
+  node svggenerator/dist/index.js results/$1.json ../docs/images/$1.svg
+}
+
+run_benchmark fib
+run_benchmark bf
+run_benchmark dyndispatch
