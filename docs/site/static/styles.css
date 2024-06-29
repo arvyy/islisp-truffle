@@ -184,11 +184,18 @@ html, body {
 nav {
     max-width: 960px;
     margin: auto;
+    display: flex;
+    justify-content: center;
 }
 
 .nav-list {
+    padding: 15px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border: solid 2px var(--heading-color);
+    border-top: none;
+    background-color: var(--bg-color);
     display: flex;
-    flex-direction: columns;
 }
 
 .nav-list__item::before {

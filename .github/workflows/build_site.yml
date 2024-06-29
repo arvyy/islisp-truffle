@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/build_site.yml'
       - 'docs/**'
+      - 'bebchmarks/results/*'
 jobs:
   build_site:
     runs-on: ubuntu-latest

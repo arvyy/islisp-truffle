@@ -39,7 +39,7 @@
 (defun do-main ()
   (let ((result 0))
     (for ((i 0 (+ i 1)))
-         ((> i 50) (format (standard-output) "Result: ~A~%" result))
+         ((> i 500) (format (standard-output) "Result: ~A~%" result))
       (setf result (+ result (fold biglist 0 (lambda (a b) (add a b)))))
       (setf result (+ result (fold bigvec 0 (lambda (a b) (add a b)))))
       (setf result (+ result (length (fold bigvec-strings "" (lambda (a b) (add a b))))))

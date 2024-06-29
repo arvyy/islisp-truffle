@@ -91,6 +91,7 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
             return frameSetter.execute(f, value, frameSlot);
         } else {
             if (valueReference == null) {
+                CompilerDirectives.transferToInterpreterAndInvalidate();
                 valueReference = ISLISPContext.get(this).lookupGlobalVar(module, name.identityReference());
             }
             if (valueReference.isReadOnly()) {

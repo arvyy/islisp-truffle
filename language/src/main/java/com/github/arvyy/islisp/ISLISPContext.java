@@ -650,6 +650,7 @@ public class ISLISPContext {
      */
     public Symbol getNil() {
         if (nil == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             nil = namedSymbol("nil");
         }
         return nil;
@@ -662,6 +663,7 @@ public class ISLISPContext {
      */
     public Symbol getT() {
         if (t == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             t = namedSymbol("t");
         }
         return t;

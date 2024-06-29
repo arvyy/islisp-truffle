@@ -1,4 +1,4 @@
-baseUrl = '/islisp-truffle'
+baseUrl = 'https://arvyy.github.io/islisp-truffle/'
 languageCode = 'en-us'
 title = 'ISLISP Truffle'
 ignoreFiles = [ "_frontmatter/*" ]

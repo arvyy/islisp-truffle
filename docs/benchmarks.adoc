@@ -1,0 +1,23 @@
+= Benchmarks
+
+Benchmarks are compared against SBCL and CCL Common-Lisp implementations. ISLISP code is straightforward to transpose to CL, the risk that benchmarks compare different code is minimal.
+
+The sourcecode of benchmarks can be found under `/benchmarks/src` directory in the source repository.
+
+== Fibonacci numbers
+
+The classic. Computes (fib 30) for 1000 times; measured in seconds.
+
+image::images/fib.svg[]
+
+== Brainfuck interpreter
+
+Runs brainfuck interpreter, which interprets a brainfuck interpreter, which computes squares of numbers from 1 to 4; measured in seconds.
+
+image::images/bf.svg[]
+
+== Dyhnamic dispatch
+
+Runs some adhoc generic methods, dynamically dispatching on iteration logic and fold logic; measured in seconds.
+
+image::images/dyndispatch.svg[]

@@ -38,6 +38,7 @@ public class ISLISPGlobalIdentifierNode extends ISLISPExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         if (valueReference == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             valueReference = ISLISPContext.get(this).lookupGlobalVar(module, name.identityReference());
             if (valueReference == null) {
                 return errorSignalerNode.signalUnboundVariable(name);
