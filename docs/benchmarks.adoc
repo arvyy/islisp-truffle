@@ -1,10 +1,12 @@
 = Benchmarks
 
-Benchmarks are mostly compared against Common Lisp implementations. CL has both more mature implementations, and it's also straight forward to transpose ISLISP code to CL quite directly
+Benchmarks are compared against SBCL and CCL Common-Lisp implementations. ISLISP code is straightforward to transpose to CL, the risk that benchmarks compare different code is minimal.
+
+The sourcecode of benchmarks can be found under `/benchmarks/src` directory in the source repository.
 
 == Fibonacci numbers
 
-Absolute classic, how could one go without it? Computes (fib 30) for 1000 times; measured in seconds.
+The classic. Computes (fib 30) for 1000 times; measured in seconds.
 
 image::images/fib.svg[]
 
