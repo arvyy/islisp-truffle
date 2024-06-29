@@ -5,7 +5,7 @@
        (result init (funcall reducer result (car list))))
       ((null list) result)))
 
-(defmethod fold ((collection simple-vector) init reducer)
+(defmethod fold ((collection vector) init reducer)
   (do ((i 0 (+ i 1))
        (result init (funcall reducer result (elt collection i))))
       ((>= i (length collection)) result)))
@@ -29,14 +29,14 @@
         ((>= i (length vec)) vec)
       (setf (elt vec i) i))))
 
-(defglobal biglist (iota 1000))
-(defglobal bigvec (iota-vector 1000))
-(defglobal bigvec-strings (make-array 1000 :initial-element "a"))
+(defconstant biglist (iota 1000))
+(defconstant bigvec (iota-vector 1000))
+(defconstant bigvec-strings (make-array 1000 :initial-element "a"))
 
 (defun do-main ()
   (let ((result 0))
     (do ((i 0 (+ i 1)))
-        ((> i 50) (format t "Result: ~A~%" result))
+        ((> i 500) (format t "Result: ~A~%" result))
       (setf result (+ result (fold biglist 0 (lambda (a b) (add a b)))))
       (setf result (+ result (fold bigvec 0 (lambda (a b) (add a b)))))
       (setf result (+ result (length (fold bigvec-strings "" (lambda (a b) (add a b))))))

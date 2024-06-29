@@ -4,7 +4,7 @@ import * as d3_chromatic from 'd3-scale-chromatic';
 import * as fs from 'node:fs';
 
 const PADDING = 50;
-const WIDTH = 400;
+const WIDTH = 600;
 const HEIGHT = 400;
 const BG_COLOR = '#151515';
 const AXIS_COLOR = '#aaaaaa';
@@ -63,7 +63,8 @@ const colorScale = d3.scaleSequential()
 
 const valueScale = d3.scaleLinear()
     .domain([0, d3.max(data.results.map(r => r.mean))])
-    .range([HEIGHT - PADDING, PADDING]);
+    .range([HEIGHT - PADDING, PADDING])
+    .nice();
 svg.append('g')
     .classed('y-axis', true)
     .attr('transform', `translate(${PADDING}, 0)`)
