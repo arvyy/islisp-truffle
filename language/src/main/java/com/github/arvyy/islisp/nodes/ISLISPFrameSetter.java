@@ -33,9 +33,7 @@ public abstract class ISLISPFrameSetter extends Node {
         return value;
     }
 
-    @Specialization(replaces = {
-        "doInt", "doDouble"
-    })
+    @Specialization(limit = "1")
     Object doObject(Frame frame, Object value, int slot) {
         frame.setObject(slot, value);
         return value;

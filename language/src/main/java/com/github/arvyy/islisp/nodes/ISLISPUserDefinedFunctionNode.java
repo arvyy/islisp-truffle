@@ -6,6 +6,7 @@ import com.github.arvyy.islisp.functions.ISLISPHasNextMethod;
 import com.github.arvyy.islisp.runtime.Closure;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Pair;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.GenerateWrapper;
@@ -37,6 +38,7 @@ public class ISLISPUserDefinedFunctionNode extends ISLISPExpressionNode {
     @Children
     private ISLISPFrameSetter[] namedArgumentSetters;
 
+    @CompilerDirectives.CompilationFinal(dimensions = 1)
     private final int[] namedArgumentSlots;
     private final int restArgumentsSlot;
 

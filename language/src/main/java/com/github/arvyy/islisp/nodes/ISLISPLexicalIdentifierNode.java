@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.runtime.Closure;
+import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -72,7 +73,12 @@ public class ISLISPLexicalIdentifierNode extends ISLISPExpressionNode {
             return frame.getDouble(slot);
         }
 
-        @Specialization(replaces = { "getInt", "getDouble" })
+        @Specialization(limit = "1", guards = "frame.isObject(slot)")
+        Object getObject(Frame frame, int slot) {
+            return frame.getObject(slot);
+        }
+
+        @Fallback
         Object getValue(Frame frame, int slot) {
             return frame.getValue(slot);
         }
