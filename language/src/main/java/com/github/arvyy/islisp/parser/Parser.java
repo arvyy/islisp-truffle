@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class Parser {
 
     private final Set<String> moduleLoadInProgress;
-    private final Map<EqWrapper, SourceSection> sourceSectionMap;
+    private final Map<EqWrapper<Pair>, SourceSection> sourceSectionMap;
 
     /**
      * Create parser.

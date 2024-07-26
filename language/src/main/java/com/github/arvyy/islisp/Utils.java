@@ -2,6 +2,7 @@ package com.github.arvyy.islisp;
 
 import com.github.arvyy.islisp.runtime.Pair;
 import com.github.arvyy.islisp.runtime.Symbol;
+import com.oracle.truffle.api.nodes.ControlFlowException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +17,7 @@ public final class Utils {
     /**
      * Exception signalling given object wasn't a list.
      */
-    public static class NotAList extends Exception {
-        @Override
-        public synchronized Throwable fillInStackTrace() {
-            return this;
-        }
+    public static class NotAList extends ControlFlowException {
     }
 
     /**

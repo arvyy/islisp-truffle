@@ -30,3 +30,7 @@ Expected 1 args; received 2
 
 Attempted to change immutable binding shouldbeimmutable
     at stacktrace.lisp:104
+
+Error with value: test
+    at islispprelude.lisp:71
+    at stacktrace.lisp:114

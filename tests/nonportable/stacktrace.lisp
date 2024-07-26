@@ -105,5 +105,15 @@
         (print "FAIL")))
 (print "")
 
+;;;;; plain `error` call
+(block exit
+    (with-handler
+        (lambda (condition)
+            (report-condition condition (standard-output))
+            (return-from exit nil))
+        (error "Error with value: ~A" "test")
+        (print "FAIL")))
+(print "")
+
 
 (finish-output (standard-output))

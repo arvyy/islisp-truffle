@@ -65,7 +65,7 @@
 
 (defclass <simple-error> (<error>)
     ((format-string :reader simple-error-format-string :initarg format-string)
-     (format-arguments :reader simple-error-format-arguments :initarg simple-error-format-arguments)))
+     (format-arguments :reader simple-error-format-arguments :initarg format-arguments)))
 
 (defun error (error-string :rest obj)
     (signal-condition
@@ -182,6 +182,11 @@
 
 (defmethod report-condition ((condition <immutable-binding-error>) (stream <stream>))
     (format stream "Attempted to change immutable binding ~A~%" (immutable-binding-name condition))
+    (print-stacktrace stream condition))
+
+(defmethod report-condition ((condition <simple-error>) (stream <stream>))
+    (apply #'format stream (simple-error-format-string condition) (simple-error-format-arguments condition))
+    (format-char stream #\newline)
     (print-stacktrace stream condition))
 
 (defun min (first :rest xs)

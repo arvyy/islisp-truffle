@@ -24,7 +24,7 @@ public class Reader {
 
     private final Lexer lexer;
     private final Source source;
-    private final Map<EqWrapper, SourceSection> sourceSectionMap;
+    private final Map<EqWrapper<Pair>, SourceSection> sourceSectionMap;
     private TokenWithSource peekedToken;
 
     private TokenWithSource lastToken;
@@ -36,7 +36,7 @@ public class Reader {
      * @param sourceSectionMap map to populate with source location information while reading
      */
     @CompilerDirectives.TruffleBoundary
-    public Reader(Source source, Map<EqWrapper, SourceSection> sourceSectionMap) {
+    public Reader(Source source, Map<EqWrapper<Pair>, SourceSection> sourceSectionMap) {
         this.source = source;
         BufferedReader bufferedReader;
         if (source.getReader() instanceof BufferedReader br) {
@@ -156,11 +156,7 @@ public class Reader {
         if (t instanceof Token.IdentifierToken) {
             var identifier = ((Token.IdentifierToken) t).identifier();
             var symbol = ISLISPContext.get(null).namedSymbol(identifier);
-            var symbolWithSource = new Symbol(symbol.name(), symbol.identityReference());
-            if (source != null) {
-                sourceSectionMap.put(new EqWrapper(symbolWithSource), section());
-            }
-            return Optional.of(symbolWithSource);
+            return Optional.of(symbol);
         }
         if (t instanceof Token.ExactNumberToken) {
             var value = ((Token.ExactNumberToken) t).value();
@@ -198,7 +194,7 @@ public class Reader {
             var nil = ISLISPContext.get(null).getNil();
             SourceSection fullSection = null;
             if (source != null) {
-                var endSection = sourceSectionMap.get(new EqWrapper(value));
+                var endSection = section();
                 if (quoteSection != null && endSection != null) {
                     fullSection = source.createSection(
                         quoteSection.getStartLine(),
@@ -212,34 +208,18 @@ public class Reader {
                 new Pair(
                     value,
                     nil));
-            sourceSectionMap.put(new EqWrapper(result), fullSection);
+            sourceSectionMap.put(new EqWrapper<>(result), fullSection);
             return Optional.of(result);
         }
         if (t instanceof Token.ArrayBracketOpenToken arr && arr.dimensions() > 1) {
-            var startLine = getLine();
-            var startColumn = getColumn();
             var content = readArrayContent(arr.dimensions());
             var array = new LispArray(content, arr.dimensions());
-            var endLine = getLine();
-            var endColumn = getColumn();
-            if (source != null) {
-                var section = source.createSection(startLine, startColumn, endLine, endColumn);
-                sourceSectionMap.put(new EqWrapper(array), section);
-            }
             return Optional.of(array);
         }
         if (t instanceof Token.VectorBracketOpenToken
             || (t instanceof Token.ArrayBracketOpenToken arr && arr.dimensions() == 1)
         ) {
-            var startLine = getLine();
-            var startColumn = getColumn();
             var vec = new LispVector(readUntilClosingBracket());
-            var endLine = getLine();
-            var endColumn = getColumn();
-            if (source != null) {
-                var section = source.createSection(startLine, startColumn, endLine, endColumn);
-                sourceSectionMap.put(new EqWrapper(vec), section);
-            }
             return Optional.of(vec);
         }
         if (t instanceof Token.BracketOpenToken) {
@@ -272,12 +252,7 @@ public class Reader {
                     var endColumn = getColumn();
                     if (lst.isEmpty()) {
                         var nil = ISLISPContext.get(null).getNil();
-                        var nilWithPos = new Symbol(nil.name(), nil.identityReference());
-                        if (source != null) {
-                            var section = source.createSection(startLine, startColumn, endLine, endColumn);
-                            sourceSectionMap.put(new EqWrapper(nilWithPos), section);
-                        }
-                        return Optional.of(nilWithPos);
+                        return Optional.of(nil);
                     } else {
                         tail = tail == null ? ISLISPContext.get(null).getNil() : tail;
                         for (var i = lst.size() - 1; i >= 0; i--) {
@@ -286,7 +261,7 @@ public class Reader {
                         var parsedTail = (Pair) tail;
                         if (source != null) {
                             var section = source.createSection(startLine, startColumn, endLine, endColumn);
-                            sourceSectionMap.put(new EqWrapper(parsedTail), section);
+                            sourceSectionMap.put(new EqWrapper<>(parsedTail), section);
                         }
                         return Optional.of(parsedTail);
                     }
@@ -304,9 +279,6 @@ public class Reader {
         }
         if (t instanceof Token.CharToken c) {
             var lispChar = new LispChar(c.value());
-            if (source != null) {
-                sourceSectionMap.put(new EqWrapper(lispChar), section());
-            }
             return Optional.of(lispChar);
         }
         if (t instanceof Token.StringToken str) {
