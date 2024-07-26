@@ -101,10 +101,10 @@ public abstract class ISLISPExpressionNode extends Node implements Instrumentabl
 
     @Override
     public boolean hasTag(Class<? extends Tag> tag) {
-        if (tag == StandardTags.ExpressionTag.class) {
+        if (getSourceSection() != null && tag == StandardTags.ExpressionTag.class) {
             return true;
         }
-        if (tag == StandardTags.StatementTag.class) {
+        if (getSourceSection() != null && tag == StandardTags.StatementTag.class) {
             return true;
         }
         return tag == StandardTags.RootBodyTag.class && isRootBody;
