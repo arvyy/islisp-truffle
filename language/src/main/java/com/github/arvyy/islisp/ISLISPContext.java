@@ -59,6 +59,7 @@ public class ISLISPContext {
         this.env = env;
         modules = new HashMap<>();
         modules.put("ROOT", new ISLISPModule());
+        modules.put("builtin/truffle.lisp", new ISLISPModule());
         symbolProperties = new HashMap<>();
         symbols = new HashMap<>();
         currentOutputStream = new ValueReference();
@@ -134,6 +135,10 @@ public class ISLISPContext {
 
     void initGlobalFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
         modules.get("ROOT").registerFunction(namedSymbol(name).identityReference(), f.apply(language));
+    }
+
+    void initTruffleLibFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
+        modules.get("builtin/truffle.lisp").registerFunction(namedSymbol(name).identityReference(), f.apply(language));
     }
 
     /**
@@ -226,13 +231,16 @@ public class ISLISPContext {
         //extension
         initGlobalFunction("current-stacktrace", ISLISPCurrentStacktrace::makeLispFunction);
         initGlobalFunction("exit", ISLISPExit::makeLispFunction);
-        initGlobalFunction("truffle-object-fields", ISLISPTruffleObjectFields::makeLispFunction);
-        initGlobalFunction("truffle-object-field", ISLISPTruffleObjectField::makeLispFunction);
-        initGlobalFunction("set-truffle-object-field", ISLISPSetTruffleObjectField::makeLispFunction);
-        initGlobalFunction("load-native-library", ISLISPLoadNativeLibrary::makeLispFunction);
-        initGlobalFunction("native-library-symbol", ISLISPNativeLibrarySymbol::makeLispFunction);
         initGlobalFunction("closed-p", ISLISPClosedp::makeLispFunction);
         initGlobalFunction("delete-file", ISLISPDeleteFile::makeLispFunction);
+
+        // truffle lib
+        initTruffleLibFunction("truffle-object-fields", ISLISPTruffleObjectFields::makeLispFunction);
+        initTruffleLibFunction("truffle-object-field", ISLISPTruffleObjectField::makeLispFunction);
+        initTruffleLibFunction("set-truffle-object-field", ISLISPSetTruffleObjectField::makeLispFunction);
+        initTruffleLibFunction("load-native-library", ISLISPLoadNativeLibrary::makeLispFunction);
+        initTruffleLibFunction("native-library-symbol", ISLISPNativeLibrarySymbol::makeLispFunction);
+        modules.get("builtin/truffle.lisp").exportAll();
     }
 
     private void initInitializeObjectMethod() {

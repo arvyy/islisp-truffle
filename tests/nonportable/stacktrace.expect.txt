@@ -1,36 +1,36 @@
 Unbound variable: unbound-var
-    at stacktrace.lisp:11
-    at stacktrace.lisp:8
-    at stacktrace.lisp:18
+    at stacktrace.lisp:13
+    at stacktrace.lisp:10
+    at stacktrace.lisp:20
 
 Division by zero
-    at stacktrace.lisp:28
+    at stacktrace.lisp:30
 
 Index 4 out of bounds (must be between 0 and 3 exclusive)
-    at stacktrace.lisp:38
+    at stacktrace.lisp:40
 
 No next method available
-    at stacktrace.lisp:44
+    at stacktrace.lisp:46
+    at stacktrace.lisp:47
     at stacktrace.lisp:45
-    at stacktrace.lisp:43
-    at stacktrace.lisp:51
+    at stacktrace.lisp:53
 
 Error during truffle interop call: Unknown identifier: b
-    at stacktrace.lisp:62
+    at stacktrace.lisp:64
 
 Undefined entity <doesntexist> in namespace class
-    at stacktrace.lisp:72
+    at stacktrace.lisp:74
 
 Cannot convert A to #<class <list>>
-    at stacktrace.lisp:82
+    at stacktrace.lisp:84
 
 Expected 1 args; received 2
-    at stacktrace.lisp:92
-    at stacktrace.lisp:93
+    at stacktrace.lisp:94
+    at stacktrace.lisp:95
 
 Attempted to change immutable binding shouldbeimmutable
-    at stacktrace.lisp:104
+    at stacktrace.lisp:106
 
 Error with value: test
     at islispprelude.lisp:71
-    at stacktrace.lisp:114
+    at stacktrace.lisp:116

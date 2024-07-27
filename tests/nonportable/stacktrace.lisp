@@ -1,3 +1,5 @@
+(requires "builtin/truffle.lisp")
+
 (defun print (str)
     (format-object (standard-output) str nil)
     (format-char (standard-output) #\newline))

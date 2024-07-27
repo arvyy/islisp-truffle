@@ -1,0 +1,11 @@
+= Truffle islisp static site
+
+This folder contains HUGO static site for truffle, consisting of landing page, benchmark graphs, and rendered docs.
+
+Building:
+
+. Install `hugo` and `asciidoctor` executables.
+. (Optionally) from `/benchmarks` folder execute `run.sh` to create benchmark svg images
+. Run `./copycontent.sh` to move benchmark images and adoc files to content
+. Run `hugo server` to run locally, site will be available at http://localhost:1313/islisp-truffle/
+. Run `hugo` to build for distribution; the result will be placed in `public` folder.

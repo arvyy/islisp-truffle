@@ -64,6 +64,8 @@ Where main.lisp starts with
 
 The correct invocation is `islisp -sp root1:root2 main.lisp` (on linux); `islisp -sp root1;root2 main.lisp` (on windows).
 
+Some modules are built-in, their name starts with "builtin/".
+
 === Debugger
 
 `(debugger)` statement enables triggering debugger breakpoint from code. Works only when ran in debug mode. Returns nil.
@@ -94,6 +96,8 @@ You can eval any at runtime present truffle language code using `(eval _language
 interop language's values are mapped to most fit ISLISP type. For some values, special procedures are given, see Truffle object api.
 
 === Truffle object interop API
+
+NOTE: Following functions are provided through `(requires "builtin/truffle.lisp")`.
 
 External objects with fields are represented as instances of `<truffle-object>` class (which is subclass of `<object>`). You can get a vector of fields (as strings) in a given object using `(truffle-object-fields _truffle-obj_)`.
 
