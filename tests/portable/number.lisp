@@ -81,6 +81,19 @@
       (quotient 0.0 0.0)
       (test-equal nil t)))
 
+;; sqrt
+(test-equal (sqrt 4) 2)
+(test-equal t (and (> (sqrt 2) 1.41421)
+                   (< (sqrt 2) 1.41422)))
+(block exit
+    (with-handler
+      (lambda (condition)
+        (test-equal
+            (instancep condition (class <domain-error>))
+            t)
+        (return-from exit nil))
+      (sqrt -1)
+      (test-equal nil t)))
 
 ;; trigonometry
 (test-equal

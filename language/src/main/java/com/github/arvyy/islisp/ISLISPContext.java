@@ -217,6 +217,7 @@ public class ISLISPContext {
         initGlobalFunction("set-property", ISLISPSetProperty::makeLispFunction);
         initGlobalFunction("sin", ISLISPTrigFunctions::makeLispFunctionSin);
         initGlobalFunction("signal-condition", ISLISPSignalCondition::makeLispFunction);
+        initGlobalFunction("sqrt", ISLISPSqrt::makeLispFunction);
         initGlobalFunction("standard-output", ISLISPStandardOutputStream::makeLispFunction);
         initGlobalFunction("standard-input", ISLISPStandardInputStream::makeLispFunction);
         initGlobalFunction("tan", ISLISPTrigFunctions::makeLispFunctionTan);
