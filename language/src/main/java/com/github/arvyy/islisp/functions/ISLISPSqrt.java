@@ -41,8 +41,9 @@ public abstract class ISLISPSqrt extends RootNode {
 
     @Specialization
     Object doInt(int a) {
-        if (a < 0)
+        if (a < 0) {
             return signalNegativeNumber(a);
+        }
         var res = Math.sqrt(a);
         var intRes = (int) res;
         if (intRes == res) {
@@ -54,8 +55,9 @@ public abstract class ISLISPSqrt extends RootNode {
 
     @Specialization
     Object doDouble(double a) {
-        if (a < 0)
+        if (a < 0) {
             return signalNegativeNumber(a);
+        }
         return Math.sqrt(a);
     }
 
