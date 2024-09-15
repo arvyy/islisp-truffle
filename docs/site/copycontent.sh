@@ -8,5 +8,5 @@ for doc in *.adoc ; do
   fi
 done
 
-mkdir site/static/benchmarks
+mkdir -p site/static/benchmarks
 cp -r images site/static/benchmarks/images
