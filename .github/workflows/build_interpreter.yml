@@ -68,7 +68,7 @@ jobs:
         run: |
           mv launcher/target/islisp islisp-linux
           gh release upload nightly islisp-linux --clobber
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: islisp-linux
           path: islisp-linux
@@ -126,7 +126,7 @@ jobs:
     environment: 'Docker hub'
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         with:
           name: islisp-linux
           path: .
