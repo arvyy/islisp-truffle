@@ -1,12 +1,18 @@
 package com.github.arvyy.islisp.parser;
 
 import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.exception.AbstractTruffleException;
+import com.oracle.truffle.api.interop.ExceptionType;
+import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.library.ExportLibrary;
+import com.oracle.truffle.api.library.ExportMessage;
 import com.oracle.truffle.api.source.SourceSection;
 
 /**
  * Indicates error during parsing stage.
  */
-public class ParsingException extends RuntimeException {
+@ExportLibrary(InteropLibrary.class)
+public class ParsingException extends AbstractTruffleException {
 
     private final SourceSection sourceSection;
     private final String reason;
@@ -34,6 +40,11 @@ public class ParsingException extends RuntimeException {
                 sourceSection.getStartLine(),
                 sourceSection.getStartColumn(),
                 reason);
+    }
+
+    @ExportMessage
+    ExceptionType getExceptionType() {
+        return ExceptionType.PARSE_ERROR;
     }
 
 }

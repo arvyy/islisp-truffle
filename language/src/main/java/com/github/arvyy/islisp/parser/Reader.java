@@ -134,6 +134,8 @@ public class Reader {
                 maybeValue = readSingle();
             }
             return lst;
+        } catch (NumberFormatException nfe) {
+            throw new ParsingException(section(), "Failed to read number");
         } catch (EOFException eof) {
             throw new ParsingException(section(), "Unexpected end of file");
         } catch (IOException e) {

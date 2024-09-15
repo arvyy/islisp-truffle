@@ -4,6 +4,7 @@ import com.github.arvyy.islisp.buildinfo.BuildInfo;
 import org.apache.commons.cli.*;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotAccess;
+import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.io.IOAccess;
 
@@ -142,8 +143,8 @@ public final class Main {
                 }
                 try {
                     context.eval(source);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (PolyglotException e) {
+                    System.out.println(e.getMessage());
                 }
             }
         } else if ("-".equals(sourceArg)) {
@@ -151,7 +152,11 @@ public final class Main {
             context.eval(source);
         } else {
             var source = Source.newBuilder("islisp", new File(sourceArg)).build();
-            context.eval(source);
+            try {
+                context.eval(source);
+            } catch (PolyglotException e) {
+                System.err.println(e.getMessage());
+            }
         }
         context.close();
     }
