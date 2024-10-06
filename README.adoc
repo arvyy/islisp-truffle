@@ -6,8 +6,6 @@ https://arvyy.github.io/islisp-truffle/
 
 ISLISP 2007 implementation on Graal's Truffle framework.
 
-CAUTION: Truffle ISLISP is WIP.
-
 == Download
 
 See link:https://github.com/arvyy/islisp-truffle/releases/[Github releases.]
@@ -19,3 +17,7 @@ See link:docs/apireference.adoc[documentation reference.]
 == Building
 
 See link:docs/building.adoc[building instructions.]
+
+== Changelog
+
+See link:Changelog.adoc[changelog.]

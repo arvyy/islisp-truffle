@@ -1,0 +1,21 @@
+= Truffle ISLISP changelog
+
+This document provide notable changes in Truffle ISLISP project.
+Before first stable release, the versions will follow format `0.0.x`.
+Afterwards the version will match truffle version followed by a date, eg. `24.0.1-2025.01.01`.
+
+== Unreleased
+
+== 0.0.2 (2024-10-06)
+
+* Add `--experimental-options` flag
+* Various significant performance optimizations
+* Fix various error reporting issues
+* Add OSR
+* Add `declaim` and `inline`
+* Move truffle interop procedures to separate module
+* Add missing `sqrt`, `isqrt`, `lcm`, `gcd` functions.
+
+== 0.0.1 (2024-05-12)
+
+Initial public release
