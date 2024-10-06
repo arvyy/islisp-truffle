@@ -208,6 +208,11 @@
 (defun reciprocal (arg)
   (quotient 1.0 arg))
 
+(defun lcm (a b)
+    (if (or (= a 0) (= b 0))
+        0
+        (quotient (abs (* a b)) (gcd a b))))
+
 (declaim (inline /=))
 (defun /= (x1 x2)
   (not (= x1 x2)))

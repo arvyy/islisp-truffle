@@ -81,6 +81,36 @@
       (quotient 0.0 0.0)
       (test-equal nil t)))
 
+;; gcd, taken from spec
+(test-equal (gcd 12 5) 1)
+(test-equal (gcd 15 24) 3)
+(test-equal (gcd -15 24) 3)
+(test-equal (gcd 15 -24) 3)
+(test-equal (gcd -15 -24) 3)
+(test-equal (gcd 0 -4) 4)
+(test-equal (gcd 0 0) 0)
+
+(test-equal (gcd 5000000000000000 5) 5)
+
+(block exit
+    (with-handler
+      (lambda (condition)
+        (test-equal
+            (instancep condition (class <domain-error>))
+            t)
+        (return-from exit nil))
+      (gcd 2.1 1)
+      (test-equal nil t)))
+
+;; lcm taken from spec
+(test-equal (lcm 2 3) 6)
+(test-equal (lcm 15 24) 120)
+(test-equal (lcm 15 -24) 120)
+(test-equal (lcm -15 24) 120)
+(test-equal (lcm -15 -24) 120)
+(test-equal (lcm 0 -4) 0)
+(test-equal (lcm 0 0) 0)
+
 ;; sqrt
 (test-equal (sqrt 4) 2)
 (test-equal t (and (> (sqrt 2) 1.41421)

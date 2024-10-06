@@ -181,6 +181,7 @@ public class ISLISPContext {
         initGlobalFunction("format-float", ISLISPFormatFloat::makeLispFunction);
         initGlobalFunction("format-object", ISLISPFormatObject::makeLispFunction);
         initGlobalFunction("format-fresh-line", ISLISPFormatFreshLine::makeLispFunction);
+        initGlobalFunction("gcd", ISLISPGcd::makeLispFunction);
         initGlobalFunction("gensym", ISLISPGensym::makeLispFunction);
         initGlobalFunction("get-internal-real-time", ISLISPGetInternalRealTime::makeLispFunction);
         initGlobalFunction("get-universal-time", ISLISPGetUniversalTime::makeLispFunction);
