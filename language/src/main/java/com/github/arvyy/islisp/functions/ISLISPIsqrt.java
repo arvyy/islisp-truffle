@@ -3,7 +3,6 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPTypes;
-import com.github.arvyy.islisp.nodes.ISLISPTypesGen;
 import com.github.arvyy.islisp.runtime.Closure;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
 import com.github.arvyy.islisp.runtime.LispFunction;
@@ -15,56 +14,58 @@ import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+import java.math.BigInteger;
+
 /**
- * Implements `gcd` function.
+ * Implements `isqrt` function.
  */
 @TypeSystemReference(ISLISPTypes.class)
-public abstract class ISLISPGcd extends RootNode {
+public abstract class ISLISPIsqrt extends RootNode {
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
-    protected ISLISPGcd(TruffleLanguage<?> language) {
+    protected ISLISPIsqrt(TruffleLanguage<?> language) {
         super(language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override
     public final Object execute(VirtualFrame frame) {
-        if (frame.getArguments().length != 3) {
+        if (frame.getArguments().length != 2) {
             return errorSignalerNode.signalWrongArgumentCount(
                 frame.getArguments().length - 1,
-                2,
-                2);
+                1,
+                1);
         }
-        return executeGeneric(frame.getArguments()[1], frame.getArguments()[2]);
+        return executeGeneric(frame.getArguments()[1]);
     }
 
-    abstract Object executeGeneric(Object a, Object b);
+    abstract Object executeGeneric(Object a);
 
-    @Specialization
-    int doInts(int a, int b) {
-        if (b == 0) {
-            return Math.abs(a);
-        }
-        return doInts(b, a % b);
-    }
+    //TODO int specialization
 
     @Specialization
     @CompilerDirectives.TruffleBoundary
-    LispBigInteger doBigInts(LispBigInteger a, LispBigInteger b) {
-        var value = a.data().gcd(b.data());
-        return new LispBigInteger(value);
+    Object doBigInt(LispBigInteger a) {
+        if (a.data().compareTo(BigInteger.ZERO) < 0) {
+            var ctx = ISLISPContext.get(this);
+            var integerClass = ctx.lookupClass("<integer>");
+            return errorSignalerNode.signalDomainError("negative value passed to isqrt", a, integerClass);
+        }
+        var value = a.data().sqrt();
+        if (value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+            return new LispBigInteger(value);
+        } else {
+            return value.intValue();
+        }
     }
 
     @Fallback
-    Object fallback(Object a, Object b) {
+    Object fallback(Object a) {
         var ctx = ISLISPContext.get(this);
         var integerClass = ctx.lookupClass("<integer>");
-        if (!ISLISPTypesGen.isImplicitLispBigInteger(a)) {
-            return errorSignalerNode.signalWrongType(a, integerClass);
-        }
-        return errorSignalerNode.signalWrongType(b, integerClass);
+        return errorSignalerNode.signalWrongType(a, integerClass);
     }
 
     /**
@@ -73,7 +74,7 @@ public abstract class ISLISPGcd extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        var callTarget = ISLISPGcdNodeGen.create(lang).getCallTarget();
+        var callTarget = ISLISPIsqrtNodeGen.create(lang).getCallTarget();
         return new LispFunction(
             new Closure(null, null, null),
             callTarget,

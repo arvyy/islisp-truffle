@@ -111,6 +111,21 @@
 (test-equal (lcm 0 -4) 0)
 (test-equal (lcm 0 0) 0)
 
+;; isqrt taken from spec
+(test-equal (isqrt 49) 7)
+(test-equal (isqrt 63) 7)
+(test-equal (isqrt 1000000000000002000000000000000) 1000000000000000)
+(block exit
+    (with-handler
+      (lambda (condition)
+        (test-equal
+            (instancep condition (class <domain-error>))
+            t)
+        (return-from exit nil))
+      (isqrt -1)
+      (test-equal nil t)))
+
+
 ;; sqrt
 (test-equal (sqrt 4) 2)
 (test-equal t (and (> (sqrt 2) 1.41421)
