@@ -54,7 +54,7 @@ public class ISLISPDefGenericNode extends ISLISPExpressionNode {
         var ctx = ISLISPContext.get(this);
         var descriptor = new GenericFunctionDescriptor(requiredArgsCount, hasRest);
         var function = new LispFunction(null, executionNode.getCallTarget(), true, false);
-        ctx.registerGenericFunction(module, name.identityReference(), setf, function, descriptor);
+        ctx.registerGenericFunction(module, name, setf, function, descriptor);
         return name;
     }
 }

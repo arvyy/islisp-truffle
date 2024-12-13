@@ -40,9 +40,9 @@ public class ISLISPDefDynamicNode extends ISLISPExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
-        var dynamicVar = new ValueReference();
+        var dynamicVar = new ValueReference(getSourceSection());
         dynamicVar.setValue(initializer.executeGeneric(frame));
-        ctx.registerDynamicVar(module, name.identityReference(), dynamicVar);
+        ctx.registerDynamicVar(module, name, dynamicVar);
         return name;
     }
 }

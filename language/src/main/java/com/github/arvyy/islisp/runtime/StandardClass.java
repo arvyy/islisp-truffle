@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.runtime;
 
 import com.oracle.truffle.api.interop.TruffleObject;
+import com.oracle.truffle.api.source.SourceSection;
 import com.oracle.truffle.api.staticobject.DefaultStaticObjectFactory;
 import com.oracle.truffle.api.staticobject.StaticProperty;
 import com.oracle.truffle.api.staticobject.StaticShape;
@@ -21,7 +22,8 @@ public record StandardClass(
         LispClass[] parents,
         StaticShape<DefaultStaticObjectFactory> shape,
         Slot[] slots,
-        boolean isAbstract
+        boolean isAbstract,
+        SourceSection sourceSection
 ) implements LispClass, TruffleObject {
 
     /**
@@ -33,10 +35,10 @@ public record StandardClass(
      * @param initArg initialization argument
      */
     public record Slot(
-            SymbolReference name,
+            Symbol name,
             StaticProperty property,
             LispFunction initForm,
-            SymbolReference initArg
+            Symbol initArg
     ) { }
 
     @Override
@@ -44,5 +46,9 @@ public record StandardClass(
         return List.of(parents);
     }
 
+    @Override
+    public SourceSection getSourceLocation() {
+        return sourceSection;
+    }
 }
 

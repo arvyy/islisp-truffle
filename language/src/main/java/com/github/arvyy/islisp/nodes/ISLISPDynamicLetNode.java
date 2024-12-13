@@ -55,11 +55,12 @@ public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
         if (vars == null) {
             vars = new ValueReference[symbols.length];
             for (int i = 0; i < vars.length; i++) {
-                var existing = ctx.lookupDynamicVar(module, symbols[i].identityReference());
+                var existing = ctx.lookupDynamicVar(module, symbols[i]);
                 if (existing == null) {
-                    vars[i] = new ValueReference();
+                    // TODO granulize source section
+                    vars[i] = new ValueReference(getSourceSection());
                     vars[i].setValue(null);
-                    ctx.registerDynamicVar(module, symbols[i].identityReference(), vars[i]);
+                    ctx.registerDynamicVar(module, symbols[i], vars[i]);
                 } else {
                     vars[i] = existing;
                 }

@@ -38,7 +38,7 @@ public class ISLISPFunctionRefNode extends ISLISPExpressionNode {
     public Object executeGeneric(VirtualFrame frame) {
         if (function == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            function = ISLISPContext.get(this).lookupFunction(module, name.identityReference());
+            function = ISLISPContext.get(this).lookupFunction(module, name);
             if (function == null) {
                 return errorSignalerNode.signalUndefinedFunction(name);
             }

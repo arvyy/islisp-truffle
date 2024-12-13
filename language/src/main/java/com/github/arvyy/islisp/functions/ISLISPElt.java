@@ -53,7 +53,7 @@ public abstract class ISLISPElt extends RootNode {
         if (cList == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            cList = ctx.lookupClass("ROOT", ctx.namedSymbol("<list>").identityReference());
+            cList = ctx.lookupClass("ROOT", ctx.namedSymbol("<list>"));
         }
         return cList;
     }
@@ -62,7 +62,7 @@ public abstract class ISLISPElt extends RootNode {
         if (cInteger == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            cInteger = ctx.lookupClass("ROOT", ctx.namedSymbol("<integer>").identityReference());
+            cInteger = ctx.lookupClass("ROOT", ctx.namedSymbol("<integer>"));
         }
         return cInteger;
     }

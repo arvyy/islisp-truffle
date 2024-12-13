@@ -24,4 +24,17 @@ public class SymbolReference {
     public int getId() {
         return id;
     }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SymbolReference r) {
+            return id == r.id;
+        }
+        return false;
+    }
 }

@@ -40,7 +40,7 @@ public abstract class ISLISPCreateArray extends RootNode {
             var ctx = ISLISPContext.get(this);
             createVectorNode = this.insert(
                 DirectCallNode.create(
-                    ctx.lookupFunction("ROOT", ctx.namedSymbol("create-vector").identityReference())
+                    ctx.lookupFunction("ROOT", ctx.namedSymbol("create-vector"))
                         .callTarget()));
         }
         return createVectorNode;
@@ -52,7 +52,7 @@ public abstract class ISLISPCreateArray extends RootNode {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             lengthNode = this.insert(
                 DirectCallNode.create(
-                    ctx.lookupFunction("ROOT", ctx.namedSymbol("length").identityReference())
+                    ctx.lookupFunction("ROOT", ctx.namedSymbol("length"))
                         .callTarget()));
         }
         return lengthNode;

@@ -38,7 +38,7 @@ public class ISLISPClassRefNode extends ISLISPExpressionNode {
     public Object executeGeneric(VirtualFrame frame) {
         if (clazz == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            clazz = ISLISPContext.get(this).lookupClass(module, name.identityReference());
+            clazz = ISLISPContext.get(this).lookupClass(module, name);
             if (clazz == null) {
                 return errorSignalerNode.signalUndefinedClass(name);
             }

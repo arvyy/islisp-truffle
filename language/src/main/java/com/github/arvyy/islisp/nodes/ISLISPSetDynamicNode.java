@@ -48,7 +48,7 @@ public class ISLISPSetDynamicNode extends ISLISPExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         if (valueReference == null) {
-            valueReference = ISLISPContext.get(this).lookupDynamicVar(module, symbol.identityReference());
+            valueReference = ISLISPContext.get(this).lookupDynamicVar(module, symbol);
             if (valueReference == null) {
                 return errorSignalerNode.signalUnboundVariable(symbol);
             }

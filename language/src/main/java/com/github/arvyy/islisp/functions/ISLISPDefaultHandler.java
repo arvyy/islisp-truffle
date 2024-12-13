@@ -32,11 +32,11 @@ public class ISLISPDefaultHandler extends RootNode {
     public Object execute(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         var exitFunction = ctx.lookupFunction(
-            "ROOT", ctx.namedSymbol("exit").identityReference());
+            "ROOT", ctx.namedSymbol("exit"));
         var reportConditionFunction = ctx.lookupFunction(
-            "ROOT", ctx.namedSymbol("report-condition").identityReference());
+            "ROOT", ctx.namedSymbol("report-condition"));
         var errorOutputFunction = ctx.lookupFunction(
-            "ROOT", ctx.namedSymbol("error-output").identityReference());
+            "ROOT", ctx.namedSymbol("error-output"));
         var errorOutput = dispatchNode.executeDispatch(errorOutputFunction, new Object[]{});
         var condition = frame.getArguments()[1];
         dispatchNode.executeDispatch(reportConditionFunction, new Object[]{condition, errorOutput});

@@ -75,7 +75,7 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
         if (genericFunctionDescriptor == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             genericFunctionDescriptor = ISLISPContext.get(this)
-                    .lookupGenericFunctionDispatchTree(module, name.identityReference(), setf);
+                    .lookupGenericFunctionDispatchTree(module, name, setf);
         }
         var argCount = frame.getArguments().length - 1;
         if (argCount < genericFunctionDescriptor.getRequiredArgCount()

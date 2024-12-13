@@ -92,7 +92,7 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
         } else {
             if (valueReference == null) {
                 CompilerDirectives.transferToInterpreterAndInvalidate();
-                valueReference = ISLISPContext.get(this).lookupGlobalVar(module, name.identityReference());
+                valueReference = ISLISPContext.get(this).lookupGlobalVar(module, name);
             }
             if (valueReference.isReadOnly()) {
                 return errorSignalerNode.signalImmutableBindingError(name);

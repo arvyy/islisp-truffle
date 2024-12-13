@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.oracle.truffle.api.source.SourceSection;
+
 import java.util.List;
 
 /**
@@ -18,5 +20,10 @@ public sealed interface LispClass permits StandardClass, BuiltinClass {
      * @return if this class is abstract and cannot be instantiated directly
      */
     boolean isAbstract();
+
+    /**
+     * @return source location of class declaration.
+     */
+    SourceSection getSourceLocation();
 
 }

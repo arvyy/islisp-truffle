@@ -39,8 +39,8 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
             new Closure(null, null, null),
             functionNode.getCallTarget(),
             false,
-            ctx.getModule(module).shouldInline(name.identityReference()));
-        ctx.registerFunction(module, name.identityReference(), fun);
+            ctx.getModule(module).shouldInline(name));
+        ctx.registerFunction(module, name, fun);
         return name;
     }
 

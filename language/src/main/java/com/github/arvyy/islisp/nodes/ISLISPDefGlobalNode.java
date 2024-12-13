@@ -38,7 +38,7 @@ public class ISLISPDefGlobalNode extends ISLISPExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         ISLISPContext.get(this).registerGlobalVar(
-            module, name.identityReference(), expression.executeGeneric(frame), false);
+            module, name, expression.executeGeneric(frame), false, getSourceSection());
         return name;
     }
 }

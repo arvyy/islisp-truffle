@@ -143,12 +143,12 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
     @CompilerDirectives.TruffleBoundary
     void executeOutsideTruffle() {
         var ctx = ISLISPContext.get(null);
-        var myslots = new HashMap<SymbolReference, StandardClass.Slot>();
+        var myslots = new HashMap<Symbol, StandardClass.Slot>();
         var shapeBuilder = StaticShape.newBuilder(ctx.getLanguage());
         var superclasses = new ArrayList<LispClass>();
         // collect inherited slots from parent classes
         for (var superclass: superclassName) {
-            var clazz = ctx.lookupClass(module, superclass.identityReference());
+            var clazz = ctx.lookupClass(module, superclass);
             if (clazz == null) {
                 errorSignalerNode.signalUndefinedClass(superclass);
             }
@@ -156,7 +156,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
             if (clazz instanceof StandardClass standardClass) {
                 for (var parentSlot: standardClass.slots()) {
                     if (!myslots.containsKey(parentSlot.name())) {
-                        var property = new DefaultStaticProperty(parentSlot.name().getId() + "");
+                        var property = new DefaultStaticProperty(parentSlot.name().identityReference().getId() + "");
                         shapeBuilder.property(property, Object.class, false);
                         var slot = new StandardClass.Slot(
                                 parentSlot.name(),
@@ -170,9 +170,9 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
         }
         // add own unique properties
         for (var slot: slots) {
-            var slotInParent = myslots.get(slot.getName().identityReference());
+            var slotInParent = myslots.get(slot.getName());
             StaticProperty property;
-            SymbolReference initArg;
+            Symbol initArg;
             LispFunction initForm;
             if (slotInParent == null) {
                 property = new DefaultStaticProperty(slot.getName().identityReference().getId() + "");
@@ -181,7 +181,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                 property = slotInParent.property();
             }
             if (slot.getInitArg() != null) {
-                initArg = slot.getInitArg().identityReference();
+                initArg = slot.getInitArg();
             } else if (slotInParent != null) {
                 initArg = slotInParent.initArg();
             } else {
@@ -194,17 +194,18 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
             } else {
                 initForm = null;
             }
-            var newSlot = new StandardClass.Slot(slot.getName().identityReference(), property, initForm, initArg);
-            myslots.put(slot.getName().identityReference(), newSlot);
+            var newSlot = new StandardClass.Slot(slot.getName(), property, initForm, initArg);
+            myslots.put(slot.getName(), newSlot);
         }
         var newClass = new StandardClass(
                 name.name(),
                 superclasses.toArray(LispClass[]::new),
                 shapeBuilder.build(),
                 myslots.values().toArray(StandardClass.Slot[]::new),
-                isAbstract
+                isAbstract,
+                getSourceSection()
         );
-        ctx.registerClass(module, name.identityReference(), newClass);
+        ctx.registerClass(module, name, newClass);
     }
 
     @Override

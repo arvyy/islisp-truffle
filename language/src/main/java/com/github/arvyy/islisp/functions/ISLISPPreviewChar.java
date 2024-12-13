@@ -40,8 +40,7 @@ public abstract class ISLISPPreviewChar extends RootNode {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
-                ctx.lookupFunction("ROOT", ctx.namedSymbol("standard-input")
-                        .identityReference())
+                ctx.lookupFunction("ROOT", ctx.namedSymbol("standard-input"))
                     .callTarget());
             standardInput = insert(callNode);
         }

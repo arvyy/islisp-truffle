@@ -32,7 +32,7 @@ public class ISLISPCreateStandardClassObject extends RootNode {
         if (initializeObjectFunction == null) {
             var ctx = ISLISPContext.get(this);
             initializeObjectFunction = ctx.lookupFunction(
-                "ROOT", ctx.namedSymbol("initialize-object").identityReference());
+                "ROOT", ctx.namedSymbol("initialize-object"));
         }
         var clazz = (StandardClass) frame.getArguments()[1];
         var obj = new StandardClassObject(clazz, clazz.shape().getFactory().create());

@@ -95,7 +95,7 @@ public class Parser {
         var content = reader.readAll();
         var rest = new ArrayList<>(content.size());
         var requires = new ArrayList<String>();
-        var provides = new ArrayList<SymbolReference>();
+        var provides = new ArrayList<Symbol>();
         for (var obj: content) {
             if (obj instanceof Pair p && p.car() instanceof Symbol s) {
                 if ("requires".equals(s.name())) {
@@ -108,7 +108,7 @@ public class Parser {
                 if ("provides".equals(s.name())) {
                     var provideList = requireList(obj, -1, -1);
                     for (var provide: provideList.subList(1, provideList.size())) {
-                        provides.add(downcast(provide, Symbol.class).identityReference());
+                        provides.add(downcast(provide, Symbol.class));
                     }
                     continue;
                 }
@@ -298,7 +298,7 @@ public class Parser {
                 var placeList = requireList(place, 1, -1);
                 var setfDispatchSymbol = downcast(placeList.get(0), Symbol.class);
                 var setfDispatch = ISLISPContext.get(null)
-                        .lookupSetfTransformer(parserContext.module, setfDispatchSymbol.identityReference());
+                        .lookupSetfTransformer(parserContext.module, setfDispatchSymbol);
                 if (setfDispatch == null) {
                     return parseDirectSetfFunctionCall(parserContext, sexpr, placeList, value);
                 }
@@ -643,7 +643,7 @@ public class Parser {
     Object macroExpand(String module, Object form, boolean single) {
         if (form instanceof Pair p && p.car() instanceof Symbol symbol) {
             var rest = p.cdr();
-            var maybeMacro = ISLISPContext.get(null).lookupMacro(module, symbol.identityReference());
+            var maybeMacro = ISLISPContext.get(null).lookupMacro(module, symbol);
             if (maybeMacro != null) {
                 var args = new ArrayList<Object>();
                 args.add(null); // closure param
@@ -1361,7 +1361,7 @@ public class Parser {
             var declarationSexpr = requireList(arg, 1, -1);
             if (declarationSexpr.get(0) instanceof Symbol s && s.name().equalsIgnoreCase("inline")) {
                 for (int i = 1; i < declarationSexpr.size(); i++) {
-                    var symbolRef = downcast(declarationSexpr.get(i), Symbol.class).identityReference();
+                    var symbolRef = downcast(declarationSexpr.get(i), Symbol.class);
                     lst.add(new Declaration.Inline(symbolRef));
                 }
             }

@@ -1,33 +1,46 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.github.arvyy.islisp.ISLISPTruffleLanguage;
 import com.github.arvyy.islisp.SetfTransformer;
 import com.github.arvyy.islisp.parser.Declaration;
 import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.TruffleLanguage;
+import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.interop.TruffleObject;
+import com.oracle.truffle.api.library.ExportLibrary;
+import com.oracle.truffle.api.library.ExportMessage;
+import com.oracle.truffle.api.source.SourceSection;
+import com.oracle.truffle.api.strings.TruffleString;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Encapsulate module's bindings.
  */
-public class ISLISPModule {
+@ExportLibrary(InteropLibrary.class)
+public class ISLISPModule implements TruffleObject {
 
+    private final String name;
     private final List<ISLISPModule> importedModules;
-    private final Set<SymbolReference> exports;
-    private final Map<SymbolReference, LispFunction> globalFunctions;
-    private final Map<SymbolReference, GenericFunctionDescriptor> genericFunctions;
-    private final Map<SymbolReference, LispFunction> setfGlobalFunctions;
-    private final Map<SymbolReference, GenericFunctionDescriptor> setfGenericFunctions;
-    private final Map<SymbolReference, LispFunction> macros;
-    private final Map<SymbolReference, LispClass> classes;
-    private final Map<SymbolReference, ValueReference> dynamicVars;
-    private final Map<SymbolReference, ValueReference> globalVars;
-    private final Map<SymbolReference, SetfTransformer> setfTransformers;
+    private final Set<Symbol> exports;
+    private final Map<Symbol, LispFunction> globalFunctions;
+    private final Map<Symbol, GenericFunctionDescriptor> genericFunctions;
+    private final Map<Symbol, LispFunction> setfGlobalFunctions;
+    private final Map<Symbol, GenericFunctionDescriptor> setfGenericFunctions;
+    private final Map<Symbol, LispFunction> macros;
+    private final Map<Symbol, LispClass> classes;
+    private final Map<Symbol, ValueReference> dynamicVars;
+    private final Map<Symbol, ValueReference> globalVars;
+    private final Map<Symbol, SetfTransformer> setfTransformers;
     private final List<Declaration> declarations;
 
+    private final Map<String, Object> visibleMembers;
     /**
      * Create empty module.
      */
-    public ISLISPModule() {
+    public ISLISPModule(String name) {
+        this.name = name;
         exports = new HashSet<>();
         importedModules = new ArrayList<>();
         globalFunctions = new HashMap<>();
@@ -40,6 +53,7 @@ public class ISLISPModule {
         setfTransformers = new HashMap<>();
         globalVars = new HashMap<>();
         declarations = new ArrayList<>();
+        visibleMembers = new HashMap<>();
     }
 
     /**
@@ -56,7 +70,7 @@ public class ISLISPModule {
      *
      * @param symbolReference exported symbol reference.
      */
-    public void addExport(SymbolReference symbolReference) {
+    public void addExport(Symbol symbolReference) {
         exports.add(symbolReference);
     }
 
@@ -83,11 +97,12 @@ public class ISLISPModule {
      * @param readonly if the variable is a constant
      */
     @CompilerDirectives.TruffleBoundary
-    public void registerGlobalVar(SymbolReference symbolReference, Object init, boolean readonly) {
-        var v = new ValueReference();
+    public void registerGlobalVar(Symbol symbolReference, Object init, boolean readonly, SourceSection sourceSection) {
+        var v = new ValueReference(sourceSection);
         v.setValue(init);
         v.setReadOnly(readonly);
         globalVars.put(symbolReference, v);
+        visibleMembers.put(symbolReference.name(), v);
     }
 
     /**
@@ -97,7 +112,7 @@ public class ISLISPModule {
      * @return variable's value reference or null if not found
      */
     @CompilerDirectives.TruffleBoundary
-    public ValueReference lookupGlobalVar(SymbolReference symbolReference) {
+    public ValueReference lookupGlobalVar(Symbol symbolReference) {
         if (globalVars.containsKey(symbolReference)) {
             return globalVars.get(symbolReference);
         }
@@ -117,7 +132,7 @@ public class ISLISPModule {
      * @param transformer transformer.
      */
     @CompilerDirectives.TruffleBoundary
-    public void registerSetfTransformer(SymbolReference symbolReference, SetfTransformer transformer) {
+    public void registerSetfTransformer(Symbol symbolReference, SetfTransformer transformer) {
         setfTransformers.put(symbolReference, transformer);
     }
 
@@ -128,7 +143,7 @@ public class ISLISPModule {
      * @return setf transformer or null if undefined
      */
     @CompilerDirectives.TruffleBoundary
-    public SetfTransformer lookupSetfTransformer(SymbolReference symbolReference) {
+    public SetfTransformer lookupSetfTransformer(Symbol symbolReference) {
         if (setfTransformers.containsKey(symbolReference)) {
             return setfTransformers.get(symbolReference);
         }
@@ -147,8 +162,9 @@ public class ISLISPModule {
      * @param v value reference.
      */
     @CompilerDirectives.TruffleBoundary
-    public void registerDynamicVar(SymbolReference symbolReference, ValueReference v) {
+    public void registerDynamicVar(Symbol symbolReference, ValueReference v) {
         dynamicVars.put(symbolReference, v);
+        visibleMembers.put(symbolReference.name(), v);
     }
 
     /**
@@ -158,7 +174,7 @@ public class ISLISPModule {
      * @return dynamic variable value reference
      */
     @CompilerDirectives.TruffleBoundary
-    public ValueReference lookupDynamicVar(SymbolReference symbolReference) {
+    public ValueReference lookupDynamicVar(Symbol symbolReference) {
         if (dynamicVars.containsKey(symbolReference)) {
             return dynamicVars.get(symbolReference);
         }
@@ -177,8 +193,9 @@ public class ISLISPModule {
      * @param function function value
      */
     @CompilerDirectives.TruffleBoundary
-    public void registerFunction(SymbolReference symbolReference, LispFunction function) {
+    public void registerFunction(Symbol symbolReference, LispFunction function) {
         globalFunctions.put(symbolReference, function);
+        visibleMembers.put(symbolReference.name(), function);
     }
 
     /**
@@ -188,7 +205,7 @@ public class ISLISPModule {
      * @return function or null if undefined
      */
     @CompilerDirectives.TruffleBoundary
-    public LispFunction lookupFunction(SymbolReference symbolReference) {
+    public LispFunction lookupFunction(Symbol symbolReference) {
         return lookupFunction(symbolReference, false);
     }
 
@@ -200,7 +217,7 @@ public class ISLISPModule {
      * @return function or null if undefined
      */
     @CompilerDirectives.TruffleBoundary
-    public LispFunction lookupFunction(SymbolReference symbolReference, boolean setf) {
+    public LispFunction lookupFunction(Symbol symbolReference, boolean setf) {
         if (setf) {
             if (setfGlobalFunctions.containsKey(symbolReference)) {
                 return setfGlobalFunctions.get(symbolReference);
@@ -236,7 +253,7 @@ public class ISLISPModule {
      */
     @CompilerDirectives.TruffleBoundary
     public void registerGenericFunction(
-        SymbolReference symbolReference,
+        Symbol symbolReference,
         boolean setf,
         LispFunction function,
         GenericFunctionDescriptor descriptor
@@ -248,6 +265,7 @@ public class ISLISPModule {
             globalFunctions.put(symbolReference, function);
             genericFunctions.put(symbolReference, descriptor);
         }
+        visibleMembers.put(symbolReference.name(), function);
     }
 
     /**
@@ -258,7 +276,7 @@ public class ISLISPModule {
      * @return generic function descriptor or null if undefined
      */
     @CompilerDirectives.TruffleBoundary
-    public GenericFunctionDescriptor lookupGenericFunctionDispatchTree(SymbolReference symbolReference, boolean setf) {
+    public GenericFunctionDescriptor lookupGenericFunctionDispatchTree(Symbol symbolReference, boolean setf) {
         if (setf) {
             if (setfGenericFunctions.containsKey(symbolReference)) {
                 return setfGenericFunctions.get(symbolReference);
@@ -290,8 +308,9 @@ public class ISLISPModule {
      * @param function macro implementation function
      */
     @CompilerDirectives.TruffleBoundary
-    public void registerMacro(SymbolReference symbolReference, LispFunction function) {
+    public void registerMacro(Symbol symbolReference, LispFunction function) {
         macros.put(symbolReference, function);
+        visibleMembers.put(symbolReference.name(), function);
     }
 
     /**
@@ -301,7 +320,7 @@ public class ISLISPModule {
      * @return macro function or null if undefined
      */
     @CompilerDirectives.TruffleBoundary
-    public LispFunction lookupMacro(SymbolReference symbolReference) {
+    public LispFunction lookupMacro(Symbol symbolReference) {
         if (macros.containsKey(symbolReference)) {
             return macros.get(symbolReference);
         }
@@ -320,8 +339,9 @@ public class ISLISPModule {
      * @param clazz class instance
      */
     @CompilerDirectives.TruffleBoundary
-    public void registerClass(SymbolReference symbolReference, LispClass clazz) {
+    public void registerClass(Symbol symbolReference, LispClass clazz) {
         classes.put(symbolReference, clazz);
+        visibleMembers.put(symbolReference.name(), clazz);
     }
 
     /**
@@ -331,7 +351,7 @@ public class ISLISPModule {
      * @return class or null if doesn't exist
      */
     @CompilerDirectives.TruffleBoundary
-    public LispClass lookupClass(SymbolReference symbolReference) {
+    public LispClass lookupClass(Symbol symbolReference) {
         if (classes.containsKey(symbolReference)) {
             return classes.get(symbolReference);
         }
@@ -360,7 +380,7 @@ public class ISLISPModule {
      * @return if definition for the function should mark it as inlined.
      */
     @CompilerDirectives.TruffleBoundary
-    public boolean shouldInline(SymbolReference symbolReference) {
+    public boolean shouldInline(Symbol symbolReference) {
         for (var decl: declarations) {
             if (decl instanceof Declaration.Inline inline) {
                 if (inline.name().equals(symbolReference)) {
@@ -370,4 +390,131 @@ public class ISLISPModule {
         }
         return false;
     }
+
+    @ExportMessage
+    public boolean isScope() {
+        return true;
+    }
+
+    @ExportMessage
+    public boolean hasMembers() {
+        return true;
+    }
+
+    @ExportMessage
+    public boolean hasLanguage() {
+        return true;
+    }
+
+    @ExportMessage
+    public Class<ISLISPTruffleLanguage> getLanguage() {
+        return ISLISPTruffleLanguage.class;
+    }
+
+    @ExportMessage
+    public String toDisplayString(boolean ignored) {
+        return "Module " + name;
+    }
+
+    @ExportMessage
+    @CompilerDirectives.TruffleBoundary
+    public LispVector getMembers(boolean ignored) {
+        var lst = new ArrayList<ISLISPModuleMemberString>(getMembersInternal(false));
+        for (var m: importedModules) {
+            lst.addAll(m.getMembersInternal(true));
+        }
+        return new LispVector(lst.toArray(new ISLISPModuleMemberString[0]));
+    }
+
+    @ExportMessage
+    @CompilerDirectives.TruffleBoundary
+    public boolean isMemberReadable(String name) {
+        return visibleMembers.containsKey(name);
+    }
+
+    @ExportMessage
+    @CompilerDirectives.TruffleBoundary
+    public Object readMember(String name) {
+        return visibleMembers.get(name);
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    private List<ISLISPModuleMemberString> getMembersInternal(boolean exportedOnly) {
+        Predicate<Symbol> include = name -> !exportedOnly || exports.contains(name);
+        var lst = new ArrayList<ISLISPModuleMemberString>();
+        for (var e: globalFunctions.keySet()) {
+            if (!include.test(e)) {
+                continue;
+            }
+            lst.add(new ISLISPModuleMemberString(e.name(), globalFunctions.get(e).getSourceLocation()));
+        }
+        for (var e: macros.keySet()) {
+            if (!include.test(e)) {
+                continue;
+            }
+            lst.add(new ISLISPModuleMemberString(e.name(), macros.get(e).getSourceLocation()));
+        }
+        for (var e: setfGlobalFunctions.keySet()) {
+            if (!include.test(e)) {
+                continue;
+            }
+            lst.add(new ISLISPModuleMemberString(e.name(), setfGlobalFunctions.get(e).getSourceLocation()));
+        }
+        for (var e: classes.keySet()) {
+            if (!include.test(e)) {
+                continue;
+            }
+            lst.add(new ISLISPModuleMemberString(e.name(), classes.get(e).getSourceLocation()));
+        }
+        for (var e: dynamicVars.keySet()) {
+            if (!include.test(e)) {
+                continue;
+            }
+            lst.add(new ISLISPModuleMemberString(e.name(), dynamicVars.get(e).getSourceLocation()));
+        }
+        for (var e: globalVars.keySet()) {
+            if (!include.test(e)) {
+                continue;
+            }
+            lst.add(new ISLISPModuleMemberString(e.name(), globalVars.get(e).getSourceLocation()));
+        }
+        return lst;
+    }
+
+}
+
+@ExportLibrary(InteropLibrary.class)
+class ISLISPModuleMemberString implements TruffleObject {
+
+    private final String name;
+    private final SourceSection source;
+    public ISLISPModuleMemberString(String name, SourceSection source) {
+        this.name = name;
+        this.source = source;
+    }
+
+    @ExportMessage
+    public boolean isString() {
+        return true;
+    }
+
+    @ExportMessage
+    public TruffleString asTruffleString() {
+        return TruffleString.fromJavaStringUncached(name, TruffleString.Encoding.BYTES);
+    }
+
+    @ExportMessage
+    public String asString() {
+        return name;
+    }
+
+    @ExportMessage
+    public boolean hasSourceLocation() {
+        return source != null;
+    }
+    @ExportMessage
+    public SourceSection getSourceLocation() {
+        return source;
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.runtime;
 
 import com.oracle.truffle.api.interop.TruffleObject;
+import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.List;
 
@@ -44,4 +45,8 @@ public final class BuiltinClass implements LispClass, TruffleObject {
         return name.name();
     }
 
+    @Override
+    public SourceSection getSourceLocation() {
+        return null;
+    }
 }

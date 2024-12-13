@@ -99,7 +99,7 @@ public class ISLISPErrorSignalerNode extends Node {
         if (cArityError == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            cArityError = ctx.lookupClass("ROOT", ctx.namedSymbol("<arity-error>").identityReference());
+            cArityError = ctx.lookupClass("ROOT", ctx.namedSymbol("<arity-error>"));
         }
         return cArityError;
     }
@@ -108,7 +108,7 @@ public class ISLISPErrorSignalerNode extends Node {
         if (cDomainError == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            cDomainError = ctx.lookupClass("ROOT", ctx.namedSymbol("<domain-error>").identityReference());
+            cDomainError = ctx.lookupClass("ROOT", ctx.namedSymbol("<domain-error>"));
         }
         return cDomainError;
     }
@@ -119,7 +119,7 @@ public class ISLISPErrorSignalerNode extends Node {
             var ctx = ISLISPContext.get(this);
             cIndexOutOfRangeError = ctx.lookupClass(
                 "ROOT",
-                ctx.namedSymbol("<index-out-of-range-error>").identityReference());
+                ctx.namedSymbol("<index-out-of-range-error>"));
         }
         return cIndexOutOfRangeError;
     }
@@ -130,7 +130,7 @@ public class ISLISPErrorSignalerNode extends Node {
             var ctx = ISLISPContext.get(this);
             cTruffleInteropError = ctx.lookupClass(
                 "ROOT",
-                ctx.namedSymbol("<truffle-interop-error>").identityReference());
+                ctx.namedSymbol("<truffle-interop-error>"));
         }
         return cTruffleInteropError;
     }
@@ -222,7 +222,7 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass("ROOT", ctx.namedSymbol("<unbound-variable>").identityReference()),
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<unbound-variable>")),
             ctx.namedSymbol("name"), name,
             ctx.namedSymbol("namespace"), ctx.namedSymbol("variable")
         );
@@ -239,7 +239,7 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass("ROOT", ctx.namedSymbol("<undefined-function>").identityReference()),
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<undefined-function>")),
             ctx.namedSymbol("name"), name,
             ctx.namedSymbol("namespace"), ctx.namedSymbol("function")
         );
@@ -256,7 +256,7 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass("ROOT", ctx.namedSymbol("<undefined-entity>").identityReference()),
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<undefined-entity>")),
             ctx.namedSymbol("name"), name,
             ctx.namedSymbol("namespace"), ctx.namedSymbol("class")
         );
@@ -269,7 +269,7 @@ public class ISLISPErrorSignalerNode extends Node {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
-                ctx.lookupFunction("ROOT", ctx.namedSymbol("signal-condition").identityReference())
+                ctx.lookupFunction("ROOT", ctx.namedSymbol("signal-condition"))
                     .callTarget());
             signalCallNode = insert(callNode);
         }
@@ -282,7 +282,7 @@ public class ISLISPErrorSignalerNode extends Node {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
-                ctx.lookupFunction("ROOT", ctx.namedSymbol("create").identityReference())
+                ctx.lookupFunction("ROOT", ctx.namedSymbol("create"))
                     .callTarget());
             createCallNode = insert(callNode);
         }
@@ -303,7 +303,7 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass("ROOT", ctx.namedSymbol("<end-of-stream>").identityReference())
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<end-of-stream>"))
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
@@ -317,7 +317,7 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass("ROOT", ctx.namedSymbol("<division-by-zero>").identityReference())
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<division-by-zero>"))
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
@@ -349,7 +349,7 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass("ROOT", ctx.namedSymbol("<no-next-method-error>").identityReference())
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<no-next-method-error>"))
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
     }
@@ -383,7 +383,7 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass("ROOT", ctx.namedSymbol("<io-error>").identityReference()),
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<io-error>")),
             ctx.namedSymbol("message"), exception.getMessage()
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());
@@ -400,7 +400,7 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass("ROOT", ctx.namedSymbol("<conversion-error>").identityReference()),
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<conversion-error>")),
             ctx.namedSymbol("value"), value,
             ctx.namedSymbol("to"), to
         );
@@ -417,7 +417,7 @@ public class ISLISPErrorSignalerNode extends Node {
         var ctx = ISLISPContext.get(this);
         var condition = getCreateCallNode().call(
             null,
-            ctx.lookupClass("ROOT", ctx.namedSymbol("<immutable-binding-error>").identityReference()),
+            ctx.lookupClass("ROOT", ctx.namedSymbol("<immutable-binding-error>")),
             ctx.namedSymbol("binding"), bindingName
         );
         return getSignalCallNode().call(null, condition, ctx.getNil());

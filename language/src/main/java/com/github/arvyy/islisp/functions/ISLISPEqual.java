@@ -45,7 +45,7 @@ public abstract class ISLISPEqual extends RootNode {
     Object isEqual(Object o1, Object o2) {
         var nil = ISLISPContext.get(this).getNil();
         var isEq = getEqCallNode().call(null, o1, o2);
-        if (isEq instanceof Symbol s && s.identityReference() == nil.identityReference()) {
+        if (isEq instanceof Symbol s && s == nil) {
             return executeGeneric(o1, o2);
         } else {
             return isEq;
@@ -153,7 +153,7 @@ public abstract class ISLISPEqual extends RootNode {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
-                ctx.lookupFunction("ROOT", ctx.namedSymbol("eq").identityReference())
+                ctx.lookupFunction("ROOT", ctx.namedSymbol("eq"))
                     .callTarget());
             eqCallNode = insert(callNode);
         }

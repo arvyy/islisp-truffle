@@ -82,6 +82,11 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
     }
 
     @Override
+    protected Object getScope(ISLISPContext context) {
+        return context.getModule("ROOT");
+    }
+
+    @Override
     protected OptionDescriptors getOptionDescriptors() {
         return new ISLISPTruffleLanguageOptionDescriptors();
     }

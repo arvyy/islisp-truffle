@@ -33,7 +33,7 @@ public class ISLISPDefMacroNode extends ISLISPExpressionNode {
         var ctx = ISLISPContext.get(this);
         ctx.registerMacro(
             defun.module,
-            defun.name.identityReference(), new LispFunction(defun.functionNode.getCallTarget()));
+            defun.name, new LispFunction(defun.functionNode.getCallTarget()));
         return defun.name;
     }
 }

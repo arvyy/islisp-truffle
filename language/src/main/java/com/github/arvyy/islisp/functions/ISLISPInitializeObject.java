@@ -27,7 +27,7 @@ public class ISLISPInitializeObject extends RootNode {
             for (int j = 0; j < clazz.slots().length; j++) {
                 var slot = clazz.slots()[j];
                 if (slot.initArg() != null
-                    && slot.initArg().getId() == initArg.identityReference().getId()
+                    && slot.initArg().identityReference().getId() == initArg.identityReference().getId()
                     && slot.property().getObject(obj.data()) == null
                 ) {
                     slot.property().setObject(obj.data(), frame.getArguments()[i + 1]);

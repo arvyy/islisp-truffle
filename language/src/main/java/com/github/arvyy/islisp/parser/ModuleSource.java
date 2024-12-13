@@ -1,6 +1,6 @@
 package com.github.arvyy.islisp.parser;
 
-import com.github.arvyy.islisp.runtime.SymbolReference;
+import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.List;
@@ -18,6 +18,6 @@ public record ModuleSource(
     String name,
     SourceSection sourceSection,
     List<String> requires,
-    List<SymbolReference> provides,
+    List<Symbol> provides,
     List<Object> content
 ) { }
