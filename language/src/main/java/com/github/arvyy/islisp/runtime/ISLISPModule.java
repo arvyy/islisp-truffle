@@ -413,6 +413,7 @@ public class ISLISPModule implements TruffleObject {
         return ISLISPTruffleLanguage.class;
     }
 
+    @CompilerDirectives.TruffleBoundary
     @ExportMessage
     String toDisplayString(boolean ignored) {
         return "Module " + name;
