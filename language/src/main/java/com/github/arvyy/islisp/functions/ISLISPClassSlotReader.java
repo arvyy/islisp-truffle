@@ -59,7 +59,7 @@ public abstract class ISLISPClassSlotReader extends RootNode {
     @CompilerDirectives.TruffleBoundary
     StaticProperty lookupProperty(StandardClass clazz) {
         for (var classSlot: clazz.slots()) {
-            if (classSlot.name().equals(slot.identityReference())) {
+            if (classSlot.name().equals(slot)) {
                 return classSlot.property();
             }
         }
