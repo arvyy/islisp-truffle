@@ -4,7 +4,6 @@ import com.github.arvyy.islisp.ISLISPTruffleLanguage;
 import com.github.arvyy.islisp.SetfTransformer;
 import com.github.arvyy.islisp.parser.Declaration;
 import com.oracle.truffle.api.CompilerDirectives;
-import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.library.ExportLibrary;
@@ -38,6 +37,8 @@ public class ISLISPModule implements TruffleObject {
     private final Map<String, Object> visibleMembers;
     /**
      * Create empty module.
+     *
+     * @param name module name
      */
     public ISLISPModule(String name) {
         this.name = name;
@@ -95,6 +96,7 @@ public class ISLISPModule implements TruffleObject {
      * @param symbolReference variable name
      * @param init initialization value
      * @param readonly if the variable is a constant
+     * @param sourceSection associated source section
      */
     @CompilerDirectives.TruffleBoundary
     public void registerGlobalVar(Symbol symbolReference, Object init, boolean readonly, SourceSection sourceSection) {
@@ -392,33 +394,33 @@ public class ISLISPModule implements TruffleObject {
     }
 
     @ExportMessage
-    public boolean isScope() {
+    boolean isScope() {
         return true;
     }
 
     @ExportMessage
-    public boolean hasMembers() {
+    boolean hasMembers() {
         return true;
     }
 
     @ExportMessage
-    public boolean hasLanguage() {
+    boolean hasLanguage() {
         return true;
     }
 
     @ExportMessage
-    public Class<ISLISPTruffleLanguage> getLanguage() {
+    Class<ISLISPTruffleLanguage> getLanguage() {
         return ISLISPTruffleLanguage.class;
     }
 
     @ExportMessage
-    public String toDisplayString(boolean ignored) {
+    String toDisplayString(boolean ignored) {
         return "Module " + name;
     }
 
     @ExportMessage
     @CompilerDirectives.TruffleBoundary
-    public LispVector getMembers(boolean ignored) {
+    LispVector getMembers(boolean ignored) {
         var lst = new ArrayList<ISLISPModuleMemberString>(getMembersInternal(false));
         for (var m: importedModules) {
             lst.addAll(m.getMembersInternal(true));
@@ -428,19 +430,19 @@ public class ISLISPModule implements TruffleObject {
 
     @ExportMessage
     @CompilerDirectives.TruffleBoundary
-    public boolean isMemberReadable(String name) {
-        return visibleMembers.containsKey(name);
+    boolean isMemberReadable(String memberName) {
+        return visibleMembers.containsKey(memberName);
     }
 
     @ExportMessage
     @CompilerDirectives.TruffleBoundary
-    public Object readMember(String name) {
-        return visibleMembers.get(name);
+    Object readMember(String memberName) {
+        return visibleMembers.get(memberName);
     }
 
     @CompilerDirectives.TruffleBoundary
     private List<ISLISPModuleMemberString> getMembersInternal(boolean exportedOnly) {
-        Predicate<Symbol> include = name -> !exportedOnly || exports.contains(name);
+        Predicate<Symbol> include = symbolName -> !exportedOnly || exports.contains(symbolName);
         var lst = new ArrayList<ISLISPModuleMemberString>();
         for (var e: globalFunctions.keySet()) {
             if (!include.test(e)) {
@@ -488,7 +490,7 @@ class ISLISPModuleMemberString implements TruffleObject {
 
     private final String name;
     private final SourceSection source;
-    public ISLISPModuleMemberString(String name, SourceSection source) {
+    ISLISPModuleMemberString(String name, SourceSection source) {
         this.name = name;
         this.source = source;
     }

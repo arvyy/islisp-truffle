@@ -16,6 +16,7 @@ import java.util.List;
  * @param shape truffle shape to create instances from
  * @param slots defclass slots
  * @param isAbstract abstract flag
+ * @param sourceSection associated source section
  */
 public record StandardClass(
         String name,

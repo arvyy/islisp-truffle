@@ -11,6 +11,10 @@ public class ValueReference {
     private boolean readOnly;
     private final SourceSection sourceSection;
 
+    /**
+     *
+     * @param sourceSection associated source section
+     */
     public ValueReference(SourceSection sourceSection) {
         this.sourceSection = sourceSection;
     }

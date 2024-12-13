@@ -371,7 +371,13 @@ public class ISLISPContext {
      * @param sourceSection source section corresponding to declaration site
      */
     @CompilerDirectives.TruffleBoundary
-    public void registerGlobalVar(String module, Symbol symbolReference, Object init, boolean readonly, SourceSection sourceSection) {
+    public void registerGlobalVar(
+        String module,
+        Symbol symbolReference,
+        Object init,
+        boolean readonly,
+        SourceSection sourceSection
+    ) {
         modules.get(module).registerGlobalVar(symbolReference, init, readonly, sourceSection);
     }
 
