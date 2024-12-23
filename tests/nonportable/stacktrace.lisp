@@ -117,5 +117,15 @@
         (print "FAIL")))
 (print "")
 
+;;;;; domain-error
+(block exit
+    (with-handler
+        (lambda (condition)
+            (report-condition condition (standard-output))
+            (return-from exit nil))
+        (+ 1 "1")
+        (print "FAIL")))
+(print "")
+
 
 (finish-output (standard-output))

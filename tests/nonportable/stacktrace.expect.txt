@@ -34,3 +34,6 @@ Attempted to change immutable binding shouldbeimmutable
 Error with value: test
     at islispprelude.lisp:71
     at stacktrace.lisp:116
+
+Unexpected type. Expected a value of class #<class <number>>, got "1".
+    at stacktrace.lisp:126

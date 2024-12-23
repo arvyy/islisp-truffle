@@ -189,6 +189,13 @@
     (format-char stream #\newline)
     (print-stacktrace stream condition))
 
+(defmethod report-condition ((condition <domain-error>) (stream <stream>))
+    (format-object stream (domain-error-message condition) nil)
+    (format stream ". Expected a value of class ~S, got ~S.~%"
+        (domain-error-expected-class condition)
+        (domain-error-object condition))
+    (print-stacktrace stream condition))
+
 (defun min (first :rest xs)
   (for ((value first (let ((x (car xs)))
                        (if (< x value)
