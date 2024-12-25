@@ -1,9 +1,10 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
+import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.exceptions.ISLISPContinueException;
 import com.github.arvyy.islisp.exceptions.ISLISPError;
-import com.github.arvyy.islisp.exceptions.ISLISPNonContinuableCondition;
+import com.github.arvyy.islisp.exceptions.ISLISPUncaughtConditionException;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNode;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNodeGen;
@@ -80,28 +81,29 @@ public class ISLISPSignalCondition extends RootNode {
         }
         var continuable = frame.getArguments()[2];
         setContinuable.call(null, continuable, conditionValue);
-        if (continuable != ctx.getNil()) {
-            var handler = ctx.popHandler();
-            // it's possible no handler is active, in which case treat it same as non-continuable.
-            // (eg., in a case when islisp function was returned from eval, and then called
-            // from a different truffle language / context)
-            if (handler == null) {
-                throw new ISLISPNonContinuableCondition(conditionValue);
-            }
-            try {
-                dispatchNode.executeDispatch(handler, new Object[]{conditionValue});
-                throw new ISLISPError("Condition handler returned normally", this);
-            } catch (ISLISPContinueException e) {
-                if (e.getCondition() == conditionValue) {
-                    return e.getValue();
-                } else {
-                    throw e;
+        var handler = ctx.popHandler();
+        // it's possible no handler is active, in which case throw special exception to indicate it.
+        // (eg., in a case when islisp function was returned from eval, and then called
+        // from a different truffle language / context)
+        if (handler == null) {
+            throw new ISLISPUncaughtConditionException(conditionValue);
+        }
+        try {
+            dispatchNode.executeDispatch(handler, new Object[]{conditionValue});
+            // ISLISP spec requires handler to do non-local transfer
+            throw new ISLISPError("Condition handler returned normally", this);
+        } catch (ISLISPContinueException e) {
+            if (e.getCondition() == conditionValue) {
+                // non-continuable exception shouldn't be able to be continued >:(
+                if (Utils.isNil(continuable)) {
+                    throw new ISLISPError("Condition is not continuable", this);
                 }
-            } finally {
-                ctx.pushHandler(handler);
+                return e.getValue();
+            } else {
+                throw e;
             }
-        } else {
-            throw new ISLISPNonContinuableCondition(conditionValue);
+        } finally {
+            ctx.pushHandler(handler);
         }
     }
 

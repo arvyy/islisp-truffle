@@ -133,6 +133,7 @@ public final class Main {
                 if (line.startsWith(",l ")) {
                     source = Source
                         .newBuilder("islisp", new File(line.substring(3)))
+                        .interactive(true)
                         .build();
                 } else {
                     source = Source

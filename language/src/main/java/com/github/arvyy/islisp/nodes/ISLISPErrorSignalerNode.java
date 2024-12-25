@@ -153,7 +153,7 @@ public class ISLISPErrorSignalerNode extends Node {
             sRequiredMin(), min,
             sRequiredMax(), max
         );
-        return getSignalCallNode().call(null, condition, ctx.getNil());
+        return getSignalCallNode().call(null, condition, ctx.getT());
     }
 
     /**
@@ -209,7 +209,7 @@ public class ISLISPErrorSignalerNode extends Node {
             sObject(), obj,
             sExpectedClass(), expectedClass
         );
-        return getSignalCallNode().call(null, condition, ctx.getNil());
+        return getSignalCallNode().call(null, condition, ctx.getT());
     }
 
     /**
@@ -226,7 +226,7 @@ public class ISLISPErrorSignalerNode extends Node {
             ctx.namedSymbol("name"), name,
             ctx.namedSymbol("namespace"), ctx.namedSymbol("variable")
         );
-        return getSignalCallNode().call(null, condition, ctx.getNil());
+        return getSignalCallNode().call(null, condition, ctx.getT());
     }
 
     /**
@@ -243,7 +243,7 @@ public class ISLISPErrorSignalerNode extends Node {
             ctx.namedSymbol("name"), name,
             ctx.namedSymbol("namespace"), ctx.namedSymbol("function")
         );
-        return getSignalCallNode().call(null, condition, ctx.getNil());
+        return getSignalCallNode().call(null, condition, ctx.getT());
     }
 
     /**
@@ -260,7 +260,7 @@ public class ISLISPErrorSignalerNode extends Node {
             ctx.namedSymbol("name"), name,
             ctx.namedSymbol("namespace"), ctx.namedSymbol("class")
         );
-        return getSignalCallNode().call(null, condition, ctx.getNil());
+        return getSignalCallNode().call(null, condition, ctx.getT());
     }
 
     @CompilerDirectives.TruffleBoundary
@@ -305,7 +305,7 @@ public class ISLISPErrorSignalerNode extends Node {
             null,
             ctx.lookupClass("ROOT", ctx.namedSymbol("<end-of-stream>"))
         );
-        return getSignalCallNode().call(null, condition, ctx.getNil());
+        return getSignalCallNode().call(null, condition, ctx.getT());
     }
 
     /**
@@ -319,7 +319,7 @@ public class ISLISPErrorSignalerNode extends Node {
             null,
             ctx.lookupClass("ROOT", ctx.namedSymbol("<division-by-zero>"))
         );
-        return getSignalCallNode().call(null, condition, ctx.getNil());
+        return getSignalCallNode().call(null, condition, ctx.getT());
     }
 
     /**
@@ -337,7 +337,7 @@ public class ISLISPErrorSignalerNode extends Node {
             sBounds(), bounds,
             sActual(), actual
         );
-        return getSignalCallNode().call(null, condition, ctx.getNil());
+        return getSignalCallNode().call(null, condition, ctx.getT());
     }
 
     /**
@@ -351,7 +351,7 @@ public class ISLISPErrorSignalerNode extends Node {
             null,
             ctx.lookupClass("ROOT", ctx.namedSymbol("<no-next-method-error>"))
         );
-        return getSignalCallNode().call(null, condition, ctx.getNil());
+        return getSignalCallNode().call(null, condition, ctx.getT());
     }
 
     /**
@@ -368,7 +368,7 @@ public class ISLISPErrorSignalerNode extends Node {
             cTruffleInteropError(),
             sMessage(), interopException.getMessage()
         );
-        return getSignalCallNode().call(null, condition, ctx.getNil());
+        return getSignalCallNode().call(null, condition, ctx.getT());
     }
 
 
@@ -386,7 +386,7 @@ public class ISLISPErrorSignalerNode extends Node {
             ctx.lookupClass("ROOT", ctx.namedSymbol("<io-error>")),
             ctx.namedSymbol("message"), exception.getMessage()
         );
-        return getSignalCallNode().call(null, condition, ctx.getNil());
+        return getSignalCallNode().call(null, condition, ctx.getT());
     }
 
     /**
@@ -404,7 +404,7 @@ public class ISLISPErrorSignalerNode extends Node {
             ctx.namedSymbol("value"), value,
             ctx.namedSymbol("to"), to
         );
-        return getSignalCallNode().call(null, condition, ctx.getNil());
+        return getSignalCallNode().call(null, condition, ctx.getT());
     }
 
     /**
@@ -420,6 +420,6 @@ public class ISLISPErrorSignalerNode extends Node {
             ctx.lookupClass("ROOT", ctx.namedSymbol("<immutable-binding-error>")),
             ctx.namedSymbol("binding"), bindingName
         );
-        return getSignalCallNode().call(null, condition, ctx.getNil());
+        return getSignalCallNode().call(null, condition, ctx.getT());
     }
 }

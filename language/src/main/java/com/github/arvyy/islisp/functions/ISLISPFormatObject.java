@@ -55,13 +55,14 @@ public abstract class ISLISPFormatObject extends RootNode {
      * Util java procedure to give same string representation as what format-object produces.
      *
      * @param o value
+     * @param escape if values should be present in a readable form (eg., show double quotes for string)
      * @return display string
      */
     @CompilerDirectives.TruffleBoundary
-    public static String format(Object o) {
+    public static String format(Object o, boolean escape) {
         try {
             var stream = new LispStream(null, new ByteArrayOutputStream());
-            doPrint(stream, o, false);
+            doPrint(stream, o, escape);
             return stream.getOutputString().get();
         } catch (Exception e) {
             return "";

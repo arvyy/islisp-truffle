@@ -76,7 +76,7 @@ public class Parser {
      */
     public ISLISPRootNode createInlineDebuggerEvalNode(
         ISLISPTruffleLanguage language,
-        ISLISPDebuggerNode debuggerNode,
+        ISLISPExpressionNode debuggerNode,
         Source source
     ) {
         var reader = new Reader(source, sourceSectionMap);

@@ -28,6 +28,6 @@ public class ISLISPTruffleLanguageView implements TruffleObject {
 
     @ExportMessage
     Object toDisplayString(boolean ignored) {
-        return ISLISPFormatObject.format(object);
+        return ISLISPFormatObject.format(object, false);
     }
 }

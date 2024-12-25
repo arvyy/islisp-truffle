@@ -1,9 +1,10 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPInteractiveExitException;
+import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNode;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNodeGen;
+import com.github.arvyy.islisp.nodes.ISLISPInteractiveDebugger;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -20,12 +21,19 @@ public class ISLISPDefaultHandler extends RootNode {
     @Child
     private ISLISPFunctionDispatchNode dispatchNode;
 
+    @Child
+    private ISLISPInteractiveDebugger interactiveDebugger;
+
     private final boolean isInteractive;
 
-    ISLISPDefaultHandler(TruffleLanguage<?> language, boolean isInteractive) {
+    ISLISPDefaultHandler(
+        TruffleLanguage<?> language,
+        boolean isInteractive
+    ) {
         super(language);
         this.isInteractive = isInteractive;
         dispatchNode = ISLISPFunctionDispatchNodeGen.create();
+        interactiveDebugger = new ISLISPInteractiveDebugger();
     }
 
     @Override
@@ -41,7 +49,8 @@ public class ISLISPDefaultHandler extends RootNode {
         var condition = frame.getArguments()[1];
         dispatchNode.executeDispatch(reportConditionFunction, new Object[]{condition, errorOutput});
         if (isInteractive) {
-            throw new ISLISPInteractiveExitException(condition);
+            interactiveDebugger.startRepl(condition);
+            throw new ISLISPError("Interactive debugger returned normally", this);
         } else {
             return dispatchNode.executeDispatch(exitFunction, new Object[] {1});
         }

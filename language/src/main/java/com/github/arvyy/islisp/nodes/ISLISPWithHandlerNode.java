@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.exceptions.ISLISPNonContinuableCondition;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
@@ -49,22 +48,17 @@ public class ISLISPWithHandlerNode extends ISLISPExpressionNode {
         if (handlerFunctionValue instanceof LispFunction handlerFunction)  {
             var ctx = ISLISPContext.get(this);
             ctx.pushHandler(handlerFunction);
-            // double try, because ctx.popHandler has to happen before the catch of non-continuable exception
             try {
-                try {
-                    if (body.length == 0) {
-                        return ctx.getNil();
-                    } else {
-                        for (var i = 0; i < body.length - 1; i++) {
-                            body[i].executeGeneric(frame);
-                        }
-                        return body[body.length - 1].executeGeneric(frame);
+                if (body.length == 0) {
+                    return ctx.getNil();
+                } else {
+                    for (var i = 0; i < body.length - 1; i++) {
+                        body[i].executeGeneric(frame);
                     }
-                } finally {
-                    ctx.popHandler();
+                    return body[body.length - 1].executeGeneric(frame);
                 }
-            } catch (ISLISPNonContinuableCondition e) {
-                return handlerDispatch.executeDispatch(handlerFunction, new Object[]{e.getCondition()});
+            } finally {
+                ctx.popHandler();
             }
         } else {
             return errorSignalerNode.signalWrongType(

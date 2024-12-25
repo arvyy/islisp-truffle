@@ -3,14 +3,10 @@ package com.github.arvyy.islisp.exceptions;
 import com.oracle.truffle.api.exception.AbstractTruffleException;
 
 /**
- * Control flow exception that unwinds stack from point of signal
- * to the handler for non-continuable conditions.
- *
- * See
- * @{@link com.github.arvyy.islisp.functions.ISLISPSignalCondition},
- * @{@link com.github.arvyy.islisp.nodes.ISLISPWithHandlerNode}.
+ * Exception thrown in case a condition is signalled, but no
+ * signal handler is present (can happen if an islisp function is stored and reinvoked from non-islisp context).
  */
-public class ISLISPNonContinuableCondition extends AbstractTruffleException {
+public class ISLISPUncaughtConditionException extends AbstractTruffleException {
 
     private final Object condition;
 
@@ -19,7 +15,7 @@ public class ISLISPNonContinuableCondition extends AbstractTruffleException {
      *
      * @param condition condition value
      */
-    public ISLISPNonContinuableCondition(Object condition) {
+    public ISLISPUncaughtConditionException(Object condition) {
         this.condition = condition;
     }
 
@@ -29,4 +25,5 @@ public class ISLISPNonContinuableCondition extends AbstractTruffleException {
     public Object getCondition() {
         return condition;
     }
+
 }
