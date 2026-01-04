@@ -59,7 +59,7 @@ public abstract class ISLISPMapcar extends RootNode {
         while (true) {
             for (int i = 0; i < args.length; i++) {
                 var arg = lists[i];
-                if (Utils.isNil(arg)) {
+                if (Utils.isNil(this, arg)) {
                     break outter;
                 } else if (arg instanceof Pair p) {
                     args[i] = p.car();

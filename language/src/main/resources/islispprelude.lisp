@@ -226,7 +226,7 @@
 
 (declaim (inline >=))
 (defun >= (x1 x2)
-  (or (> x1 x2) (= x1 x2)))
+  (not (> x2 x1)))
 
 (declaim (inline <))
 (defun < (x1 x2)
@@ -234,7 +234,7 @@
 
 (declaim (inline <=))
 (defun <= (x1 x2)
-  (or (< x1 x2) (= x1 x2)))
+  (not (> x1 x2)))
 
 (declaim (inline char/=))
 (defun char/= (x1 x2)
@@ -242,7 +242,7 @@
 
 (declaim (inline char>=))
 (defun char>= (x1 x2)
-  (or (char> x1 x2) (char= x1 x2)))
+  (not (char< x1 x2)))
 
 (declaim (inline char>))
 (defun char> (x1 x2)
@@ -250,7 +250,7 @@
 
 (declaim (inline char<=))
 (defun char<= (x1 x2)
-  (or (char< x1 x2) (char= x1 x2)))
+  (not (char< x2 x1)))
 
 (defun string< (s1 s2)
   (block string<
@@ -279,11 +279,11 @@
 
 (declaim (inline string>=))
 (defun string>= (s1 s2)
-  (or (string> s1 s2) (string= s1 s2)))
+  (not (string< s1 s2)))
 
 (declaim (inline string<=))
 (defun string<= (s1 s2)
-  (or (string< s1 s2) (string= s1 s2)))
+  (not (string< s2 s1)))
 
 (declaim (inline string/=))
 (defun string/= (s1 s2)

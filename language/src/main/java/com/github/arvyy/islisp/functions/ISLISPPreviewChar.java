@@ -92,7 +92,7 @@ public abstract class ISLISPPreviewChar extends RootNode {
             if (codepoint != -1) {
                 return new LispChar(codepoint);
             }
-            if (Utils.isNil(eosErrorP)) {
+            if (Utils.isNil(this, eosErrorP)) {
                 return eosValue;
             } else {
                 return errorSignalerNode.signalEndOfStream();

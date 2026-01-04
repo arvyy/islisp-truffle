@@ -99,7 +99,7 @@ public class ISLISPForNode extends ISLISPExpressionNode {
         @Override
         public boolean executeRepeating(VirtualFrame frame) {
             var test = testExpression.executeGeneric(frame);
-            if (Utils.isNil(test)) {
+            if (Utils.isNil(this, test)) {
                 runIteration(frame);
                 return true;
             }

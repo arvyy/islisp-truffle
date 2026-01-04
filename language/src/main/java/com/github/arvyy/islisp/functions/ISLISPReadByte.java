@@ -89,7 +89,7 @@ public abstract class ISLISPReadByte extends RootNode {
             if (b != -1) {
                 return b;
             }
-            if (Utils.isNil(eosErrorP)) {
+            if (Utils.isNil(this, eosErrorP)) {
                 return eosValue;
             } else {
                 return errorSignalerNode.signalEndOfStream();

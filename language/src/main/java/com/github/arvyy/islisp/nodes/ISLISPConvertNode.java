@@ -134,7 +134,7 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
 
         @Specialization
         Object convertList(Symbol s) {
-            if (Utils.isNil(s)) {
+            if (Utils.isNil(this, s)) {
                 return s;
             }
             return fallback(s);

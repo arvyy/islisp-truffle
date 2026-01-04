@@ -76,7 +76,7 @@ public abstract class ISLISPCreateArray extends RootNode {
 
     @Specialization
     Object executeProper(Pair dimensions, Object initValue) {
-        if (isNil(dimensions.cdr())) {
+        if (isNil(this, dimensions.cdr())) {
             return getCreateVectorNode().call(null, dimensions.car(), initValue);
         } else {
             var dimensionsSize = (int) getLengthNode().call(null, dimensions);

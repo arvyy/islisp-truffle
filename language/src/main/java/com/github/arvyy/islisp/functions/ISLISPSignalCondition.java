@@ -95,7 +95,7 @@ public class ISLISPSignalCondition extends RootNode {
         } catch (ISLISPContinueException e) {
             if (e.getCondition() == conditionValue) {
                 // non-continuable exception shouldn't be able to be continued >:(
-                if (Utils.isNil(continuable)) {
+                if (Utils.isNil(this, continuable)) {
                     throw new ISLISPError("Condition is not continuable", this);
                 }
                 return e.getValue();

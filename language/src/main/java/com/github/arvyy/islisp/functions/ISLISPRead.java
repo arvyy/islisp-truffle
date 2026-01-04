@@ -96,7 +96,7 @@ public abstract class ISLISPRead extends RootNode {
         if (maybeDatum.isPresent()) {
             return maybeDatum.get();
         }
-        if (Utils.isNil(eosErrorP)) {
+        if (Utils.isNil(this, eosErrorP)) {
             return eosValue;
         } else {
             return errorSignalerNode.signalEndOfStream();

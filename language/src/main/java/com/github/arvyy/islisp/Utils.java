@@ -3,6 +3,7 @@ package com.github.arvyy.islisp;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.nodes.ControlFlowException;
+import com.oracle.truffle.api.nodes.Node;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,11 +95,12 @@ public final class Utils {
     /**
      * Is given object a nil symbol.
      *
+     * @param n Truffle node invoking the method
      * @param o any object
      * @return true if o is nil
      */
-    public static boolean isNil(Object o) {
-        var ctx = ISLISPContext.get(null);
+    public static boolean isNil(Node n, Object o) {
+        var ctx = ISLISPContext.get(n);
         var nil = ctx.getNil();
         return o instanceof Symbol s && s.identityReference() == nil.identityReference();
     }

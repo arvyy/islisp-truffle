@@ -51,7 +51,7 @@ public class ISLISPCondNode extends ISLISPExpressionNode {
                 ? content.length
                 : offsets[i + 1];
             var testValue = content[start].executeGeneric(frame);
-            if (!Utils.isNil(testValue)) {
+            if (!Utils.isNil(this, testValue)) {
                 if (start + 1 == end) {
                     return testValue;
                 }

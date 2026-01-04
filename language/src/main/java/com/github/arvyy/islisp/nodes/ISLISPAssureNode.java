@@ -54,7 +54,7 @@ public class ISLISPAssureNode extends ISLISPExpressionNode {
         }
         var obj = expressionNode.executeGeneric(frame);
         var isSubclass = instancepCall.call(null, obj, lispClass);
-        if (Utils.isNil(isSubclass)) {
+        if (Utils.isNil(this, isSubclass)) {
             return errorSignalerNode.signalWrongType(obj, lispClass);
         }
         return obj;

@@ -103,7 +103,7 @@ public abstract class ISLISPEqual extends RootNode {
     Object doPairs(Pair p1, Pair p2) {
         var ctx = ISLISPContext.get(this);
         var nil = ctx.getNil();
-        if (isNil(isEqual(p1.car(), p2.car()))) {
+        if (isNil(this, isEqual(p1.car(), p2.car()))) {
             return nil;
         }
         return isEqual(p1.cdr(), p2.cdr());
@@ -117,7 +117,7 @@ public abstract class ISLISPEqual extends RootNode {
             return nil;
         }
         for (int i = 0; i < v1.values().length; i++) {
-            if (isNil(isEqual(v1.values()[i], v2.values()[i]))) {
+            if (isNil(this, isEqual(v1.values()[i], v2.values()[i]))) {
                 return nil;
             }
         }

@@ -72,7 +72,7 @@ public abstract class ISLISPSetElt extends RootNode {
                 cell = pair;
                 continue;
             }
-            if (Utils.isNil(cell.cdr())) {
+            if (Utils.isNil(this, cell.cdr())) {
                 try {
                     return errorSignalerNode.signalIndexOutOfRange(index,  getListSize(p));
                 } catch (Utils.NotAList e) {

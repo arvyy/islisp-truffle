@@ -80,7 +80,7 @@ public class ISLISPCaseNode extends ISLISPExpressionNode {
             var matched = false;
             for (var obj: keys[i]) {
                 try {
-                    if (!Utils.isNil(interop.execute(fn, obj, value))) {
+                    if (!Utils.isNil(this, interop.execute(fn, obj, value))) {
                         matched = true;
                         break;
                     }

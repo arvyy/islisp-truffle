@@ -94,7 +94,7 @@ public abstract class ISLISPElt extends RootNode {
                 value = pair;
                 continue;
             }
-            if (Utils.isNil(value.cdr())) {
+            if (Utils.isNil(this, value.cdr())) {
                 try {
                     return errorSignalerNode.signalIndexOutOfRange(index,  getListSize(p));
                 } catch (Utils.NotAList e) {

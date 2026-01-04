@@ -59,7 +59,7 @@ public abstract class ISLISPMapcan extends RootNode {
         while (true) {
             for (int i = 0; i < args.length; i++) {
                 var arg = lists[i];
-                if (Utils.isNil(arg)) {
+                if (Utils.isNil(this, arg)) {
                     break outter;
                 } else if (arg instanceof Pair p) {
                     args[i] = p.car();
@@ -69,15 +69,15 @@ public abstract class ISLISPMapcan extends RootNode {
                 }
             }
             var mappedValue = fn.execute(o, args);
-            if (head == null && !Utils.isNil(mappedValue)) {
+            if (head == null && !Utils.isNil(this, mappedValue)) {
                 head = (Pair) mappedValue;
                 tail = head;
-                while (!Utils.isNil(tail.cdr())) {
+                while (!Utils.isNil(this, tail.cdr())) {
                     tail = (Pair) tail.cdr();
                 }
             } else if (head != null) {
                 tail.setCdr(mappedValue);
-                while (!Utils.isNil(tail.cdr())) {
+                while (!Utils.isNil(this, tail.cdr())) {
                     tail = (Pair) tail.cdr();
                 }
             }

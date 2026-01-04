@@ -89,7 +89,7 @@ public abstract class ISLISPReadLine extends RootNode {
             if (line != null) {
                 return line;
             }
-            if (Utils.isNil(eosErrorP)) {
+            if (Utils.isNil(this, eosErrorP)) {
                 return eosValue;
             } else {
                 return errorSignalerNode.signalEndOfStream();
