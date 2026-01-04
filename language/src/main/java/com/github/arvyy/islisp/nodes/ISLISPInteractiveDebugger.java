@@ -103,8 +103,6 @@ public class ISLISPInteractiveDebugger extends Node {
                 }
             }
         }
-        System.out.println(signallingNode);
-        System.out.println(condition);
     }
 
     @CompilerDirectives.TruffleBoundary
