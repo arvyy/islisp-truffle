@@ -16,7 +16,7 @@ Runs brainfuck interpreter, which interprets a brainfuck interpreter, which comp
 
 image::images/bf.svg[]
 
-== Dyhnamic dispatch
+== Multi-dispatch
 
 Runs some adhoc generic methods, dynamically dispatching on iteration logic and fold logic; measured in seconds.
 
