@@ -303,6 +303,10 @@
 (defun integerp (obj)
   (instancep obj (class <integer>)))
 
+(declaim (inline floatp))
+(defun floatp (obj)
+  (instancep obj (class <float>)))
+
 (declaim (inline characterp))
 (defun characterp (obj)
   (instancep obj (class <character>)))

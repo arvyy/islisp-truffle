@@ -175,6 +175,7 @@ public class ISLISPContext {
         initGlobalFunction("eval", ISLISPEval::makeLispFunction);
         initGlobalFunction("file-position", ISLISPFilePosition::makeLispFunction);
         initGlobalFunction("finish-output", ISLISPFinishOutput::makeLispFunction);
+        initGlobalFunction("float", ISLISPFloat::makeLispFunction);
         initGlobalFunction("floor", ISLISPRoundingFunctions::makeLispFunctionFloor);
         initGlobalFunction("format", ISLISPFormat::makeLispFunction);
         initGlobalFunction("format-char", ISLISPFormatChar::makeLispFunction);
@@ -359,6 +360,8 @@ public class ISLISPContext {
     void initBuiltinVars() {
         modules.get("ROOT").registerGlobalVar(getNil(), getNil(), true, null);
         modules.get("ROOT").registerGlobalVar(getT(), getT(), true, null);
+        modules.get("ROOT").registerGlobalVar(namedSymbol("*most-positive-float*"), Double.MAX_VALUE, true, null);
+        modules.get("ROOT").registerGlobalVar(namedSymbol("*most-negative-float*"), -Double.MAX_VALUE, true, null);
     }
 
     /**
