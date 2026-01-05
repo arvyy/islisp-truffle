@@ -6,6 +6,10 @@ Afterwards the version will match truffle version followed by a date, eg. `24.0.
 
 == Unreleased
 
+* Optimize comparison functions (`>=`, ..., `char>=`, ...)
+* Add missing functions `float`, `floatp`
+* Add missing constants `*most-positive-float*`, `*most-negative-float*`
+
 == 0.0.2 (2024-10-06)
 
 * Add `--experimental-options` flag
