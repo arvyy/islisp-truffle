@@ -76,6 +76,7 @@ public abstract class ISLISPFloat extends RootNode {
     }
 
     @Specialization
+    @CompilerDirectives.TruffleBoundary
     double executeBigNum(LispBigInteger b) {
         return b.data().doubleValue();
     }
