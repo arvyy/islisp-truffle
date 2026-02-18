@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.runtime.SymbolReference;
 import com.oracle.truffle.api.frame.FrameDescriptor;
+import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -137,6 +138,7 @@ public class ParserContext {
         String name;
         int frameDepth;
         int slot;
+        SourceSection declarationLocation;
     }
 
     /**

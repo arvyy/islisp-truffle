@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp.parser;
 
 import com.github.arvyy.islisp.ISLISPContext;
+import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.nodes.ControlFlowException;
@@ -63,7 +64,7 @@ public sealed interface QuasiquoteTree {
      * @param tree
      * @param expressions
      */
-    record QuasiquoteTreeAndExpressions(QuasiquoteTree tree, Object[] expressions) { }
+    record QuasiquoteTreeAndExpressions(QuasiquoteTree tree, SyntaxObject[] expressions) { }
 
     /**
      * Parse sexpr into quasiquote tree.
@@ -72,7 +73,7 @@ public sealed interface QuasiquoteTree {
      * @param expr sexpr
      * @return quasiquote tree and expressions
      */
-    static QuasiquoteTreeAndExpressions parseQuasiquoteTree(SourceSection sourceSection, Object expr) {
+    static QuasiquoteTreeAndExpressions parseQuasiquoteTree(SourceSection sourceSection, SyntaxObject expr) {
         return parseQuasiquoteTree(sourceSection, expr, 0, 0);
     }
 
@@ -87,17 +88,19 @@ public sealed interface QuasiquoteTree {
 
     private static QuasiquoteTreeAndExpressions parseQuasiquoteTree(
         SourceSection sourceSection,
-        Object expr,
+        SyntaxObject expr,
         int level,
         int holeIndex
     ) {
-        if (expr instanceof Pair p) {
-            if (p.car() instanceof Symbol s) {
-                Object rest;
+        var exprValue = expr.value();
+        if (exprValue instanceof Pair p) {
+            java.util.List<SyntaxObject> content = Utils.readList(p);
+            if (content.size() >= 2 && content.get(0).value() instanceof Symbol s) {
+                SyntaxObject rest;
                 boolean isSplicing = false;
                 switch (s.name()) {
                     case "quasiquote":
-                        rest = ((Pair) p.cdr()).car();
+                        rest = content.get(1);
                         if (level > 0) {
                             return rewrap(parseQuasiquoteTree(sourceSection, rest, level + 1, holeIndex), s);
                         } else {
@@ -107,7 +110,7 @@ public sealed interface QuasiquoteTree {
                         isSplicing = true;
                         // fallthrough
                     case "unquote":
-                        rest = ((Pair) p.cdr()).car();
+                        rest = content.get(1);
                         if (level < 1) {
                             throw new ParsingException(
                                 sourceSection,
@@ -116,9 +119,9 @@ public sealed interface QuasiquoteTree {
                         if (level == 1) {
                             var hole = new Hole(holeIndex);
                             if (isSplicing) {
-                                return new QuasiquoteTreeAndExpressions(new UnquoteSplicing(hole), new Object[]{rest});
+                                return new QuasiquoteTreeAndExpressions(new UnquoteSplicing(hole), new SyntaxObject[]{rest});
                             } else {
-                                return new QuasiquoteTreeAndExpressions(new Unquote(hole), new Object[]{rest});
+                                return new QuasiquoteTreeAndExpressions(new Unquote(hole), new SyntaxObject[]{rest});
                             }
                         } else {
                             return rewrap(parseQuasiquoteTree(sourceSection, rest, level - 1, holeIndex), s);
@@ -127,37 +130,37 @@ public sealed interface QuasiquoteTree {
                 }
             }
             // regular list
-            var expressions = new ArrayList<Object>();
+            var expressions = new ArrayList<SyntaxObject>();
             var children = new ArrayList<QuasiquoteTree>();
-            for (var v: p) {
+            for (var v: content) {
                 var parsedChildResult = parseQuasiquoteTree(sourceSection, v, level, holeIndex + expressions.size());
                 expressions.addAll(Arrays.asList(parsedChildResult.expressions));
                 children.add(parsedChildResult.tree);
             }
             return new QuasiquoteTreeAndExpressions(
                     new List(children.toArray(QuasiquoteTree[]::new)),
-                    expressions.toArray(Object[]::new));
+                    expressions.toArray(SyntaxObject[]::new));
         }
-        if (expr instanceof LispVector v) {
-            var expressions = new ArrayList<Object>();
+        if (exprValue instanceof LispVector v) {
+            var expressions = new ArrayList<SyntaxObject>();
             var children = new ArrayList<QuasiquoteTree>();
             for (var el: v.values()) {
-                var parsedChildResult = parseQuasiquoteTree(sourceSection, el, level, holeIndex + expressions.size());
+                var parsedChildResult = parseQuasiquoteTree(sourceSection, (SyntaxObject) el, level, holeIndex + expressions.size());
                 expressions.addAll(Arrays.asList(parsedChildResult.expressions));
                 children.add(parsedChildResult.tree);
             }
             return new QuasiquoteTreeAndExpressions(
                 new Vector(children.toArray(QuasiquoteTree[]::new)),
-                expressions.toArray(Object[]::new));
+                expressions.toArray(SyntaxObject[]::new));
         }
-        if (expr instanceof Integer
-            || expr instanceof LispBigInteger
-            || expr instanceof Symbol
-            || expr instanceof LispChar
-            || expr instanceof String
-            || expr instanceof StringBuffer
+        if (exprValue instanceof Integer
+            || exprValue instanceof LispBigInteger
+            || exprValue instanceof Symbol
+            || exprValue instanceof LispChar
+            || exprValue instanceof String
+            || exprValue instanceof StringBuffer
         ) {
-            return new QuasiquoteTreeAndExpressions(new Atom(expr), new Object[]{});
+            return new QuasiquoteTreeAndExpressions(new Atom(exprValue), new SyntaxObject[]{});
         }
         throw new ParsingException(sourceSection, "Unrecognized quasi-quote form.");
     }

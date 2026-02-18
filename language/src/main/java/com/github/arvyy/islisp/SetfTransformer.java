@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp;
 
+import com.github.arvyy.islisp.parser.SyntaxObject;
+
 import java.util.List;
 
 /**
@@ -15,6 +17,6 @@ public interface SetfTransformer {
      * @param value value part expression
      * @return new sexpr
      */
-    Object transform(List<Object> form, Object value);
+    SyntaxObject transform(List<SyntaxObject> form, SyntaxObject value);
 
 }

@@ -19,5 +19,5 @@ public record ModuleSource(
     SourceSection sourceSection,
     List<String> requires,
     List<Symbol> provides,
-    List<Object> content
+    List<SyntaxObject> content
 ) { }
