@@ -4,10 +4,12 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.parser.ModuleSource;
 import com.github.arvyy.islisp.parser.Parser;
 import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.TruffleFile;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 /**
@@ -40,7 +42,7 @@ public class ISLISPModuleNode extends ISLISPExpressionNode {
         parser.ensureRequiresLoaded(source.requires());
         var ctx = ISLISPContext.get(this);
         if (ctx.getModule(source.name()) == null) {
-            ctx.createModule(source.name(), source.requires(), source.provides());
+            ctx.createModule(source.name(), source.sourceSection(), source.requires(), source.provides());
         }
         var nonDefinitionRoot = parser.expandAndExecuteDefinitions(source.name(), source.content());
         nonDefinitionExecutionNode = DirectCallNode.create(nonDefinitionRoot.getCallTarget());

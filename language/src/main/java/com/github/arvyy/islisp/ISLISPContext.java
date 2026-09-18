@@ -9,6 +9,7 @@ import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.nodes.Node;
+import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.*;
@@ -60,8 +61,8 @@ public class ISLISPContext {
         this.language = language;
         this.env = env;
         modules = new HashMap<>();
-        modules.put("ROOT", new ISLISPModule("main"));
-        modules.put("builtin/truffle.lisp", new ISLISPModule("builtin/truffle.lisp"));
+        modules.put("ROOT", new ISLISPModule("ROOT", null));
+        modules.put("builtin/truffle.lisp", new ISLISPModule("builtin/truffle.lisp", null));
         symbolProperties = new HashMap<>();
         symbols = new HashMap<>();
         currentOutputStream = new ValueReference(null);
@@ -95,11 +96,11 @@ public class ISLISPContext {
      * @param requiredModules list of required modules, must exist.
      * @param exports list of exports.
      */
-    public void createModule(String module, List<String> requiredModules, List<Symbol> exports) {
+    public void createModule(String module, SourceSection sourceSection, List<String> requiredModules, List<Symbol> exports) {
         if (modules.containsKey(module)) {
             throw new ParsingException(null, "Module already defined: " + module);
         }
-        var m = new ISLISPModule(module);
+        var m = new ISLISPModule(module, sourceSection);
         m.addImport(modules.get("ROOT"));
         for (var req: requiredModules) {
             if (!modules.containsKey(req)) {

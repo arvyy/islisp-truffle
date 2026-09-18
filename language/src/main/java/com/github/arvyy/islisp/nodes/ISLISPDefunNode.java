@@ -18,6 +18,10 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
 
     ISLISPRootNode functionNode;
 
+    public ISLISPRootNode getFunctionNode() {
+        return functionNode;
+    }
+
     /**
      * Create defun node.
      *

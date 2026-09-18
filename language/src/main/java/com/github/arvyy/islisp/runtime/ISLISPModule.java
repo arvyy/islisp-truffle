@@ -2,15 +2,23 @@ package com.github.arvyy.islisp.runtime;
 
 import com.github.arvyy.islisp.ISLISPTruffleLanguage;
 import com.github.arvyy.islisp.SetfTransformer;
+import com.github.arvyy.islisp.nodes.ISLISPExpressionNode;
 import com.github.arvyy.islisp.parser.Declaration;
+import com.github.arvyy.islisp.parser.NodeFinderVisitor;
+import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.RootCallTarget;
+import com.oracle.truffle.api.TruffleFile;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
+import com.oracle.truffle.api.nodes.NodeVisitor;
+import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.SourceSection;
 import com.oracle.truffle.api.strings.TruffleString;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -35,13 +43,22 @@ public class ISLISPModule implements TruffleObject {
     private final List<Declaration> declarations;
 
     private final Map<String, Object> visibleMembers;
+    private final SourceSection sourceSection;
+
+    @CompilerDirectives.CompilationFinal
+    private boolean initialized = false;
+
+    @CompilerDirectives.CompilationFinal
+    private RootNode bodyRoot = null;
+
     /**
      * Create empty module.
      *
      * @param name module name
      */
-    public ISLISPModule(String name) {
+    public ISLISPModule(String name, SourceSection sourceSection) {
         this.name = name;
+        this.sourceSection = sourceSection;
         exports = new HashSet<>();
         importedModules = new ArrayList<>();
         globalFunctions = new HashMap<>();
@@ -55,6 +72,27 @@ public class ISLISPModule implements TruffleObject {
         globalVars = new HashMap<>();
         declarations = new ArrayList<>();
         visibleMembers = new HashMap<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public void initialize() {
+        if (initialized) {
+            return;
+        }
+        CompilerDirectives.transferToInterpreterAndInvalidate();
+        initialized = true;
+        // TODO
+    }
+
+    public RootNode getBodyRoot() {
+        return bodyRoot;
     }
 
     /**
@@ -482,6 +520,31 @@ public class ISLISPModule implements TruffleObject {
             lst.add(new ISLISPModuleMemberString(e.name(), globalVars.get(e).getSourceLocation()));
         }
         return lst;
+    }
+
+    public Optional<SourceSection> getSourceSection() {
+        return Optional.ofNullable(sourceSection);
+    }
+
+    public Optional<ISLISPExpressionNode> findExpressionNode(SourceSection section) {
+        RootNode root = null;
+        for (var f: globalFunctions.values()) {
+            if (!f.hasSourceLocation()) {
+                continue;
+            }
+            if (NodeFinderVisitor.isSubSection(f.getSourceLocation(), section)) {
+                root = ((RootCallTarget) f.callTarget()).getRootNode();
+                break;
+            }
+        }
+        // TODO
+        if (root != null) {
+            var v = new NodeFinderVisitor(section);
+            root.accept(v);
+            return v.foundNode();
+        } else {
+            return Optional.empty();
+        }
     }
 
 }

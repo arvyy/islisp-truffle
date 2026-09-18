@@ -1502,7 +1502,7 @@ public class Parser {
             var source = Source.newBuilder("islisp", file).build();
             var moduleSource = parseModuleSource(module, source);
             ensureRequiresLoaded(moduleSource.requires());
-            ctx.createModule(module, moduleSource.requires(), moduleSource.provides());
+            ctx.createModule(module, moduleSource.sourceSection(), moduleSource.requires(), moduleSource.provides());
             new ISLISPModuleNode(this, moduleSource).initialize();
         } catch (IOException e) {
             throw new ParsingException(
