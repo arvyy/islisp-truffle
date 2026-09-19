@@ -19,6 +19,13 @@ public record SyntaxObject(Object value, SourceSection source) {
         return syntaxToDatum(value);
     }
 
+    /**
+    * Wraps datum with given source, if datum is a pair / list / array, does so recursively.
+    *
+    * @param datum lisp value to augment to syntax object
+    * @param source source section to pervasively attach
+    * @return augmented syntax object
+ */
     public static SyntaxObject fromDatum(Object datum, SourceSection source) {
         if (datum instanceof SyntaxObject s) {
             return s;

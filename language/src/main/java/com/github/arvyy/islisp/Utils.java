@@ -24,6 +24,7 @@ public final class Utils {
     /**
      * Parse sexpr (Pair or nil) to a java list.
      *
+     * @param <T> element type of the list
      * @param v sesxpr
      * @return java list
      */
@@ -81,7 +82,7 @@ public final class Utils {
      * @param lst java list
      * @return sexpr
      */
-    public static <T> Object listToValue(List<?> lst) {
+    public static Object listToValue(List<?> lst) {
         Object val = ISLISPContext.get(null).getNil();
         for (int i = lst.size() - 1; i >= 0; i--) {
             val = new Pair(lst.get(i), val);

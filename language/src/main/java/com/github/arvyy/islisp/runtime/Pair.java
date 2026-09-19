@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.runtime;
 
 import com.github.arvyy.islisp.Utils;
-import com.github.arvyy.islisp.parser.ParsingException;
 import com.github.arvyy.islisp.parser.SyntaxObject;
 import com.oracle.truffle.api.interop.TruffleObject;
 

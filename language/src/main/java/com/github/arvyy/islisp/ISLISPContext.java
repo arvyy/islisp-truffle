@@ -667,9 +667,9 @@ public class ISLISPContext {
     }
 
     /**
-     * Returns an interned version of the symbol
+     * Returns an interned version of the symbol.
      * @param s symbol
-     * @return interned symbol
+     * @return interned symbol reference
      */
     @CompilerDirectives.TruffleBoundary
     public Symbol namedSymbol(Symbol s) {

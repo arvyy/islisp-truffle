@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -267,7 +266,9 @@ public class Reader {
                     var endColumn = getColumn();
                     if (lst.isEmpty()) {
                         var nil = ISLISPContext.get(null).getNil();
-                        var section = source == null ? null : source.createSection(startLine, startColumn, endLine, endColumn);
+                        var section = source == null
+                            ? null
+                            : source.createSection(startLine, startColumn, endLine, endColumn);
                         return Optional.of(new SyntaxObject(nil, section));
                     } else {
                         tail = tail == null ? ISLISPContext.get(null).getNil() : tail;
@@ -275,7 +276,9 @@ public class Reader {
                             tail = new Pair(lst.get(i), tail);
                         }
                         var parsedTail = (Pair) tail;
-                        var section = source == null ? null : source.createSection(startLine, startColumn, endLine, endColumn);
+                        var section = source == null
+                            ? null
+                            : source.createSection(startLine, startColumn, endLine, endColumn);
                         return Optional.of(new SyntaxObject(parsedTail, section));
                     }
                 }

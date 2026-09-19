@@ -119,7 +119,9 @@ public sealed interface QuasiquoteTree {
                         if (level == 1) {
                             var hole = new Hole(holeIndex);
                             if (isSplicing) {
-                                return new QuasiquoteTreeAndExpressions(new UnquoteSplicing(hole), new SyntaxObject[]{rest});
+                                return new QuasiquoteTreeAndExpressions(
+                                    new UnquoteSplicing(hole),
+                                    new SyntaxObject[]{rest});
                             } else {
                                 return new QuasiquoteTreeAndExpressions(new Unquote(hole), new SyntaxObject[]{rest});
                             }
@@ -145,7 +147,11 @@ public sealed interface QuasiquoteTree {
             var expressions = new ArrayList<SyntaxObject>();
             var children = new ArrayList<QuasiquoteTree>();
             for (var el: v.values()) {
-                var parsedChildResult = parseQuasiquoteTree(sourceSection, (SyntaxObject) el, level, holeIndex + expressions.size());
+                var parsedChildResult = parseQuasiquoteTree(
+                    sourceSection,
+                    (SyntaxObject) el,
+                    level,
+                    holeIndex + expressions.size());
                 expressions.addAll(Arrays.asList(parsedChildResult.expressions));
                 children.add(parsedChildResult.tree);
             }

@@ -8,8 +8,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 
-import java.util.ArrayList;
-
 /**
  * Helper node for deferring full parsing (which requires running user code) until runtime.
  */
@@ -35,6 +33,11 @@ public class ISLISPModuleNode extends ISLISPExpressionNode {
         this.source = moduleSource;
     }
 
+    /**
+     * Triggers load of this modules dependencies, if necessary.
+     * Initializes (= executes) module's definitions.
+     * Prepares a call node wrapping non-definition top level expressions.
+     */
     public void initialize() {
         CompilerDirectives.transferToInterpreterAndInvalidate();
         parser.ensureRequiresLoaded(source.requires());
