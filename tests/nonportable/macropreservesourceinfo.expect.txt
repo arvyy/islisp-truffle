@@ -1,5 +1,5 @@
 Unbound variable: asd
     at macropreservesourceinfo.lisp:11
     at macropreservesourceinfo.lisp:8
-    at macropreservesourceinfo.lisp:27
+    at macropreservesourceinfo.lisp:25
 macropreservesourceinfo.lisp end

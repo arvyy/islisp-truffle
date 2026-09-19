@@ -54,7 +54,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
             boolean isAbstract,
             SourceSection sourceSection
     ) {
-        super(sourceSection);
+        super(true, sourceSection);
         this.module = module;
         this.name = name;
         this.superclassName = superclassName.isEmpty()

@@ -24,14 +24,15 @@ public final class Utils {
     /**
      * Parse sexpr (Pair or nil) to a java list.
      *
+     * @param <T> element type of the list
      * @param v sesxpr
      * @return java list
      */
-    public static List<Object> readList(Object v) throws NotAList {
+    public static <T> List<T> readList(Object v) throws NotAList {
         if (v instanceof Pair p) {
-            var lst = new ArrayList<Object>();
+            var lst = new ArrayList<T>();
             for (var el : p) {
-                lst.add(el);
+                lst.add((T) el);
             }
             return lst;
         } else if (v instanceof Symbol s) {
@@ -81,7 +82,7 @@ public final class Utils {
      * @param lst java list
      * @return sexpr
      */
-    public static Object listToValue(List<Object> lst) {
+    public static Object listToValue(List<?> lst) {
         Object val = ISLISPContext.get(null).getNil();
         for (int i = lst.size() - 1; i >= 0; i--) {
             val = new Pair(lst.get(i), val);

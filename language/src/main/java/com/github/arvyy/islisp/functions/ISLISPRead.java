@@ -4,6 +4,7 @@ import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.parser.Reader;
+import com.github.arvyy.islisp.parser.SyntaxObject;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -87,14 +88,14 @@ public abstract class ISLISPRead extends RootNode {
         Object eosValue
     ) {
         var reader = new Reader(stream);
-        Optional<Object> maybeDatum = null;
+        Optional<SyntaxObject> maybeDatum;
         try {
             maybeDatum = reader.readSingle();
         } catch (IOException e) {
             return errorSignalerNode.signalIOError(e);
         }
         if (maybeDatum.isPresent()) {
-            return maybeDatum.get();
+            return maybeDatum.get().syntaxToDatum();
         }
         if (Utils.isNil(this, eosErrorP)) {
             return eosValue;

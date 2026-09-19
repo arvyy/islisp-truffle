@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.github.arvyy.islisp.Utils;
+import com.github.arvyy.islisp.parser.SyntaxObject;
 import com.oracle.truffle.api.interop.TruffleObject;
 
 import java.util.Iterator;
@@ -66,6 +68,10 @@ public final class Pair implements TruffleObject, Iterable<Object> {
         return iterator;
     }
 
+    @Override
+    public String toString() {
+        return String.format("(%s . %s)", car, cdr);
+    }
 }
 
 final class PairIterator implements Iterator<Object> {
@@ -76,13 +82,21 @@ final class PairIterator implements Iterator<Object> {
 
     @Override
     public boolean hasNext() {
-        return next instanceof Pair;
+        return next instanceof Pair || (next instanceof SyntaxObject so && so.value() instanceof Pair);
     }
 
     @Override
     public Object next() {
-        var car = ((Pair) next).car();
-        next = ((Pair) next).cdr();
+        Pair nextPair;
+        if (next instanceof Pair p) {
+            nextPair = p;
+        } else if (next instanceof SyntaxObject so && so.value() instanceof Pair p) {
+            nextPair = p;
+        } else {
+            throw new Utils.NotAList();
+        }
+        var car = nextPair.car();
+        next = nextPair.cdr();
         return car;
     }
 }

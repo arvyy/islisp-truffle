@@ -21,7 +21,7 @@
             (report-condition condition (standard-output))
             (return-from exit nil))
         ;; use of my-progn mustn't lose the fact
-        ;; the foo call came from line 27
+        ;; the foo call came from line 25
         (my-progn
             (+ 1 2)
             (foo))
