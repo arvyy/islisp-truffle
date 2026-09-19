@@ -25,13 +25,11 @@ import java.util.stream.Collectors;
 public class Parser {
 
     private final Set<String> moduleLoadInProgress;
-    private final Map<EqWrapper<Pair>, SourceSection> sourceSectionMap;
 
     /**
      * Create parser.
      */
     public Parser() {
-        sourceSectionMap = new HashMap<>();
         moduleLoadInProgress = new HashSet<>();
     }
 
@@ -79,7 +77,7 @@ public class Parser {
         ISLISPExpressionNode debuggerNode,
         Source source
     ) {
-        var reader = new Reader(source, sourceSectionMap);
+        var reader = new Reader(source);
         var sexprs = reader.readAll();
         var exprs = new ArrayList<ISLISPExpressionNode>();
         for (var sexpr: sexprs) {
@@ -91,13 +89,13 @@ public class Parser {
 
     @CompilerDirectives.TruffleBoundary
     ModuleSource parseModuleSource(String name, Source source) {
-        var reader = new Reader(source, sourceSectionMap);
+        var reader = new Reader(source);
         var content = reader.readAll();
-        var rest = new ArrayList<>(content.size());
+        var rest = new ArrayList<SyntaxObject>(content.size());
         var requires = new ArrayList<String>();
         var provides = new ArrayList<Symbol>();
         for (var obj: content) {
-            if (obj instanceof Pair p && p.car() instanceof Symbol s) {
+            if (obj.value() instanceof Pair p && p.car() instanceof SyntaxObject so && so.value() instanceof Symbol s) {
                 if ("requires".equals(s.name())) {
                     var requireList = requireList(obj, -1, -1);
                     for (var req: requireList.subList(1, requireList.size())) {
@@ -129,7 +127,9 @@ public class Parser {
     }
 
     /**
-     * Expand, parse, and execute given sexprs.
+     * Expand, parse, and execute definitions.
+     * Non-definition top-level expressions are collected and returned wrapped in a root node.
+     *
      * This is deferredly called from ISLISPModuleNode, because macro expansion
      * might require execution of user code.
      * The expanded result must be spliced into node tree using exprCallback
@@ -137,35 +137,44 @@ public class Parser {
      *
      * @param module module to which given sexprs belong
      * @param sexprs source code as a list of sexprs
-     * @param exprCallback callback to run upon evaluation of each top level sexpr
-     * @return value of last expression
+     * @return root node containing parsed expressions which weren't definitions
      */
-    public Object expandAndExecute(String module, List<Object> sexprs, Consumer<ISLISPExpressionNode> exprCallback) {
+    public ISLISPRootNode expandAndExecuteDefinitions(String module, List<SyntaxObject> sexprs) {
         var parserContext = new ParserContext(module);
-        Object last = ISLISPContext.get(null).getNil();
+        var nonDefinitionExprs = new ArrayList<ISLISPExpressionNode>();
         for (var v: sexprs) {
             var expression = parseExpressionNode(parserContext, v, true);
-            last = executeExpression(expression, parserContext.frameBuilder.build());
-            exprCallback.accept(expression);
+            if (expression.isDefinitionNode()) {
+                executeExpression(expression, parserContext.frameBuilder.build());
+            } else {
+                nonDefinitionExprs.add(expression);
+            }
         }
-        return last;
+        var root = new ISLISPRootNode(
+            null,
+            nonDefinitionExprs.toArray(ISLISPExpressionNode[]::new),
+            parserContext.frameBuilder.build()
+        );
+        return root;
     }
 
-    Object executeExpression(ISLISPExpressionNode expression, FrameDescriptor fd) {
+    void executeExpression(ISLISPExpressionNode expression, FrameDescriptor fd) {
         var root = new ISLISPRootNode(
             null,
             new ISLISPExpressionNode[]{expression},
             fd);
-        return root.getCallTarget().call();
+        root.getCallTarget().call();
     }
 
-    ISLISPExpressionNode parseExpressionNode(ParserContext parserContext, Object sexpr) {
+    ISLISPExpressionNode parseExpressionNode(ParserContext parserContext, SyntaxObject sexpr) {
         return parseExpressionNode(parserContext, sexpr, false);
     }
 
-    ISLISPExpressionNode parseExpressionNode(ParserContext parserContext, Object sexpr, boolean topLevel) {
-        if (sexpr instanceof Pair form && ((Pair) sexpr).car() instanceof Symbol symbol) {
-            var carName = ((Symbol) ((Pair) sexpr).car()).name();
+    ISLISPExpressionNode parseExpressionNode(ParserContext parserContext, SyntaxObject sexpr, boolean topLevel) {
+        var carSymbol = carSymbol(sexpr);
+        var sexprValue = sexpr.value();
+        if (carSymbol.isPresent()) {
+            var carName = carSymbol.get().name();
             if (!topLevel) {
                 switch (carName) {
                     case "defclass":
@@ -177,7 +186,7 @@ public class Parser {
                     case "defun":
                     case "defmethod":
                         throw new ParsingException(
-                            source(sexpr),
+                            sexpr.source(),
                             String.format("%s required to be at top level.", carName));
                     default:
                 }
@@ -283,17 +292,18 @@ public class Parser {
             }
             // macros
             if ("setf".equals(carName)) {
-                var args = requireList(form, 3, 3);
+                var args = requireList(sexpr, 3, 3);
                 var place = macroExpand(parserContext.module, args.get(1), false);
                 var value = args.get(2);
-                if (place instanceof Symbol s) {
+                var placeMaybeSymbol = tryDowncast(place, Symbol.class);
+                if (placeMaybeSymbol.isPresent()) {
                     var setq = Utils.listToValue(List.of(
-                        ISLISPContext.get(null).namedSymbol("setq"),
-                        s,
+                        new SyntaxObject(ISLISPContext.get(null).namedSymbol("setq"), null),
+                        place,
                         value
                     ));
-                    sourceSectionMap.put(new EqWrapper(setq), source(sexpr));
-                    return parseExpressionNode(parserContext, setq);
+                    var setqSyntaxObject = new SyntaxObject(setq, sexpr.source());
+                    return parseExpressionNode(parserContext, setqSyntaxObject);
                 }
                 var placeList = requireList(place, 1, -1);
                 var setfDispatchSymbol = downcast(placeList.get(0), Symbol.class);
@@ -303,7 +313,6 @@ public class Parser {
                     return parseDirectSetfFunctionCall(parserContext, sexpr, placeList, value);
                 }
                 var transformed = setfDispatch.transform(placeList, value);
-                sourceSectionMap.put(new EqWrapper(transformed), source(sexpr));
                 return parseExpressionNode(
                         parserContext,
                         transformed);
@@ -316,12 +325,16 @@ public class Parser {
             }
         }
         //a list pattern, but car isn't a symbol: it might be immediate lambda call
-        if (sexpr instanceof Pair) {
-            var car = ((Pair) sexpr).car();
-            if (car instanceof Pair firstPos) {
-                if (firstPos.car() instanceof Symbol maybeLambda) {
+        if (sexprValue instanceof Pair) {
+            var car = (SyntaxObject) ((Pair) sexprValue).car();
+            var carMaybePair = tryDowncast(car, Pair.class);
+            if (carMaybePair.isPresent()) {
+                var firstPos = carMaybePair.get();
+                var caarMaybeSymbol = tryDowncast((SyntaxObject) firstPos.car(), Symbol.class);
+                if (caarMaybeSymbol.isPresent()) {
+                    var maybeLambda = caarMaybeSymbol.get();
                     if (maybeLambda.name().equals("lambda")) {
-                        var lambda = parseLambda(parserContext, firstPos);
+                        var lambda = parseLambda(parserContext, car);
                         return parseDirectLambdaCall(
                                 parserContext,
                                 lambda,
@@ -330,19 +343,19 @@ public class Parser {
                 }
             }
         }
-        if (sexpr instanceof Integer
-            || sexpr instanceof Double
-            || sexpr instanceof LispChar
-            || sexpr instanceof String
-            || sexpr instanceof LispVector
-            || sexpr instanceof LispArray
+        if (sexprValue instanceof Integer
+            || sexprValue instanceof Double
+            || sexprValue instanceof LispChar
+            || sexprValue instanceof String
+            || sexprValue instanceof LispVector
+            || sexprValue instanceof LispArray
         ) {
-            return new ISLISPLiteralNode(sexpr, null);
+            return new ISLISPLiteralNode(sexpr.syntaxToDatum(), sexpr.source());
         }
-        if (sexpr instanceof BigInteger b) {
-            return new ISLISPLiteralNode(new LispBigInteger(b), null);
+        if (sexprValue instanceof BigInteger b) {
+            return new ISLISPLiteralNode(new LispBigInteger(b), sexpr.source());
         }
-        if (sexpr instanceof Symbol symbol) {
+        if (sexprValue instanceof Symbol symbol) {
             var maybeLexicalSlot = parserContext.variables.get(symbol.identityReference());
             if (maybeLexicalSlot.isPresent()) {
                 var variableContext = maybeLexicalSlot.get();
@@ -356,7 +369,7 @@ public class Parser {
         throw new ParsingException(source(sexpr), "Unrecognized form.");
     }
 
-    private ISLISPConvertNode parseConvert(ParserContext parserContext, Object sexpr) {
+    private ISLISPConvertNode parseConvert(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, 3);
         var valueExpr = parseExpressionNode(parserContext, args.get(1));
         var className = downcast(args.get(2), Symbol.class);
@@ -364,22 +377,22 @@ public class Parser {
             parserContext.module,
             valueExpr,
             className,
-            source(sexpr)
+            sexpr.source()
         );
     }
 
-    private ISLISPCaseNode parseCaseUsing(ParserContext parserContext, Object sexpr) {
+    private ISLISPCaseNode parseCaseUsing(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, -1);
         return parseCaseHelper(
             parserContext,
             parseExpressionNode(parserContext, args.get(1)),
             parseExpressionNode(parserContext, args.get(2)),
             args.subList(3, args.size()),
-            source(sexpr)
+            sexpr.source()
         );
     }
 
-    private ISLISPCaseNode parseCase(ParserContext parserContext, Object sexpr) {
+    private ISLISPCaseNode parseCase(ParserContext parserContext, SyntaxObject sexpr) {
         var ctx = ISLISPContext.get(null);
         var args = requireList(sexpr, 2, -1);
         return parseCaseHelper(
@@ -387,7 +400,7 @@ public class Parser {
             new ISLISPFunctionRefNode("ROOT", ctx.namedSymbol("eql"), null),
             parseExpressionNode(parserContext, args.get(1)),
             args.subList(2, args.size()),
-            source(sexpr)
+            sexpr.source()
         );
     }
 
@@ -395,7 +408,7 @@ public class Parser {
         ParserContext parserContext,
         ISLISPExpressionNode comparatorFn,
         ISLISPExpressionNode keyForm,
-        List<Object> cases,
+        List<SyntaxObject> cases,
         SourceSection sourceSection
     ) {
         var ctx = ISLISPContext.get(null);
@@ -404,8 +417,9 @@ public class Parser {
         var exprs = new ArrayList<ISLISPExpressionNode[]>();
         for (var c: cases) {
             var caseList = requireList(c, 1, -1);
-            if (caseList.get(0) instanceof Symbol s
-                && s.identityReference() == ctx.namedSymbol("t").identityReference()
+            var maybeSymbolCar = tryDowncast(caseList.get(0), Symbol.class);
+            if (maybeSymbolCar.isPresent()
+                && maybeSymbolCar.get().identityReference() == ctx.getT().identityReference()
             ) {
                 elseExprs = caseList.stream()
                     .skip(1)
@@ -416,7 +430,7 @@ public class Parser {
                     throw new ParsingException(sourceSection, "Trailing cases after 'else' case");
                 }
                 var caseKeysList = requireList(caseList.get(0), -1, -1);
-                keys.add(caseKeysList.toArray());
+                keys.add(caseKeysList.stream().map(so -> so.syntaxToDatum()).toArray());
                 var caseExprs = caseList.stream()
                     .skip(1)
                     .map(sexpr -> parseExpressionNode(parserContext, sexpr))
@@ -434,7 +448,7 @@ public class Parser {
         );
     }
 
-    private ISLISPCondNode parseCond(ParserContext parserContext, Object sexpr) {
+    private ISLISPCondNode parseCond(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, -1, -1);
         var content = args.stream()
             .skip(1)
@@ -445,37 +459,37 @@ public class Parser {
                     .toArray(ISLISPExpressionNode[]::new);
             })
             .toArray(ISLISPExpressionNode[][]::new);
-        return new ISLISPCondNode(content, source(sexpr));
+        return new ISLISPCondNode(content, sexpr.source());
     }
 
-    private ISLISPAssureNode parseAssureNode(ParserContext parserContext, Object sexpr) {
+    private ISLISPAssureNode parseAssureNode(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, 3);
         var className = downcast(args.get(1), Symbol.class);
         var expression = parseExpressionNode(parserContext, args.get(2));
-        return new ISLISPAssureNode(className, expression, source(sexpr));
+        return new ISLISPAssureNode(className, expression, sexpr.source());
     }
 
-    private ISLISPExpressionNode parseWithStandardOutput(ParserContext parserContext, Object sexpr) {
+    private ISLISPExpressionNode parseWithStandardOutput(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, -1);
         var outputstreamExpr = parseExpressionNode(parserContext, args.get(1));
         var bodyExprs = args.stream()
             .skip(2)
             .map(s -> parseExpressionNode(parserContext, s))
             .toArray(ISLISPExpressionNode[]::new);
-        return new ISLISPWithStandardOutputNode(outputstreamExpr, bodyExprs, source(sexpr));
+        return new ISLISPWithStandardOutputNode(outputstreamExpr, bodyExprs, sexpr.source());
     }
 
-    private ISLISPExpressionNode parseWithStandardInput(ParserContext parserContext, Object sexpr) {
+    private ISLISPExpressionNode parseWithStandardInput(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, -1);
         var inputstreamExpr = parseExpressionNode(parserContext, args.get(1));
         var bodyExprs = args.stream()
             .skip(2)
             .map(s -> parseExpressionNode(parserContext, s))
             .toArray(ISLISPExpressionNode[]::new);
-        return new ISLISPWithStandardInputNode(inputstreamExpr, bodyExprs, source(sexpr));
+        return new ISLISPWithStandardInputNode(inputstreamExpr, bodyExprs, sexpr.source());
     }
 
-    private ISLISPExpressionNode parseWithErrorOutput(ParserContext parserContext, Object sexpr) {
+    private ISLISPExpressionNode parseWithErrorOutput(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, -1);
         var outputstreamExpr = parseExpressionNode(parserContext, args.get(1));
         var bodyExprs = args.stream()
@@ -485,7 +499,7 @@ public class Parser {
         return new ISLISPWithErrorOutputNode(outputstreamExpr, bodyExprs, source(sexpr));
     }
 
-    private ISLISPForNode parseFor(ParserContext parserContext, Object sexpr) {
+    private ISLISPForNode parseFor(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, -1);
         var slots = new ArrayList<Integer>();
         var inits = new ArrayList<ISLISPExpressionNode>();
@@ -502,13 +516,14 @@ public class Parser {
             variableContext.slot = slot;
             variableContext.frameDepth = parserContext.frameDepth;
             variableContext.name = varName.name();
+            variableContext.declarationLocation = source(varSpecList.get(0));
             newLexicalScope.put(varName.identityReference(), variableContext);
         }
         var internalParserContext = parserContext.pushLexicalScope(newLexicalScope);
         for (var variableSpec : iterationSpecList) {
             var varSpecList = requireList(variableSpec, 2, 3);
             var varName = downcast(varSpecList.get(0), Symbol.class);
-            var step = varSpecList.size() == 2 ? varName : varSpecList.get(2);
+            var step = varSpecList.size() == 2 ? varSpecList.get(0) : varSpecList.get(2);
             var stepExpression = parseExpressionNode(internalParserContext, step);
             stepExpression.setParserContext(internalParserContext);
             steps.add(stepExpression);
@@ -535,7 +550,7 @@ public class Parser {
         );
     }
 
-    private ISLISPWhileNode parseWhile(ParserContext parserContext, Object sexpr) {
+    private ISLISPWhileNode parseWhile(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, -1);
         var testExpression = parseExpressionNode(parserContext, args.get(1));
         var body = args.stream()
@@ -545,7 +560,7 @@ public class Parser {
         return new ISLISPWhileNode(testExpression, body, source(sexpr));
     }
 
-    private ISLISPWithHandlerNode parseWithHandler(ParserContext parserContext, Object sexpr) {
+    private ISLISPWithHandlerNode parseWithHandler(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, -1);
         var handlerExpression = parseExpressionNode(parserContext, args.get(1));
         var body = args.stream()
@@ -555,14 +570,14 @@ public class Parser {
         return new ISLISPWithHandlerNode(handlerExpression, body, source(sexpr));
     }
 
-    private ISLISPThrowNode parseThrowNode(ParserContext parserContext, Object sexpr) {
+    private ISLISPThrowNode parseThrowNode(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, 3);
         var tagForm = parseExpressionNode(parserContext, args.get(1));
         var resultForm = parseExpressionNode(parserContext, args.get(2));
         return new ISLISPThrowNode(tagForm, resultForm, source(sexpr));
     }
 
-    ISLISPCatchNode parseCatchNode(ParserContext parserContext, Object sexpr) {
+    ISLISPCatchNode parseCatchNode(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, -1);
         var tagForm = parseExpressionNode(parserContext, args.get(1));
         var forms = args.stream()
@@ -572,21 +587,21 @@ public class Parser {
         return new ISLISPCatchNode(tagForm, forms, source(sexpr));
     }
 
-    ISLISPDefGlobalNode parseDefGlobal(ParserContext parserContext, Object sexpr) {
+    ISLISPDefGlobalNode parseDefGlobal(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, 3);
         var name = downcast(args.get(1), Symbol.class);
         var init = parseExpressionNode(parserContext, args.get(2));
         return new ISLISPDefGlobalNode(parserContext.module, name, init, source(sexpr));
     }
 
-    ISLISPDefConstantNode parseDefConstant(ParserContext parserContext, Object sexpr) {
+    ISLISPDefConstantNode parseDefConstant(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, 3);
         var name = downcast(args.get(1), Symbol.class);
         var init = parseExpressionNode(parserContext, args.get(2));
         return new ISLISPDefConstantNode(parserContext.module, name, init, source(sexpr));
     }
 
-    ISLISPTagBodyGoNode parseTagBodyGo(ParserContext parserContext, Object sexpr) {
+    ISLISPTagBodyGoNode parseTagBodyGo(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, 2);
         var tagSymbol = downcast(args.get(1), Symbol.class);
         var maybeTagId = parserContext.tagbodyTags.get(tagSymbol.identityReference());
@@ -596,16 +611,19 @@ public class Parser {
         throw new ParsingException(source(sexpr), "Not found tag " + tagSymbol);
     }
 
-    ISLISPTagBodyNode parseTagBody(ParserContext parserContext, Object sexpr) {
+    ISLISPTagBodyNode parseTagBody(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 1, -1);
-        var expressions = new ArrayList<Object>();
+        var expressions = new ArrayList<SyntaxObject>();
         var tags = new HashMap<SymbolReference, Integer>();
         var tagSymbols = new ArrayList<SymbolReference>();
         for (var arg: args.subList(1, args.size())) {
-            if (arg instanceof Symbol tag) {
+            var maybeTag = tryDowncast(arg, Symbol.class);
+            var maybePair = tryDowncast(arg, Pair.class);
+            if (maybeTag.isPresent()) {
+                var tag = maybeTag.get();
                 tags.put(tag.identityReference(), expressions.size());
                 tagSymbols.add(tag.identityReference());
-            } else if (arg instanceof Pair) {
+            } else if (maybePair.isPresent()) {
                 expressions.add(arg);
             } else {
                 throw new ParsingException(source(arg), "Tagbody part neither a symbol nor a complex expression.");
@@ -626,7 +644,7 @@ public class Parser {
         return new ISLISPTagBodyNode(tagIds, tagPosition, parsedExpressions, source(sexpr));
     }
 
-    ISLISPSetqNode parseSetq(ParserContext parserContext, Object sexpr) {
+    ISLISPSetqNode parseSetq(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, 3);
         var name = downcast(args.get(1), Symbol.class);
         var expr = parseExpressionNode(parserContext, args.get(2));
@@ -640,16 +658,22 @@ public class Parser {
         }
     }
 
-    Object macroExpand(String module, Object form, boolean single) {
-        if (form instanceof Pair p && p.car() instanceof Symbol symbol) {
-            var rest = p.cdr();
+    SyntaxObject macroExpand(String module, SyntaxObject form, boolean single) {
+        var maybePair = tryDowncast(form, Pair.class);
+        macro:
+        if (maybePair.isPresent()) {
+            List<SyntaxObject> lst = Utils.readList(maybePair.get());
+            var maybeSymbol = tryDowncast(lst.get(0), Symbol.class);
+            if (maybeSymbol.isEmpty()) {
+                break macro;
+            }
+            var symbol = maybeSymbol.get();
             var maybeMacro = ISLISPContext.get(null).lookupMacro(module, symbol);
             if (maybeMacro != null) {
                 var args = new ArrayList<Object>();
                 args.add(null); // closure param
-                Iterable<Object> it = rest.equals(ISLISPContext.get(null).getNil()) ? List.of() : (Pair) rest;
-                for (var e: it) {
-                    args.add(e);
+                for (var e: lst.subList(1, lst.size())) {
+                    args.add(e.syntaxToDatum());
                 }
                 Object transformedSexpr;
                 try {
@@ -667,30 +691,26 @@ public class Parser {
                         throw new ParsingException(source(form), "Macro transformer returned not a list");
                     }
                     var newParts = parts.stream()
-                            .map(part -> macroExpand(module, part, false))
+                            .map(part -> macroExpand(module, SyntaxObject.fromDatum(part, null), false))
                             .collect(Collectors.toList());
                     var transformedValue = Utils.listToValue(newParts);
-                    sourceSectionMap.put(new EqWrapper(transformedValue), source(form));
-                    return transformedValue;
+                    return new SyntaxObject(transformedValue, form.source());
                 } else {
-                    if (transformedSexpr instanceof Pair || transformedSexpr instanceof Symbol) {
-                        sourceSectionMap.put(new EqWrapper(transformedSexpr), source(form));
-                    }
-                    return transformedSexpr;
+                    return SyntaxObject.fromDatum(transformedSexpr, form.source());
                 }
             }
         }
         return form;
     }
 
-    ISLISPSetDynamicNode parseSetDynamic(ParserContext parserContext, Object sexpr) {
+    ISLISPSetDynamicNode parseSetDynamic(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, 3);
         var initalizer = parseExpressionNode(parserContext, args.get(1));
-        var symbol = (Symbol) args.get(2);
+        var symbol = downcast(args.get(2), Symbol.class);
         return new ISLISPSetDynamicNode(parserContext.module, symbol, initalizer, source(sexpr));
     }
 
-    ISLISPDynamicLetNode parseDynamicLet(ParserContext parserContext, Object sexpr) {
+    ISLISPDynamicLetNode parseDynamicLet(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, -1);
         var bindingList = requireList(args.get(1), -1, -1);
         var symbols = new Symbol[bindingList.size()];
@@ -707,13 +727,13 @@ public class Parser {
         return new ISLISPDynamicLetNode(parserContext.module, symbols, initializers, body, source(sexpr));
     }
 
-    ISLISPDynamicLookupNode parseDynamic(ParserContext parserContext, Object sexpr) {
+    ISLISPDynamicLookupNode parseDynamic(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, 2);
         var name = downcast(args.get(1), Symbol.class);
         return new ISLISPDynamicLookupNode(parserContext.module, name, source(sexpr));
     }
 
-    ISLISPDefDynamicNode parseDefDynamic(ParserContext parserContext, Object sexpr) {
+    ISLISPDefDynamicNode parseDefDynamic(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, 3);
         return new ISLISPDefDynamicNode(
                 parserContext.module,
@@ -721,16 +741,20 @@ public class Parser {
                 parseExpressionNode(parserContext, args.get(2)), source(sexpr));
     }
 
-    ISLISPDefMethodNode parseDefMethod(ParserContext parserContext, Object sexpr) {
+    ISLISPDefMethodNode parseDefMethod(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, -1);
         Symbol name;
         boolean setf;
-        if (args.get(1) instanceof Symbol s) {
-            name = s;
+        var targetMaybeSymbol = tryDowncast(args.get(1), Symbol.class);
+        if (targetMaybeSymbol.isPresent()) {
+            name = targetMaybeSymbol.get();
             setf = false;
         } else {
             var setfForm = requireList(args.get(1), 2, 2);
-            if (!(setfForm.get(0) instanceof Symbol setfSymbol) || !setfSymbol.name().equals("setf")) {
+            var setfTargetCarMaybeSymbol = tryDowncast(setfForm.get(0), Symbol.class);
+            if (!(setfTargetCarMaybeSymbol.isPresent() &&
+                  setfTargetCarMaybeSymbol.get().name().equalsIgnoreCase("setf"))
+            ) {
                 throw new ParsingException(source(sexpr), "Bad defmethod function spec");
             }
             name = downcast(setfForm.get(1), Symbol.class);
@@ -738,22 +762,28 @@ public class Parser {
         }
         var methodQualifiers = new ArrayList<String>();
         for (int i = 2; i < args.size(); i++) {
-            if (args.get(i) instanceof Symbol s && !s.name().equals("nil")) {
-                methodQualifiers.add(s.name());
+            var maybeSymbol = tryDowncast(args.get(i), Symbol.class);
+            if (maybeSymbol.isPresent()) {
+                var s = maybeSymbol.get();
+                if (!s.identityReference().equals(ISLISPContext.get(null).getNil().identityReference())) {
+                    methodQualifiers.add(s.name());
+                }
             } else {
                 break;
             }
         }
         var paramListIndex = 2 + methodQualifiers.size();
         var parameterList = requireList(args.get(paramListIndex), -1, -1);
-        var plainParamList = new ArrayList<Symbol>();
+        var plainParamList = new ArrayList<SyntaxObject>();
         // collect defmethod argument list into normal lambda list to resolve slots
         for (var el: parameterList) {
-            if (el instanceof Symbol s) {
-                plainParamList.add(s);
-            } else if (el instanceof Pair p) {
-                var paramWithType = requireList(p, 2, 2);
-                plainParamList.add(downcast(paramWithType.get(0), Symbol.class));
+            var maybeSymbol = tryDowncast(el, Symbol.class);
+            var maybePair = tryDowncast(el, Pair.class);
+            if (maybeSymbol.isPresent()) {
+                plainParamList.add(el);
+            } else if (maybePair.isPresent()) {
+                var paramWithType = requireList(el, 2, 2);
+                plainParamList.add(paramWithType.get(0));
             }
         }
         parserContext = parserContext.pushFrameDescriptor();
@@ -762,10 +792,12 @@ public class Parser {
         List<Symbol> paramTypes = new ArrayList<>();
         for (int i = 0; i < slotsAndNewContext.namedArgsSlots.length; i++) {
             var el = parameterList.get(i);
-            if (el instanceof Symbol s) {
+            var elMaybeSymbol = tryDowncast(el, Symbol.class);
+            var elMaybePair = tryDowncast(el, Pair.class);
+            if (elMaybeSymbol.isPresent()) {
                 paramTypes.add(ISLISPContext.get(null).namedSymbol("<object>"));
-            } else if (el instanceof Pair p) {
-                var paramWithType = requireList(p, 2, 2);
+            } else if (elMaybePair.isPresent()) {
+                var paramWithType = requireList(el, 2, 2);
                 paramTypes.add(downcast(paramWithType.get(1), Symbol.class));
             }
         }
@@ -848,22 +880,23 @@ public class Parser {
                 source(sexpr));
     }
 
-    ISLISPDefClassNode parseDefClass(ParserContext parserContext, Object sexpr) {
+    ISLISPDefClassNode parseDefClass(ParserContext parserContext, SyntaxObject sexpr) {
         var ctx = ISLISPContext.get(null);
         var args = requireList(sexpr, 4, -1);
         var className = downcast(args.get(1), Symbol.class);
         var parentClasses = new ArrayList<Symbol>();
         for (var e: requireList(args.get(2), -1, -1)) {
-            parentClasses.add((Symbol) e);
+            parentClasses.add(downcast(e, Symbol.class));
         }
         var slots = new ArrayList<ISLISPDefClassNode.SlotDefinition>();
         for (var slot: requireList(args.get(3), -1, -1)) {
             var slotDef = new ISLISPDefClassNode.SlotDefinition();
-            if (slot instanceof Symbol s) {
-                slotDef.setName(s);
+            var slotMaybeSymbol = tryDowncast(slot, Symbol.class);
+            if (slotMaybeSymbol.isPresent()) {
+                slotDef.setName(slotMaybeSymbol.get());
             } else {
                 var slotDefLst = requireList(slot, 1, -1);
-                slotDef.setName((Symbol) slotDefLst.get(0));
+                slotDef.setName(downcast(slotDefLst.get(0), Symbol.class));
                 var readers = new ArrayList<Symbol>();
                 var writters = new ArrayList<Symbol>();
                 var accessors = new ArrayList<Symbol>();
@@ -881,7 +914,7 @@ public class Parser {
                         case ":boundp" -> boundp.add(downcast(value, Symbol.class));
                         case ":initform" -> {
                             if (initForm != null) {
-                                throw new ParsingException(source(key), "Duplicate init form");
+                                throw new ParsingException(source(slotDefLst.get(i)), "Duplicate init form");
                             }
                             var newParserContext = parserContext.pushFrameDescriptor();
                             var formExpression = parseExpressionNode(newParserContext, value);
@@ -892,11 +925,11 @@ public class Parser {
                         }
                         case ":initarg" -> {
                             if (initArg != null) {
-                                throw new ParsingException(source(initArg), "Duplicate init arg");
+                                throw new ParsingException(source(slotDefLst.get(i)), "Duplicate init arg");
                             }
-                            initArg = (Symbol) value;
+                            initArg = downcast(value, Symbol.class);
                         }
-                        default -> throw new ParsingException(source(key), "Unknown defclass option");
+                        default -> throw new ParsingException(source(slotDefLst.get(i)), "Unknown defclass option");
                     }
                 }
                 slotDef.setInitArg(initArg);
@@ -927,16 +960,18 @@ public class Parser {
             source(sexpr));
     }
 
-    ISLISPDefGenericNode parseDefGeneric(ParserContext parserContext, Object sexpr) {
+    ISLISPDefGenericNode parseDefGeneric(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, 3);
         Symbol name;
         boolean setf;
-        if (args.get(1) instanceof Symbol s) {
-            name = s;
+        var targetMaybeSymbol = tryDowncast(args.get(1), Symbol.class);
+        if (targetMaybeSymbol.isPresent()) {
+            name = targetMaybeSymbol.get();
             setf = false;
         } else {
             var setfForm = requireList(args.get(1), 2, 2);
-            if (!(setfForm.get(0) instanceof Symbol setfSymbol) || !setfSymbol.name().equals("setf")) {
+            var setfCarMaybeSymbol = tryDowncast(setfForm.get(0), Symbol.class);
+            if (setfCarMaybeSymbol.isEmpty() || !setfCarMaybeSymbol.get().name().equalsIgnoreCase("setf")) {
                 throw new ParsingException(source(sexpr), "Bad defgeneric function spec");
             }
             name = downcast(setfForm.get(1), Symbol.class);
@@ -947,7 +982,7 @@ public class Parser {
         return new ISLISPDefGenericNode(parserContext.module, name, setf, lambdaList.size(), false, source(sexpr));
     }
 
-    ISLISPReturnFromNode parseReturnFrom(ParserContext parserContext, Object sexpr) {
+    ISLISPReturnFromNode parseReturnFrom(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, 3);
         var name = downcast(args.get(1), Symbol.class);
         var blockId = parserContext.blocks.get(name.identityReference())
@@ -956,7 +991,7 @@ public class Parser {
         return new ISLISPReturnFromNode(blockId, expression, source(sexpr));
     }
 
-    ISLISPBlockNode parseBlock(ParserContext parserContext, Object sexpr) {
+    ISLISPBlockNode parseBlock(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, -1);
         var name = downcast(args.get(1), Symbol.class);
         var newContext = parserContext.pushBlockScope(name.identityReference());
@@ -969,19 +1004,19 @@ public class Parser {
         return new ISLISPBlockNode(blockId, expressions, source(sexpr));
     }
 
-    ISLISPLiteralNode parseQuote(ParserContext parserContext, Object sexpr) {
+    ISLISPLiteralNode parseQuote(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, 2);
-        return new ISLISPLiteralNode(args.get(1), source(sexpr));
+        return new ISLISPLiteralNode(args.get(1).syntaxToDatum(), source(sexpr));
     }
 
-    ISLISPExpressionNode parseDebuggerNode(ParserContext parserContext, Object sexpr) {
+    ISLISPExpressionNode parseDebuggerNode(ParserContext parserContext, SyntaxObject sexpr) {
         return new ISLISPDebuggerNode(source(sexpr));
     }
 
-    ISLISPExpressionNode parseIndirectFunCall(ParserContext parserContext, Object sexpr, boolean lastArgRest) {
+    ISLISPExpressionNode parseIndirectFunCall(ParserContext parserContext, SyntaxObject sexpr, boolean lastArgRest) {
         var args = requireList(sexpr, 2, -1);
         var argNodes = new ArrayList<ISLISPExpressionNode>();
-        for (Object arg : args.subList(1, args.size())) {
+        for (var arg : args.subList(1, args.size())) {
             argNodes.add(parseExpressionNode(parserContext, arg));
         }
         return new ISLISPIndirectFunctionCallNode(
@@ -993,9 +1028,9 @@ public class Parser {
 
     ISLISPExpressionNode parseDirectSetfFunctionCall(
         ParserContext parserContext,
-        Object sexpr,
-        List<Object> placeList,
-        Object value
+        SyntaxObject sexpr,
+        List<SyntaxObject> placeList,
+        SyntaxObject value
     ) {
         var name = downcast(placeList.get(0), Symbol.class);
         var args = new ArrayList<ISLISPExpressionNode>();
@@ -1013,19 +1048,19 @@ public class Parser {
 
     ISLISPExpressionNode parseDirectFunctionCall(
             ParserContext parserContext,
-            Object sexpr
+            SyntaxObject sexpr
     ) {
         var args = requireList(sexpr, 1, -1);
         var argNodes = new ArrayList<ISLISPExpressionNode>();
         var name = downcast(args.get(0), Symbol.class);
-        for (Object arg : args.subList(1, args.size())) {
+        for (var arg : args.subList(1, args.size())) {
             argNodes.add(parseExpressionNode(parserContext, arg));
         }
         var maybeVar = parserContext.localFunctions.get(name.identityReference());
         if (maybeVar.isPresent()) {
             var variableContext = maybeVar.get();
             var index = parserContext.frameDepth - variableContext.frameDepth;
-            var functionLookup = new ISLISPLexicalIdentifierNode(index, variableContext.slot, source(name));
+            var functionLookup = new ISLISPLexicalIdentifierNode(index, variableContext.slot, source(args.get(0)));
             return new ISLISPIndirectFunctionCallNode(
                     functionLookup,
                     argNodes.toArray(ISLISPExpressionNode[]::new),
@@ -1044,11 +1079,11 @@ public class Parser {
     ISLISPDirectLambdaCallNode parseDirectLambdaCall(
             ParserContext parserContext,
             ISLISPLambdaNode lambdaNode,
-            Object sexpr
+            SyntaxObject sexpr
     ) {
         var args = requireList(sexpr, 1, -1);
         var argNodes = new ArrayList<ISLISPExpressionNode>();
-        for (Object arg : args.subList(1, args.size())) {
+        for (var arg : args.subList(1, args.size())) {
             argNodes.add(parseExpressionNode(parserContext, arg));
         }
         return new ISLISPDirectLambdaCallNode(lambdaNode, argNodes.toArray(ISLISPExpressionNode[]::new), source(sexpr));
@@ -1056,8 +1091,8 @@ public class Parser {
 
     ISLISPLambdaNode makeLambdaNode(
         ParserContext parserContext,
-        Object argList,
-        List<Object> bodyExprs,
+        SyntaxObject argList,
+        List<SyntaxObject> bodyExprs,
         SourceSection source
     ) {
         parserContext = parserContext.pushFrameDescriptor();
@@ -1089,12 +1124,12 @@ public class Parser {
         return new ISLISPLambdaNode(rootNode);
     }
 
-    ISLISPLambdaNode parseLambda(ParserContext parserContext, Object sexpr) {
+    ISLISPLambdaNode parseLambda(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, -1);
         return makeLambdaNode(parserContext, args.get(1), args.subList(2, args.size()), source(sexpr));
     }
 
-    ISLISPDefunNode parseDefun(ParserContext parserContext, Object sexpr) {
+    ISLISPDefunNode parseDefun(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, -1);
         var restList = args.subList(1, args.size());
         var name = downcast(restList.get(0), Symbol.class);
@@ -1128,18 +1163,20 @@ public class Parser {
 
     SlotsAndNewContext processFrameDescriptorsForFunctionArguments(
             ParserContext parserContext,
-            Object parameterList
+            SyntaxObject parameterList
     ) {
         var args = requireList(parameterList, -1, -1)
                 .stream()
-                .map(v -> downcast(v, Symbol.class))
+                .peek(v -> {
+                    downcast(v, Symbol.class);
+                })
                 .collect(Collectors.toList());
         return processFrameDescriptorsForFunctionArguments(parserContext, args);
     }
 
     SlotsAndNewContext processFrameDescriptorsForFunctionArguments(
             ParserContext parserContext,
-            List<Symbol> parameterList
+            List<SyntaxObject> parameterList
     ) {
         var restSlot = -1;
         var positionalArgumentSlots = new ArrayList<Integer>();
@@ -1148,7 +1185,8 @@ public class Parser {
         int stateAfterRestKw = 1;
         int stateAfterRestArg = 2;
         int state = stateNamedArgs;
-        for (var arg: parameterList) {
+        for (var argStx: parameterList) {
+            var arg = downcast(argStx, Symbol.class);
             var isRestKw = "&rest".equals(arg.name()) || ":rest".equals(arg.name());
             if (state == stateNamedArgs && !isRestKw) {
                 var slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
@@ -1157,6 +1195,7 @@ public class Parser {
                 variableContext.frameDepth = parserContext.frameDepth;
                 variableContext.slot = slot;
                 variableContext.name = arg.name();
+                variableContext.declarationLocation = source(argStx);
                 variables.put(arg.identityReference(), variableContext);
             } else if (state == stateNamedArgs && isRestKw) {
                 state = stateAfterRestKw;
@@ -1167,11 +1206,12 @@ public class Parser {
                 variableContext.frameDepth = parserContext.frameDepth;
                 variableContext.slot = restSlot;
                 variableContext.name = arg.name();
+                variableContext.declarationLocation = source(argStx);
                 variables.put(arg.identityReference(), variableContext);
             } else if (state == stateAfterRestArg) {
-                throw new ParsingException(source(arg), "Multiple symbols after :rest");
+                throw new ParsingException(source(argStx), "Multiple symbols after :rest");
             } else {
-                throw new ParsingException(source(arg), "Bad parameter list form");
+                throw new ParsingException(source(argStx), "Bad parameter list form");
             }
         }
         var argSlots = new int[positionalArgumentSlots.size()];
@@ -1186,7 +1226,7 @@ public class Parser {
         return result;
     }
 
-    ISLISPPrognNode parseProgn(ParserContext parserContext, Object sexpr, boolean isTopLevel)  {
+    ISLISPPrognNode parseProgn(ParserContext parserContext, SyntaxObject sexpr, boolean isTopLevel)  {
         var args = requireList(sexpr, 1, -1);
         var bodyStatements = new ArrayList<ISLISPExpressionNode>();
         for (var e: args.subList(1, args.size())) {
@@ -1195,7 +1235,7 @@ public class Parser {
         return new ISLISPPrognNode(bodyStatements.toArray(ISLISPExpressionNode[]::new), source(sexpr));
     }
 
-    ISLISPExpressionNode parseFunctionRef(ParserContext parserContext, Object sexpr) {
+    ISLISPExpressionNode parseFunctionRef(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, 2);
         var name = downcast(args.get(1), Symbol.class);
         var maybeVar = parserContext.localFunctions.get(name.identityReference());
@@ -1208,13 +1248,13 @@ public class Parser {
         }
     }
 
-    ISLISPClassRefNode parseClassRef(ParserContext parserContext, Object sexpr) {
+    ISLISPClassRefNode parseClassRef(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, 2);
         var name = downcast(args.get(1), Symbol.class);
         return new ISLISPClassRefNode(parserContext.module, name, source(sexpr));
     }
 
-    ISLISPIfNode parseIfNode(ParserContext parserContext, Object sexpr) {
+    ISLISPIfNode parseIfNode(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 3, 4);
         var body = new ArrayList<ISLISPExpressionNode>();
         for (var e: args.subList(1, args.size())) {
@@ -1226,11 +1266,11 @@ public class Parser {
         return new ISLISPIfNode(test, truthy, falsy, source(sexpr));
     }
 
-    ISLISPDefMacroNode parseDefMacro(ParserContext parserContext, Object sexpr) {
+    ISLISPDefMacroNode parseDefMacro(ParserContext parserContext, SyntaxObject sexpr) {
         return new ISLISPDefMacroNode(parseDefun(parserContext, sexpr));
     }
 
-    ISLISPQuasiquoteNode parseQuasiquote(ParserContext parserContext, Object sexpr) {
+    ISLISPQuasiquoteNode parseQuasiquote(ParserContext parserContext, SyntaxObject sexpr) {
         var qq = QuasiquoteTree.parseQuasiquoteTree(source(sexpr), sexpr);
         var childNodes = new ISLISPExpressionNode[qq.expressions().length];
         for (var i = 0; i < childNodes.length; i++) {
@@ -1239,7 +1279,7 @@ public class Parser {
         return new ISLISPQuasiquoteNode(source(sexpr), qq.tree(), childNodes);
     }
 
-    ISLISPLetNode parseLetNode(ParserContext parserContext, Object sexpr) {
+    ISLISPLetNode parseLetNode(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, -1);
         var variablesList = requireList(args.get(1), -1, -1);
         var bodyExpressions = args.subList(2, args.size());
@@ -1259,6 +1299,7 @@ public class Parser {
             variableContext.slot = variableSlots[i];
             variableContext.frameDepth = parserContext.frameDepth;
             variableContext.name = variableName.name();
+            variableContext.declarationLocation = source(variable.get(0));
             variableNameMap.put(variableName.identityReference(), variableContext);
         }
         parserContext = parserContext.pushLexicalScope(variableNameMap);
@@ -1270,7 +1311,7 @@ public class Parser {
         return new ISLISPLetNode(variableSlots, variableInitializers, body, source(sexpr));
     }
 
-    ISLISPLetNode parseLetStarNode(ParserContext parserContext, Object sexpr) {
+    ISLISPLetNode parseLetStarNode(ParserContext parserContext, SyntaxObject sexpr) {
         var args = requireList(sexpr, 2, -1);
         var variablesList = requireList(args.get(1), -1, -1);
         var bodyExpressions = args.subList(2, args.size());
@@ -1287,6 +1328,7 @@ public class Parser {
             variableContext.slot = variableSlots[i];
             variableContext.frameDepth = parserContext.frameDepth;
             variableContext.name = variableName.name();
+            variableContext.declarationLocation = source(variable.get(0));
             parserContext = parserContext.pushLexicalScope(Map.of(variableName.identityReference(), variableContext));
         }
         var body = new ISLISPExpressionNode[bodyExpressions.size()];
@@ -1296,15 +1338,15 @@ public class Parser {
         return new ISLISPLetNode(variableSlots, variableInitializers, body, source(sexpr));
     }
 
-    ISLISPLetNode parseFletNode(ParserContext parserContext, Object sexpr) {
+    ISLISPLetNode parseFletNode(ParserContext parserContext, SyntaxObject sexpr) {
         return parseFunctionLetNode(parserContext, sexpr, false);
     }
 
-    ISLISPLetNode parseLabelsNode(ParserContext parserContext, Object sexpr) {
+    ISLISPLetNode parseLabelsNode(ParserContext parserContext, SyntaxObject sexpr) {
         return parseFunctionLetNode(parserContext, sexpr, true);
     }
 
-    ISLISPLetNode parseFunctionLetNode(ParserContext parserContext, Object sexpr, boolean augmentFunctionScope) {
+    ISLISPLetNode parseFunctionLetNode(ParserContext parserContext, SyntaxObject sexpr, boolean augmentFunctionScope) {
         var args = requireList(sexpr, 2, -1);
         var functionList = requireList(args.get(1), -1, -1);
         var bindingSlots = new int[functionList.size()];
@@ -1318,6 +1360,7 @@ public class Parser {
             variableContext.slot = bindingSlots[i];
             variableContext.frameDepth = parserContext.frameDepth;
             variableContext.name = name.name();
+            variableContext.declarationLocation = source(function.get(0));
             if (bindingNameMap.containsKey(name.identityReference())) {
                 throw new ParsingException(source(sexpr), "Duplicate variable declaration.");
             }
@@ -1331,7 +1374,7 @@ public class Parser {
             var function = requireList(functionList.get(i), 3, -1);
             var argumentList = function.get(1);
             var body = function.subList(2, function.size());
-            lambdaInitializers[i] = makeLambdaNode(lambdaBodyContext, argumentList, body, source(function));
+            lambdaInitializers[i] = makeLambdaNode(lambdaBodyContext, argumentList, body, source(functionList.get(i)));
         }
         var body = args
             .stream()
@@ -1343,7 +1386,7 @@ public class Parser {
 
     ISLISPUnwindProtectNode parseUnwindProtectNode(
             ParserContext parserContext,
-            Object sexpr
+            SyntaxObject sexpr
     ) {
         var args = requireList(sexpr, 2, -1);
         var body = parseExpressionNode(parserContext, args.get(1));
@@ -1354,12 +1397,13 @@ public class Parser {
         return new ISLISPUnwindProtectNode(body, cleanups, source(sexpr));
     }
 
-    ISLISPDeclaimNode parseDeclaim(ParserContext context, Object sexpr) {
+    ISLISPDeclaimNode parseDeclaim(ParserContext context, SyntaxObject sexpr) {
         var lst = new ArrayList<Declaration>();
         var args = requireList(sexpr, 1, -1);
         for (var arg: args.subList(1, args.size())) {
             var declarationSexpr = requireList(arg, 1, -1);
-            if (declarationSexpr.get(0) instanceof Symbol s && s.name().equalsIgnoreCase("inline")) {
+            var maybeSymbol = tryDowncast(declarationSexpr.get(0), Symbol.class);
+            if (maybeSymbol.isPresent() && maybeSymbol.get().name().equalsIgnoreCase("inline")) {
                 for (int i = 1; i < declarationSexpr.size(); i++) {
                     var symbolRef = downcast(declarationSexpr.get(i), Symbol.class);
                     lst.add(new Declaration.Inline(symbolRef));
@@ -1369,20 +1413,36 @@ public class Parser {
         return new ISLISPDeclaimNode(context.module, lst, source(sexpr));
     }
 
-    <T> T downcast(Object value, Class<T> clazz) throws ParsingException {
-        if (clazz.isAssignableFrom(value.getClass())) {
-            return (T) value;
+    <T> T downcast(SyntaxObject value, Class<T> clazz) throws ParsingException {
+        var v = value.value();
+        if (clazz.isAssignableFrom(v.getClass())) {
+            return (T) v;
         }
         throw new ParsingException(
             source(value),
             "Expected " + clazz.getSimpleName() + "; was " + value.getClass().getSimpleName() + ".");
     }
 
-    List<Object> requireList(Object value, int minLength, int maxLength) throws ParsingException {
-        if (value instanceof Pair || (value instanceof Symbol s && s.name().equals("nil"))) {
-            List<Object> lst;
+    <T> Optional<T> tryDowncast(SyntaxObject value, Class<T> clazz) {
+        var v = value.value();
+        if (clazz.isAssignableFrom(v.getClass())) {
+            return Optional.of((T) v);
+        }
+        return Optional.empty();
+    }
+
+    Optional<Symbol> carSymbol(SyntaxObject o) {
+        if (o.value() instanceof Pair p && p.car() instanceof SyntaxObject car && car.value() instanceof Symbol s) {
+            return Optional.of(s);
+        }
+        return Optional.empty();
+    }
+
+    List<SyntaxObject> requireList(SyntaxObject value, int minLength, int maxLength) throws ParsingException {
+        if (value.value() instanceof Pair || (value.value() instanceof Symbol s && s.name().equals("nil"))) {
+            List<SyntaxObject> lst;
             try {
-                lst = Utils.readList(value);
+                lst = Utils.readList(value.value());
             } catch (Utils.NotAList e) {
                 throw new ParsingException(
                     source(value),
@@ -1410,8 +1470,10 @@ public class Parser {
             "Expected a list; was " + value.getClass().getSimpleName() + ".");
     }
 
-    SourceSection source(Object sexpr) {
-        return sourceSectionMap.get(new EqWrapper(sexpr));
+    SourceSection source(SyntaxObject sexpr) {
+        //TODO inline
+        return sexpr.source();
+        //return sourceSectionMap.get(new EqWrapper<Object>(sexpr));
     }
 
     /**
@@ -1441,11 +1503,7 @@ public class Parser {
             var moduleSource = parseModuleSource(module, source);
             ensureRequiresLoaded(moduleSource.requires());
             ctx.createModule(module, moduleSource.requires(), moduleSource.provides());
-            new ISLISPRootNode(
-                ctx.getLanguage(),
-                new ISLISPExpressionNode[]{new ISLISPModuleNode(this, moduleSource)},
-                null
-            ).getCallTarget().call();
+            new ISLISPModuleNode(this, moduleSource).initialize();
         } catch (IOException e) {
             throw new ParsingException(
                 null,

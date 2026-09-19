@@ -24,7 +24,6 @@ public class Reader {
 
     private final Lexer lexer;
     private final Source source;
-    private final Map<EqWrapper<Pair>, SourceSection> sourceSectionMap;
     private TokenWithSource peekedToken;
 
     private TokenWithSource lastToken;
@@ -33,10 +32,9 @@ public class Reader {
      * Create reader from given source.
      *
      * @param source source to read from
-     * @param sourceSectionMap map to populate with source location information while reading
      */
     @CompilerDirectives.TruffleBoundary
-    public Reader(Source source, Map<EqWrapper<Pair>, SourceSection> sourceSectionMap) {
+    public Reader(Source source) {
         this.source = source;
         BufferedReader bufferedReader;
         if (source.getReader() instanceof BufferedReader br) {
@@ -45,7 +43,6 @@ public class Reader {
             bufferedReader = new BufferedReader(source.getReader());
         }
         lexer = new Lexer(new LexerSourceFromReader(bufferedReader, source));
-        this.sourceSectionMap = sourceSectionMap;
     }
 
     /**
@@ -56,7 +53,6 @@ public class Reader {
     @CompilerDirectives.TruffleBoundary
     public Reader(LispStream stream) {
         this.source = null;
-        this.sourceSectionMap = null;
         lexer = new Lexer(new LexerSourceFromLispStream(stream));
     }
 
@@ -118,6 +114,9 @@ public class Reader {
     }
 
     SourceSection section() {
+        if (source == null) {
+            return null;
+        }
         return source.createSection(getLine(), getColumn(), getEndLine(), getEndColumn());
     }
 
@@ -125,10 +124,10 @@ public class Reader {
      * @return list of all top level expressions in given source.
      */
     @CompilerDirectives.TruffleBoundary
-    public List<Object> readAll() {
+    public List<SyntaxObject> readAll() {
         try {
-            var lst = new ArrayList<Object>();
-            Optional<Object> maybeValue = readSingle();
+            var lst = new ArrayList<SyntaxObject>();
+            Optional<SyntaxObject> maybeValue = readSingle();
             while (maybeValue.isPresent()) {
                 lst.add(maybeValue.get());
                 maybeValue = readSingle();
@@ -149,7 +148,7 @@ public class Reader {
      * @return sexpr expression
      */
     @CompilerDirectives.TruffleBoundary
-    public Optional<Object> readSingle() throws IOException {
+    public Optional<SyntaxObject> readSingle() throws IOException {
         Optional<Token> maybeT = getToken();
         if (maybeT.isEmpty()) {
             return Optional.empty();
@@ -158,18 +157,18 @@ public class Reader {
         if (t instanceof Token.IdentifierToken) {
             var identifier = ((Token.IdentifierToken) t).identifier();
             var symbol = ISLISPContext.get(null).namedSymbol(identifier);
-            return Optional.of(symbol);
+            return Optional.of(new SyntaxObject(symbol, section()));
         }
         if (t instanceof Token.ExactNumberToken) {
             var value = ((Token.ExactNumberToken) t).value();
             if (value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) < 0) {
-                return Optional.of(value.intValueExact());
+                return Optional.of(new SyntaxObject(value.intValueExact(), section()));
             } else {
-                return Optional.of(value);
+                return Optional.of(new SyntaxObject(value, section()));
             }
         }
         if (t instanceof Token.InexactNumberToken inexact) {
-            return Optional.of(inexact.value());
+            return Optional.of(new SyntaxObject(inexact.value(), section()));
         }
         if (t instanceof Token.QuasiquoteToken
                 || t instanceof Token.QuoteToken
@@ -206,23 +205,37 @@ public class Reader {
                 }
             }
             var result = new Pair(
-                normalizedSyntaxSymbol,
-                new Pair(
-                    value,
-                    nil));
-            sourceSectionMap.put(new EqWrapper<>(result), fullSection);
-            return Optional.of(result);
+                new SyntaxObject(normalizedSyntaxSymbol, quoteSection),
+                new Pair(value, nil));
+            return Optional.of(new SyntaxObject(result, fullSection));
         }
         if (t instanceof Token.ArrayBracketOpenToken arr && arr.dimensions() > 1) {
+            var startSection = section();
             var content = readArrayContent(arr.dimensions());
+            var endSection = section();
+            var fullSection = source.createSection(
+                startSection.getStartLine(),
+                startSection.getStartColumn(),
+                endSection.getEndLine(),
+                endSection.getEndColumn());
             var array = new LispArray(content, arr.dimensions());
-            return Optional.of(array);
+            return Optional.of(new SyntaxObject(array, fullSection));
         }
         if (t instanceof Token.VectorBracketOpenToken
             || (t instanceof Token.ArrayBracketOpenToken arr && arr.dimensions() == 1)
         ) {
+            var startSection = section();
             var vec = new LispVector(readUntilClosingBracket());
-            return Optional.of(vec);
+            var endSection = section();
+            SourceSection fullSection = null;
+            if (startSection != null && endSection != null) {
+                fullSection = source.createSection(
+                    startSection.getStartLine(),
+                    startSection.getStartColumn(),
+                    endSection.getEndLine(),
+                    endSection.getEndColumn());
+            }
+            return Optional.of(new SyntaxObject(vec, fullSection));
         }
         if (t instanceof Token.BracketOpenToken) {
             var startLine = getLine();
@@ -254,18 +267,16 @@ public class Reader {
                     var endColumn = getColumn();
                     if (lst.isEmpty()) {
                         var nil = ISLISPContext.get(null).getNil();
-                        return Optional.of(nil);
+                        var section = source == null ? null : source.createSection(startLine, startColumn, endLine, endColumn);
+                        return Optional.of(new SyntaxObject(nil, section));
                     } else {
                         tail = tail == null ? ISLISPContext.get(null).getNil() : tail;
                         for (var i = lst.size() - 1; i >= 0; i--) {
                             tail = new Pair(lst.get(i), tail);
                         }
                         var parsedTail = (Pair) tail;
-                        if (source != null) {
-                            var section = source.createSection(startLine, startColumn, endLine, endColumn);
-                            sourceSectionMap.put(new EqWrapper<>(parsedTail), section);
-                        }
-                        return Optional.of(parsedTail);
+                        var section = source == null ? null : source.createSection(startLine, startColumn, endLine, endColumn);
+                        return Optional.of(new SyntaxObject(parsedTail, section));
                     }
                 }
                 if (periodSeen && tail == null) {
@@ -281,10 +292,10 @@ public class Reader {
         }
         if (t instanceof Token.CharToken c) {
             var lispChar = new LispChar(c.value());
-            return Optional.of(lispChar);
+            return Optional.of(new SyntaxObject(lispChar, section()));
         }
         if (t instanceof Token.StringToken str) {
-            return Optional.of(str.value());
+            return Optional.of(new SyntaxObject(str.value(), section()));
         }
         return Optional.empty();
     }
@@ -310,9 +321,9 @@ public class Reader {
         }
     }
 
-    Object[] readUntilClosingBracket() throws IOException {
+    SyntaxObject[] readUntilClosingBracket() throws IOException {
         Optional<Token> next;
-        var lst = new ArrayList<Object>();
+        var lst = new ArrayList<SyntaxObject>();
         while (true) {
             next = peekToken();
             if (next.isEmpty()) {
@@ -321,7 +332,7 @@ public class Reader {
             var token = next.get();
             if (token instanceof Token.BracketCloseToken) {
                 getToken();
-                return lst.toArray();
+                return lst.toArray(SyntaxObject[]::new);
             }
             readSingle().ifPresent(lst::add);
         }

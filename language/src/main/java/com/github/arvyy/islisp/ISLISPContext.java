@@ -3,6 +3,7 @@ package com.github.arvyy.islisp;
 import com.github.arvyy.islisp.functions.*;
 import com.github.arvyy.islisp.nodes.ISLISPDefGenericExecutionNodeGen;
 import com.github.arvyy.islisp.parser.ParsingException;
+import com.github.arvyy.islisp.parser.SyntaxObject;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -307,10 +308,10 @@ public class ISLISPContext {
     void initBasicSetfExpander(String setfForm, String expandedForm) {
         SetfTransformer transformer = (forms, value) -> {
             var lst = new ArrayList<>();
-            lst.add(namedSymbol(expandedForm));
+            lst.add(new SyntaxObject(namedSymbol(expandedForm), null));
             lst.add(value);
             lst.addAll(forms.subList(1, forms.size()));
-            return Utils.listToValue(lst);
+            return new SyntaxObject(Utils.listToValue(lst), null);
         };
         modules.get("ROOT").registerSetfTransformer(namedSymbol(setfForm), transformer);
     }
@@ -663,6 +664,20 @@ public class ISLISPContext {
     public Symbol namedSymbol(String name) {
         var v = symbols.computeIfAbsent(name, k -> new SymbolReference());
         return new Symbol(name, v);
+    }
+
+    /**
+     * Returns an interned version of the symbol
+     * @param s symbol
+     * @return interned symbol
+     */
+    @CompilerDirectives.TruffleBoundary
+    public Symbol namedSymbol(Symbol s) {
+        var v = symbols.computeIfAbsent(s.name(), k -> new SymbolReference());
+        if (v.equals(s.identityReference())) {
+            return s;
+        }
+        return new Symbol(s.name(), v);
     }
 
     /**
