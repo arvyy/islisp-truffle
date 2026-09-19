@@ -6,6 +6,7 @@ Afterwards the version will match truffle version followed by a date, eg. `24.0.
 
 == Unreleased
 
+* Bump GraalVM version to 25
 * Optimize comparison functions (`>=`, ..., `char>=`, ...)
 * Add missing functions `float`, `floatp`
 * Add missing constants `*most-positive-float*`, `*most-negative-float*`
