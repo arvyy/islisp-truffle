@@ -360,6 +360,8 @@
               ,@forms)))))
 
 (defun reverse (list)
+  "These functions each return a list whose elements are those of the given list, but in reverse order. An error shall be signaled if list is not a list (error-id. domain-error ).
+  @return <list>"
   (for ((list list (cdr list))
         (reversed () (cons (car list) reversed)))
        ((not list) reversed)))

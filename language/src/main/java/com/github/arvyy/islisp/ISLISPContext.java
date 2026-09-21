@@ -11,6 +11,7 @@ import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.source.SourceSection;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -62,6 +63,7 @@ public class ISLISPContext {
         modules = new HashMap<>();
         modules.put("ROOT", new ISLISPModule("main"));
         modules.put("builtin/truffle.lisp", new ISLISPModule("builtin/truffle.lisp"));
+        modules.put("builtin/introspection.lisp", new ISLISPModule("builtin/introspection.lisp"));
         symbolProperties = new HashMap<>();
         symbols = new HashMap<>();
         currentOutputStream = new ValueReference(null);
@@ -141,6 +143,10 @@ public class ISLISPContext {
 
     void initTruffleLibFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
         modules.get("builtin/truffle.lisp").registerFunction(namedSymbol(name), f.apply(language));
+    }
+
+    void initIntrospectionLibFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
+        modules.get("builtin/introspection.lisp").registerFunction(namedSymbol(name), f.apply(language));
     }
 
     /**
@@ -239,6 +245,7 @@ public class ISLISPContext {
         initGlobalFunction("exit", ISLISPExit::makeLispFunction);
         initGlobalFunction("closed-p", ISLISPClosedp::makeLispFunction);
         initGlobalFunction("delete-file", ISLISPDeleteFile::makeLispFunction);
+        initGlobalFunction("documentation", ISLISPDocumentation::makeLispFunction);
 
         // truffle lib
         initTruffleLibFunction("truffle-object-fields", ISLISPTruffleObjectFields::makeLispFunction);
@@ -247,6 +254,10 @@ public class ISLISPContext {
         initTruffleLibFunction("load-native-library", ISLISPLoadNativeLibrary::makeLispFunction);
         initTruffleLibFunction("native-library-symbol", ISLISPNativeLibrarySymbol::makeLispFunction);
         modules.get("builtin/truffle.lisp").exportAll();
+
+        initIntrospectionLibFunction("lookup-module", ISLISPLookupModule::makeLispFunction);
+        initIntrospectionLibFunction("list-module-declarations", ISLISPListModuleDeclarations::makeLispFunction);
+        modules.get("builtin/introspection.lisp").exportAll();
     }
 
     private void initInitializeObjectMethod() {
@@ -353,6 +364,9 @@ public class ISLISPContext {
         initBuiltin("<truffle-object>", "<object>");
         initBuiltin("<truffle-native-library>", "<object>");
         initBuiltin("<truffle-vector>", "<basic-vector>");
+
+        // introspection
+        initBuiltin("<module>", "<object>");
     }
 
     /**

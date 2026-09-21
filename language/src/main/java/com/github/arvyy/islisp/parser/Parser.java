@@ -1140,9 +1140,23 @@ public class Parser {
         var bodyStatements = restList.stream()
                 .skip(2)
                 .map(v -> parseExpressionNode(slotsAndNewContext.context, v))
-                .toArray(ISLISPExpressionNode[]::new);
+                .toList();
+        // if body has multiple expressions, and first one is string literal,
+        // treat it as a documentation string
+        String documentation = null;
+        if (bodyStatements.size() > 1 && bodyStatements.get(0) instanceof ISLISPLiteralNode literalNode && literalNode.getValue() instanceof String s) {
+            documentation = s;
+            bodyStatements = bodyStatements.subList(1, bodyStatements.size());
+        }
+        String descriptionDocumentation = null;
+        String returnTypeDocumentation = null;
+        if (documentation != null) {
+            var r = DocstringParser.parseDocstring(documentation);
+            descriptionDocumentation = r.description();
+            returnTypeDocumentation = r.returnType();
+        }
         var body = new ISLISPPrognNode(
-                bodyStatements,
+                bodyStatements.toArray(ISLISPExpressionNode[]::new),
                 sexpr.source());
         body.setParserContext(slotsAndNewContext.context);
         var ctx = ISLISPContext.get(null);
@@ -1160,7 +1174,13 @@ public class Parser {
                 parserContext.frameBuilder.build());
         rootNode.setName(name.name());
         rootNode.setSourceSection(sexpr.source());
-        return new ISLISPDefunNode(parserContext.module, name, rootNode);
+        var functionDocumentation = new LispFunction.Documentation(
+            name.name(),
+            slotsAndNewContext.namedArgNames,
+            slotsAndNewContext.restArgName,
+            returnTypeDocumentation,
+            descriptionDocumentation);
+        return new ISLISPDefunNode(parserContext.module, name, rootNode, functionDocumentation);
     }
 
     SlotsAndNewContext processFrameDescriptorsForFunctionArguments(
@@ -1182,6 +1202,9 @@ public class Parser {
     ) {
         var restSlot = -1;
         var positionalArgumentSlots = new ArrayList<Integer>();
+        // for documentation
+        var positionalArgNames = new ArrayList<String>();
+        String restArgName = null;
         var variables = new HashMap<SymbolReference, ParserContext.VariableContext>();
         int stateNamedArgs = 0;
         int stateAfterRestKw = 1;
@@ -1193,6 +1216,7 @@ public class Parser {
             if (state == stateNamedArgs && !isRestKw) {
                 var slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
                 positionalArgumentSlots.add(slot);
+                positionalArgNames.add(arg.name());
                 var variableContext = new ParserContext.VariableContext();
                 variableContext.frameDepth = parserContext.frameDepth;
                 variableContext.slot = slot;
@@ -1204,6 +1228,7 @@ public class Parser {
             } else if (state == stateAfterRestKw && !isRestKw) {
                 state = stateAfterRestArg;
                 restSlot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
+                restArgName = arg.name();
                 var variableContext = new ParserContext.VariableContext();
                 variableContext.frameDepth = parserContext.frameDepth;
                 variableContext.slot = restSlot;
@@ -1225,6 +1250,8 @@ public class Parser {
         result.namedArgsSlots = argSlots;
         result.context = newContext;
         result.restArgsSlot = restSlot;
+        result.namedArgNames = positionalArgNames;
+        result.restArgName = restArgName;
         return result;
     }
 
@@ -1523,5 +1550,8 @@ public class Parser {
         int[] namedArgsSlots;
         int restArgsSlot;
         ParserContext context;
+        // documentation
+        List<String> namedArgNames;
+        String restArgName;
     }
 }

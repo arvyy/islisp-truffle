@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
+import java.util.List;
+
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
@@ -15,6 +17,12 @@ import com.oracle.truffle.api.nodes.RootNode;
  */
 public abstract class ISLISPCar extends RootNode {
 
+    private final static String NAME = "car";
+    private final static List<String> ARGS = List.of("cons");
+    private final static String REST_ARG = null;
+    private final static String RETURN_TYPE = "<object>";
+    private final static String DESC = "The function car returns the left component of the cons. An error shall be signaled if cons is not a cons (error-id. domain-error ).";
+    
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
@@ -50,7 +58,9 @@ public abstract class ISLISPCar extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPCarNodeGen.create(lang).getCallTarget());
+        return new LispFunction(
+            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
+            ISLISPCarNodeGen.create(lang).getCallTarget());
     }
 
 }

@@ -9,12 +9,19 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 /**
  * Implements `create-string-output-stream`.
  */
 public class ISLISPCreateStringOutputStream extends RootNode {
 
+    private final static String NAME = "create-string-output-stream";
+    private final static List<String> ARGS = List.of();
+    private final static String REST_ARG = null;
+    private final static String RETURN_TYPE = "<stream>";
+    private final static String DESC = "This function creates and returns a string output stream. The output to a string stream can be retrieved by get-output-stream-string.";
+    
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
@@ -42,6 +49,8 @@ public class ISLISPCreateStringOutputStream extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(new ISLISPCreateStringOutputStream(lang).getCallTarget());
+        return new LispFunction(
+            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
+            new ISLISPCreateStringOutputStream(lang).getCallTarget());
     }
 }

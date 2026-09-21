@@ -11,12 +11,19 @@ import com.oracle.truffle.api.nodes.RootNode;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * Implements `create-string-input-stream` method.
  */
 public class ISLISPCreateStringInputStream extends RootNode {
 
+    private final static String NAME = "create-string-input-stream";
+    private final static List<String> ARGS = List.of("string");
+    private final static String REST_ARG = null;
+    private final static String RETURN_TYPE = "<stream>";
+    private final static String DESC = "Creates and returns an input stream from the string. An error shall be signaled if string is not a string (error-id. domain-error).";
+        
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
@@ -54,6 +61,8 @@ public class ISLISPCreateStringInputStream extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(new ISLISPCreateStringInputStream(lang).getCallTarget());
+        return new LispFunction(
+            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
+            new ISLISPCreateStringInputStream(lang).getCallTarget());
     }
 }

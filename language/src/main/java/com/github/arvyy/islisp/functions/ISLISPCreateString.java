@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
+import java.util.List;
+
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispChar;
@@ -16,6 +18,12 @@ import com.oracle.truffle.api.nodes.RootNode;
  */
 public abstract class ISLISPCreateString extends RootNode {
 
+    private final static String NAME = "create-string";
+    private final static List<String> ARGS = List.of("i", "[initial-character]");
+    private final static String REST_ARG = null;
+    private final static String RETURN_TYPE = "<string>";
+    private final static String DESC = "Returns a string of length i. If initial-character is given, then the characters of the new string are initialized with this character, otherwise the initialization is implementation defined. An error shall be signaled if the requested string cannot be allocated (error-id. cannot-create-string). An error shall be signaled if i is not a non-negative integer or if initial-character is not a character (error-id. domain-error).";
+    
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
@@ -65,7 +73,9 @@ public abstract class ISLISPCreateString extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPCreateStringNodeGen.create(lang).getCallTarget());
+        return new LispFunction(
+            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
+            ISLISPCreateStringNodeGen.create(lang).getCallTarget());
     }
 
 }

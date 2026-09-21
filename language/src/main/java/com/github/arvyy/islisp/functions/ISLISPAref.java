@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
+import java.util.List;
+
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
@@ -14,6 +16,13 @@ import com.oracle.truffle.api.nodes.RootNode;
  * Implements `aref` function.
  */
 public abstract class ISLISPAref extends RootNode {
+    
+    private final static String NAME = "aref";
+    private final static List<String> ARGS = List.of("basic-array");
+    private final static String REST_ARG = "z*";
+    private final static String RETURN_TYPE = "<object>";
+    private final static String DESC = "aref returns the object stored in the component of the basic-array specified by the sequence of integers z . This sequence must have exactly as many elements as there are dimensions in the basic-array, and each one must satisfy 0 ≤ zi < di, di the ith dimension and 0 ≤ i < d, d the number of dimensions. Arrays are indexed 0 based, so the ith row is accessed via the index i − 1." +
+    "\nAn error shall be signaled if basic-array is not a basic-array (error-id. domain-error ). An error shall be signaled if any z is not a non-negative integer (error-id. domain-error ).";
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
@@ -123,7 +132,9 @@ public abstract class ISLISPAref extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPArefNodeGen.create(lang).getCallTarget());
+        return new LispFunction(
+            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
+            ISLISPArefNodeGen.create(lang).getCallTarget());
     }
 
 }

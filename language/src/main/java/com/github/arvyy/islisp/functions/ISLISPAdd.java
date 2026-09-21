@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
+import java.util.List;
+
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPTypes;
@@ -26,6 +28,13 @@ import com.oracle.truffle.api.source.SourceSection;
 @TypeSystemReference(ISLISPTypes.class)
 @ReportPolymorphism
 public abstract class ISLISPAdd extends RootNode {
+
+    private final static String NAME = "+";
+    private final static List<String> ARGS = List.of();
+    private final static String REST_ARG = "x*";
+    private final static String RETURN_TYPE = "<number>";
+    private final static String DESC = "Returns the sum of its arguments. If all arguments are integers, the result is an integer. If any argument is a float, the result is a float. When given no arguments, + returns 0. An error shall be signaled if any x is not a number (error-id. domain-error ).";
+    
 
     @Override
     public boolean isCloningAllowed() {
@@ -174,6 +183,7 @@ public abstract class ISLISPAdd extends RootNode {
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
         var callTarget = ISLISPAddNodeGen.create(lang).getCallTarget();
         return new LispFunction(
+            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
             new Closure(null, null, null),
             callTarget,
             false,

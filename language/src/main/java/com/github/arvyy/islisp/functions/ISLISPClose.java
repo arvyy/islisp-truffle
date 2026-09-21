@@ -10,11 +10,18 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Implements `close` function.
  */
 public class ISLISPClose extends RootNode {
+    
+    private final static String NAME = "close";
+    private final static List<String> ARGS = List.of("stream");
+    private final static String REST_ARG = null;
+    private final static String RETURN_TYPE = null;
+    private final static String DESC = "The function close closes the stream stream. If stream is closed it may no longer be used in input or output operations. Closing a file stream ends the association between the stream and its file. If the stream was already closed this function performs nothing. The result value is implementation defined. An error shall be signaled if stream is not a stream (error-id. domain-error).";
 
     @Child
     private ISLISPErrorSignalerNode errorSignalerNode;
@@ -54,7 +61,9 @@ public class ISLISPClose extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(new ISLISPClose(lang).getCallTarget());
+        return new LispFunction(
+            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
+            new ISLISPClose(lang).getCallTarget());
     }
 
 

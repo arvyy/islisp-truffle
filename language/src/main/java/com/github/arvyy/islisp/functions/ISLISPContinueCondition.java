@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
+import java.util.List;
+
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.exceptions.ISLISPContinueException;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
@@ -13,6 +15,12 @@ import com.oracle.truffle.api.nodes.RootNode;
  */
 public class ISLISPContinueCondition extends RootNode {
 
+    private final static String NAME = "continue-condition";
+    private final static List<String> ARGS = List.of("condition", "[value]");
+    private final static String REST_ARG = null;
+    private final static String RETURN_TYPE = null;
+    private final static String DESC = "\"Continues\" from condition by finding the call to signal-condition and arranging for it to perform a normal return of the value, which defaults to nil. The consequences are undefined if the condition is not continuable.";
+    
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
@@ -41,6 +49,8 @@ public class ISLISPContinueCondition extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(new ISLISPContinueCondition(lang).getCallTarget());
+        return new LispFunction(
+            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
+            new ISLISPContinueCondition(lang).getCallTarget());
     }
 }

@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
+import java.util.List;
+
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispFunction;
@@ -14,6 +16,12 @@ import com.oracle.truffle.api.nodes.RootNode;
  * Implements `cdr` function, returning pair's second slot.
  */
 public abstract class ISLISPCdr extends RootNode {
+    
+    private final static String NAME = "cdr";
+    private final static List<String> ARGS = List.of("cons");
+    private final static String REST_ARG = null;
+    private final static String RETURN_TYPE = "<object>";
+    private final static String DESC = "The function cdr returns the right component of the cons. An error shall be signaled if cons is not a cons (error-id. domain-error ).";
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
@@ -49,7 +57,9 @@ public abstract class ISLISPCdr extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPCdrNodeGen.create(lang).getCallTarget());
+        return new LispFunction(
+            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
+            ISLISPCdrNodeGen.create(lang).getCallTarget());
     }
 
 }

@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
+import java.util.List;
+
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispChar;
@@ -14,6 +16,12 @@ import com.oracle.truffle.api.nodes.RootNode;
  * Implements `char<` function.
  */
 public abstract class ISLISPCharLt extends RootNode {
+    
+    private final static String NAME = "char<";
+    private final static List<String> ARGS = List.of("char1", "char2");
+    private final static String REST_ARG = null;
+    private final static String RETURN_TYPE = "boolean";
+    private final static String DESC = "The function char< tests whether char1 is less than char2.";
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
@@ -53,6 +61,8 @@ public abstract class ISLISPCharLt extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPCharLtNodeGen.create(lang).getCallTarget());
+        return new LispFunction(
+            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
+            ISLISPCharLtNodeGen.create(lang).getCallTarget());
     }
 }

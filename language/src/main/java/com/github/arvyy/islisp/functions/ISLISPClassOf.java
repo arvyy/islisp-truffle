@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.functions;
 
+import java.util.List;
+
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
@@ -17,6 +19,12 @@ import com.oracle.truffle.api.nodes.RootNode;
  * Implements `class-of` function, returning given object's class.
  */
 public abstract class ISLISPClassOf extends RootNode {
+    
+    private final static String NAME = "class-of";
+    private final static List<String> ARGS = List.of("obj");
+    private final static String REST_ARG = null;
+    private final static String RETURN_TYPE = "<class>";
+    private final static String DESC = "Returns the class of which the given obj is a direct instance. obj may be any ISLISP object.";
 
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
@@ -149,6 +157,14 @@ public abstract class ISLISPClassOf extends RootNode {
     ) {
         return libClass;
     }
+    
+    @Specialization
+    LispClass doNativeLibrary(
+        ISLISPModule module,
+        @Cached("loadModuleClass()") LispClass libClass
+    ) {
+        return libClass;
+    }
 
     @Specialization(guards = {
         "interop.hasMembers(o)",
@@ -241,6 +257,10 @@ public abstract class ISLISPClassOf extends RootNode {
         return loadClass("<truffle-native-library>");
     }
 
+    LispClass loadModuleClass() {
+        return loadClass("<module>");
+    }
+
     LispClass loadObjectClass() {
         return loadClass("<object>");
     }
@@ -257,6 +277,8 @@ public abstract class ISLISPClassOf extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPClassOfNodeGen.create(lang).getCallTarget());
+        return new LispFunction(
+            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
+            ISLISPClassOfNodeGen.create(lang).getCallTarget());
     }
 }

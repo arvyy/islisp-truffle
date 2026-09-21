@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.runtime;
 import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.parser.SyntaxObject;
 import com.oracle.truffle.api.interop.TruffleObject;
+import com.github.arvyy.islisp.ISLISPContext;
 
 import java.util.Iterator;
 
@@ -82,7 +83,19 @@ final class PairIterator implements Iterator<Object> {
 
     @Override
     public boolean hasNext() {
-        return next instanceof Pair || (next instanceof SyntaxObject so && so.value() instanceof Pair);
+        Object unwrapped;
+        if (next instanceof SyntaxObject so) {
+            unwrapped = so.value();
+        } else {
+            unwrapped = next;
+        }
+        if (unwrapped instanceof Pair) {
+            return true;
+        }
+        if (unwrapped instanceof Symbol s && s == ISLISPContext.get(null).getNil()) {
+            return false;
+        }
+        throw new Utils.NotAList();
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static com.github.arvyy.islisp.Utils.isNil;
 
@@ -20,6 +21,18 @@ import static com.github.arvyy.islisp.Utils.isNil;
  */
 public abstract class ISLISPCreateArray extends RootNode {
 
+    private final static String NAME = "create-array";
+    private final static List<String> ARGS = List.of("dimensions", "[initial-element]");
+    private final static String REST_ARG = null;
+    private final static String RETURN_TYPE = "<basic-array>";
+    private final static String DESC = """
+This function creates an array of the given dimensions. The dimensions argument is a list of non-negative integers.
+The result is of class general-vector if there is only one dimension, or of class general-array* otherwise.
+If initial-element is given, the elements of the new array are initialized with this object, otherwise the initialization is implementation defined.
+An error shall be signaled if the requested array cannot be allocated (error-id. cannot-create-array).
+An error shall be signaled if dimensions is not a proper list of non-negative integers (error-id. domain-error). initial-element may be any ISLISP object.
+    """;
+        
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
@@ -134,6 +147,8 @@ public abstract class ISLISPCreateArray extends RootNode {
      * @return lisp function
      */
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPCreateArrayNodeGen.create(lang).getCallTarget());
+        return new LispFunction(
+            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
+            ISLISPCreateArrayNodeGen.create(lang).getCallTarget());
     }
 }

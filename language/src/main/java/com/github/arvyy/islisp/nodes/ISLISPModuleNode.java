@@ -56,7 +56,6 @@ public class ISLISPModuleNode extends ISLISPExpressionNode {
             initialized = true;
             initialize();
         }
-        nonDefinitionExecutionNode.call();
-        return ISLISPContext.get(this).getNil();
+        return nonDefinitionExecutionNode.call();
     }
 }

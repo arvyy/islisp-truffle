@@ -1,5 +1,7 @@
 package com.github.arvyy.islisp.runtime;
 
+import java.util.List;
+
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.RootCallTarget;
 import com.oracle.truffle.api.dsl.Cached;
@@ -25,18 +27,41 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 @ExportLibrary(InteropLibrary.class)
 public record LispFunction(
+    Documentation documentation,
     Closure closure,
     CallTarget callTarget,
     boolean isGeneric,
     boolean inline
 ) implements TruffleObject {
 
+    public record Documentation(
+        String name,
+        List<String> arguments,
+        String restArgument,
+        String returnType,
+        String docstring
+    ) {}
+
+    // TODO remove once callsites add docs
+    public LispFunction(
+        Closure closure,
+        CallTarget callTarget,
+        boolean isGeneric,
+        boolean inline
+    ) {
+        this(null, closure, callTarget, isGeneric, inline);
+    }
+    
     /**
      * Create plain lisp function.
      * @param callTarget call target
      */
+    public LispFunction(Documentation documentation, CallTarget callTarget) {
+        this(documentation, new Closure(null, null, null), callTarget, false, false);
+    }
+    // TODO remove once callsites add docs
     public LispFunction(CallTarget callTarget) {
-        this(new Closure(null, null, null), callTarget, false, false);
+        this(null, new Closure(null, null, null), callTarget, false, false);
     }
 
     /**
@@ -44,8 +69,12 @@ public record LispFunction(
      * @param frame materialized closure frame
      * @param callTarget call target
      */
+    public LispFunction(Documentation documentation, MaterializedFrame frame, CallTarget callTarget) {
+        this(documentation, new Closure(frame, null, null), callTarget, false, false);
+    }
+    // TODO remove once callsites add docs
     public LispFunction(MaterializedFrame frame, CallTarget callTarget) {
-        this(new Closure(frame, null, null), callTarget, false, false);
+        this(null, new Closure(frame, null, null), callTarget, false, false);
     }
 
     /**
@@ -55,8 +84,12 @@ public record LispFunction(
      * @param args initial invocation arguments
      * @param callTarget call target
      */
+    public LispFunction(Documentation documentation, GenericMethodApplicableMethods nextMethods, Object[] args, CallTarget callTarget) {
+        this(documentation, new Closure(null, nextMethods, args), callTarget, true, false);
+    }
+    // TODO remove once callsites add docs
     public LispFunction(GenericMethodApplicableMethods nextMethods, Object[] args, CallTarget callTarget) {
-        this(new Closure(null, nextMethods, args), callTarget, true, false);
+        this(null, new Closure(null, nextMethods, args), callTarget, true, false);
     }
 
     /**
@@ -64,8 +97,12 @@ public record LispFunction(
      * @param closure closure
      * @param callTarget call target
      */
+    public LispFunction(Documentation documentation, Closure closure, CallTarget callTarget) {
+        this(documentation, closure, callTarget, false, false);
+    }
+    // TODO remove once callsites add docs
     public LispFunction(Closure closure, CallTarget callTarget) {
-        this(closure, callTarget, false, false);
+        this(null, closure, callTarget, false, false);
     }
 
     @ExportMessage

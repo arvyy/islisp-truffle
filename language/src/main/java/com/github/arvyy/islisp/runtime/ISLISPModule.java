@@ -484,6 +484,17 @@ public class ISLISPModule implements TruffleObject {
         return lst;
     }
 
+    @CompilerDirectives.TruffleBoundary
+    public List<LispFunction> listExportedFunctions() {
+        var lst = new ArrayList<LispFunction>(globalFunctions.size());
+        for (var e: globalFunctions.entrySet()) {
+            if (exports.contains(e.getKey())) {
+                lst.add(e.getValue());
+            }
+        }
+        return lst;
+    }
+
 }
 
 @ExportLibrary(InteropLibrary.class)
