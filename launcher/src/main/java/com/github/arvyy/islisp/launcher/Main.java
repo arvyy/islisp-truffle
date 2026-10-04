@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.launcher;
 
 import com.github.arvyy.islisp.buildinfo.BuildInfo;
 import org.apache.commons.cli.*;
+import org.commonmark.renderer.text.TextContentRenderer;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotAccess;
 import org.graalvm.polyglot.PolyglotException;
@@ -31,7 +32,7 @@ public final class Main {
         var versionOpt = versionOpt();
 
         var options = new Options();
-        //options.addOption(helpOpt);
+        options.addOption(helpOpt);
         options.addOption(versionOpt);
 
         var parser = DefaultParser.builder()
@@ -128,6 +129,20 @@ public final class Main {
                 if (line.equals(",q")) {
                     break;
                 }
+                if (line.startsWith(",d ")) {
+                    var words = line.split("\\s+");
+                    if (words.length != 3 && words.length != 2) {
+                        System.out.println("Unrecognized ,d command format");
+                        printReplHelp();
+                        continue;
+                    }
+                    if (words.length == 2) {
+                        printDocumentation(context, null, words[1]);
+                    } else {
+                        printDocumentation(context, words[1], words[2]);
+                    }
+                    continue;
+                }
 
                 Source source;
                 if (line.startsWith(",l ")) {
@@ -162,6 +177,41 @@ public final class Main {
         context.close();
     }
 
+    static void printDocumentation(Context context, String namespace, String name) {
+        try {
+            var extractor = context.eval("islisp", """
+                (lambda (#:rest args)
+                    (let* ((doc (if (= (length args) 2) 
+                                    (documentation (convert (elt args 0) <symbol>) (convert (elt args 1) <symbol>))
+                                    (documentation (convert (elt args 0) <symbol>))))
+                           (desc (assoc 'desc doc))
+                           (result (if desc (cdr desc) "")))
+                      result))
+                """);
+            Object[] args;
+            if (namespace == null) {
+                args = new Object[]{ name };
+            } else {
+                args = new Object[]{ namespace, name };
+            }
+            var desc = extractor.execute(args).asString();
+            if (desc.isEmpty()) {
+                System.out.println("No docs UwU"); 
+            } else {
+                System.out.println(markdownToPlaintext(desc));
+            }
+        } catch (PolyglotException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    static String markdownToPlaintext(String m) {
+        var parser = org.commonmark.parser.Parser.builder().build();
+        var document = parser.parse(m);
+        var renderer = TextContentRenderer.builder().build();
+        return renderer.render(document);
+    }
+
     static Option helpOpt() {
         return Option.builder()
             .option("h")
@@ -181,9 +231,18 @@ public final class Main {
     static void printReplHelp() {
         var pw = new PrintWriter(System.out);
         new HelpFormatter().printWrapped(pw, HELP_WIDTH, """
-            ,h - This help message
-            ,q - Quit
-            ,l path - Load and evaluate file from given path
+            ,h
+            This help message
+            
+            ,q
+            Quit
+            
+            ,l path
+            Load and evaluate file from given path
+            
+            ,d [namespace] symbol
+            Lookup documentation for a symbol in scope. Optionally can specify namespace (one of: function, setf, syntax, value) to disambiguate.
+            
             """);
         pw.flush();
     }

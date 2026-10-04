@@ -1,7 +1,5 @@
 package com.github.arvyy.islisp.functions;
 
-import java.util.List;
-
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
@@ -10,33 +8,19 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.RootNode;
 
 /**
  * Implements `aref` function.
  */
-public abstract class ISLISPAref extends RootNode {
+public abstract class ISLISPAref extends ISLISPBuiltinFunctionRootNode {
     
-    private final static String NAME = "aref";
-    private final static List<String> ARGS = List.of("basic-array");
-    private final static String REST_ARG = "z*";
-    private final static String RETURN_TYPE = "<object>";
-    private final static String DESC = "aref returns the object stored in the component of the basic-array specified by the sequence of integers z . This sequence must have exactly as many elements as there are dimensions in the basic-array, and each one must satisfy 0 ≤ zi < di, di the ith dimension and 0 ≤ i < d, d the number of dimensions. Arrays are indexed 0 based, so the ith row is accessed via the index i − 1." +
-    "\nAn error shall be signaled if basic-array is not a basic-array (error-id. domain-error ). An error shall be signaled if any z is not a non-negative integer (error-id. domain-error ).";
-
-    @Child
-    ISLISPErrorSignalerNode errorSignalerNode;
-
     ISLISPAref(TruffleLanguage<?> language) {
-        super(language);
+        super("aref", vararg(2), language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override
-    public final Object execute(VirtualFrame frame) {
-        if (frame.getArguments().length < 3) {
-            return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length, 2, -1);
-        }
+    public final Object executeImpl(VirtualFrame frame) {
         int[] lookup = new int[frame.getArguments().length - 2];
         for (var i = 0; i < lookup.length; i++) {
             var arg = frame.getArguments()[i + 2];
@@ -124,17 +108,6 @@ public abstract class ISLISPAref extends RootNode {
     Object fallback(Object arr, int[] lookup) {
         var ctx = ISLISPContext.get(this);
         return errorSignalerNode.signalWrongType(arr, ctx.lookupClass("<basic-array>"));
-    }
-
-    /**
-     * Construct LispFunction using this root node.
-     * @param lang truffle language reference
-     * @return lisp function
-     */
-    public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(
-            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
-            ISLISPArefNodeGen.create(lang).getCallTarget());
     }
 
 }

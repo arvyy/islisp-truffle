@@ -1,9 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
-import java.util.List;
-
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -13,34 +10,20 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.library.CachedLibrary;
-import com.oracle.truffle.api.nodes.RootNode;
 
 /**
  * Implements `class-of` function, returning given object's class.
  */
-public abstract class ISLISPClassOf extends RootNode {
-    
-    private final static String NAME = "class-of";
-    private final static List<String> ARGS = List.of("obj");
-    private final static String REST_ARG = null;
-    private final static String RETURN_TYPE = "<class>";
-    private final static String DESC = "Returns the class of which the given obj is a direct instance. obj may be any ISLISP object.";
-
-    @Child
-    ISLISPErrorSignalerNode errorSignalerNode;
+public abstract class ISLISPClassOf extends ISLISPBuiltinFunctionRootNode {
 
     ISLISPClassOf(TruffleLanguage<?> language) {
-        super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode(this);
+        super("class-of", arg(1), language);
     }
 
     abstract Object executeGeneric(Object value);
 
     @Override
-    public final Object execute(VirtualFrame frame) {
-        if (frame.getArguments().length != 2) {
-            return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 1, 1);
-        }
+    public final Object executeImpl(VirtualFrame frame) {
         var value = (Object) frame.getArguments()[1];
         return executeGeneric(value);
     }
@@ -271,14 +254,4 @@ public abstract class ISLISPClassOf extends RootNode {
         return clazz;
     }
 
-    /**
-     * Construct LispFunction using this root node.
-     * @param lang truffle language reference
-     * @return lisp function
-     */
-    public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(
-            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
-            ISLISPClassOfNodeGen.create(lang).getCallTarget());
-    }
 }

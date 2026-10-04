@@ -8,6 +8,7 @@ import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.ISLISPModule;
 import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispVector;
+import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
@@ -27,45 +28,28 @@ public class ISLISPDocumentation extends RootNode {
 
     @Override
     public final Object execute(VirtualFrame frame) {
-        if (frame.getArguments().length != 2) {
-            return errorSignalerNode.signalWrongArgumentCount(
-                frame.getArguments().length - 1,
-                1,
-                1);
+        var args = frame.getArguments();
+        if (args.length != 2 && args.length != 3) {
+            return errorSignalerNode.signalWrongArgumentCount(args.length - 1, 1, 2);
         }
-        var arg = frame.getArguments()[1];
-        var c = ISLISPContext.get(this);
-        if (arg instanceof LispFunction f) {
-            var doc = f.documentation();
-            if (doc == null) {
-                return c.getNil();
+        var ctx = ISLISPContext.get(this);
+        if (args.length == 2) {
+            if (args[1] instanceof Symbol s) {
+                return ctx.getCurrentModule().getDocumentationIncludeImports(s);
             } else {
-                return documentationToAlist(doc);
+                return errorSignalerNode.signalWrongType(args[1], ctx.lookupClass("<symbol>"));
             }
         } else {
-            return c.getNil();
+            if (args[1] instanceof Symbol ns) {
+                if (args[2] instanceof Symbol s) {
+                    return ctx.getCurrentModule().getDocumentationIncludeImports(ns, s);
+                } else {
+                    return errorSignalerNode.signalWrongType(args[2], ctx.lookupClass("<symbol>"));
+                }
+            } else {
+                return errorSignalerNode.signalWrongType(args[1], ctx.lookupClass("<symbol>"));
+            }
         }
-    }
-
-    @TruffleBoundary 
-    Object documentationToAlist(LispFunction.Documentation doc) {
-        var map = new HashMap<String, Object>();
-        if (doc.name() != null) {
-            map.put("name", doc.name());
-        }
-        if (doc.arguments() != null) {
-            map.put("named-args", new LispVector(doc.arguments().toArray()));
-        }
-        if (doc.restArgument() != null) {
-            map.put("rest-arg", doc.restArgument());
-        }
-        if (doc.returnType() != null) {
-            map.put("return-type", doc.returnType());
-        }
-        if (doc.docstring() != null) {
-            map.put("docstring", doc.docstring());
-        }
-        return Utils.mapToAlist(map);
     }
     
     public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {

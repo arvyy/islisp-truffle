@@ -18,7 +18,7 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
 
     ISLISPRootNode functionNode;
 
-    final LispFunction.Documentation documentation;
+    final LispFunction.Meta documentation;
 
     /**
      * Create defun node.
@@ -27,7 +27,7 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
      * @param name function's symbol name
      * @param functionNode root node wrapping function body
      */
-    public ISLISPDefunNode(String module, Symbol name, ISLISPRootNode functionNode, LispFunction.Documentation documentation) {
+    public ISLISPDefunNode(String module, Symbol name, ISLISPRootNode functionNode, LispFunction.Meta documentation) {
         super(true, functionNode.getSourceSection());
         this.module = module;
         this.name = name;

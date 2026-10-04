@@ -11,7 +11,6 @@ import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.source.SourceSection;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -42,6 +41,7 @@ public class ISLISPContext {
     private Symbol t;
 
     private final Map<String, ISLISPModule> modules;
+    private ISLISPModule currentModule = null;
 
     private final Map<SymbolReference, Map<SymbolReference, ValueReference>> symbolProperties;
     private final Map<String, SymbolReference> symbols;
@@ -115,6 +115,14 @@ public class ISLISPContext {
         modules.put(module, m);
     }
 
+    public void setCurrentModule(ISLISPModule m) {
+        currentModule = m;
+    }
+
+    public ISLISPModule getCurrentModule() {
+        return currentModule;
+    }
+
     /**
      * Push handler into active handler stack, making it first handler to be hit by the condition signal.
      * @param f handler function
@@ -140,6 +148,10 @@ public class ISLISPContext {
     void initGlobalFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
         modules.get("ROOT").registerFunction(namedSymbol(name), f.apply(language));
     }
+    
+    void initGlobalFunction(String name, LispFunction f) {
+        modules.get("ROOT").registerFunction(namedSymbol(name), f);
+    }
 
     void initTruffleLibFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
         modules.get("builtin/truffle.lisp").registerFunction(namedSymbol(name), f.apply(language));
@@ -154,26 +166,26 @@ public class ISLISPContext {
      */
     void initGlobalFunctions() {
         // standard
-        initGlobalFunction("+", ISLISPAdd::makeLispFunction);
+        initGlobalFunction("+", ISLISPAddNodeGen.create(language).makeLispFunction());
         initGlobalFunction("-", ISLISPSubtract::makeLispFunction);
         initGlobalFunction("*", ISLISPMul::makeLispFunction);
         initGlobalFunction("=", ISLISPNumericEqual::makeLispFunction);
         initGlobalFunction(">", ISLISPNumericGt::makeLispFunction);
-        initGlobalFunction("aref", ISLISPAref::makeLispFunction);
-        initGlobalFunction("car", ISLISPCar::makeLispFunction);
-        initGlobalFunction("cdr", ISLISPCdr::makeLispFunction);
+        initGlobalFunction("aref", ISLISPArefNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("car", ISLISPCarNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("cdr", ISLISPCdrNodeGen.create(language).makeLispFunction());
         initGlobalFunction("ceiling", ISLISPRoundingFunctions::makeLispFunctionCeiling);
-        initGlobalFunction("char=", ISLISPCharEqual::makeLispFunction);
-        initGlobalFunction("char<", ISLISPCharLt::makeLispFunction);
-        initGlobalFunction("class-of", ISLISPClassOf::makeLispFunction);
-        initGlobalFunction("close", ISLISPClose::makeLispFunction);
-        initGlobalFunction("cons", ISLISPCons::makeLispFunction);
-        initGlobalFunction("continue-condition", ISLISPContinueCondition::makeLispFunction);
+        initGlobalFunction("char=", ISLISPCharEqualNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("char<", ISLISPCharLtNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("class-of", ISLISPClassOfNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("close", new ISLISPClose(language).makeLispFunction());
+        initGlobalFunction("cons", new ISLISPCons(language).makeLispFunction());
+        initGlobalFunction("continue-condition", new ISLISPContinueCondition(language).makeLispFunction());
         initGlobalFunction("cos", ISLISPTrigFunctions::makeLispFunctionCos);
-        initGlobalFunction("create-array", ISLISPCreateArray::makeLispFunction);
-        initGlobalFunction("create-string", ISLISPCreateString::makeLispFunction);
-        initGlobalFunction("create-string-input-stream", ISLISPCreateStringInputStream::makeLispFunction);
-        initGlobalFunction("create-string-output-stream", ISLISPCreateStringOutputStream::makeLispFunction);
+        initGlobalFunction("create-array", ISLISPCreateArrayNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("create-string", ISLISPCreateStringNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("create-string-input-stream", new ISLISPCreateStringInputStream(language).makeLispFunction());
+        initGlobalFunction("create-string-output-stream", new ISLISPCreateStringOutputStream(language).makeLispFunction());
         initGlobalFunction("create-vector", ISLISPCreateVector::makeLispFunction);
         initGlobalFunction("elt", ISLISPElt::makeLispFunction);
         initGlobalFunction("error-output", ISLISPErrorOutputStream::makeLispFunction);
@@ -246,6 +258,7 @@ public class ISLISPContext {
         initGlobalFunction("closed-p", ISLISPClosedp::makeLispFunction);
         initGlobalFunction("delete-file", ISLISPDeleteFile::makeLispFunction);
         initGlobalFunction("documentation", ISLISPDocumentation::makeLispFunction);
+        initGlobalFunction("set-documentation", ISLISPSetDocumentation::makeLispFunction);
 
         // truffle lib
         initTruffleLibFunction("truffle-object-fields", ISLISPTruffleObjectFields::makeLispFunction);
@@ -257,6 +270,7 @@ public class ISLISPContext {
 
         initIntrospectionLibFunction("lookup-module", ISLISPLookupModule::makeLispFunction);
         initIntrospectionLibFunction("list-module-declarations", ISLISPListModuleDeclarations::makeLispFunction);
+        initIntrospectionLibFunction("list-module-documentations", ISLISPListModuleDocumentations::makeLispFunction);
         modules.get("builtin/introspection.lisp").exportAll();
     }
 
@@ -314,6 +328,7 @@ public class ISLISPContext {
 
         //extensions
         initBasicSetfExpander("truffle-object-field", "set-truffle-object-field");
+        initBasicSetfExpander("documentation", "set-documentation");
     }
 
     void initBasicSetfExpander(String setfForm, String expandedForm) {

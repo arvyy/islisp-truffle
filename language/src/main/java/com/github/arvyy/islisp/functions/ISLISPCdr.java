@@ -1,43 +1,25 @@
 package com.github.arvyy.islisp.functions;
 
-import java.util.List;
-
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
-import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.RootNode;
 
 /**
  * Implements `cdr` function, returning pair's second slot.
  */
-public abstract class ISLISPCdr extends RootNode {
-    
-    private final static String NAME = "cdr";
-    private final static List<String> ARGS = List.of("cons");
-    private final static String REST_ARG = null;
-    private final static String RETURN_TYPE = "<object>";
-    private final static String DESC = "The function cdr returns the right component of the cons. An error shall be signaled if cons is not a cons (error-id. domain-error ).";
-
-    @Child
-    ISLISPErrorSignalerNode errorSignalerNode;
+public abstract class ISLISPCdr extends ISLISPBuiltinFunctionRootNode {
 
     ISLISPCdr(TruffleLanguage<?> language) {
-        super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode(this);
+        super("cdr", arg(1), language);
     }
 
     abstract Object executeGeneric(Object arg);
 
     @Override
-    public final Object execute(VirtualFrame frame) {
-        if (frame.getArguments().length != 2) {
-            return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 1, 1);
-        }
+    public final Object executeImpl(VirtualFrame frame) {
         return executeGeneric(frame.getArguments()[1]);
     }
 
@@ -49,17 +31,6 @@ public abstract class ISLISPCdr extends RootNode {
     @Fallback
     Object fallback(Object o) {
         return errorSignalerNode.signalWrongType(o, ISLISPContext.get(this).lookupClass("<cons>"));
-    }
-
-    /**
-     * Construct LispFunction using this root node.
-     * @param lang truffle language reference
-     * @return lisp function
-     */
-    public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(
-            new LispFunction.Documentation(NAME, ARGS, REST_ARG, RETURN_TYPE, DESC),
-            ISLISPCdrNodeGen.create(lang).getCallTarget());
     }
 
 }

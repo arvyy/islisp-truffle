@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.parser;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPTruffleLanguage;
 import com.github.arvyy.islisp.Utils;
+import com.github.arvyy.islisp.functions.ISLISPBuiltinFunctionRootNode;
 import com.github.arvyy.islisp.functions.ISLISPDefaultHandler;
 import com.github.arvyy.islisp.nodes.*;
 import com.github.arvyy.islisp.runtime.*;
@@ -1148,6 +1149,7 @@ public class Parser {
             documentation = s;
             bodyStatements = bodyStatements.subList(1, bodyStatements.size());
         }
+        // TODO use these fields to generate set-documentation expression
         String descriptionDocumentation = null;
         String returnTypeDocumentation = null;
         if (documentation != null) {
@@ -1174,12 +1176,16 @@ public class Parser {
                 parserContext.frameBuilder.build());
         rootNode.setName(name.name());
         rootNode.setSourceSection(sexpr.source());
-        var functionDocumentation = new LispFunction.Documentation(
+        int argcMask;
+        if (slotsAndNewContext.restArgsSlot == -1) {
+            argcMask = ISLISPBuiltinFunctionRootNode.arg(slotsAndNewContext.namedArgsSlots.length);
+        } else {
+            argcMask = ISLISPBuiltinFunctionRootNode.vararg(slotsAndNewContext.namedArgsSlots.length);
+        }
+        var functionDocumentation = new LispFunction.Meta(
             name.name(),
-            slotsAndNewContext.namedArgNames,
-            slotsAndNewContext.restArgName,
-            returnTypeDocumentation,
-            descriptionDocumentation);
+            argcMask
+        );
         return new ISLISPDefunNode(parserContext.module, name, rootNode, functionDocumentation);
     }
 
@@ -1202,9 +1208,6 @@ public class Parser {
     ) {
         var restSlot = -1;
         var positionalArgumentSlots = new ArrayList<Integer>();
-        // for documentation
-        var positionalArgNames = new ArrayList<String>();
-        String restArgName = null;
         var variables = new HashMap<SymbolReference, ParserContext.VariableContext>();
         int stateNamedArgs = 0;
         int stateAfterRestKw = 1;
@@ -1216,7 +1219,6 @@ public class Parser {
             if (state == stateNamedArgs && !isRestKw) {
                 var slot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
                 positionalArgumentSlots.add(slot);
-                positionalArgNames.add(arg.name());
                 var variableContext = new ParserContext.VariableContext();
                 variableContext.frameDepth = parserContext.frameDepth;
                 variableContext.slot = slot;
@@ -1228,7 +1230,6 @@ public class Parser {
             } else if (state == stateAfterRestKw && !isRestKw) {
                 state = stateAfterRestArg;
                 restSlot = parserContext.frameBuilder.addSlot(FrameSlotKind.Object, null, null);
-                restArgName = arg.name();
                 var variableContext = new ParserContext.VariableContext();
                 variableContext.frameDepth = parserContext.frameDepth;
                 variableContext.slot = restSlot;
@@ -1250,8 +1251,6 @@ public class Parser {
         result.namedArgsSlots = argSlots;
         result.context = newContext;
         result.restArgsSlot = restSlot;
-        result.namedArgNames = positionalArgNames;
-        result.restArgName = restArgName;
         return result;
     }
 
@@ -1550,8 +1549,5 @@ public class Parser {
         int[] namedArgsSlots;
         int restArgsSlot;
         ParserContext context;
-        // documentation
-        List<String> namedArgNames;
-        String restArgName;
     }
 }
