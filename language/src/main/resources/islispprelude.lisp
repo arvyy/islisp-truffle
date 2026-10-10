@@ -360,8 +360,6 @@
               ,@forms)))))
 
 (defun reverse (list)
-  "These functions each return a list whose elements are those of the given list, but in reverse order. An error shall be signaled if list is not a list (error-id. domain-error ).
-  @return <list>"
   (for ((list list (cdr list))
         (reversed () (cons (car list) reversed)))
        ((not list) reversed)))
@@ -469,7 +467,12 @@
         nil))
   (apply #'set-aref obj array indices))
 
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DOCS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (setf (documentation 'function '-)
     '((kind . function)
       (syntax . "(- x+)")
@@ -486,7 +489,7 @@ If an implementation supports a -0.0 that is distinct from 0.0, then (- 0.0) ret
       (return-type . "<number>")
       (min-args . 0)
       (max-args . nil)
-      (desc . "The functions *&#43;* and *&#42;* return the sum and the product, respectively, of their arguments. If all arguments are integers, the result is an integer. If any argument is a ﬂoat, the result is a ﬂoat. When given no arguments, *&#43;* returns 0 and *&#42;* returns 1. An error shall be signaled if any _x_ is not a number (error-id. _domain-error_).")))
+      (desc . "Returns the product of its arguments. If all arguments are integers, the result is an integer. If any argument is a ﬂoat, the result is a ﬂoat. When given no arguments *&#42;* returns 1. An error shall be signaled if any _x_ is not a number (error-id. _domain-error_).")))
 
 (setf (documentation 'value '*most-negative-float*)
     '((kind . constant)
@@ -517,7 +520,7 @@ If an implementation supports a -0.0 that is distinct from 0.0, then (- 0.0) ret
       (return-type . "<number>")
       (min-args . 0)
       (max-args . nil)
-      (desc . "The functions *&#43;* and *&#42;* return the sum and the product, respectively, of their arguments. If all arguments are integers, the result is an integer. If any argument is a ﬂoat, the result is a ﬂoat. When given no arguments, *&#43;* returns 0 and *&#42;* returns 1. An error shall be signaled if any _x_ is not a number (error-id. _domain-error_).")))
+      (desc . "Returns the sum of its arguments. If all arguments are integers, the result is an integer. If any argument is a ﬂoat, the result is a ﬂoat. When given no arguments, *&#43;* returns 0. An error shall be signaled if any _x_ is not a number (error-id. _domain-error_).")))
 
 (setf (documentation 'function '<)
     '((kind . function)
@@ -525,7 +528,7 @@ If an implementation supports a -0.0 that is distinct from 0.0, then (- 0.0) ret
       (return-type . "boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "*>=* returns *t* if _x~1~_ is greater than or *=* _x~2~_. *<=* returns *t* if _x~1~_ is less than or *=* _x~2~_. *>* returns *t* if _x~1~_ is greater than _x~2~_. *<* returns *t* if _x~1~_ is less than _x~2~_.
+      (desc . "*<* returns *t* if _x~1~_ is less than _x~2~_.
 
 The mathematical values of the arguments are compared. An error shall be signaled if either _x~1~_ or _x~2~_ is not a number (error-id. _domain-error_).")))
 
@@ -535,7 +538,7 @@ The mathematical values of the arguments are compared. An error shall be signale
       (return-type . "boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "*>=* returns *t* if _x~1~_ is greater than or *=* _x~2~_. *<=* returns *t* if _x~1~_ is less than or *=* _x~2~_. *>* returns *t* if _x~1~_ is greater than _x~2~_. *<* returns *t* if _x~1~_ is less than _x~2~_.
+      (desc . "*<=* returns *t* if _x~1~_ is less than or *=* _x~2~_.
 
 The mathematical values of the arguments are compared. An error shall be signaled if either _x~1~_ or _x~2~_ is not a number (error-id. _domain-error_).")))
 
@@ -556,7 +559,7 @@ NOTE: *=* differs from *eql* because *=* compares only the mathematical values o
       (return-type . "boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "*>=* returns *t* if _x~1~_ is greater than or *=* _x~2~_. *<=* returns *t* if _x~1~_ is less than or *=* _x~2~_. *>* returns *t* if _x~1~_ is greater than _x~2~_. *<* returns *t* if _x~1~_ is less than _x~2~_.
+      (desc . "*>* returns *t* if _x~1~_ is greater than _x~2~_.
 
 The mathematical values of the arguments are compared. An error shall be signaled if either _x~1~_ or _x~2~_ is not a number (error-id. _domain-error_).")))
 
@@ -566,7 +569,7 @@ The mathematical values of the arguments are compared. An error shall be signale
       (return-type . "boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "*>=* returns *t* if _x~1~_ is greater than or *=* _x~2~_. *<=* returns *t* if _x~1~_ is less than or *=* _x~2~_. *>* returns *t* if _x~1~_ is greater than _x~2~_. *<* returns *t* if _x~1~_ is less than _x~2~_.
+      (desc . "*>=* returns *t* if _x~1~_ is greater than or *=* _x~2~_.
 
 The mathematical values of the arguments are compared. An error shall be signaled if either _x~1~_ or _x~2~_ is not a number (error-id. _domain-error_).")))
 
@@ -582,13 +585,13 @@ The mathematical values of the arguments are compared. An error shall be signale
     '((kind . syntax)
       (syntax . "(and form*)")
       (return-type . "<object>")
-      (desc . "*and* is the sequential logical “and” (or “∧”). _forms_ are evaluated from left to right until either one of them evaluates to *nil* or else none are left. If one of them evaluates to *nil*, then *nil* is returned from the *and*; otherwise, the value of the last evaluated _form_ is returned. The form *and* is equivalent to the following:
+      (desc . "*and* is the sequential logical \"and\" (or \"∧\"). _forms_ are evaluated from left to right until either one of them evaluates to *nil* or else none are left. If one of them evaluates to *nil*, then *nil* is returned from the *and*; otherwise, the value of the last evaluated _form_ is returned. The form *and* is equivalent to the following:
 
 [subs=\"+quotes,+replacements\"]
 ----
-(and)                      ≡ 't
-(and _form_)                 ≡ _form_
-(and _form~1~_ _form~2~_ … _form~n~_) ≡ (if _form~1~_ (and _form~2~_ … _form~n~_) 'nil)
+(and) = 't
+(and _form_) = _form_
+(and _form~1~_ _form~2~_ … _form~n~_) = (if _form~1~_ (and _form~2~_ … _form~n~_) 'nil)
 ----")))
 
 (setf (documentation 'function 'append)
@@ -617,7 +620,7 @@ An error shall be signaled if _function_ is not a function (error-id. _domain-er
     '((kind . setf)
       (syntax . "(setf (aref basic-array z*) obj)")
       (return-type . "<object>")
-      (desc . "These replace the object obtainable by *aref* or *garef* with _obj_. The returned value is _obj_. The constraints on the _basic-array_, the _general-array_, and the sequence of indices _z_ is the same as for *aref* and *garef*.")))
+      (desc . "Replaces the object obtainable by *aref* with _obj_. The returned value is _obj_. The constraints on the _basic-array_ and the sequence of indices _z_ is the same as for *aref*.")))
 
 (setf (documentation 'function 'aref)
     '((kind . function)
@@ -627,7 +630,7 @@ An error shall be signaled if _function_ is not a function (error-id. _domain-er
       (max-args . nil)
       (desc . "*aref* returns the object stored in the component of the _basic-array_ specified by the sequence of integers _z_. This sequence must have exactly as many elements as there are dimensions in the _basic-array_, and each one must satisfy 0 ≤ _zi_ < _di_ , _di_ the _i_th dimension and 0 ≤ _i_ < _d_, _d_ the number of dimensions. Arrays are indexed 0 based, so the _i_th row is accessed via the index _i_ − 1.
 
-An error shall be signaled if _basic-array_ is not a general-array&#42;</span> (error-id. _domain-error_).")))
+An error shall be signaled if _basic-array_ is not a basic-array (error-id. _domain-error_). An error shall be signaled if any _z_ is not a non-negative integer (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'arithmetic-error-operands)
     '((kind . function)
@@ -635,7 +638,7 @@ An error shall be signaled if _basic-array_ is not a general-array&#42;</span> (
       (return-type . "<list>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "These functions return the _operation_ and _operands_ supplied as data when creating the _arithmetic-error_. An error shall be signaled if _arithmetic-error_ is not a condition of class *<arithmetic-error>* (error-id. _domain-error_).")))
+      (desc . "This function returns the _operands_ supplied as data when creating the _arithmetic-error_. An error shall be signaled if _arithmetic-error_ is not a condition of class *<arithmetic-error>* (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'arithmetic-error-operation)
     '((kind . function)
@@ -643,7 +646,7 @@ An error shall be signaled if _basic-array_ is not a general-array&#42;</span> (
       (return-type . "<function>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "These functions return the _operation_ and _operands_ supplied as data when creating the _arithmetic-error_. An error shall be signaled if _arithmetic-error_ is not a condition of class *<arithmetic-error>* (error-id. _domain-error_).")))
+      (desc . "This function returns the _operation_ supplied as data when creating the _arithmetic-error_. An error shall be signaled if _arithmetic-error_ is not a condition of class *<arithmetic-error>* (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'array-dimensions)
     '((kind . function)
@@ -665,9 +668,9 @@ An error shall be signaled if _basic-array_ is not a general-array&#42;</span> (
     '((kind . syntax)
       (syntax . "(assure class-name form)")
       (return-type . "<object>")
-      (desc . "These forms evaluate _form_. If _form_ returns, the returned value is returned by the *the* or *assure* form. In addition, these forms specify that the value of _form_ is of the class specified by _class-name_ (which must be the name of an existing class).
+      (desc . "Evaluates _form_. If _form_ returns, the returned value is returned by the *assure* form. In addition, this form specifies that the value of _form_ is of the class specified by _class-name_ (which must be the name of an existing class).
 
-In a *the* special form, the consequences are undefined if the value of _form_ is not of the class or a subclass of the class designated by _class-name_. In an *assure* special form, an error shall be signaled if the value of _form_ is not of the class or a subclass of the class designated by _class-name_ (error-id. _domain-error_).")))
+An error shall be signaled if the value of _form_ is not of the class or a subclass of the class designated by _class-name_ (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'atan)
     '((kind . function)
@@ -681,29 +684,12 @@ The result is a (real) number that lies between −π/2 and π/2 (both exclusive
 
 The following definition for (one-argument) arc tangent determines the range and branch cuts:
 
+[stem]
+++++
+\\arctan x = \\frac{log(1 + ix) - log(1 - ix)}{2i}
+++++
 
-[cols=\"1,1,1,1,1\"]
-|===
-
-| arctan x | = | 
-                        
-                            
-                                log (1 &#43; ix) - log (1 - ix)
-                            
-                            
-                                2i
-                            
-                         | log (1 &#43; ix) - log (1 - ix) | 2i
-
-| log (1 &#43; ix) - log (1 - ix)
-
-| 2i
-|===
-
-
-                    </td>
-                </tr>
-            </tbody></table>An error shall be signaled if _x_ is not a number (error-id. _domain-error_).")))
+An error shall be signaled if _x_ is not a number (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'atan2)
     '((kind . function)
@@ -774,11 +760,7 @@ The signs of _x~1~_ (indicated as _y_) and _x~2~_ (indicated as _x_) are used to
       (return-type . "boolean")
       (min-args . 1)
       (max-args . 1)
-      (desc . "*basic-array-p* returns *t* if _obj_ is a basic-array (instance of class *<basic-array>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
-
-*basic-array&#42;-p* returns *t* if _obj_ is a basic-array&#42; (instance of class *<basic-array&#42;>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
-
-*general-array&#42;-p* returns *t* if _obj_ is a general-array&#42; (instance of class *<general-array&#42;>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.")))
+      (desc . "*basic-array-p* returns *t* if _obj_ is a basic-array (instance of class *<basic-array>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.")))
 
 (setf (documentation 'function 'basic-array*-p)
     '((kind . function)
@@ -786,11 +768,7 @@ The signs of _x~1~_ (indicated as _y_) and _x~2~_ (indicated as _x_) are used to
       (return-type . "boolean")
       (min-args . 1)
       (max-args . 1)
-      (desc . "*basic-array-p* returns *t* if _obj_ is a basic-array (instance of class *<basic-array>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
-
-*basic-array&#42;-p* returns *t* if _obj_ is a basic-array&#42; (instance of class *<basic-array&#42;>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
-
-*general-array&#42;-p* returns *t* if _obj_ is a general-array&#42; (instance of class *<general-array&#42;>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.")))
+      (desc . "*basic-array&#42;-p* returns *t* if _obj_ is a basic-array&#42; (instance of class *<basic-array&#42;>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.")))
 
 (setf (documentation 'function 'basic-vector-p)
     '((kind . function)
@@ -798,9 +776,7 @@ The signs of _x~1~_ (indicated as _y_) and _x~2~_ (indicated as _x_) are used to
       (return-type . "boolean")
       (min-args . 1)
       (max-args . 1)
-      (desc . "*basic-vector-p* returns *t* if _obj_ is a basic-vector (instance of class *<basic-vector>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
-
-*general-vector-p* returns *t* if _obj_ is a general-vector (instance of class *<general-vector>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.")))
+      (desc . "*basic-vector-p* returns *t* if _obj_ is a basic-vector (instance of class *<basic-vector>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.")))
 
 (setf (documentation 'syntax 'block)
     '((kind . syntax)
@@ -949,9 +925,7 @@ An error shall be signaled if _char_ is not a character or if _string_ is not a 
       (return-type . "boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *char=* tests whether _char~1~_ is the same character as _char~2~_. The function *char<* tests whether _char~1~_ is less than _char~2~_. The function *char<=* tests whether _char~1~_ is less than or equal to _char~2~_. The ordering used is the partial order defined above, extended to a total order on all characters in an implementation-defined manner. If the test is satisfied, *t* is returned; otherwise, *nil* is returned.
-
-Two characters are *char/=* if and only if they are not *char=*. Two characters are *char>* if and only if they are not *char<=*. Two characters are *char>=* if and only if they are not *char<*.
+      (desc . "Two characters are *char/=* if and only if they are not *char=*. If the test is satisfied, *t* is returned; otherwise, *nil* is returned.
 
 An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (error-id. _domain-error_).")))
 
@@ -961,9 +935,7 @@ An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (
       (return-type . "boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *char=* tests whether _char~1~_ is the same character as _char~2~_. The function *char<* tests whether _char~1~_ is less than _char~2~_. The function *char<=* tests whether _char~1~_ is less than or equal to _char~2~_. The ordering used is the partial order defined above, extended to a total order on all characters in an implementation-defined manner. If the test is satisfied, *t* is returned; otherwise, *nil* is returned.
-
-Two characters are *char/=* if and only if they are not *char=*. Two characters are *char>* if and only if they are not *char<=*. Two characters are *char>=* if and only if they are not *char<*.
+      (desc . "The function *char<* tests whether _char~1~_ is less than _char~2~_. The ordering used is the partial order defined above, extended to a total order on all characters in an implementation-defined manner. If the test is satisfied, *t* is returned; otherwise, *nil* is returned.
 
 An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (error-id. _domain-error_).")))
 
@@ -973,9 +945,7 @@ An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (
       (return-type . "boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *char=* tests whether _char~1~_ is the same character as _char~2~_. The function *char<* tests whether _char~1~_ is less than _char~2~_. The function *char<=* tests whether _char~1~_ is less than or equal to _char~2~_. The ordering used is the partial order defined above, extended to a total order on all characters in an implementation-defined manner. If the test is satisfied, *t* is returned; otherwise, *nil* is returned.
-
-Two characters are *char/=* if and only if they are not *char=*. Two characters are *char>* if and only if they are not *char<=*. Two characters are *char>=* if and only if they are not *char<*.
+      (desc . "The function *char<=* tests whether _char~1~_ is less than or equal to _char~2~_. The ordering used is the partial order defined above, extended to a total order on all characters in an implementation-defined manner. If the test is satisfied, *t* is returned; otherwise, *nil* is returned.
 
 An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (error-id. _domain-error_).")))
 
@@ -985,9 +955,7 @@ An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (
       (return-type . "boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *char=* tests whether _char~1~_ is the same character as _char~2~_. The function *char<* tests whether _char~1~_ is less than _char~2~_. The function *char<=* tests whether _char~1~_ is less than or equal to _char~2~_. The ordering used is the partial order defined above, extended to a total order on all characters in an implementation-defined manner. If the test is satisfied, *t* is returned; otherwise, *nil* is returned.
-
-Two characters are *char/=* if and only if they are not *char=*. Two characters are *char>* if and only if they are not *char<=*. Two characters are *char>=* if and only if they are not *char<*.
+      (desc . "The function *char=* tests whether _char~1~_ is the same character as _char~2~_. If the test is satisfied, *t* is returned; otherwise, *nil* is returned.
 
 An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (error-id. _domain-error_).")))
 
@@ -997,9 +965,7 @@ An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (
       (return-type . "boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *char=* tests whether _char~1~_ is the same character as _char~2~_. The function *char<* tests whether _char~1~_ is less than _char~2~_. The function *char<=* tests whether _char~1~_ is less than or equal to _char~2~_. The ordering used is the partial order defined above, extended to a total order on all characters in an implementation-defined manner. If the test is satisfied, *t* is returned; otherwise, *nil* is returned.
-
-Two characters are *char/=* if and only if they are not *char=*. Two characters are *char>* if and only if they are not *char<=*. Two characters are *char>=* if and only if they are not *char<*.
+      (desc . "Two characters are *char>* if and only if they are not *char<=*.
 
 An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (error-id. _domain-error_).")))
 
@@ -1009,9 +975,7 @@ An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (
       (return-type . "boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *char=* tests whether _char~1~_ is the same character as _char~2~_. The function *char<* tests whether _char~1~_ is less than _char~2~_. The function *char<=* tests whether _char~1~_ is less than or equal to _char~2~_. The ordering used is the partial order defined above, extended to a total order on all characters in an implementation-defined manner. If the test is satisfied, *t* is returned; otherwise, *nil* is returned.
-
-Two characters are *char/=* if and only if they are not *char=*. Two characters are *char>* if and only if they are not *char<=*. Two characters are *char>=* if and only if they are not *char<*.
+      (desc . "Two characters are *char>=* if and only if they are not *char<*.
 
 An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (error-id. _domain-error_).")))
 
@@ -1053,34 +1017,12 @@ An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (
 
 *cond* obeys the following equivalences:
 
-
-[cols=\"1,1,1\"]
-|===
-
-| 
-                        (cond)
-                     | 
-                        ≡
-                     | 
-                        nil
-                    
-
-| 
-                        (cond (test1) (test2 form2&#42;) ...)
-                     | 
-                        ≡
-                     | 
-                        (or test1 (cond (test2 form2&#42;) ...))
-                    
-
-| 
-                        (cond (test1 form1&#43;) (test2 form2&#42;) ...)
-                     | 
-                        ≡
-                     | 
-                        (if test1 (progn form1&#43;) (cond (test2 form2&#42;) ...))
-                    
-|===")))
+[subs=\"+quotes,+replacements\"]
+----
+(cond) = nil
+(cond (test1) (test2 form2&#42;) ...) = (or test1 (cond (test2 form2&#42;) ...))
+(cond (test1 form1&#43;) (test2 form2&#42;) ...) = (if test1 (progn form1&#43;) (cond (test2 form2&#42;) ...))
+----")))
 
 (setf (documentation 'function 'condition-continuable)
     '((kind . function)
@@ -1141,40 +1083,30 @@ An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (
 | - | - | - | - | - | X | =
 |===
 
-<dl class=\"legend\">
-                <dt>*=*</dt>
-                <dd>This is the identity function</dd>
-                <dt>*X*</dt>
-                <dd>
-                    <dl>
-                        <dd>This coercion shall be provided</dd>
-                        <dt>*X(2)*</dt>
-                        <dd>An error shall be signaled if this coercion is attempted and the string does not contain the textual representation of a number of the target class. In all other respects, this is the same as *parse-number*.</dd>
-                        <dt>*X(5)*</dt>
-                        <dd>This may be the same as the *&#126;D* format directive.</dd>
-                        <dt>*X(6)*</dt>
-                        <dd>This may be the same as the *&#126;G* format directive.</dd>
-                        <dt>*X(7)*</dt>
-                        <dd>This is the identity if strings are vectors in the implementation.</dd>
-                    </dl>
-                </dd>
-                <dt>*I*</dt>
-                <dd>This coercion shall be provided, but its definition is implementation defined.
-                    <dl>
-                        <dt>*I(3)*</dt>
-                        <dd>This coercion shall be provided, but its definition is §18.1.2).</dd>
-                    </dl>
-                </dd>
-                <dt>*–*</dt>
-                <dd>An error shall be signaled if this coercion is attempted.
-                    <dl>
-                        <dt>*–(1)*</dt>
-                        <dd>Programmers requiring this kind of functionality may wish to consider instead using one of the functions, *floor*, *ceiling*, *round*, or *truncate*.</dd>
-                        <dt>*–(4)*</dt>
-                        <dd>programmers requiring this kind of functionality may wish to consider instead using the following: (*create-string* 1 _obj_)</dd>
-                    </dl>
-                </dd>
-            </dl>If an implementation provides implementation-defined coercions for the names of those classes using convert.")))
+*=*::
+    This is the identity function
+*X*::
+    This coercion shall be provided
+    *X(2)*:::
+        An error shall be signaled if this coercion is attempted and the string does not contain the textual representation of a number of the target class. In all other respects, this is the same as *parse-number*.
+    *X(5)*:::
+        This may be the same as the *&#126;D* format directive.
+    *X(6)*:::
+        This may be the same as the *&#126;G* format directive.
+    *X(7)*:::
+        This is the identity if strings are vectors in the implementation.
+*I*::
+    This coercion shall be provided, but its definition is implementation defined.
+    *I(3)*:::
+        This coercion shall be provided, but its definition is implementation defined. The coercion depends on the implementation's _neutral_ alphabetic characters (see §18.1.2).
+*-*::
+    An error shall be signaled if this coercion is attempted.
+    *–(1)*:::
+        Programmers requiring this kind of functionality may wish to consider instead using one of the functions, *floor*, *ceiling*, *round*, or *truncate*.
+    *–(4)*:::
+        Programmers requiring this kind of functionality may wish to consider instead using the following: (*create-string* 1 _obj_)
+        
+If an implementation provides implementation-defined classes, it may also provide implementation-defined coercions for the names of those classes using convert.")))
 
 (setf (documentation 'function 'cos)
     '((kind . function)
@@ -1182,7 +1114,7 @@ An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (
       (return-type . "<number>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "The function *sin* returns the sine of _x_ . The function *cos* returns the cosine of _x_. The function tan returns the tangent of _x_. In each case, _x_ must be given in radians.
+      (desc . "The function *cos* returns the cosine of _x_. _x_ must be given in radians.
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).")))
 
@@ -1192,7 +1124,7 @@ An error shall be signaled if _x_ is not a number (error-id. _domain-error_)."))
       (return-type . "<number>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "The function *sinh* returns the hyperbolic sine of _x_. The function *cosh* returns the hyperbolic cosine of _x_. The function *tanh* returns the hyperbolic tangent of _x_.
+      (desc . "The function *cosh* returns the hyperbolic cosine of _x_.
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).")))
 
@@ -1299,16 +1231,13 @@ _class-opt_            ::= (*:metaclass* _class-name_) |
 _abstract-flag_        ::= *t* | *nil*
 ----
 
-                The *defclass* defining form returns the symbol named class-name as its result.
-            
+The *defclass* defining form returns the symbol named class-name as its result.
 
 The _class-name_ argument is an identifier which becomes the name of the new class. The defining point of the _class-name_ is the end of the *defclass* defining form.
 
-Each superclass name argument _sc-name_ is an identifier that specifies a direct superclass of the new class. The new class will inherit slots and their :reader or *:writer* or *:accessor* methods from each of its superclasses. See §15.2.3 for a definition of how methods are inherited. No _sc-name_ may appear more than once in super class names. It is a violation if the superclasses of any two direct superclasses _sc-name_ have superclasses other than *<standard-object>* and *<object>* in common unless a metaclass other than *<standard-class>* is specified.
+Each superclass name argument _sc-name_ is an identifier that specifies a direct superclass of the new class. The new class will inherit slots and their :reader or *:writer* or *:accessor* methods from each of its superclasses. See §15.1.3 for a definition of how slots are inherited, and §15.2.3 for a definition of how methods are inherited. No _sc-name_ may appear more than once in super class names. It is a violation if the superclasses of any two direct superclasses _sc-name_ have superclasses other than *<standard-object>* and *<object>* in common unless a metaclass other than *<standard-class>* is specified.
 
 Each _slot-spec_ argument is the name of the slot or a list consisting of the slot name followed by zero or more slot options. The _slot-name_ argument is an identifier that is syntactically valid for use as an ISLISP variable name. No slot names may appear more than once in _slot-spec_ The following slot options are available:
-
-
 
 * The :reader slot option specifies that an unqualified method with the parameter profile ((x class-name)) is to be defined on the generic function named reader-function-name to retrieve the value of the given slot. The :reader slot option may be specified more than once for a given slot.
 * The :writer slot option specifies that an unqualified method with the parameter profile ((y object) (x class-name)) is to be defined on the generic function named writer-function-name to store the value into the slot. The writer-function-name argument is an identifier. The :writer slot option may be specified more than once for a given slot.
@@ -1323,20 +1252,18 @@ No implementation is permitted to extend the syntax of *defclass* to allow (*slo
 
 Each class option is an option that refers to the class as a whole. The following class options are available:
 
-
-
 * The :metaclass class option is used to specify that instances of the class being defined are to have a different metaclass than the default provided by the system, that is, different from the class standard-class. The class-name argument is the name of the desired metaclass. The :metaclass class option may be specified once at most. It is a violation if built-in-class is specified as the metaclass.
 * The :abstractp class option is used to specify that the class is an abstract class. If this option is supplied and abstract-flag is t, create will signal an error if an attempt is made to create an instance of this class. If the option is unsupplied, or if abstract-flag is nil, the class is not an abstract class. It is a violation if the abstract-flag is supplied but is neither t nor nil.
 
 The following rules of defclass hold for standard classes:
 
-
-
 * The defclass defining form must be in the scope of any superclass identifier it refers to.
 * All the superclasses of a class must be defined before an instance of the class can be made.
 * Any reference to class-name as a parameter specializer in a defmethod form must be in the scope of class-name. That is, a defmethod form that names a class must textually follow the defclass form that defines that class.
 
-An ISLISP processor may be extended to cover situations where these rules are not obeyed. These extensions shall be §15.1.3.
+An ISLISP processor may be extended to cover situations where these rules are not obeyed. These extensions shall be implementation defined.
+
+Some slot options are inherited by a class from its superclasses, and some can be shadowed or altered by providing a local slot description. No class options are inherited. For a detailed description of how slots and slot options are inherited, see the section §15.1.3.
 
 If no slot accessors are specified for a slot, the slot cannot be accessed.
 
@@ -1356,7 +1283,7 @@ The result of the evaluation of _form_ is bound to the variable named by _name_.
     '((kind . syntax)
       (syntax . "(defdynamic name form)")
       (return-type . "<symbol>")
-      (desc . "This form is used to define a dynamic variable namespace. The scope of _name_ is the entire current toplevel scope except the body form.
+      (desc . "This form is used to define a dynamic variable identifier in the dynamic variable namespace. The scope of _name_ is the entire current toplevel scope except the body form.
 
 The symbol named _name_ is returned.")))
 
@@ -1406,7 +1333,9 @@ The _method-desc_ arguments define methods that will belong to the generic funct
 
 If no method descriptions are specified, a generic function with no methods is created. An error shall be signaled if a generic function is called and no methods apply.
 
-The _lambda-list_ argument of *defgeneric* specifies the shape of lambda-lists for the methods on this generic function. All methods on the resulting generic function must have parameter-profiles that are congruent with this shape. For further details on method congruence, see implementation-defined options.")))
+The _lambda-list_ argument of *defgeneric* specifies the shape of lambda-lists for the methods on this generic function. All methods on the resulting generic function must have parameter-profiles that are congruent with this shape. For further details on method congruence, see §15.2.2.2.
+
+Implementations can extend *defgeneric* to include other implementation-defined options.")))
 
 (setf (documentation 'syntax 'defglobal)
     '((kind . syntax)
@@ -1457,7 +1386,15 @@ Preparing a method-defining form for execution causes one of the following cases
 * It is a violation if the defmethod defining form is in the scope of a func-spec identifier that does not designate a generic function.
 * It is a violation if the given name func-spec does not exist in the current toplevel scope immediately containing the defmethod defining form. Furthermore, it is a violation if a defgeneric form for func-spec does not precede the method-defining form in the text unit being prepared for execution unless the method-defining form is a defclass.
 
-The parameter-profile of the method being defined must be congruent with the lambda-list of the generic function. See §15.2.2.1 for a definition of agreement in this context.
+The parameter-profile of the method being defined must be congruent with the lambda-list of the generic function. See §15.2.2.2 for a definition of congruence in this context.
+
+Each _method-qualifier argument_ is an object that is used as an attribute to the given method by method combination. A method qualifier is a non-nil symbol or keyword. The method combination type further restricts what a method qualifier may be. The standard method combination type allows for unqualified methods or methods whose sole qualifier is one of the keywords *:before*, *:after*, *:around*.
+
+The _parameter-profile argument_ is like an ordinary function lambda-list except that the names of required parameters can be replaced by specialized parameters. A specialized parameter is a list of the form (_variable-name_ _parameter-specializer-name_). Only required parameters may be specialized. A parameter specializer name is an identifier that names a class. If no parameter specializer name is specified for a given required parameter, the parameter specializer defaults to the class named *<object>*.
+
+The _form_ arguments specify the method body.
+
+No two methods with agreeing parameter specializers and qualifiers may be defined for the same generic function. See the section §15.2.2.1 for a definition of agreement in this context.
 
 A method is not a function and cannot be invoked as a function.")))
 
@@ -1497,7 +1434,7 @@ An error shall be signaled if either _z~1~_ or _z~2~_ is not an integer (error-i
       (return-type . "<class>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "These functions return the _object_ and _expected-class_ supplied as data when creating the _domain-error_. An error shall be signaled if _domain-error_ is not a condition of class *<domain-error>* (error-id. _domain-error_).")))
+      (desc . "These function returns the _expected-class_ supplied as data when creating the _domain-error_. An error shall be signaled if _domain-error_ is not a condition of class *<domain-error>* (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'domain-error-object)
     '((kind . function)
@@ -1505,7 +1442,7 @@ An error shall be signaled if either _z~1~_ or _z~2~_ is not an integer (error-i
       (return-type . "<object>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "These functions return the _object_ and _expected-class_ supplied as data when creating the _domain-error_. An error shall be signaled if _domain-error_ is not a condition of class *<domain-error>* (error-id. _domain-error_).")))
+      (desc . "These functions returns the _object_  supplied as data when creating the _domain-error_. An error shall be signaled if _domain-error_ is not a condition of class *<domain-error>* (error-id. _domain-error_).")))
 
 (setf (documentation 'setf 'dynamic)
     '((kind . setf)
@@ -1559,15 +1496,9 @@ An error shall be signaled if _sequence_ is not a basic-vector or a list or if _
       (return-type . "boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "*eq* and *eql* test whether _obj~1~_ and _obj~2~_ are same identical object. They return *t* if the objects are the same; otherwise, they return *nil*. Two objects are the same if there is no operation that could distinguish them (without modifying them), and if modifying one would modify the other the same way.
+      (desc . "*eq* tests whether _obj~1~_ and _obj~2~_ are same identical object. It returns *t* if the objects are the same; otherwise, they return *nil*. Two objects are the same if there is no operation that could distinguish them (without modifying them), and if modifying one would modify the other the same way.
 
-For *eq*, the consequences are implementation defined if both _obj~1~_ and _obj~2~_ are numbers or both are characters. For *eql* the meaning for numbers and characters is defined as follows:
-
-
-
-* If obj1 and obj2 are numbers, eql tests whether they are direct instances of the same class and have the same value.
-                    If an implementation supports positive and negative zeros as distinct values, then (eql 0.0 -0.0) returns nil. When the syntax -0.0 is read and it is interpreted as the value 0.0 then (eql 0.0 -0.0) returns t.
-* If obj1 and obj2 are characters, eql tests whether they are the same character (see char=).")))
+For *eq*, the consequences are implementation defined if both _obj~1~_ and _obj~2~_ are numbers or both are characters.")))
 
 (setf (documentation 'function 'eql)
     '((kind . function)
@@ -1575,14 +1506,12 @@ For *eq*, the consequences are implementation defined if both _obj~1~_ and _obj~
       (return-type . "boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "*eq* and *eql* test whether _obj~1~_ and _obj~2~_ are same identical object. They return *t* if the objects are the same; otherwise, they return *nil*. Two objects are the same if there is no operation that could distinguish them (without modifying them), and if modifying one would modify the other the same way.
+      (desc . "*eql* tests whether _obj~1~_ and _obj~2~_ are same identical object. It returns *t* if the objects are the same; otherwise, they return *nil*. Two objects are the same if there is no operation that could distinguish them (without modifying them), and if modifying one would modify the other the same way.
 
-For *eq*, the consequences are implementation defined if both _obj~1~_ and _obj~2~_ are numbers or both are characters. For *eql* the meaning for numbers and characters is defined as follows:
-
-
+For *eql* the meaning for numbers and characters is defined as follows:
 
 * If obj1 and obj2 are numbers, eql tests whether they are direct instances of the same class and have the same value.
-                    If an implementation supports positive and negative zeros as distinct values, then (eql 0.0 -0.0) returns nil. When the syntax -0.0 is read and it is interpreted as the value 0.0 then (eql 0.0 -0.0) returns t.
+If an implementation supports positive and negative zeros as distinct values, then (eql 0.0 -0.0) returns nil. When the syntax -0.0 is read and it is interpreted as the value 0.0 then (eql 0.0 -0.0) returns t.
 * If obj1 and obj2 are characters, eql tests whether they are the same character (see char=).")))
 
 (setf (documentation 'function 'equal)
@@ -1595,18 +1524,29 @@ For *eq*, the consequences are implementation defined if both _obj~1~_ and _obj~
 
 If _obj~1~_ and _obj~2~_ are direct instances of the same class, *equal* returns *t* if they are *eql*. Otherwise (if they are direct instances of the same class but not *eql*), the result is *t* if one of the following cases applies:
 
-
-
 * lists: either obj1 and obj2 are both the empty list (i.e., nil), or
++
+----
 (and (equal (car obj1) (car obj2))
-     (equal (cdr obj1) (cdr obj2))) holds;
+     (equal (cdr obj1) (cdr obj2)))
+----
++
+holds;
 * basic arrays:
++
+----
 (equal (array-dimensions obj1)
        (array-dimensions obj2))
-
-                    holds and for every valid reference (aref obj1 ind1 ...indn)
+----
++
+holds and for every valid reference (aref obj1 ind1 ...indn)
++
+----
 (equal (aref obj1 ind1 … indn)
-       (aref obj2 ind1 … indn)) is satisfied.
+       (aref obj2 ind1 … indn))
+----
++
+is satisfied.
 
 Otherwise the value is *nil*.
 
@@ -1639,13 +1579,9 @@ This is equivalent to:
       (return-type . "<stream>")
       (min-args . 0)
       (max-args . 0)
-      (desc . "The function *standard-input* returns the stream used as the default stream for input functions.
+      (desc . "The function *error-output* returns the stream used as the default stream for warnings and non-interactive error messages.
 
-The function *standard-output* returns the stream used as the default stream for output functions.
-
-The function *error-output* returns the stream used as the default stream for warnings and non-interactive error messages.
-
-The value returned by each of these functions is initially with-error-output</span>.")))
+The value returned by the function is initially implementation-defined, but can be dynamically bound; see *with-error-output*.")))
 
 (setf (documentation 'function 'exp)
     '((kind . function)
@@ -1727,16 +1663,12 @@ The amount may depend on the output and on the file position itself. It is imple
     '((kind . syntax)
       (syntax . "(flet ((function-name lambda-list form*)*) body-form*)")
       (return-type . "<object>")
-      (desc . "The *flet* and *labels* special forms allow the definition of new identifiers in the function namespace for function objects.
+      (desc . "The *labels* special form allows the definition of new identifiers in the function namespace for function objects.
 
-In a *labels* special form the scope of an identifier _function-name_ is the whole *labels* special form (excluding nested scopes, if any); for the *flet* special form, the scope of an identifier is only the _body-form_&#42;. Within these scopes, each _function-name_ is bound to a function object whose behavior is equivalent to (*lambda* _lambda-list_ _form&#42;_), where free identifier references are resolved as follows:
+In a *flet* special form, the scope of an identifier is only the _body-form_&#42;. Within this scope, each _function-name_ is bound to a function object whose behavior is equivalent to (*lambda* _lambda-list_ _form&#42;_).
+Free identifier references in the lambda-expression are resolved in the lexical environment that was active immediately outside the flet form (i.e., any reference to a function function-name are not visible).
 
-
-
-* For a labels form, such free references are resolved in the lexical environment that was active immediately outside the labels form augmented by the function bindings for the given function-names (i.e., any reference to a function function-name refers to a binding created by the labels).
-* For a flet form, free identifier references in the lambda-expression are resolved in the lexical environment that was active immediately outside the flet form (i.e., any reference to a function function-name are not visible).
-
-During activation, the prepared *labels* or *flet* establishes function bindings and then evaluates each _body-form_ in the body sequentially; the value of the last one (or *nil* if there is none) is the value returned by the special form activation.
+During activation, the prepared *flet* establishes function bindings and then evaluates each _body-form_ in the body sequentially; the value of the last one (or *nil* if there is none) is the value returned by the special form activation.
 
 No _function-name_ may appear more than once in the function bindings.")))
 
@@ -1791,125 +1723,32 @@ Each iteration begins by evaluating _end-test_. If the result is *nil*, the form
 
 _obj_ refers to the next item of the set of _obj_&#42; to be processed.
 
-<dl>
-                <dt>&#126;A</dt>
-                <dd>
-                    Aesthetic: The _obj_ is any object. _obj_ is printed as it would with &#126;S, but without escape characters. Characters are output directly without any conversion. That is, the output generated using this format directive is suitable for being read by a human reader.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *nil*).
-
-
-                </dd>
-                <dt>&#126;B</dt>
-                <dd>
-                    Binary: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in binary radix (radix 2).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 2).
-
-
-                </dd>
-                <dt>&#126;C</dt>
-                <dd>
-                    Character: An error shall be signaled if _obj_ is not a character. _obj_ is output directly without any conversion.
-
-
-                    This effect is implemented by (*format-char* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;D</dt>
-                <dd>
-                    Decimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in decimal radix (radix 10).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 10).
-
-
-                </dd>
-                <dt>&#126;G</dt>
-                <dd>
-                    General ﬂoating point: An error shall be signaled if _obj_ is not a number. _obj_ is printed as a ﬂoat.
-
-
-                    This effect is implemented by (*format-float* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;O</dt>
-                <dd>
-                    Octal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in octal radix (radix 8).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 8).
-
-
-                </dd>
-                <dt>&#126;_n_R</dt>
-                <dd>
-                    Radix: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in radix _n_ (which must be between 2 and 36, inclusive).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ _n_).
-
-
-                </dd>
-                <dt>&#126;S</dt>
-                <dd>
-                    S-expression: _obj_ is any object. This format directive outputs the textual representation of _obj_, with escape characters as needed. That is, the output generated using this format directive is suitable for input to the function *read*.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *t*).
-
-
-                </dd>
-                <dt>&#126;_n_T</dt>
-                <dd>
-                    Tab: output enough spaces to move to column _n_ (where column 0 represents the left margin). If already at or beyond column _n_, one space is output. If an implementation cannot determine the current column position, the behavior is implementation defined, but at least one space will be output.
-
-
-                    This effect is implemented by (*format-tab* _output-stream_ _n_).
-
-
-                </dd>
-                <dt>&#126;X</dt>
-                <dd>
-                    Hexadecimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in hexadecimal radix (radix 16).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 16).
-
-
-                </dd>
-                <dt>&#126;%</dt>
-                <dd>
-                    newline: output a #\\newline character;
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\newline).
-
-
-                </dd>
-                <dt>&#126;&#38;</dt>
-                <dd>
-                    conditional newline: output a #\\newline character if it cannot be determined that the output stream is at the beginning of a fresh line;
-
-
-                    This effect is implemented by (*format-fresh-line* _output-stream_).
-
-
-                </dd>
-                <dt>&#126;&#126;</dt>
-                <dd>
-                    tilde: output a tilde (˜).
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\&#126;).
-
-
-                </dd>
-            </dl>")))
+&#126;A::
+    Aesthetic: The _obj_ is any object. _obj_ is printed as it would with &#126;S, but without escape characters. Characters are output directly without any conversion. That is, the output generated using this format directive is suitable for being read by a human reader.
+&#126;B::
+    Binary: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in binary radix (radix 2).
+&#126;C::
+    Character: An error shall be signaled if _obj_ is not a character. _obj_ is output directly without any conversion.
+&#126;D::
+    Decimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in decimal radix (radix 10).
+&#126;G::
+    General ﬂoating point: An error shall be signaled if _obj_ is not a number. _obj_ is printed as a ﬂoat.
+&#126;O::
+    Octal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in octal radix (radix 8).
+&#126;_n_R::
+    Radix: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in radix _n_ (which must be between 2 and 36, inclusive).
+&#126;S::
+    S-expression: _obj_ is any object. This format directive outputs the textual representation of _obj_, with escape characters as needed. That is, the output generated using this format directive is suitable for input to the function *read*.
+&#126;_n_T::
+    Tab: output enough spaces to move to column _n_ (where column 0 represents the left margin). If already at or beyond column _n_, one space is output. If an implementation cannot determine the current column position, the behavior is implementation defined, but at least one space will be output.
+&#126;X::
+    Hexadecimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in hexadecimal radix (radix 16).
+&#126;%::
+    newline: output a #\\newline character;
+&#126;&#38;::
+    conditional newline: output a #\\newline character if it cannot be determined that the output stream is at the beginning of a fresh line;
+&#126;&#126;::
+    tilde: output a tilde (&#126;).")))
 
 (setf (documentation 'function 'format-char)
     '((kind . function)
@@ -1917,129 +1756,7 @@ _obj_ refers to the next item of the set of _obj_&#42; to be processed.
       (return-type . "<null>")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *format* has the side-effect of printing according to _format-string_. It returns *nil*. An error shall be signaled if the _output-stream_ parameter does not satisfy the *output-stream-p* predicate (error-id. _not-an-output-stream_). An error shall be signaled if _format-string_ is not a string (error-id. _domain-error_). The following is a summary of all the available format directives:
-
-_obj_ refers to the next item of the set of _obj_&#42; to be processed.
-
-<dl>
-                <dt>&#126;A</dt>
-                <dd>
-                    Aesthetic: The _obj_ is any object. _obj_ is printed as it would with &#126;S, but without escape characters. Characters are output directly without any conversion. That is, the output generated using this format directive is suitable for being read by a human reader.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *nil*).
-
-
-                </dd>
-                <dt>&#126;B</dt>
-                <dd>
-                    Binary: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in binary radix (radix 2).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 2).
-
-
-                </dd>
-                <dt>&#126;C</dt>
-                <dd>
-                    Character: An error shall be signaled if _obj_ is not a character. _obj_ is output directly without any conversion.
-
-
-                    This effect is implemented by (*format-char* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;D</dt>
-                <dd>
-                    Decimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in decimal radix (radix 10).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 10).
-
-
-                </dd>
-                <dt>&#126;G</dt>
-                <dd>
-                    General ﬂoating point: An error shall be signaled if _obj_ is not a number. _obj_ is printed as a ﬂoat.
-
-
-                    This effect is implemented by (*format-float* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;O</dt>
-                <dd>
-                    Octal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in octal radix (radix 8).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 8).
-
-
-                </dd>
-                <dt>&#126;_n_R</dt>
-                <dd>
-                    Radix: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in radix _n_ (which must be between 2 and 36, inclusive).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ _n_).
-
-
-                </dd>
-                <dt>&#126;S</dt>
-                <dd>
-                    S-expression: _obj_ is any object. This format directive outputs the textual representation of _obj_, with escape characters as needed. That is, the output generated using this format directive is suitable for input to the function *read*.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *t*).
-
-
-                </dd>
-                <dt>&#126;_n_T</dt>
-                <dd>
-                    Tab: output enough spaces to move to column _n_ (where column 0 represents the left margin). If already at or beyond column _n_, one space is output. If an implementation cannot determine the current column position, the behavior is implementation defined, but at least one space will be output.
-
-
-                    This effect is implemented by (*format-tab* _output-stream_ _n_).
-
-
-                </dd>
-                <dt>&#126;X</dt>
-                <dd>
-                    Hexadecimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in hexadecimal radix (radix 16).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 16).
-
-
-                </dd>
-                <dt>&#126;%</dt>
-                <dd>
-                    newline: output a #\\newline character;
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\newline).
-
-
-                </dd>
-                <dt>&#126;&#38;</dt>
-                <dd>
-                    conditional newline: output a #\\newline character if it cannot be determined that the output stream is at the beginning of a fresh line;
-
-
-                    This effect is implemented by (*format-fresh-line* _output-stream_).
-
-
-                </dd>
-                <dt>&#126;&#126;</dt>
-                <dd>
-                    tilde: output a tilde (˜).
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\&#126;).
-
-
-                </dd>
-            </dl>")))
+      (desc . "An error shall be signaled if _obj_ is not a character. _obj_ is output directly without any conversion.")))
 
 (setf (documentation 'function 'format-float)
     '((kind . function)
@@ -2047,129 +1764,7 @@ _obj_ refers to the next item of the set of _obj_&#42; to be processed.
       (return-type . "<null>")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *format* has the side-effect of printing according to _format-string_. It returns *nil*. An error shall be signaled if the _output-stream_ parameter does not satisfy the *output-stream-p* predicate (error-id. _not-an-output-stream_). An error shall be signaled if _format-string_ is not a string (error-id. _domain-error_). The following is a summary of all the available format directives:
-
-_obj_ refers to the next item of the set of _obj_&#42; to be processed.
-
-<dl>
-                <dt>&#126;A</dt>
-                <dd>
-                    Aesthetic: The _obj_ is any object. _obj_ is printed as it would with &#126;S, but without escape characters. Characters are output directly without any conversion. That is, the output generated using this format directive is suitable for being read by a human reader.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *nil*).
-
-
-                </dd>
-                <dt>&#126;B</dt>
-                <dd>
-                    Binary: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in binary radix (radix 2).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 2).
-
-
-                </dd>
-                <dt>&#126;C</dt>
-                <dd>
-                    Character: An error shall be signaled if _obj_ is not a character. _obj_ is output directly without any conversion.
-
-
-                    This effect is implemented by (*format-char* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;D</dt>
-                <dd>
-                    Decimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in decimal radix (radix 10).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 10).
-
-
-                </dd>
-                <dt>&#126;G</dt>
-                <dd>
-                    General ﬂoating point: An error shall be signaled if _obj_ is not a number. _obj_ is printed as a ﬂoat.
-
-
-                    This effect is implemented by (*format-float* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;O</dt>
-                <dd>
-                    Octal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in octal radix (radix 8).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 8).
-
-
-                </dd>
-                <dt>&#126;_n_R</dt>
-                <dd>
-                    Radix: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in radix _n_ (which must be between 2 and 36, inclusive).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ _n_).
-
-
-                </dd>
-                <dt>&#126;S</dt>
-                <dd>
-                    S-expression: _obj_ is any object. This format directive outputs the textual representation of _obj_, with escape characters as needed. That is, the output generated using this format directive is suitable for input to the function *read*.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *t*).
-
-
-                </dd>
-                <dt>&#126;_n_T</dt>
-                <dd>
-                    Tab: output enough spaces to move to column _n_ (where column 0 represents the left margin). If already at or beyond column _n_, one space is output. If an implementation cannot determine the current column position, the behavior is implementation defined, but at least one space will be output.
-
-
-                    This effect is implemented by (*format-tab* _output-stream_ _n_).
-
-
-                </dd>
-                <dt>&#126;X</dt>
-                <dd>
-                    Hexadecimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in hexadecimal radix (radix 16).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 16).
-
-
-                </dd>
-                <dt>&#126;%</dt>
-                <dd>
-                    newline: output a #\\newline character;
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\newline).
-
-
-                </dd>
-                <dt>&#126;&#38;</dt>
-                <dd>
-                    conditional newline: output a #\\newline character if it cannot be determined that the output stream is at the beginning of a fresh line;
-
-
-                    This effect is implemented by (*format-fresh-line* _output-stream_).
-
-
-                </dd>
-                <dt>&#126;&#126;</dt>
-                <dd>
-                    tilde: output a tilde (˜).
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\&#126;).
-
-
-                </dd>
-            </dl>")))
+      (desc . "An error shall be signaled if _obj_ is not a number. _obj_ is printed as a ﬂoat.")))
 
 (setf (documentation 'function 'format-fresh-line)
     '((kind . function)
@@ -2177,129 +1772,7 @@ _obj_ refers to the next item of the set of _obj_&#42; to be processed.
       (return-type . "<null>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "The function *format* has the side-effect of printing according to _format-string_. It returns *nil*. An error shall be signaled if the _output-stream_ parameter does not satisfy the *output-stream-p* predicate (error-id. _not-an-output-stream_). An error shall be signaled if _format-string_ is not a string (error-id. _domain-error_). The following is a summary of all the available format directives:
-
-_obj_ refers to the next item of the set of _obj_&#42; to be processed.
-
-<dl>
-                <dt>&#126;A</dt>
-                <dd>
-                    Aesthetic: The _obj_ is any object. _obj_ is printed as it would with &#126;S, but without escape characters. Characters are output directly without any conversion. That is, the output generated using this format directive is suitable for being read by a human reader.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *nil*).
-
-
-                </dd>
-                <dt>&#126;B</dt>
-                <dd>
-                    Binary: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in binary radix (radix 2).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 2).
-
-
-                </dd>
-                <dt>&#126;C</dt>
-                <dd>
-                    Character: An error shall be signaled if _obj_ is not a character. _obj_ is output directly without any conversion.
-
-
-                    This effect is implemented by (*format-char* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;D</dt>
-                <dd>
-                    Decimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in decimal radix (radix 10).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 10).
-
-
-                </dd>
-                <dt>&#126;G</dt>
-                <dd>
-                    General ﬂoating point: An error shall be signaled if _obj_ is not a number. _obj_ is printed as a ﬂoat.
-
-
-                    This effect is implemented by (*format-float* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;O</dt>
-                <dd>
-                    Octal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in octal radix (radix 8).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 8).
-
-
-                </dd>
-                <dt>&#126;_n_R</dt>
-                <dd>
-                    Radix: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in radix _n_ (which must be between 2 and 36, inclusive).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ _n_).
-
-
-                </dd>
-                <dt>&#126;S</dt>
-                <dd>
-                    S-expression: _obj_ is any object. This format directive outputs the textual representation of _obj_, with escape characters as needed. That is, the output generated using this format directive is suitable for input to the function *read*.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *t*).
-
-
-                </dd>
-                <dt>&#126;_n_T</dt>
-                <dd>
-                    Tab: output enough spaces to move to column _n_ (where column 0 represents the left margin). If already at or beyond column _n_, one space is output. If an implementation cannot determine the current column position, the behavior is implementation defined, but at least one space will be output.
-
-
-                    This effect is implemented by (*format-tab* _output-stream_ _n_).
-
-
-                </dd>
-                <dt>&#126;X</dt>
-                <dd>
-                    Hexadecimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in hexadecimal radix (radix 16).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 16).
-
-
-                </dd>
-                <dt>&#126;%</dt>
-                <dd>
-                    newline: output a #\\newline character;
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\newline).
-
-
-                </dd>
-                <dt>&#126;&#38;</dt>
-                <dd>
-                    conditional newline: output a #\\newline character if it cannot be determined that the output stream is at the beginning of a fresh line;
-
-
-                    This effect is implemented by (*format-fresh-line* _output-stream_).
-
-
-                </dd>
-                <dt>&#126;&#126;</dt>
-                <dd>
-                    tilde: output a tilde (˜).
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\&#126;).
-
-
-                </dd>
-            </dl>")))
+      (desc . "Output a #\\newline character if it cannot be determined that the output stream is at the beginning of a fresh line.")))
 
 (setf (documentation 'function 'format-integer)
     '((kind . function)
@@ -2307,129 +1780,7 @@ _obj_ refers to the next item of the set of _obj_&#42; to be processed.
       (return-type . "<null>")
       (min-args . 3)
       (max-args . 3)
-      (desc . "The function *format* has the side-effect of printing according to _format-string_. It returns *nil*. An error shall be signaled if the _output-stream_ parameter does not satisfy the *output-stream-p* predicate (error-id. _not-an-output-stream_). An error shall be signaled if _format-string_ is not a string (error-id. _domain-error_). The following is a summary of all the available format directives:
-
-_obj_ refers to the next item of the set of _obj_&#42; to be processed.
-
-<dl>
-                <dt>&#126;A</dt>
-                <dd>
-                    Aesthetic: The _obj_ is any object. _obj_ is printed as it would with &#126;S, but without escape characters. Characters are output directly without any conversion. That is, the output generated using this format directive is suitable for being read by a human reader.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *nil*).
-
-
-                </dd>
-                <dt>&#126;B</dt>
-                <dd>
-                    Binary: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in binary radix (radix 2).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 2).
-
-
-                </dd>
-                <dt>&#126;C</dt>
-                <dd>
-                    Character: An error shall be signaled if _obj_ is not a character. _obj_ is output directly without any conversion.
-
-
-                    This effect is implemented by (*format-char* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;D</dt>
-                <dd>
-                    Decimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in decimal radix (radix 10).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 10).
-
-
-                </dd>
-                <dt>&#126;G</dt>
-                <dd>
-                    General ﬂoating point: An error shall be signaled if _obj_ is not a number. _obj_ is printed as a ﬂoat.
-
-
-                    This effect is implemented by (*format-float* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;O</dt>
-                <dd>
-                    Octal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in octal radix (radix 8).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 8).
-
-
-                </dd>
-                <dt>&#126;_n_R</dt>
-                <dd>
-                    Radix: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in radix _n_ (which must be between 2 and 36, inclusive).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ _n_).
-
-
-                </dd>
-                <dt>&#126;S</dt>
-                <dd>
-                    S-expression: _obj_ is any object. This format directive outputs the textual representation of _obj_, with escape characters as needed. That is, the output generated using this format directive is suitable for input to the function *read*.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *t*).
-
-
-                </dd>
-                <dt>&#126;_n_T</dt>
-                <dd>
-                    Tab: output enough spaces to move to column _n_ (where column 0 represents the left margin). If already at or beyond column _n_, one space is output. If an implementation cannot determine the current column position, the behavior is implementation defined, but at least one space will be output.
-
-
-                    This effect is implemented by (*format-tab* _output-stream_ _n_).
-
-
-                </dd>
-                <dt>&#126;X</dt>
-                <dd>
-                    Hexadecimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in hexadecimal radix (radix 16).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 16).
-
-
-                </dd>
-                <dt>&#126;%</dt>
-                <dd>
-                    newline: output a #\\newline character;
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\newline).
-
-
-                </dd>
-                <dt>&#126;&#38;</dt>
-                <dd>
-                    conditional newline: output a #\\newline character if it cannot be determined that the output stream is at the beginning of a fresh line;
-
-
-                    This effect is implemented by (*format-fresh-line* _output-stream_).
-
-
-                </dd>
-                <dt>&#126;&#126;</dt>
-                <dd>
-                    tilde: output a tilde (˜).
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\&#126;).
-
-
-                </dd>
-            </dl>")))
+      (desc . "An error shall be signaled if _obj_ is not an integer. _obj_ is printed in given radix.")))
 
 (setf (documentation 'function 'format-object)
     '((kind . function)
@@ -2437,129 +1788,8 @@ _obj_ refers to the next item of the set of _obj_&#42; to be processed.
       (return-type . "<null>")
       (min-args . 3)
       (max-args . 3)
-      (desc . "The function *format* has the side-effect of printing according to _format-string_. It returns *nil*. An error shall be signaled if the _output-stream_ parameter does not satisfy the *output-stream-p* predicate (error-id. _not-an-output-stream_). An error shall be signaled if _format-string_ is not a string (error-id. _domain-error_). The following is a summary of all the available format directives:
-
-_obj_ refers to the next item of the set of _obj_&#42; to be processed.
-
-<dl>
-                <dt>&#126;A</dt>
-                <dd>
-                    Aesthetic: The _obj_ is any object. _obj_ is printed as it would with &#126;S, but without escape characters. Characters are output directly without any conversion. That is, the output generated using this format directive is suitable for being read by a human reader.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *nil*).
-
-
-                </dd>
-                <dt>&#126;B</dt>
-                <dd>
-                    Binary: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in binary radix (radix 2).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 2).
-
-
-                </dd>
-                <dt>&#126;C</dt>
-                <dd>
-                    Character: An error shall be signaled if _obj_ is not a character. _obj_ is output directly without any conversion.
-
-
-                    This effect is implemented by (*format-char* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;D</dt>
-                <dd>
-                    Decimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in decimal radix (radix 10).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 10).
-
-
-                </dd>
-                <dt>&#126;G</dt>
-                <dd>
-                    General ﬂoating point: An error shall be signaled if _obj_ is not a number. _obj_ is printed as a ﬂoat.
-
-
-                    This effect is implemented by (*format-float* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;O</dt>
-                <dd>
-                    Octal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in octal radix (radix 8).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 8).
-
-
-                </dd>
-                <dt>&#126;_n_R</dt>
-                <dd>
-                    Radix: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in radix _n_ (which must be between 2 and 36, inclusive).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ _n_).
-
-
-                </dd>
-                <dt>&#126;S</dt>
-                <dd>
-                    S-expression: _obj_ is any object. This format directive outputs the textual representation of _obj_, with escape characters as needed. That is, the output generated using this format directive is suitable for input to the function *read*.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *t*).
-
-
-                </dd>
-                <dt>&#126;_n_T</dt>
-                <dd>
-                    Tab: output enough spaces to move to column _n_ (where column 0 represents the left margin). If already at or beyond column _n_, one space is output. If an implementation cannot determine the current column position, the behavior is implementation defined, but at least one space will be output.
-
-
-                    This effect is implemented by (*format-tab* _output-stream_ _n_).
-
-
-                </dd>
-                <dt>&#126;X</dt>
-                <dd>
-                    Hexadecimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in hexadecimal radix (radix 16).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 16).
-
-
-                </dd>
-                <dt>&#126;%</dt>
-                <dd>
-                    newline: output a #\\newline character;
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\newline).
-
-
-                </dd>
-                <dt>&#126;&#38;</dt>
-                <dd>
-                    conditional newline: output a #\\newline character if it cannot be determined that the output stream is at the beginning of a fresh line;
-
-
-                    This effect is implemented by (*format-fresh-line* _output-stream_).
-
-
-                </dd>
-                <dt>&#126;&#126;</dt>
-                <dd>
-                    tilde: output a tilde (˜).
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\&#126;).
-
-
-                </dd>
-            </dl>")))
+      (desc . "_obj_ is any object. This format directive outputs the textual representation of _obj_. If _escape-p_ is not *nil*, the output generated using this format directive is suitable for input to the function *read*.
+Otherwise characters are output directly without any conversion. That is, the output generated using this format directive is suitable for being read by a human reader.")))
 
 (setf (documentation 'function 'format-tab)
     '((kind . function)
@@ -2567,129 +1797,7 @@ _obj_ refers to the next item of the set of _obj_&#42; to be processed.
       (return-type . "<null>")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *format* has the side-effect of printing according to _format-string_. It returns *nil*. An error shall be signaled if the _output-stream_ parameter does not satisfy the *output-stream-p* predicate (error-id. _not-an-output-stream_). An error shall be signaled if _format-string_ is not a string (error-id. _domain-error_). The following is a summary of all the available format directives:
-
-_obj_ refers to the next item of the set of _obj_&#42; to be processed.
-
-<dl>
-                <dt>&#126;A</dt>
-                <dd>
-                    Aesthetic: The _obj_ is any object. _obj_ is printed as it would with &#126;S, but without escape characters. Characters are output directly without any conversion. That is, the output generated using this format directive is suitable for being read by a human reader.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *nil*).
-
-
-                </dd>
-                <dt>&#126;B</dt>
-                <dd>
-                    Binary: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in binary radix (radix 2).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 2).
-
-
-                </dd>
-                <dt>&#126;C</dt>
-                <dd>
-                    Character: An error shall be signaled if _obj_ is not a character. _obj_ is output directly without any conversion.
-
-
-                    This effect is implemented by (*format-char* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;D</dt>
-                <dd>
-                    Decimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in decimal radix (radix 10).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 10).
-
-
-                </dd>
-                <dt>&#126;G</dt>
-                <dd>
-                    General ﬂoating point: An error shall be signaled if _obj_ is not a number. _obj_ is printed as a ﬂoat.
-
-
-                    This effect is implemented by (*format-float* _output-stream_ _obj_).
-
-
-                </dd>
-                <dt>&#126;O</dt>
-                <dd>
-                    Octal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in octal radix (radix 8).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 8).
-
-
-                </dd>
-                <dt>&#126;_n_R</dt>
-                <dd>
-                    Radix: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in radix _n_ (which must be between 2 and 36, inclusive).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ _n_).
-
-
-                </dd>
-                <dt>&#126;S</dt>
-                <dd>
-                    S-expression: _obj_ is any object. This format directive outputs the textual representation of _obj_, with escape characters as needed. That is, the output generated using this format directive is suitable for input to the function *read*.
-
-
-                    This effect is implemented by (*format-object* _output-stream_ _obj_ *t*).
-
-
-                </dd>
-                <dt>&#126;_n_T</dt>
-                <dd>
-                    Tab: output enough spaces to move to column _n_ (where column 0 represents the left margin). If already at or beyond column _n_, one space is output. If an implementation cannot determine the current column position, the behavior is implementation defined, but at least one space will be output.
-
-
-                    This effect is implemented by (*format-tab* _output-stream_ _n_).
-
-
-                </dd>
-                <dt>&#126;X</dt>
-                <dd>
-                    Hexadecimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in hexadecimal radix (radix 16).
-
-
-                    This effect is implemented by (*format-integer* _output-stream_ _obj_ 16).
-
-
-                </dd>
-                <dt>&#126;%</dt>
-                <dd>
-                    newline: output a #\\newline character;
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\newline).
-
-
-                </dd>
-                <dt>&#126;&#38;</dt>
-                <dd>
-                    conditional newline: output a #\\newline character if it cannot be determined that the output stream is at the beginning of a fresh line;
-
-
-                    This effect is implemented by (*format-fresh-line* _output-stream_).
-
-
-                </dd>
-                <dt>&#126;&#126;</dt>
-                <dd>
-                    tilde: output a tilde (˜).
-
-
-                    This effect is implemented by (*format-char* _output-stream_ #\\&#126;).
-
-
-                </dd>
-            </dl>")))
+      (desc . "Output enough spaces to move to column _n_ (where column 0 represents the left margin). If already at or beyond column _n_, one space is output. If an implementation cannot determine the current column position, the behavior is implementation defined, but at least one space will be output.")))
 
 (setf (documentation 'function 'funcall)
     '((kind . function)
@@ -2704,16 +1812,14 @@ _obj_ refers to the next item of the set of _obj_&#42; to be processed.
 (defun funcall (function :rest arguments)
   (apply function arguments))
 ----
-
-                An error shall be signaled if _function_ is not a function (error-id. _domain-error_). Each _obj_ may be any ISLISP object.")))
+                
+ An error shall be signaled if _function_ is not a function (error-id. _domain-error_). Each _obj_ may be any ISLISP object.")))
 
 (setf (documentation 'syntax 'function)
     '((kind . syntax)
       (syntax . "(function function-name)")
       (return-type . "<function>")
-      (desc . "<div class=\"definition-syntax\">
-                #'function-name → *<function>*
-            </div>This special form denotes a reference to the function named by _function-name_. This special form is used to refer to identifiers defined by function-defining forms, *labels*, or *flet* which are not in operator position.
+      (desc . "This special form denotes a reference to the function named by _function-name_. This special form is used to refer to identifiers defined by function-defining forms, *labels*, or *flet* which are not in operator position.
 
 (*function* _function-name_) can be written as #'_function-name_.
 
@@ -2733,7 +1839,7 @@ An error shall be signaled if no binding has been established for the identifier
     '((kind . setf)
       (syntax . "(setf (garef general-array z*) obj)")
       (return-type . "<object>")
-      (desc . "These replace the object obtainable by *aref* or *garef* with _obj_. The returned value is _obj_. The constraints on the _basic-array_, the _general-array_, and the sequence of indices _z_ is the same as for *aref* and *garef*.")))
+      (desc . "Replaces the object obtainable by *garef* with _obj_. The returned value is _obj_. The constraints on the _basic-array_, the _general-array_, and the sequence of indices _z_ is the same as for *garef*.")))
 
 (setf (documentation 'function 'garef)
     '((kind . function)
@@ -2741,9 +1847,7 @@ An error shall be signaled if no binding has been established for the identifier
       (return-type . "<object>")
       (min-args . 1)
       (max-args . nil)
-      (desc . "*aref* returns the object stored in the component of the _basic-array_ specified by the sequence of integers _z_. This sequence must have exactly as many elements as there are dimensions in the _basic-array_, and each one must satisfy 0 ≤ _zi_ < _di_ , _di_ the _i_th dimension and 0 ≤ _i_ < _d_, _d_ the number of dimensions. Arrays are indexed 0 based, so the _i_th row is accessed via the index _i_ − 1.
-
-An error shall be signaled if _basic-array_ is not a general-array&#42;</span> (error-id. _domain-error_).")))
+      (desc . "*garef* is like *aref* but an error shall be signaled if its first argument, _general-array_, is not an object of class *<general-vector>* or of class *<general-array&#42;>* (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'gcd)
     '((kind . function)
@@ -2761,11 +1865,7 @@ An error shall be signaled if either _z~1~_ or _z~2~_ is not an integer (error-i
       (return-type . "boolean")
       (min-args . 1)
       (max-args . 1)
-      (desc . "*basic-array-p* returns *t* if _obj_ is a basic-array (instance of class *<basic-array>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
-
-*basic-array&#42;-p* returns *t* if _obj_ is a basic-array&#42; (instance of class *<basic-array&#42;>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
-
-*general-array&#42;-p* returns *t* if _obj_ is a general-array&#42; (instance of class *<general-array&#42;>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.")))
+      (desc . "*general-array&#42;-p* returns *t* if _obj_ is a general-array&#42; (instance of class *<general-array&#42;>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.")))
 
 (setf (documentation 'function 'general-vector-p)
     '((kind . function)
@@ -2773,9 +1873,7 @@ An error shall be signaled if either _z~1~_ or _z~2~_ is not an integer (error-i
       (return-type . "boolean")
       (min-args . 1)
       (max-args . 1)
-      (desc . "*basic-vector-p* returns *t* if _obj_ is a basic-vector (instance of class *<basic-vector>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
-
-*general-vector-p* returns *t* if _obj_ is a general-vector (instance of class *<general-vector>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.")))
+      (desc . "*general-vector-p* returns *t* if _obj_ is a general-vector (instance of class *<general-vector>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.")))
 
 (setf (documentation 'function 'generic-function-p)
     '((kind . function)
@@ -2799,9 +1897,7 @@ An error shall be signaled if either _z~1~_ or _z~2~_ is not an integer (error-i
       (return-type . "<integer>")
       (min-args . 0)
       (max-args . 0)
-      (desc . "*get-internal-real-time* returns as an integer the current time in internal time units, relative to an arbitrary time base. The difference between the values of two calls to this function is the amount of elapsed real time (i.e., clock time) between the two calls.
-
-*get-internal-run-time* returns as an integer the current run time in internal time units. The precise meaning of this quantity is implementation defined. The difference between the values of two calls to this function is the amount of time between the two calls during which computational effort was expended on behalf of the executing program.")))
+      (desc . "*get-internal-real-time* returns as an integer the current time in internal time units, relative to an arbitrary time base. The difference between the values of two calls to this function is the amount of elapsed real time (i.e., clock time) between the two calls.")))
 
 (setf (documentation 'function 'get-internal-run-time)
     '((kind . function)
@@ -2809,9 +1905,7 @@ An error shall be signaled if either _z~1~_ or _z~2~_ is not an integer (error-i
       (return-type . "<integer>")
       (min-args . 0)
       (max-args . 0)
-      (desc . "*get-internal-real-time* returns as an integer the current time in internal time units, relative to an arbitrary time base. The difference between the values of two calls to this function is the amount of elapsed real time (i.e., clock time) between the two calls.
-
-*get-internal-run-time* returns as an integer the current run time in internal time units. The precise meaning of this quantity is implementation defined. The difference between the values of two calls to this function is the amount of time between the two calls during which computational effort was expended on behalf of the executing program.")))
+      (desc . "*get-internal-run-time* returns as an integer the current run time in internal time units. The precise meaning of this quantity is implementation defined. The difference between the values of two calls to this function is the amount of time between the two calls during which computational effort was expended on behalf of the executing program.")))
 
 (setf (documentation 'function 'get-output-stream-string)
     '((kind . function)
@@ -2835,16 +1929,7 @@ No implementation is required to have a way to verify that the time returned is 
     '((kind . syntax)
       (syntax . "(go tagbody-tag) transfers control")
       (return-type . nil)
-      (desc . "*tagbody* executes the _forms_ sequentially from left to right, discarding their values. If the execution of the last _form_ completes normally, *nil* is returned by the *tagbody* special form.
-
-The series of _tagbody-tags_ and _forms_ is collectively referred to as the body of a *tagbody* form. An identifier _tagbody-tag_ that appears at toplevel of the body denotes a tagbody tag that can be used with *go* to transfer control to that point in the body. Any compound form that appears is taken as a _form_. Literals are not permitted at the toplevel of a *tagbody*. No _tagbody-tag_ may appear more than once in the tags in the body.
-
-The namespace used for tagbody tags is distinct from that used for *block* tags.
-
-At any point lexically contained in the *tagbody* a form (*go* _tag_) can be used to transfer control to a tag _tag_ that appears among the _tagbody-tags_, except where a _tag_ is shadowed according to the lexical principle (see §14.7.2 for other errors.
-
-
-NOTE: As a stylistic matter, programmers are not encouraged to use *tagbody* and *go* in everyday programming. The primary uses for which these forms are intended are for implementing other control abstractions (using macros), and for the occassional real-world situation that uses unstructured imperative transfer of control (such as a finite state machine).")))
+      (desc . "Used to transfer control to a tag _tag_ that appears among the _tagbody-tags_ in the surrounding *tagbody* form. See *tagbody* for details.")))
 
 (setf (documentation 'function 'identity)
     '((kind . function)
@@ -2924,16 +2009,13 @@ The _instance_ argument is the object to be initialized. The modified instance i
     '((kind . syntax)
       (syntax . "(labels ((function-name lambda-list form*)*) body-form*)")
       (return-type . "<object>")
-      (desc . "The *flet* and *labels* special forms allow the definition of new identifiers in the function namespace for function objects.
+      (desc . "The *labels* special form allows the definition of new identifiers in the function namespace for function objects.
 
-In a *labels* special form the scope of an identifier _function-name_ is the whole *labels* special form (excluding nested scopes, if any); for the *flet* special form, the scope of an identifier is only the _body-form_&#42;. Within these scopes, each _function-name_ is bound to a function object whose behavior is equivalent to (*lambda* _lambda-list_ _form&#42;_), where free identifier references are resolved as follows:
+In a *labels* special form the scope of an identifier _function-name_ is the whole *labels* special form (excluding nested scopes, if any). Within this scope, each _function-name_ is bound to a function object whose behavior is equivalent to (*lambda* _lambda-list_ _form&#42;_).
 
+Free references are resolved in the lexical environment that was active immediately outside the labels form augmented by the function bindings for the given function-names (i.e., any reference to a function function-name refers to a binding created by the labels).
 
-
-* For a labels form, such free references are resolved in the lexical environment that was active immediately outside the labels form augmented by the function bindings for the given function-names (i.e., any reference to a function function-name refers to a binding created by the labels).
-* For a flet form, free identifier references in the lambda-expression are resolved in the lexical environment that was active immediately outside the flet form (i.e., any reference to a function function-name are not visible).
-
-During activation, the prepared *labels* or *flet* establishes function bindings and then evaluates each _body-form_ in the body sequentially; the value of the last one (or *nil* if there is none) is the value returned by the special form activation.
+During activation, the prepared *labels* establishes function bindings and then evaluates each _body-form_ in the body sequentially; the value of the last one (or *nil* if there is none) is the value returned by the special form activation.
 
 No _function-name_ may appear more than once in the function bindings.")))
 
@@ -2955,7 +2037,9 @@ The scope of the identifiers of the _lambda-list_ is the sequence of forms _form
 
 When the prepared function is activated later (even if transported as object to some other activation) with some arguments, the body of the function is evaluated as if it was at the same textual position where the *lambda* special form is located, but in a context where the lambda variables are bound in the variable namespace with the values of the corresponding arguments. A *&#38;rest* or *:rest* variable, if any, is bound to the list of the values of the remaining arguments. An error shall be signaled if the number of arguments received is incompatible with the specified _lambda-list_ (error-id. _arity-error_).
 
-Once the lambda variables have been bound, the body is executed. If the body is empty, *nil* is returned otherwise the result of the evaluation of the last form of body is returned if the body was not left by a _non-local exit_ (see implementation defined whether _L~1~_ shares structure with _L~2~_.")))
+Once the lambda variables have been bound, the body is executed. If the body is empty, *nil* is returned otherwise the result of the evaluation of the last form of body is returned if the body was not left by a _non-local exit_ (see §14.7.1).
+
+If the function receives a *&#38;rest* or *:rest* parameter _R_, the list _L~1~_ to which that parameter is bound has indefinite extent. _L~1~_ is newly allocated unless the function was called with apply and _R_ corresponds to the final argument, _L~2~_, to that call to *apply* (or some subtail of _L~2~)_, in which case it is implementation defined whether _L~1~_ shares structure with _L~2~_.")))
 
 (setf (documentation 'function 'lcm)
     '((kind . function)
@@ -2997,25 +2081,12 @@ The _forms_ are evaluated sequentially from left to right; then each variable de
 
 No _var_ may appear more than once in *let* variable list.
 
-
 NOTE: Although this form is a special form, one can think of it as a macro whose rewriting rules are as follows:
 
-[cols=\"1,1,1\"]
+[cols=\"1,1\"]
 |===
-
-| (let () body-form&#42;) | ≡ | (progn body-form&#42;)
-
-| 
-                        
-                            (let ((var1 form1)
-                            (var2 form2)
-                            …
-                            (varn formn))
-                            body-form&#42;)
-                        
-                     | ≡ | 
-                        ((lambda (var1 var2 … varn) body-form&#42;) form1 form2 … formn)
-                    
+| (let () body-form&#42;) | (progn body-form&#42;)
+| (let ((var1 form1) (var2 form2) … (varn formn)) body-form&#42;) | ((lambda (var1 var2 … varn) body-form&#42;) form1 form2 … formn)
 |===")))
 
 (setf (documentation 'syntax 'let*)
@@ -3026,19 +2097,12 @@ NOTE: Although this form is a special form, one can think of it as a macro whose
 
 For each pair (_var_ _form_) the following is done: _form_ is evaluated in the context of the bindings in effect at that point in the evaluation. The result of the evaluation is bound to its associated variable named by the identifier _var_. These variable bindings enlarge the set of current valid identifiers perhaps shadowing previous variable bindings (in case some _var_ was defined outside), and in this enlarged or modified environment the _body-forms_ are executed. The returned value of *let&#42;* is the result of the evaluation of the last form of its body (or *nil* if there is none).
 
-
 NOTE: Although this form is a special form, one can think of it as a macro whose rewriting rules are as follows:
 
 [cols=\"1,1,1\"]
 |===
-
-| (let&#42; () body-form&#42;) | ≡ | (progn body-form&#42;)
-
-| 
-                        (let&#42; ((var1 form1) (var2 form2) … (varn formn)) body-form&#42;)
-                     | ≡ | 
-                        (let ((var1 form1)) (let ((var2 form2)) … (let ((varn formn)) body-form&#42;)...))
-                    
+| (let&#42; () body-form&#42;) | (progn body-form&#42;)
+| (let&#42; ((var1 form1) (var2 form2) … (varn formn)) body-form&#42;) | (let ((var1 form1)) (let ((var2 form2)) … (let ((varn formn)) body-form&#42;)...))
 |===")))
 
 (setf (documentation 'function 'list)
@@ -3087,40 +2151,12 @@ An error shall be signaled if any _sequence_ is not a basic-vector or a list (er
       (return-type . "<list>")
       (min-args . 2)
       (max-args . 2)
-      (desc . "Successively applies the given _function_ to sets of arguments determined by the given _lists_. The way in which the arguments are determined, and the way in which the result is accumulated are how these functions differ.
-
-
-[cols=\"1,1,1\"]
-|===
-| Function | Argument | Result
-
-
-| mapcar | successive elements | successive cons
-
-| mapc | successive elements | none (i.e., list1 returned)
-
-| mapcan | successive elements | successive destructive append
-
-| maplist | successive sublists | successive cons
-
-| mapl | successive sublists | none (i.e., list1 returned)
-
-| mapcon | successive sublists | successive destructive append
-|===
-
-*mapcar* operates on successive elements of the _lists_. _function_ is applied to the first element of each _list_, then to the second element of each _list_, and so on. The iteration terminates when the shortest _list_ runs out, and excess elements in other _lists_ are ignored. The value returned by *mapcar* is a list of the results of successive calls to _function_.
-
+      (desc . "Successively applies the given _function_ to sets of arguments determined by the given _lists_.
 *mapc* is like *mapcar* except that the results of applying _function_ are not accumulated; _list~1~_ is returned.
-
-*maplist* is like *mapcar* except that _function_ is applied to successive sublists of the _lists_. _function_ is first applied to the _lists_ themselves, and then to the cdr of each _list_, and then to the cdr of the cdr of each _list_, and so on.
-
-*mapl* is like *maplist* except that the results of applying _function_ are not accumulated; _list~1~_ is returned.
-
-*mapcan* and *mapcon* are like *mapcar* and *maplist* respectively, except that the results of applying _function_ are combined into a list by the use of an operation that performs a destructive form of append rather than list.
 
 An error shall be signaled if _function_ is not a function (error-id. _domain-error_). An error shall be signaled if any _list_ is not a list (error-id. _domain-error_).
 
-In all cases, the calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.")))
+The calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.")))
 
 (setf (documentation 'function 'mapcan)
     '((kind . function)
@@ -3128,40 +2164,12 @@ In all cases, the calls to _function_ proceed from left to right, so that if _fu
       (return-type . "<list>")
       (min-args . 2)
       (max-args . 2)
-      (desc . "Successively applies the given _function_ to sets of arguments determined by the given _lists_. The way in which the arguments are determined, and the way in which the result is accumulated are how these functions differ.
-
-
-[cols=\"1,1,1\"]
-|===
-| Function | Argument | Result
-
-
-| mapcar | successive elements | successive cons
-
-| mapc | successive elements | none (i.e., list1 returned)
-
-| mapcan | successive elements | successive destructive append
-
-| maplist | successive sublists | successive cons
-
-| mapl | successive sublists | none (i.e., list1 returned)
-
-| mapcon | successive sublists | successive destructive append
-|===
-
-*mapcar* operates on successive elements of the _lists_. _function_ is applied to the first element of each _list_, then to the second element of each _list_, and so on. The iteration terminates when the shortest _list_ runs out, and excess elements in other _lists_ are ignored. The value returned by *mapcar* is a list of the results of successive calls to _function_.
-
-*mapc* is like *mapcar* except that the results of applying _function_ are not accumulated; _list~1~_ is returned.
-
-*maplist* is like *mapcar* except that _function_ is applied to successive sublists of the _lists_. _function_ is first applied to the _lists_ themselves, and then to the cdr of each _list_, and then to the cdr of the cdr of each _list_, and so on.
-
-*mapl* is like *maplist* except that the results of applying _function_ are not accumulated; _list~1~_ is returned.
-
-*mapcan* and *mapcon* are like *mapcar* and *maplist* respectively, except that the results of applying _function_ are combined into a list by the use of an operation that performs a destructive form of append rather than list.
+      (desc . "Successively applies the given _function_ to sets of arguments determined by the given _lists_.
+*mapcan* is like *mapcar*, except that the results of applying _function_ are combined into a list by the use of an operation that performs a destructive form of append rather than list.
 
 An error shall be signaled if _function_ is not a function (error-id. _domain-error_). An error shall be signaled if any _list_ is not a list (error-id. _domain-error_).
 
-In all cases, the calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.")))
+The calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.")))
 
 (setf (documentation 'function 'mapcar)
     '((kind . function)
@@ -3169,40 +2177,12 @@ In all cases, the calls to _function_ proceed from left to right, so that if _fu
       (return-type . "<list>")
       (min-args . 2)
       (max-args . 2)
-      (desc . "Successively applies the given _function_ to sets of arguments determined by the given _lists_. The way in which the arguments are determined, and the way in which the result is accumulated are how these functions differ.
-
-
-[cols=\"1,1,1\"]
-|===
-| Function | Argument | Result
-
-
-| mapcar | successive elements | successive cons
-
-| mapc | successive elements | none (i.e., list1 returned)
-
-| mapcan | successive elements | successive destructive append
-
-| maplist | successive sublists | successive cons
-
-| mapl | successive sublists | none (i.e., list1 returned)
-
-| mapcon | successive sublists | successive destructive append
-|===
-
+      (desc . "Successively applies the given _function_ to sets of arguments determined by the given _lists_.
 *mapcar* operates on successive elements of the _lists_. _function_ is applied to the first element of each _list_, then to the second element of each _list_, and so on. The iteration terminates when the shortest _list_ runs out, and excess elements in other _lists_ are ignored. The value returned by *mapcar* is a list of the results of successive calls to _function_.
-
-*mapc* is like *mapcar* except that the results of applying _function_ are not accumulated; _list~1~_ is returned.
-
-*maplist* is like *mapcar* except that _function_ is applied to successive sublists of the _lists_. _function_ is first applied to the _lists_ themselves, and then to the cdr of each _list_, and then to the cdr of the cdr of each _list_, and so on.
-
-*mapl* is like *maplist* except that the results of applying _function_ are not accumulated; _list~1~_ is returned.
-
-*mapcan* and *mapcon* are like *mapcar* and *maplist* respectively, except that the results of applying _function_ are combined into a list by the use of an operation that performs a destructive form of append rather than list.
 
 An error shall be signaled if _function_ is not a function (error-id. _domain-error_). An error shall be signaled if any _list_ is not a list (error-id. _domain-error_).
 
-In all cases, the calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.")))
+The calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.")))
 
 (setf (documentation 'function 'mapcon)
     '((kind . function)
@@ -3210,40 +2190,12 @@ In all cases, the calls to _function_ proceed from left to right, so that if _fu
       (return-type . "<list>")
       (min-args . 2)
       (max-args . 2)
-      (desc . "Successively applies the given _function_ to sets of arguments determined by the given _lists_. The way in which the arguments are determined, and the way in which the result is accumulated are how these functions differ.
-
-
-[cols=\"1,1,1\"]
-|===
-| Function | Argument | Result
-
-
-| mapcar | successive elements | successive cons
-
-| mapc | successive elements | none (i.e., list1 returned)
-
-| mapcan | successive elements | successive destructive append
-
-| maplist | successive sublists | successive cons
-
-| mapl | successive sublists | none (i.e., list1 returned)
-
-| mapcon | successive sublists | successive destructive append
-|===
-
-*mapcar* operates on successive elements of the _lists_. _function_ is applied to the first element of each _list_, then to the second element of each _list_, and so on. The iteration terminates when the shortest _list_ runs out, and excess elements in other _lists_ are ignored. The value returned by *mapcar* is a list of the results of successive calls to _function_.
-
-*mapc* is like *mapcar* except that the results of applying _function_ are not accumulated; _list~1~_ is returned.
-
-*maplist* is like *mapcar* except that _function_ is applied to successive sublists of the _lists_. _function_ is first applied to the _lists_ themselves, and then to the cdr of each _list_, and then to the cdr of the cdr of each _list_, and so on.
-
-*mapl* is like *maplist* except that the results of applying _function_ are not accumulated; _list~1~_ is returned.
-
-*mapcan* and *mapcon* are like *mapcar* and *maplist* respectively, except that the results of applying _function_ are combined into a list by the use of an operation that performs a destructive form of append rather than list.
+      (desc . "Successively applies the given _function_ to sets of arguments determined by the given _lists_.
+*mapcon* is like *maplist*, except that the results of applying _function_ are combined into a list by the use of an operation that performs a destructive form of append rather than list.
 
 An error shall be signaled if _function_ is not a function (error-id. _domain-error_). An error shall be signaled if any _list_ is not a list (error-id. _domain-error_).
 
-In all cases, the calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.")))
+The calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.")))
 
 (setf (documentation 'function 'mapl)
     '((kind . function)
@@ -3251,40 +2203,12 @@ In all cases, the calls to _function_ proceed from left to right, so that if _fu
       (return-type . "<list>")
       (min-args . 2)
       (max-args . 2)
-      (desc . "Successively applies the given _function_ to sets of arguments determined by the given _lists_. The way in which the arguments are determined, and the way in which the result is accumulated are how these functions differ.
-
-
-[cols=\"1,1,1\"]
-|===
-| Function | Argument | Result
-
-
-| mapcar | successive elements | successive cons
-
-| mapc | successive elements | none (i.e., list1 returned)
-
-| mapcan | successive elements | successive destructive append
-
-| maplist | successive sublists | successive cons
-
-| mapl | successive sublists | none (i.e., list1 returned)
-
-| mapcon | successive sublists | successive destructive append
-|===
-
-*mapcar* operates on successive elements of the _lists_. _function_ is applied to the first element of each _list_, then to the second element of each _list_, and so on. The iteration terminates when the shortest _list_ runs out, and excess elements in other _lists_ are ignored. The value returned by *mapcar* is a list of the results of successive calls to _function_.
-
-*mapc* is like *mapcar* except that the results of applying _function_ are not accumulated; _list~1~_ is returned.
-
-*maplist* is like *mapcar* except that _function_ is applied to successive sublists of the _lists_. _function_ is first applied to the _lists_ themselves, and then to the cdr of each _list_, and then to the cdr of the cdr of each _list_, and so on.
-
+      (desc . "Successively applies the given _function_ to sets of arguments determined by the given _lists_.
 *mapl* is like *maplist* except that the results of applying _function_ are not accumulated; _list~1~_ is returned.
-
-*mapcan* and *mapcon* are like *mapcar* and *maplist* respectively, except that the results of applying _function_ are combined into a list by the use of an operation that performs a destructive form of append rather than list.
 
 An error shall be signaled if _function_ is not a function (error-id. _domain-error_). An error shall be signaled if any _list_ is not a list (error-id. _domain-error_).
 
-In all cases, the calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.")))
+The calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.")))
 
 (setf (documentation 'function 'maplist)
     '((kind . function)
@@ -3292,40 +2216,12 @@ In all cases, the calls to _function_ proceed from left to right, so that if _fu
       (return-type . "<list>")
       (min-args . 2)
       (max-args . 2)
-      (desc . "Successively applies the given _function_ to sets of arguments determined by the given _lists_. The way in which the arguments are determined, and the way in which the result is accumulated are how these functions differ.
-
-
-[cols=\"1,1,1\"]
-|===
-| Function | Argument | Result
-
-
-| mapcar | successive elements | successive cons
-
-| mapc | successive elements | none (i.e., list1 returned)
-
-| mapcan | successive elements | successive destructive append
-
-| maplist | successive sublists | successive cons
-
-| mapl | successive sublists | none (i.e., list1 returned)
-
-| mapcon | successive sublists | successive destructive append
-|===
-
-*mapcar* operates on successive elements of the _lists_. _function_ is applied to the first element of each _list_, then to the second element of each _list_, and so on. The iteration terminates when the shortest _list_ runs out, and excess elements in other _lists_ are ignored. The value returned by *mapcar* is a list of the results of successive calls to _function_.
-
-*mapc* is like *mapcar* except that the results of applying _function_ are not accumulated; _list~1~_ is returned.
-
+      (desc . "Successively applies the given _function_ to sets of arguments determined by the given _lists_.
 *maplist* is like *mapcar* except that _function_ is applied to successive sublists of the _lists_. _function_ is first applied to the _lists_ themselves, and then to the cdr of each _list_, and then to the cdr of the cdr of each _list_, and so on.
-
-*mapl* is like *maplist* except that the results of applying _function_ are not accumulated; _list~1~_ is returned.
-
-*mapcan* and *mapcon* are like *mapcar* and *maplist* respectively, except that the results of applying _function_ are combined into a list by the use of an operation that performs a destructive form of append rather than list.
 
 An error shall be signaled if _function_ is not a function (error-id. _domain-error_). An error shall be signaled if any _list_ is not a list (error-id. _domain-error_).
 
-In all cases, the calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.")))
+The calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.")))
 
 (setf (documentation 'function 'max)
     '((kind . function)
@@ -3333,9 +2229,7 @@ In all cases, the calls to _function_ proceed from left to right, so that if _fu
       (return-type . "<number>")
       (min-args . 1)
       (max-args . nil)
-      (desc . "The function *min* returns the least (closest to negative infinity) of its arguments. The comparison is done by *<*.
-
-The function *max* returns the greatest (closest to positive infinity) of its arguments. The comparison is done by *>*.
+      (desc . "The function *max* returns the greatest (closest to positive infinity) of its arguments. The comparison is done by *>*.
 
 An error shall be signaled if any _x_ is not a number (error-id. _domain-error_).")))
 
@@ -3355,8 +2249,6 @@ An error shall be signaled if any _x_ is not a number (error-id. _domain-error_)
       (max-args . nil)
       (desc . "The function *min* returns the least (closest to negative infinity) of its arguments. The comparison is done by *<*.
 
-The function *max* returns the greatest (closest to positive infinity) of its arguments. The comparison is done by *>*.
-
 An error shall be signaled if any _x_ is not a number (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'mod)
@@ -3365,9 +2257,7 @@ An error shall be signaled if any _x_ is not a number (error-id. _domain-error_)
       (return-type . "<integer>")
       (min-args . 2)
       (max-args . 2)
-      (desc . "*div* returns the greatest integer less than or equal to the quotient of _z~1~_ and _z~2~_. An error shall be signaled if _z~2~_ is zero (error-id. _division-by-zero_).
-
-*mod* returns the remainder of the integer division of _z~1~_ by _z~2~_. The sign of the result is the sign of _z~2~_. The result lies between 0 (inclusive) and _z~2~_ (exclusive), and the difference of _z~1~_ and this result is divisible by _z~2~_ without remainder.
+      (desc . "*mod* returns the remainder of the integer division of _z~1~_ by _z~2~_. The sign of the result is the sign of _z~2~_. The result lies between 0 (inclusive) and _z~2~_ (exclusive), and the difference of _z~1~_ and this result is divisible by _z~2~_ without remainder.
 
 *div* and *mod* satisfy:
 
@@ -3392,7 +2282,7 @@ The functional binding of *next-method-p* is lexical within the body of the meth
 (setf (documentation 'value 'nil)
     '((kind . constant)
       (value-type . "<null>")
-      (desc . "*t* is a named constant whose value is the symbol *t* itself. *nil* is a named constant whose value is the symbol *nil* itself.")))
+      (desc . "*nil* is a named constant whose value is the symbol *nil* itself.")))
 
 (setf (documentation 'function 'not)
     '((kind . function)
@@ -3408,11 +2298,9 @@ The functional binding of *next-method-p* is lexical within the body of the meth
       (return-type . "<list>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "These functions each return a list whose elements are those of the given _list_, but in reverse order. An error shall be signaled if _list_ is not a list (error-id. _domain-error_).
+      (desc . "*nreverse* returns a list whose elements are those of the given _list_, but in reverse order. An error shall be signaled if _list_ is not a list (error-id. _domain-error_).
 
-For *reverse*, no side-effect to the given _list_ occurs. The resulting list is permitted but not required to share structure with the input _list_.
-
-For *nreverse*, the conses which make up the top level of the given _list_ are permitted, but not required, to be side-effected in order to produce this new list. *nreverse* should never be called on a literal object.")))
+The conses which make up the top level of the given _list_ are permitted, but not required, to be side-effected in order to produce this new list. *nreverse* should never be called on a literal object.")))
 
 (setf (documentation 'function 'null)
     '((kind . function)
@@ -3436,12 +2324,11 @@ For *nreverse*, the conses which make up the top level of the given _list_ are p
       (return-type . "<stream>")
       (min-args . 1)
       (max-args . 2)
-      (desc . "*open-input-file* opens a file for input only. *open-output-file* opens a file for output only. *open-io-file* opens a file for both input and output.
+      (desc . "*open-input-file* opens a file for input only.
 
 An error shall be signaled if _filename_ is not a string. The corresponding file is opened in an implementation-defined way. These functions return an instance of the *<stream>* class connected to the file specified by _filename_.
 
 The _element-class_ can be either the class *<character>* (the default) or a positive integer that is a number of bits in a byte to be used for a binary stream. All implementations must support a value of 8 (denoting integer byte values from 0 to 255), but some implementations might support other byte sizes as well.
-
 
 NOTE: When a binary stream is used, the order of bits within bytes and bytes within words (i.e., whether it is right to left or left to right) are each implementation defined.")))
 
@@ -3451,12 +2338,11 @@ NOTE: When a binary stream is used, the order of bits within bytes and bytes wit
       (return-type . "<stream>")
       (min-args . 1)
       (max-args . 2)
-      (desc . "*open-input-file* opens a file for input only. *open-output-file* opens a file for output only. *open-io-file* opens a file for both input and output.
+      (desc . "*open-io-file* opens a file for both input and output.
 
 An error shall be signaled if _filename_ is not a string. The corresponding file is opened in an implementation-defined way. These functions return an instance of the *<stream>* class connected to the file specified by _filename_.
 
 The _element-class_ can be either the class *<character>* (the default) or a positive integer that is a number of bits in a byte to be used for a binary stream. All implementations must support a value of 8 (denoting integer byte values from 0 to 255), but some implementations might support other byte sizes as well.
-
 
 NOTE: When a binary stream is used, the order of bits within bytes and bytes within words (i.e., whether it is right to left or left to right) are each implementation defined.")))
 
@@ -3466,12 +2352,11 @@ NOTE: When a binary stream is used, the order of bits within bytes and bytes wit
       (return-type . "<stream>")
       (min-args . 1)
       (max-args . 2)
-      (desc . "*open-input-file* opens a file for input only. *open-output-file* opens a file for output only. *open-io-file* opens a file for both input and output.
+      (desc . "*open-output-file* opens a file for output only.
 
 An error shall be signaled if _filename_ is not a string. The corresponding file is opened in an implementation-defined way. These functions return an instance of the *<stream>* class connected to the file specified by _filename_.
 
 The _element-class_ can be either the class *<character>* (the default) or a positive integer that is a number of bits in a byte to be used for a binary stream. All implementations must support a value of 8 (denoting integer byte values from 0 to 255), but some implementations might support other byte sizes as well.
-
 
 NOTE: When a binary stream is used, the order of bits within bytes and bytes within words (i.e., whether it is right to left or left to right) are each implementation defined.")))
 
@@ -3491,13 +2376,9 @@ NOTE: When a binary stream is used, the order of bits within bytes and bytes wit
 
 [subs=\"+quotes,+replacements\"]
 ----
-(or) ≡ 'nil
-
-(or _form_) ≡ _form_
-
-(or _form~1~_ _form~2~_ … _form~n~_) ≡ ((lambda (var)
-                                (if var var (or _form~2~_ … _form~n~_))) _form~1~_)
-where var does not occur in _form~2~_ … _form~n~_
+(or) = 'nil
+(or _form_) = _form_
+(or _form~1~_ _form~2~_ … _form~n~_) = ((lambda (var) (if var var (or _form~2~_ … _form~n~_))) _form~1~_)
 ----")))
 
 (setf (documentation 'function 'output-stream-p)
@@ -3514,7 +2395,7 @@ where var does not occur in _form~2~_ … _form~n~_
       (return-type . "<class>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "These functions return the _string_ and _expected-class_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class ** (error-id. _domain-error_).")))
+      (desc . "Returns the _expected-class_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class ** (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'parse-error-string)
     '((kind . function)
@@ -3522,7 +2403,7 @@ where var does not occur in _form~2~_ … _form~n~_
       (return-type . "<string>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "These functions return the _string_ and _expected-class_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class ** (error-id. _domain-error_).")))
+      (desc . "Returns the _string_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class ** (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'parse-number)
     '((kind . function)
@@ -3530,7 +2411,7 @@ where var does not occur in _form~2~_ … _form~n~_
       (return-type . "<number>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "The characters belonging to _string_ are scanned (as if by read</span>) and if the resulting lexeme is the textual representation of a number, the number it represents is returned.
+      (desc . "The characters belonging to _string_ are scanned (as if by *read*) and if the resulting lexeme is the textual representation of a number, the number it represents is returned.
 
 An error shall be signaled if _string_ is not a string (error-id. _domain-error_). An error shall be signaled if _string_ is not the textual representation of a number (error-id. _cannot-parse-number_).")))
 
@@ -3582,11 +2463,9 @@ An error shall be signaled if either symbol or property-name is not a symbol (er
     '((kind . syntax)
       (syntax . "(quote obj)")
       (return-type . "<object>")
-      (desc . "<div class=\"definition-syntax\">
-                '_obj_ → *<object>*
-            </div>A quoted expression denotes a reference to an object. This notation is used to include any object in an ISLISP text.
+      (desc . "A quoted expression denotes a reference to an object. This notation is used to include any object in an ISLISP text.
 
-The character *'* (apostrophe or single quote) is syntax for quotation. That is, (*quote* a) ≡ *'*a.
+The character *'* (apostrophe or single quote) is syntax for quotation. That is, (*quote* a) = *'*a.
 
 The result of the evaluation of the *quote* special form is _obj_.")))
 
@@ -3596,16 +2475,13 @@ The result of the evaluation of the *quote* special form is _obj_.")))
       (return-type . "<number>")
       (min-args . 2)
       (max-args . nil)
-      (desc . "The function *reciprocal* returns the reciprocal of its argument _x_; that is, 1/_x_. An error shall be signaled if _x_ is zero (error-id. _division-by-zero_).
-
-The function *quotient*, given two arguments _dividend_ and _divisor_, returns the quotient of those numbers. The result is an integer if _dividend_ and _divisor_ are integers and _divisor_ evenly divides _dividend_, otherwise it will be a ﬂoat.
+      (desc . "The function *quotient*, given two arguments _dividend_ and _divisor_, returns the quotient of those numbers. The result is an integer if _dividend_ and _divisor_ are integers and _divisor_ evenly divides _dividend_, otherwise it will be a ﬂoat.
 
 Given more than two arguments, *quotient* operates iteratively on each of the _divisor~1~_ … _divisor~n~_ as in _dividend_ / _divisor~1~_ / … / _divisor~n~_. The type of the result follows from the two-argument case because the three-or-more-argument quotient can be defined as follows:
 
 [subs=\"+quotes,+replacements\"]
 ----
-(quotient _dividend_ _divisor~1~_ _divisor~2~_ …)
-≡ (quotient (quotient _dividend_ _divisor~1~_) _divisor~2~_ …)
+(quotient _dividend_ _divisor~1~_ _divisor~2~_ …) = (quotient (quotient _dividend_ _divisor~1~_) _divisor~2~_ …)
 ----
 An error shall be signaled if _dividend_ is not a number (error-id. _domain-error_). An error shall be signaled if any _divisor_ is not a number (error-id. _domain-error_). An error shall be signaled if any _divisor_ is zero (error-id. _division-by-zero_).")))
 
@@ -3625,7 +2501,9 @@ See §27.1 for information about how input-stream, eos-error-p, and eos-value ar
       (return-type . "<integer>")
       (min-args . 2)
       (max-args . 3)
-      (desc . "Reads a byte from the _input-stream_ and returns it. The number of bits in a byte is determined by the stream element type of the _input-stream_; see §27.1 for information about how _input-stream_, _eos-error-p_, and _eos-value_ are treated.")))
+      (desc . "Reads a byte from the _input-stream_ and returns it. The number of bits in a byte is determined by the stream element type of the _input-stream_; see *open-input-file*.
+
+See §27.1 for information about how _input-stream_, _eos-error-p_, and _eos-value_ are treated.")))
 
 (setf (documentation 'function 'read-char)
     '((kind . function)
@@ -3653,18 +2531,7 @@ See §27.1 for information about how _input-stream_, _eos-error-p_, and _eos-val
       (return-type . "<number>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "The function *reciprocal* returns the reciprocal of its argument _x_; that is, 1/_x_. An error shall be signaled if _x_ is zero (error-id. _division-by-zero_).
-
-The function *quotient*, given two arguments _dividend_ and _divisor_, returns the quotient of those numbers. The result is an integer if _dividend_ and _divisor_ are integers and _divisor_ evenly divides _dividend_, otherwise it will be a ﬂoat.
-
-Given more than two arguments, *quotient* operates iteratively on each of the _divisor~1~_ … _divisor~n~_ as in _dividend_ / _divisor~1~_ / … / _divisor~n~_. The type of the result follows from the two-argument case because the three-or-more-argument quotient can be defined as follows:
-
-[subs=\"+quotes,+replacements\"]
-----
-(quotient _dividend_ _divisor~1~_ _divisor~2~_ …)
-≡ (quotient (quotient _dividend_ _divisor~1~_) _divisor~2~_ …)
-----
-An error shall be signaled if _dividend_ is not a number (error-id. _domain-error_). An error shall be signaled if any _divisor_ is not a number (error-id. _domain-error_). An error shall be signaled if any _divisor_ is zero (error-id. _division-by-zero_).")))
+      (desc . "The function *reciprocal* returns the reciprocal of its argument _x_; that is, 1/_x_. An error shall be signaled if _x_ is zero (error-id. _division-by-zero_).")))
 
 (setf (documentation 'function 'remove-property)
     '((kind . function)
@@ -3686,17 +2553,9 @@ An error shall be signaled if either _symbol_ or _property-name_ is not a symbol
 
 (setf (documentation 'syntax 'return-from)
     '((kind . syntax)
-      (syntax . "(return-from name result-form transfers control and data")
+      (syntax . "(return-from name result-form")
       (return-type . nil)
-      (desc . "The *block* special form executes each _form_ sequentially from left to right. If the last form exits normally, whatever it returns is returned by the *block* form.
-
-The _name_ in a *block* form is not evaluated; it must be an identifier. The scope of _name_ is the body _form_&#42;—only a *return-from* textually contained in some form can exit the *block*. The extent of _name_ is dynamic.
-
-If a _return-from_ is executed, the *result-form* is evaluated. If this evaluation returns normally, the value it returns is immediately returned from the innermost lexically enclosing *block* form with the same name.
-
-*return-from* is used to return from a *block*. _name_ is not evaluated and must be an identifier. A *block* special form must lexically enclose the occurrence of *return-from*; the value produced by *result-form* is immediately returned from the *block*. The *return-from* form never returns and does not have a value.
-
-An error shall be signaled if an attempt is made to exit a *block* after it has been exited (error-id. _control-error_); It is a violation if _name_ is not an identifier. It is a violation if a *block* with a corresponding _name_ does not exist. See §14.7.2 for other errors.")))
+      (desc . "Returns from named block. See *block* for details.")))
 
 (setf (documentation 'function 'reverse)
     '((kind . function)
@@ -3704,11 +2563,9 @@ An error shall be signaled if an attempt is made to exit a *block* after it has 
       (return-type . "<list>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "These functions each return a list whose elements are those of the given _list_, but in reverse order. An error shall be signaled if _list_ is not a list (error-id. _domain-error_).
+      (desc . "Returns a list whose elements are those of the given _list_, but in reverse order. An error shall be signaled if _list_ is not a list (error-id. _domain-error_).
 
-For *reverse*, no side-effect to the given _list_ occurs. The resulting list is permitted but not required to share structure with the input _list_.
-
-For *nreverse*, the conses which make up the top level of the given _list_ are permitted, but not required, to be side-effected in order to produce this new list. *nreverse* should never be called on a literal object.")))
+For *reverse*, no side-effect to the given _list_ occurs. The resulting list is permitted but not required to share structure with the input _list_.")))
 
 (setf (documentation 'function 'round)
     '((kind . function)
@@ -3724,7 +2581,7 @@ For *nreverse*, the conses which make up the top level of the given _list_ are p
       (return-type . "<object>")
       (min-args . 2)
       (max-args . nil)
-      (desc . "These replace the object obtainable by *aref* or *garef* with _obj_. The returned value is _obj_. The constraints on the _basic-array_, the _general-array_, and the sequence of indices _z_ is the same as for *aref* and *garef*.")))
+      (desc . "Replaces the object obtainable by *aref* with _obj_. The returned value is _obj_. The constraints on the _basic-array_ and the sequence of indices _z_ is the same as for *aref*.")))
 
 (setf (documentation 'function 'set-car)
     '((kind . function)
@@ -3758,7 +2615,7 @@ An error shall be signaled if _var_ has no dynamic value (error-id. _unbound-var
       (return-type . "<object>")
       (min-args . 3)
       (max-args . 3)
-      (desc . "These replace the object obtainable by *elt* with _obj_. The returned value is _obj_.
+      (desc . "Replaces the object obtainable by *elt* with _obj_. The returned value is _obj_.
 
 An error shall be signaled if _z_ is an integer outside of the valid range of indices (error-id. _index-out-of-range_). An error shall be signaled if _sequence_ is not a basic-vector or a list or if _z_ is not an integer (error-id. _domain-error_). obj may be any ISLISP object.")))
 
@@ -3768,7 +2625,7 @@ An error shall be signaled if _z_ is an integer outside of the valid range of in
       (return-type . "<integer>")
       (min-args . 2)
       (max-args . 2)
-      (desc . "Attempts to change the file position (see implementation-defined motion within the file might still be performed. The value returned is the new file position, which might or might not be _z_.
+      (desc . "Attempts to change the file position (see *file-position*) of the stream _stream_ to _z_ . If it is not possible to move to the exact position _z_ , some implementation-defined motion within the file might still be performed. The value returned is the new file position, which might or might not be _z_.
 
 An error shall be signaled if _stream_ is not a stream to or from a file, or if _z_ is not a non-negative integer (error-id. _domain-error_).")))
 
@@ -3778,7 +2635,7 @@ An error shall be signaled if _stream_ is not a stream to or from a file, or if 
       (return-type . "<object>")
       (min-args . 2)
       (max-args . nil)
-      (desc . "These replace the object obtainable by *aref* or *garef* with _obj_. The returned value is _obj_. The constraints on the _basic-array_, the _general-array_, and the sequence of indices _z_ is the same as for *aref* and *garef*.")))
+      (desc . "Replace the object obtainable by *garef* with _obj_. The returned value is _obj_. The constraints on the _general-array_ and the sequence of indices _z_ is the same as for *garef*.")))
 
 (setf (documentation 'function 'set-property)
     '((kind . function)
@@ -3798,28 +2655,17 @@ An error shall be signaled if either symbol or property-name is not a symbol (er
 
 *setf* takes a _place_ and stores in this place the result of the evaluation of the form _form_. The _place_ form is not evaluated as a whole entity, but subforms of _place_ are evaluated sequentially from left to right to determine a place to be assigned a value. When _place_ is denoted by an identifier, *setf* behaves exactly as *setq*. The returned value is the result of the evaluation of _form_. The valid places for the *setf* special form are as follows:
 
-
 [cols=\"1,1\"]
 |===
 | variables | var
-
-
 | dynamic bindings | (dynamic var)
-
 | the components of a basic-array | (aref basic-array z1 … zn)
-
 | the components of a general array | (garef general-array z1 … zn)
-
 | the components of a list | (elt list z)
-
 | the components of a vector | (elt basic-vector z)
-
 | the left component of a cons | (car cons)
-
 | the right component of a cons | (cdr cons)
-
 | a property of a symbol | (property symbol property)
-
 | a slot of an instance of a class | (reader-function-name instance)
 |===
 
@@ -3831,7 +2677,7 @@ A place can also be a macro form that expands (during preparation for execution)
       (return-type . "<object>")
       (desc . "This form represents an assignment to the variable denoted by the _identifier_. In consequence, the _identifier_ may designate a different object than before, the value of _form_.
 
-The result of the evaluation of _form_ is returned. This result is used to modify the variable binding denoted by the identifier _var_ (if it is mutable). *setq* can be used only for modifying bindings, and not for establishing a variable. The *setq* special form must be contained in the scope of _var_ , established by lambda</span> expression.")))
+The result of the evaluation of _form_ is returned. This result is used to modify the variable binding denoted by the identifier _var_ (if it is mutable). *setq* can be used only for modifying bindings, and not for establishing a variable. The *setq* special form must be contained in the scope of _var_ , established by *defglobal*, *let*, *let&#42;*, *for*, or a *lambda* expression.")))
 
 (setf (documentation 'function 'signal-condition)
     '((kind . function)
@@ -3841,7 +2687,9 @@ The result of the evaluation of _form_ is returned. This result is used to modif
       (max-args . 2)
       (desc . "Invokes the condition handling system on _condition_.
 
-If _continuable_ is *nil*, the results of attempting to “continue” (see implementation-defined string such as \"Continue with no special action.\" is to be used.")))
+If _continuable_ is *nil*, the results of attempting to “continue” (see *continue-condition*) are not defined except that the call to *signal-condition* will not return normally.
+
+If _continuable_ is not *nil*, it will be possible to return from the call to *signal-condition* (see *continue-condition*). In this case, the specific value of continuable may be a string indicating the effect of continuing, or it may be the symbol *t*, indicating that an implementation-defined string such as \"Continue with no special action.\" is to be used.")))
 
 (setf (documentation 'function 'simple-error-format-arguments)
     '((kind . function)
@@ -3849,7 +2697,7 @@ If _continuable_ is *nil*, the results of attempting to “continue” (see impl
       (return-type . "<list>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "These functions return the _format-string_ and _format-arguments_ supplied as data when creating the _simple-error_. An error shall be signaled if _simple-error_ is not a condition of class *<simple-error>* (error-id. _domain-error_).")))
+      (desc . "Returns the _format-arguments_ supplied as data when creating the _simple-error_. An error shall be signaled if _simple-error_ is not a condition of class *<simple-error>* (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'simple-error-format-string)
     '((kind . function)
@@ -3857,7 +2705,7 @@ If _continuable_ is *nil*, the results of attempting to “continue” (see impl
       (return-type . "<string>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "These functions return the _format-string_ and _format-arguments_ supplied as data when creating the _simple-error_. An error shall be signaled if _simple-error_ is not a condition of class *<simple-error>* (error-id. _domain-error_).")))
+      (desc . "Returns the _format-string_ supplied as data when creating the _simple-error_. An error shall be signaled if _simple-error_ is not a condition of class *<simple-error>* (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'sin)
     '((kind . function)
@@ -3865,7 +2713,7 @@ If _continuable_ is *nil*, the results of attempting to “continue” (see impl
       (return-type . "<number>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "The function *sin* returns the sine of _x_ . The function *cos* returns the cosine of _x_. The function tan returns the tangent of _x_. In each case, _x_ must be given in radians.
+      (desc . "The function *sin* returns the sine of _x_ ._x_ must be given in radians.
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).")))
 
@@ -3875,15 +2723,9 @@ An error shall be signaled if _x_ is not a number (error-id. _domain-error_)."))
       (return-type . "<number>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "The function *sinh* returns the hyperbolic sine of _x_. The function *cosh* returns the hyperbolic cosine of _x_. The function *tanh* returns the hyperbolic tangent of _x_.
+      (desc . "The function *sinh* returns the hyperbolic sine of _x_.
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).")))
-
-(setf (documentation 'syntax 'special-operator)
-    '((kind . syntax)
-      (syntax . "(special-operator argument*)")
-      (return-type . "<result-class>")
-      (desc . nil)))
 
 (setf (documentation 'function 'sqrt)
     '((kind . function)
@@ -3901,11 +2743,7 @@ An error shall be signaled if _x_ is not a number (error-id. _domain-error_)."))
       (max-args . 0)
       (desc . "The function *standard-input* returns the stream used as the default stream for input functions.
 
-The function *standard-output* returns the stream used as the default stream for output functions.
-
-The function *error-output* returns the stream used as the default stream for warnings and non-interactive error messages.
-
-The value returned by each of these functions is initially with-error-output</span>.")))
+The value returned by this function is initially implementation-defined, but can be dynamically bound; see *with-standard-input*.")))
 
 (setf (documentation 'function 'standard-output)
     '((kind . function)
@@ -3913,13 +2751,9 @@ The value returned by each of these functions is initially with-error-output</sp
       (return-type . "<stream>")
       (min-args . 0)
       (max-args . 0)
-      (desc . "The function *standard-input* returns the stream used as the default stream for input functions.
+      (desc . "The function *standard-output* returns the stream used as the default stream for output functions.
 
-The function *standard-output* returns the stream used as the default stream for output functions.
-
-The function *error-output* returns the stream used as the default stream for warnings and non-interactive error messages.
-
-The value returned by each of these functions is initially with-error-output</span>.")))
+The value returned by this function is initially implementation-defined, but can be dynamically bound; see *with-standard-output*.")))
 
 (setf (documentation 'function 'stream-error-stream)
     '((kind . function)
@@ -3973,19 +2807,7 @@ An error shall be signaled if either _substring_ or _string_ is not a string (er
       (return-type . "quasi-boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *string=* tests whether _string~1~_ is the same string as _string~2~_. The function *string<* tests whether _string~1~_ is less than _string~2~_. The function *string<=* tests whether _string~1~_ is less than or equal to _string~2~_.
-
-The ordering used is based on character comparisons.
-
-Two strings are *string=* if they are of the same length, _l_ , and if for every _i_, where 0 ≤ _i_ < _l_, (*char=* (*elt* _string~1~_ _i_) (*elt* _string~2~_ _i_)) holds.
-
-Two strings _string~1~_ and _string~2~_ are in order (*string<*) if in the first position in which they differ the character of _string~1~_ is *char<* the corresponding character of _string~2~_, or if the _string~1~_ is a proper prefix of _string~2~_ (of shorter length and matching in all the characters of _string~1~_).
-
-Two strings are _string<=_ if they are either *string<* or they are *string=*.
-
-Two strings are *string/=* if and only if they are not *string=*. Two strings are *string>* if and only if they are not *string<=*. Two strings are *string>=* if and only if they are not *string<*.
-
-For these 6 string comparison functions, if the test is satisfied, an implementation-defined non-nil value is returned; otherwise, *nil* is returned.
+      (desc . "Two strings are *string/=* if and only if they are not *string=*. If the test is satisfied, an implementation-defined non-nil value is returned; otherwise, *nil* is returned.
 
 An error shall be signaled if either _string~1~_ or _string~2~_ is not a string (error-id. _domain-error_).")))
 
@@ -3995,19 +2817,13 @@ An error shall be signaled if either _string~1~_ or _string~2~_ is not a string 
       (return-type . "quasi-boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *string=* tests whether _string~1~_ is the same string as _string~2~_. The function *string<* tests whether _string~1~_ is less than _string~2~_. The function *string<=* tests whether _string~1~_ is less than or equal to _string~2~_.
+      (desc . "The function *string<* tests whether _string~1~_ is less than _string~2~_.
 
 The ordering used is based on character comparisons.
 
-Two strings are *string=* if they are of the same length, _l_ , and if for every _i_, where 0 ≤ _i_ < _l_, (*char=* (*elt* _string~1~_ _i_) (*elt* _string~2~_ _i_)) holds.
-
 Two strings _string~1~_ and _string~2~_ are in order (*string<*) if in the first position in which they differ the character of _string~1~_ is *char<* the corresponding character of _string~2~_, or if the _string~1~_ is a proper prefix of _string~2~_ (of shorter length and matching in all the characters of _string~1~_).
 
-Two strings are _string<=_ if they are either *string<* or they are *string=*.
-
-Two strings are *string/=* if and only if they are not *string=*. Two strings are *string>* if and only if they are not *string<=*. Two strings are *string>=* if and only if they are not *string<*.
-
-For these 6 string comparison functions, if the test is satisfied, an implementation-defined non-nil value is returned; otherwise, *nil* is returned.
+If the test is satisfied, an implementation-defined non-nil value is returned; otherwise, *nil* is returned.
 
 An error shall be signaled if either _string~1~_ or _string~2~_ is not a string (error-id. _domain-error_).")))
 
@@ -4017,19 +2833,9 @@ An error shall be signaled if either _string~1~_ or _string~2~_ is not a string 
       (return-type . "quasi-boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *string=* tests whether _string~1~_ is the same string as _string~2~_. The function *string<* tests whether _string~1~_ is less than _string~2~_. The function *string<=* tests whether _string~1~_ is less than or equal to _string~2~_.
+      (desc . "Two strings are _string<=_ if they are either *string<* or they are *string=*.
 
-The ordering used is based on character comparisons.
-
-Two strings are *string=* if they are of the same length, _l_ , and if for every _i_, where 0 ≤ _i_ < _l_, (*char=* (*elt* _string~1~_ _i_) (*elt* _string~2~_ _i_)) holds.
-
-Two strings _string~1~_ and _string~2~_ are in order (*string<*) if in the first position in which they differ the character of _string~1~_ is *char<* the corresponding character of _string~2~_, or if the _string~1~_ is a proper prefix of _string~2~_ (of shorter length and matching in all the characters of _string~1~_).
-
-Two strings are _string<=_ if they are either *string<* or they are *string=*.
-
-Two strings are *string/=* if and only if they are not *string=*. Two strings are *string>* if and only if they are not *string<=*. Two strings are *string>=* if and only if they are not *string<*.
-
-For these 6 string comparison functions, if the test is satisfied, an implementation-defined non-nil value is returned; otherwise, *nil* is returned.
+If the test is satisfied, an implementation-defined non-nil value is returned; otherwise, *nil* is returned.
 
 An error shall be signaled if either _string~1~_ or _string~2~_ is not a string (error-id. _domain-error_).")))
 
@@ -4039,19 +2845,9 @@ An error shall be signaled if either _string~1~_ or _string~2~_ is not a string 
       (return-type . "quasi-boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *string=* tests whether _string~1~_ is the same string as _string~2~_. The function *string<* tests whether _string~1~_ is less than _string~2~_. The function *string<=* tests whether _string~1~_ is less than or equal to _string~2~_.
+      (desc . "Two strings are *string=* if they are of the same length, _l_ , and if for every _i_, where 0 ≤ _i_ < _l_, (*char=* (*elt* _string~1~_ _i_) (*elt* _string~2~_ _i_)) holds.
 
-The ordering used is based on character comparisons.
-
-Two strings are *string=* if they are of the same length, _l_ , and if for every _i_, where 0 ≤ _i_ < _l_, (*char=* (*elt* _string~1~_ _i_) (*elt* _string~2~_ _i_)) holds.
-
-Two strings _string~1~_ and _string~2~_ are in order (*string<*) if in the first position in which they differ the character of _string~1~_ is *char<* the corresponding character of _string~2~_, or if the _string~1~_ is a proper prefix of _string~2~_ (of shorter length and matching in all the characters of _string~1~_).
-
-Two strings are _string<=_ if they are either *string<* or they are *string=*.
-
-Two strings are *string/=* if and only if they are not *string=*. Two strings are *string>* if and only if they are not *string<=*. Two strings are *string>=* if and only if they are not *string<*.
-
-For these 6 string comparison functions, if the test is satisfied, an implementation-defined non-nil value is returned; otherwise, *nil* is returned.
+If the test is satisfied, an implementation-defined non-nil value is returned; otherwise, *nil* is returned.
 
 An error shall be signaled if either _string~1~_ or _string~2~_ is not a string (error-id. _domain-error_).")))
 
@@ -4061,19 +2857,9 @@ An error shall be signaled if either _string~1~_ or _string~2~_ is not a string 
       (return-type . "quasi-boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *string=* tests whether _string~1~_ is the same string as _string~2~_. The function *string<* tests whether _string~1~_ is less than _string~2~_. The function *string<=* tests whether _string~1~_ is less than or equal to _string~2~_.
-
-The ordering used is based on character comparisons.
-
-Two strings are *string=* if they are of the same length, _l_ , and if for every _i_, where 0 ≤ _i_ < _l_, (*char=* (*elt* _string~1~_ _i_) (*elt* _string~2~_ _i_)) holds.
-
-Two strings _string~1~_ and _string~2~_ are in order (*string<*) if in the first position in which they differ the character of _string~1~_ is *char<* the corresponding character of _string~2~_, or if the _string~1~_ is a proper prefix of _string~2~_ (of shorter length and matching in all the characters of _string~1~_).
-
-Two strings are _string<=_ if they are either *string<* or they are *string=*.
-
-Two strings are *string/=* if and only if they are not *string=*. Two strings are *string>* if and only if they are not *string<=*. Two strings are *string>=* if and only if they are not *string<*.
-
-For these 6 string comparison functions, if the test is satisfied, an implementation-defined non-nil value is returned; otherwise, *nil* is returned.
+      (desc . "Two strings are *string>* if and only if they are not *string<=*.      
+      
+If the test is satisfied, an implementation-defined non-nil value is returned; otherwise, *nil* is returned.
 
 An error shall be signaled if either _string~1~_ or _string~2~_ is not a string (error-id. _domain-error_).")))
 
@@ -4083,19 +2869,9 @@ An error shall be signaled if either _string~1~_ or _string~2~_ is not a string 
       (return-type . "quasi-boolean")
       (min-args . 2)
       (max-args . 2)
-      (desc . "The function *string=* tests whether _string~1~_ is the same string as _string~2~_. The function *string<* tests whether _string~1~_ is less than _string~2~_. The function *string<=* tests whether _string~1~_ is less than or equal to _string~2~_.
+      (desc . "Two strings are *string>=* if and only if they are not *string<*.
 
-The ordering used is based on character comparisons.
-
-Two strings are *string=* if they are of the same length, _l_ , and if for every _i_, where 0 ≤ _i_ < _l_, (*char=* (*elt* _string~1~_ _i_) (*elt* _string~2~_ _i_)) holds.
-
-Two strings _string~1~_ and _string~2~_ are in order (*string<*) if in the first position in which they differ the character of _string~1~_ is *char<* the corresponding character of _string~2~_, or if the _string~1~_ is a proper prefix of _string~2~_ (of shorter length and matching in all the characters of _string~1~_).
-
-Two strings are _string<=_ if they are either *string<* or they are *string=*.
-
-Two strings are *string/=* if and only if they are not *string=*. Two strings are *string>* if and only if they are not *string<=*. Two strings are *string>=* if and only if they are not *string<*.
-
-For these 6 string comparison functions, if the test is satisfied, an implementation-defined non-nil value is returned; otherwise, *nil* is returned.
+If the test is satisfied, an implementation-defined non-nil value is returned; otherwise, *nil* is returned.
 
 An error shall be signaled if either _string~1~_ or _string~2~_ is not a string (error-id. _domain-error_).")))
 
@@ -4148,8 +2924,13 @@ The series of _tagbody-tags_ and _forms_ is collectively referred to as the body
 
 The namespace used for tagbody tags is distinct from that used for *block* tags.
 
-At any point lexically contained in the *tagbody* a form (*go* _tag_) can be used to transfer control to a tag _tag_ that appears among the _tagbody-tags_, except where a _tag_ is shadowed according to the lexical principle (see §14.7.2 for other errors.
+At any point lexically contained in the *tagbody* a form (*go* _tag_) can be used to transfer control to a tag _tag_ that appears among the _tagbody-tags_, except where a _tag_ is shadowed according to the lexical principle (see §11.1).
 
+A _tagbody-tag_ established by *tagbody* has lexical scope, but the point in the program to which it refers has dynamic extent. Once *tagbody* has been exited, it is no longer valid to use *go* to transfer to any tag in its body.
+
+The determination of which elements of the body are _tagbody-tags_ and which are _forms_ is made prior to any macro expansion of that element. If _form_ is a macro form and its macro expansion is a symbol or literal, that atom is treated as a _form_, not as a _tagbody-tag_.
+
+It is a violation if a _tagbody tag_ is other than an identifier. See §14.7.2 for other errors.
 
 NOTE: As a stylistic matter, programmers are not encouraged to use *tagbody* and *go* in everyday programming. The primary uses for which these forms are intended are for implementing other control abstractions (using macros), and for the occassional real-world situation that uses unstructured imperative transfer of control (such as a finite state machine).")))
 
@@ -4159,7 +2940,7 @@ NOTE: As a stylistic matter, programmers are not encouraged to use *tagbody* and
       (return-type . "<number>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "The function *sin* returns the sine of _x_ . The function *cos* returns the cosine of _x_. The function tan returns the tangent of _x_. In each case, _x_ must be given in radians.
+      (desc . "The function tan returns the tangent of _x_. _x_ must be given in radians.
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).")))
 
@@ -4169,7 +2950,7 @@ An error shall be signaled if _x_ is not a number (error-id. _domain-error_)."))
       (return-type . "<number>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "The function *sinh* returns the hyperbolic sine of _x_. The function *cosh* returns the hyperbolic cosine of _x_. The function *tanh* returns the hyperbolic tangent of _x_.
+      (desc . "The function *tanh* returns the hyperbolic tangent of _x_.
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).")))
 
@@ -4177,13 +2958,13 @@ An error shall be signaled if _x_ is not a number (error-id. _domain-error_)."))
     '((kind . syntax)
       (syntax . "(the class-name form)")
       (return-type . "<object>")
-      (desc . "These forms evaluate _form_. If _form_ returns, the returned value is returned by the *the* or *assure* form. In addition, these forms specify that the value of _form_ is of the class specified by _class-name_ (which must be the name of an existing class).
+      (desc . "This form evaluates _form_. If _form_ returns, the returned value is returned by the *the* form. In addition, this form specifies that the value of _form_ is of the class specified by _class-name_ (which must be the name of an existing class).
 
-In a *the* special form, the consequences are undefined if the value of _form_ is not of the class or a subclass of the class designated by _class-name_. In an *assure* special form, an error shall be signaled if the value of _form_ is not of the class or a subclass of the class designated by _class-name_ (error-id. _domain-error_).")))
+The consequences are undefined if the value of _form_ is not of the class or a subclass of the class designated by _class-name_.")))
 
 (setf (documentation 'syntax 'throw)
     '((kind . syntax)
-      (syntax . "(throw tag-form result-form) transfers control and data")
+      (syntax . "(throw tag-form result-form)")
       (return-type . nil)
       (desc . "The special forms *catch* and *throw* provide a facility for programming of structured non-local dynamic exits. A *catch* form and a *throw* form are said to correspond if the _tag-form_ of the *catch* and the _tag-form_ of the *throw* evaluate to the same object, a catch tag. A catch tag may be any object other than a number or a character; the comparison of _catch tags_ uses *eq*.
 
@@ -4209,9 +2990,7 @@ An error shall be signaled if there is no outstanding catcher for a _T~1~_ (erro
       (return-type . "<symbol>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "These functions return the _name_ and _namespace_ supplied as data when creating the _undefined-entity_. An error shall be signaled if _undefined-entity_ is not a condition of class *<undefined-entity>* (error-id. _domain-error_).
-
-The result of *undefined-entity-namespace* will be one of the symbols *variable*, *dynamic-variable*, *function*, or *class*.")))
+      (desc . "Returns the _name_ supplied as data when creating the _undefined-entity_. An error shall be signaled if _undefined-entity_ is not a condition of class *<undefined-entity>* (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'undefined-entity-namespace)
     '((kind . function)
@@ -4219,7 +2998,7 @@ The result of *undefined-entity-namespace* will be one of the symbols *variable*
       (return-type . "<symbol>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "These functions return the _name_ and _namespace_ supplied as data when creating the _undefined-entity_. An error shall be signaled if _undefined-entity_ is not a condition of class *<undefined-entity>* (error-id. _domain-error_).
+      (desc . "Returns the _namespace_ supplied as data when creating the _undefined-entity_. An error shall be signaled if _undefined-entity_ is not a condition of class *<undefined-entity>* (error-id. _domain-error_).
 
 The result of *undefined-entity-namespace* will be one of the symbols *variable*, *dynamic-variable*, *function*, or *class*.")))
 
@@ -4237,7 +3016,6 @@ The _cleanup-forms_ are evaluated from left to right, discarding the resulting v
 
 An error shall be signaled if during execution of the _cleanup-forms_ of an *unwind-protect* form, a non-local exit is executed to a destination which has been marked as invalid due to some other non-local exit that is already in progress (see §14.7.1) (error-id. _control-error_).
 
-
 NOTE: Because ISLISP does not specify an interactive debugger, it is unspecified whether or how error recovery can occur interactively if programmatic handling fails. The intent is that if the ISLISP processor does not terminate abnormally, normal mechanisms for non-local exit (*return-from*, *throw*, or *go*) would be used as necessary and would respect these _cleanup-forms_.")))
 
 (setf (documentation 'function 'vector)
@@ -4254,8 +3032,6 @@ NOTE: Because ISLISP does not specify an interactive debugger, it is unspecified
       (return-type . "<null>")
       (desc . "Iterates while the _test-form_ returns a true value. Specifically:
 
-
-
 1. test-form is evaluated, producing a value Vt.
 2. If Vt is nil, then the while form immediately returns nil.
 3. Otherwise, if Vt is non-nil, the forms body-form&#42; are evaluated sequentially (from left to right).
@@ -4265,7 +3041,7 @@ NOTE: Because ISLISP does not specify an interactive debugger, it is unspecified
     '((kind . syntax)
       (syntax . "(with-error-output stream-form form*)")
       (return-type . "<object>")
-      (desc . "These special forms first evaluate their _stream-form_ argument to produce a stream _s_ and then evaluate their body _forms_ in a dynamic environment where the corresponding function (*standard-input*, *standard-output*, or *error-output*) returns the stream _s_. The returned value of each of these _forms_ is the result of the evaluation of the last _form_ of their body (or *nil* if there is none).")))
+      (desc . "This special form first evaluate its _stream-form_ argument to produce a stream _s_ and then evaluate its body _forms_ in a dynamic environment where the function *error-output* returns the stream _s_. The returned value is the result of the evaluation of the last _form_ of its body (or *nil* if there is none).")))
 
 (setf (documentation 'syntax 'with-handler)
     '((kind . syntax)
@@ -4277,7 +3053,7 @@ NOTE: Because ISLISP does not specify an interactive debugger, it is unspecified
     '((kind . syntax)
       (syntax . "(with-open-input-file (name filename [element-class]) form*)")
       (return-type . "<object>")
-      (desc . "Each of these special forms opens a stream to a file (using *open-input-file*, *open-output-file*, or *open-io-file*, respectively), evaluates the _forms_, closes the file, and returns the value returned by the last _form_ (or *nil* if there are no forms).
+      (desc . "This special form opens a stream to a file (using *open-input-file*), evaluates the _forms_, closes the file, and returns the value returned by the last _form_ (or *nil* if there are no forms).
 
 The _filename_ and _element-class_ are evaluated and passed as arguments to the appropriate file-opening function. The stream created by opening the file is bound to the variable named by _name_ (as if a let was used), so the identifier _name_ can be used to refer to the stream.
 
@@ -4287,7 +3063,7 @@ The stream is closed on exit, whether or not exit from these special forms is no
     '((kind . syntax)
       (syntax . "(with-open-io-file (name filename [element-class]) form*)")
       (return-type . "<object>")
-      (desc . "Each of these special forms opens a stream to a file (using *open-input-file*, *open-output-file*, or *open-io-file*, respectively), evaluates the _forms_, closes the file, and returns the value returned by the last _form_ (or *nil* if there are no forms).
+      (desc . "This special form opens a stream to a file (using *open-io-file*), evaluates the _forms_, closes the file, and returns the value returned by the last _form_ (or *nil* if there are no forms).
 
 The _filename_ and _element-class_ are evaluated and passed as arguments to the appropriate file-opening function. The stream created by opening the file is bound to the variable named by _name_ (as if a let was used), so the identifier _name_ can be used to refer to the stream.
 
@@ -4297,7 +3073,7 @@ The stream is closed on exit, whether or not exit from these special forms is no
     '((kind . syntax)
       (syntax . "(with-open-output-file (name filename [element-class]) form*)")
       (return-type . "<object>")
-      (desc . "Each of these special forms opens a stream to a file (using *open-input-file*, *open-output-file*, or *open-io-file*, respectively), evaluates the _forms_, closes the file, and returns the value returned by the last _form_ (or *nil* if there are no forms).
+      (desc . "This special form opens a stream to a file (using *open-output-file*), evaluates the _forms_, closes the file, and returns the value returned by the last _form_ (or *nil* if there are no forms).
 
 The _filename_ and _element-class_ are evaluated and passed as arguments to the appropriate file-opening function. The stream created by opening the file is bound to the variable named by _name_ (as if a let was used), so the identifier _name_ can be used to refer to the stream.
 
@@ -4307,13 +3083,13 @@ The stream is closed on exit, whether or not exit from these special forms is no
     '((kind . syntax)
       (syntax . "(with-standard-input stream-form form*)")
       (return-type . "<object>")
-      (desc . "These special forms first evaluate their _stream-form_ argument to produce a stream _s_ and then evaluate their body _forms_ in a dynamic environment where the corresponding function (*standard-input*, *standard-output*, or *error-output*) returns the stream _s_. The returned value of each of these _forms_ is the result of the evaluation of the last _form_ of their body (or *nil* if there is none).")))
+      (desc . "This special form first evaluate its _stream-form_ argument to produce a stream _s_ and then evaluate its body _forms_ in a dynamic environment where the function *standard-input* returns the stream _s_. The returned value is the result of the evaluation of the last _form_ of its body (or *nil* if there is none).")))
 
 (setf (documentation 'syntax 'with-standard-output)
     '((kind . syntax)
       (syntax . "(with-standard-output stream-form form*)")
       (return-type . "<object>")
-      (desc . "These special forms first evaluate their _stream-form_ argument to produce a stream _s_ and then evaluate their body _forms_ in a dynamic environment where the corresponding function (*standard-input*, *standard-output*, or *error-output*) returns the stream _s_. The returned value of each of these _forms_ is the result of the evaluation of the last _form_ of their body (or *nil* if there is none).")))
+      (desc . "This special form first evaluate its _stream-form_ argument to produce a stream _s_ and then evaluate its body _forms_ in a dynamic environment where the function *standard-output* returns the stream _s_. The returned value is the result of the evaluation of the last _form_ of its body (or *nil* if there is none).")))
 
 (setf (documentation 'function 'write-byte)
     '((kind . function)
@@ -4322,4 +3098,3 @@ The stream is closed on exit, whether or not exit from these special forms is no
       (min-args . 2)
       (max-args . 2)
       (desc . "Writes _z_ to the _output-stream_ and returns it. An error shall be signaled if _z_ is not an integer in the range appropriate to the stream element type of _output-stream_ or if _output-stream_ is not a stream capable of handling output operations (error-id. _domain-error_).")))
-

@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "parse": "tsx index.ts",
-    "build": "npm run --silent parse > ../language/src/main/resources/docs.lisp && cat ../language/src/main/resources/islispprelude.original.lisp ../language/src/main/resources/docs.lisp > ../language/src/main/resources/islispprelude.lisp"
+    "build": "npm run --silent parse > ../language/src/main/resources/docs.lisp"
   },
   "dependencies": {
     "cheerio": "^1.2.0",

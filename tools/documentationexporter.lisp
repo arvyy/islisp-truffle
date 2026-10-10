@@ -14,5 +14,5 @@
       (mapc #'print-entry (convert entries <list>))))
 
 (let ((modules '("ROOT" "builtin/truffle.lisp" "builtin/introspection.lisp")))
-    (format (standard-output) "= Docs ~%:icons: font~%:toc: left~%~%")
+    (format (standard-output) "= Docs ~%:icons: font~%:toc: left~%:stem: latexmath~%~%")
     (mapc #'print-module modules))

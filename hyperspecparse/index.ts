@@ -50,7 +50,7 @@ function main() {
       }
     }
     const returnType = parseReturnType($, genDef);
-    const desc = collectDescription($, genDef);
+    const desc = collectDescription(name, $, genDef);
     docs.push({
       kind: 'generic-function',
       name,
@@ -67,7 +67,7 @@ function main() {
     let syntax = $(defDef).text();
     syntax = syntax.split('→')[0]!.trim();
     const returnType = parseReturnType($, defDef);
-    const desc = collectDescription($, defDef);
+    const desc = collectDescription(name, $, defDef);
     docs.push({
       kind: 'syntax',
       name,
@@ -79,7 +79,7 @@ function main() {
   for (const constDef of $('.definition-constant')) {
     const name = $(constDef).find('.terminal').text();
     const valueType = parseReturnType($, constDef);
-    const desc = collectDescription($, constDef);
+    const desc = collectDescription(name, $, constDef);
     docs.push({
       kind: 'constant',
       name,
@@ -96,7 +96,7 @@ function main() {
     let syntax = $(specDef).text();
     syntax = syntax.split('→')[0]!.trim();
     const returnType = parseReturnType($, specDef);
-    const desc = collectDescription($, specDef);
+    const desc = collectDescription(name, $, specDef);
     docs.push({
       // mark the base setf form itself as a syntax
       kind: name == 'setf' ? 'syntax' : 'setf',
@@ -111,7 +111,7 @@ function main() {
     let syntax = $(specDef).text();
     syntax = syntax.split('→')[0]!.trim();
     const returnType = parseReturnType($, specDef);
-    const desc = collectDescription($, specDef);
+    const desc = collectDescription(name, $, specDef);
     docs.push({
       kind: 'syntax',
       name,
@@ -144,7 +144,7 @@ function main() {
       }
     }
     const returnType = parseReturnType($, funDef);
-    const desc = collectDescription($, funDef);
+    const desc = collectDescription(name, $, funDef);
     docs.push({
       kind: 'function',
       name,
@@ -179,7 +179,7 @@ function main() {
       }
     }
     const returnType = parseReturnType($, funDef);
-    const desc = collectDescription($, funDef);
+    const desc = collectDescription(name, $, funDef);
     docs.push({
       kind: 'local-function',
       name,
@@ -197,7 +197,7 @@ function main() {
   }
 }
 
-function collectDescription($: CheerioAPI.CheerioAPI, el: Element): string {
+function collectDescription(name: string, $: CheerioAPI.CheerioAPI, el: Element): string {
   let descHtml: string = '';
   let skippingGroupedDefs = true;
   for (const sib of $(el).nextAll()) {
@@ -221,10 +221,10 @@ function collectDescription($: CheerioAPI.CheerioAPI, el: Element): string {
     }
     descHtml += $(sib);
   }
-  return htmlToPseudoAsciidoc(descHtml);
+  return htmlToPseudoAsciidoc(name, descHtml);
 }
 
-function htmlToPseudoAsciidoc(html: string): string {
+function htmlToPseudoAsciidoc(name: string, html: string): string {
   // handle lists
   html = html.replaceAll(/\s*(<ol>.*?<\/ol>)/gs, capture => {
     const $ = load(capture);
@@ -302,9 +302,20 @@ function htmlToPseudoAsciidoc(html: string): string {
   
   // note
   html = html.replaceAll(/<div class="note">Note: (.*?)<\/div>/gs, `\nNOTE: $1\n`);
-  
+
+  /*
+  html.replaceAll(/<a href=".*">(.*?)<\/a>/g, r1 => { 
+    html.replaceAll(/<a href=".*?">(.*?)<\/a>.*<\/a>/g, r2 => {
+      console.log(name);
+      console.log(r2);
+      console.log();
+      return '';
+    });
+    return '';
+  })
+  */
   // remove links
-  html = html.replaceAll(/<a href=".*">(.*?)<\/a>/g, "$1");
+  html = html.replaceAll(/<a href=".*?">(.*?)<\/a>/g, "$1");
 
   // bolden terminals, italics for non-terminals and error references
   html = html.replaceAll(/<span class="terminal">(.*?)<\/span>/g, "*$1*");
@@ -369,7 +380,6 @@ function renderDocumentationSexpr(doc: DocEntry) {
     str += `      (max-args . ${numToSexpr(doc.maxArgs)})\n`;
   }
   str += `      (desc . ${strToSexpr(doc.desc)})))\n`;
-  //if (doc.name == 'mapc')
   console.log(str);
 }
 
