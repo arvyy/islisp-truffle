@@ -1,11 +1,47 @@
 (requires "builtin/introspection.lisp")
 
+(defun assoc* (key alist)
+    (let ((e (assoc key alist)))
+        (if e
+            (cdr e)
+            nil)))
+
+(defun print-heading (ns name)
+    (format (standard-output) "=== [.namspace_~A]_~A_ +~A+~%" ns ns name))
+
+(defun print-value-type (vt)
+    (format (standard-output)
+"[subs=\"+quotes,+replacements\"]
+----
+~A
+----~%~%" vt))
+
+(defun print-syntax (stx return-type)
+    (format (standard-output)
+"[subs=\"+quotes,+replacements\"]
+----
+~A" stx)
+    (if return-type
+        (format (standard-output) "=> ~A" return-type))
+    (format (standard-output) "~%----~%~%"))
+
 (defun print-entry (e)
     (block print-entry
-        (let* ((doc (elt e 2))
+        (let* ((namespace (elt e 0))
                (name (elt e 1))
-               (desc (cdr (assoc 'desc doc))))
-            (format (standard-output) "=== +~A+~%~%~A~%~%" name desc))))
+               (doc (elt e 2))
+               (desc (assoc* 'desc doc))
+               (stx (assoc* 'syntax doc))
+               (return-type (assoc* 'return-type doc))
+               (value-type (assoc* 'value-type doc)))
+            ;;(format (standard-output) "=== +~A+~%~%~A~%~%" name desc)
+            (print-heading namespace name)
+            (if stx
+                (print-syntax stx return-type))
+            (if value-type
+                (print-value-type value-type))
+            (format (standard-output) "~%~%~A~%~%" desc)
+            )))
 
 (defun print-module (name)
     (format (standard-output) "== ~A ~%" name)

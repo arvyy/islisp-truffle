@@ -67,7 +67,9 @@ public final class Main {
                 
                 ISLISP specific options:
                 * islisp.Sourcepath - when using `require` form, islisp searches from roots provided through this option.
-                Option value: set of paths, separated by `:`.
+                Option value: set of paths, separated by `:`, defaults to `.`.
+                * islisp.IncludeDocumentation - flag if documentation should be loaded. Disabling might improve startup time.
+                Optional value: true or false, defaults to true.
                 
                 Use `--experimental-options` to enable experimental options.
                 

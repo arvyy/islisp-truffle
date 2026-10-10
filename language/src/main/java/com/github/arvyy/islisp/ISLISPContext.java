@@ -62,8 +62,12 @@ public class ISLISPContext {
         this.env = env;
         modules = new HashMap<>();
         modules.put("ROOT", new ISLISPModule("main"));
-        modules.put("builtin/truffle.lisp", new ISLISPModule("builtin/truffle.lisp"));
-        modules.put("builtin/introspection.lisp", new ISLISPModule("builtin/introspection.lisp"));
+        var truffleModule = new ISLISPModule("builtin/truffle.lisp");
+        truffleModule.addImport(modules.get("ROOT"));
+        modules.put("builtin/truffle.lisp", truffleModule);
+        var introspectionModule = new ISLISPModule("builtin/introspection.lisp");
+        introspectionModule.addImport(modules.get("ROOT"));
+        modules.put("builtin/introspection.lisp", introspectionModule);
         symbolProperties = new HashMap<>();
         symbols = new HashMap<>();
         currentOutputStream = new ValueReference(null);
@@ -318,20 +322,21 @@ public class ISLISPContext {
 
     void initSetfExpanders() {
         // standard
-        initBasicSetfExpander("car", "set-car");
-        initBasicSetfExpander("cdr", "set-cdr");
-        initBasicSetfExpander("property", "set-property");
-        initBasicSetfExpander("aref", "set-aref");
-        initBasicSetfExpander("garef", "set-garef");
-        initBasicSetfExpander("dynamic", "set-dynamic");
-        initBasicSetfExpander("elt", "set-elt");
+        initBasicSetfExpander("ROOT", "car", "set-car");
+        initBasicSetfExpander("ROOT", "cdr", "set-cdr");
+        initBasicSetfExpander("ROOT", "property", "set-property");
+        initBasicSetfExpander("ROOT", "aref", "set-aref");
+        initBasicSetfExpander("ROOT", "garef", "set-garef");
+        initBasicSetfExpander("ROOT", "dynamic", "set-dynamic");
+        initBasicSetfExpander("ROOT", "elt", "set-elt");
 
         //extensions
-        initBasicSetfExpander("truffle-object-field", "set-truffle-object-field");
-        initBasicSetfExpander("documentation", "set-documentation");
+        initBasicSetfExpander("ROOT", "documentation", "set-documentation");
+        
+        initBasicSetfExpander("builtin/truffle.lisp", "truffle-object-field", "set-truffle-object-field");
     }
 
-    void initBasicSetfExpander(String setfForm, String expandedForm) {
+    void initBasicSetfExpander(String module, String setfForm, String expandedForm) {
         SetfTransformer transformer = (forms, value) -> {
             var lst = new ArrayList<>();
             lst.add(new SyntaxObject(namedSymbol(expandedForm), null));
