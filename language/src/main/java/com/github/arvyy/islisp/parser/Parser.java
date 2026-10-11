@@ -1145,7 +1145,10 @@ public class Parser {
         // if body has multiple expressions, and first one is string literal,
         // treat it as a documentation string
         String documentation = null;
-        if (bodyStatements.size() > 1 && bodyStatements.get(0) instanceof ISLISPLiteralNode literalNode && literalNode.getValue() instanceof String s) {
+        if (bodyStatements.size() > 1
+            && bodyStatements.get(0) instanceof ISLISPLiteralNode literalNode
+            && literalNode.getValue() instanceof String s
+        ) {
             documentation = s;
             bodyStatements = bodyStatements.subList(1, bodyStatements.size());
         }

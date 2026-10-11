@@ -14,7 +14,7 @@ import com.oracle.truffle.api.source.SourceSection;
  * Implements `char=` function.
  */
 public abstract class ISLISPCharEqual extends ISLISPBuiltinFunctionRootNode {
-    
+
     ISLISPCharEqual(TruffleLanguage<?> language) {
         super("char=", arg(2), language);
     }

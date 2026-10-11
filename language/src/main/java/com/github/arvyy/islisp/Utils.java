@@ -120,14 +120,19 @@ public final class Utils {
         return b ? t : nil;
     }
 
-	public static Object mapToAlist(HashMap<String, Object> map) {
-	    var entries = new ArrayList<Pair>();
-		for (var e: map.entrySet()) {
-		    var key = ISLISPContext.get(null).namedSymbol(e.getKey());
-			var p = new Pair(key, e.getValue());
-			entries.add(p);
-		}
-		return listToValue(entries);
-	}
-	
+    /**
+    * Convert java map to an alist usable in truffle runtime.
+    * @param map java map
+    * @return islisp alist
+ */
+    public static Object mapToAlist(HashMap<String, Object> map) {
+        var entries = new ArrayList<Pair>();
+        for (var e: map.entrySet()) {
+            var key = ISLISPContext.get(null).namedSymbol(e.getKey());
+            var p = new Pair(key, e.getValue());
+            entries.add(p);
+        }
+        return listToValue(entries);
+    }
+
 }

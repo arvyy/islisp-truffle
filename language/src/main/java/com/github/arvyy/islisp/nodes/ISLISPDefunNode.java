@@ -18,7 +18,7 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
 
     ISLISPRootNode functionNode;
 
-    final LispFunction.Meta documentation;
+    final LispFunction.Meta functionMetaInfo;
 
     /**
      * Create defun node.
@@ -26,20 +26,26 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
      * @param module module name whose source's this node is part of
      * @param name function's symbol name
      * @param functionNode root node wrapping function body
+     * @param functionMetaInfo meta information about function for introspection
      */
-    public ISLISPDefunNode(String module, Symbol name, ISLISPRootNode functionNode, LispFunction.Meta documentation) {
+    public ISLISPDefunNode(
+        String module,
+        Symbol name,
+        ISLISPRootNode functionNode,
+        LispFunction.Meta functionMetaInfo
+    ) {
         super(true, functionNode.getSourceSection());
         this.module = module;
         this.name = name;
         this.functionNode = functionNode;
-        this.documentation = documentation;
+        this.functionMetaInfo = functionMetaInfo;
     }
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         var fun = new LispFunction(
-            documentation,
+            functionMetaInfo,
             new Closure(null, null, null),
             functionNode.getCallTarget(),
             false,

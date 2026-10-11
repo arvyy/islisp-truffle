@@ -140,7 +140,7 @@ public abstract class ISLISPClassOf extends ISLISPBuiltinFunctionRootNode {
     ) {
         return libClass;
     }
-    
+
     @Specialization
     LispClass doNativeLibrary(
         ISLISPModule module,

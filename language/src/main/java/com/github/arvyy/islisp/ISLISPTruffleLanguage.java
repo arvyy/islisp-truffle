@@ -69,7 +69,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
         var debuggerNode = (ISLISPDebuggerNode) request.getLocation();
         return parser.createInlineDebuggerEvalNode(this, debuggerNode, request.getSource());
     }
-    
+
     @Override
     protected void initializeContext(ISLISPContext context) throws Exception {
         var preludeSource = Source
@@ -86,7 +86,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
         if (includeDocs) {
             Source docsSource;
             ISLISPRootNode docsRootNode;
-            
+
             docsSource = Source
                 .newBuilder(
                     "islisp",
@@ -104,7 +104,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
                 .build();
             docsRootNode = parser.createMainModuleNode(this, "builtin/truffle.lisp", docsSource);
             docsRootNode.getCallTarget().call();
-            
+
             docsSource = Source
                 .newBuilder(
                     "islisp",
@@ -115,8 +115,6 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
             docsRootNode.getCallTarget().call();
         }
     }
-
-    
 
     @Override
     protected Object getLanguageView(ISLISPContext context, Object value) {

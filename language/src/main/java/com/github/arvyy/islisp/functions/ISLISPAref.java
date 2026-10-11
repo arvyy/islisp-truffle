@@ -13,7 +13,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  * Implements `aref` function.
  */
 public abstract class ISLISPAref extends ISLISPBuiltinFunctionRootNode {
-    
+
     ISLISPAref(TruffleLanguage<?> language) {
         super("aref", vararg(2), language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);

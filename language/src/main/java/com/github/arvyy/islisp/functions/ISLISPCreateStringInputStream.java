@@ -14,6 +14,10 @@ import java.nio.charset.StandardCharsets;
  */
 public class ISLISPCreateStringInputStream extends ISLISPBuiltinFunctionRootNode {
 
+    /**
+    * Construct node.
+    * @param language truffle language reference
+    */
     public ISLISPCreateStringInputStream(TruffleLanguage<?> language) {
         super("create-string-input-stream", arg(1), language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);

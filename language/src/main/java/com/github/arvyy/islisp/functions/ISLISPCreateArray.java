@@ -22,6 +22,10 @@ public abstract class ISLISPCreateArray extends ISLISPBuiltinFunctionRootNode {
     @Child
     DirectCallNode lengthNode;
 
+    /**
+    * Construct node.
+    * @param language truffle language reference
+    */
     public ISLISPCreateArray(TruffleLanguage<?> language) {
         super("create-array", arg(1, 2), language);
     }

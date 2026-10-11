@@ -13,6 +13,10 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  */
 public abstract class ISLISPCreateString extends ISLISPBuiltinFunctionRootNode {
 
+    /**
+    * Construct node.
+    * @param language truffle language reference
+    */
     public ISLISPCreateString(TruffleLanguage<?> language) {
         super("create-string", arg(1, 2), language);
     }

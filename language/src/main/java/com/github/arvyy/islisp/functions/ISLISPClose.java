@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -12,10 +11,13 @@ import java.io.IOException;
  * Implements `close` function.
  */
 public class ISLISPClose extends ISLISPBuiltinFunctionRootNode {
-    
+
+    /**
+    * Construct node.
+    * @param language truffle language reference
+    */
     public ISLISPClose(TruffleLanguage<?> language) {
         super("close", arg(1), language);
-        errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override

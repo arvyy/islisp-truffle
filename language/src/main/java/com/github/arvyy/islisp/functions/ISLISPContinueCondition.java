@@ -10,6 +10,10 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  */
 public class ISLISPContinueCondition extends ISLISPBuiltinFunctionRootNode {
 
+    /**
+    * Construct node.
+    * @param language truffle language reference
+    */
     public ISLISPContinueCondition(TruffleLanguage<?> language) {
         super("continue-condition", arg(1, 2), language);
     }

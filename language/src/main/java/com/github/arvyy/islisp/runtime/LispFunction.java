@@ -1,7 +1,5 @@
 package com.github.arvyy.islisp.runtime;
 
-import java.util.List;
-
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.RootCallTarget;
 import com.oracle.truffle.api.dsl.Cached;
@@ -20,26 +18,41 @@ import com.oracle.truffle.api.source.SourceSection;
 /**
  * ISLISP invocable function object.
  *
- * @param closure necessary context to be passed when calling.
+ * @param meta meta information
+ * @param closure necessary context to be passed when calling
  * @param callTarget function implementation
- * @param isGeneric whether this is plain or generic function.
- * @param inline whether this function should be inlined when called directly.
+ * @param isGeneric whether this is plain or generic function
+ * @param inline whether this function should be inlined when called directly
  */
 @ExportLibrary(InteropLibrary.class)
 public record LispFunction(
-    Meta documentation,
+    Meta meta,
     Closure closure,
     CallTarget callTarget,
     boolean isGeneric,
     boolean inline
 ) implements TruffleObject {
 
+    /**
+    * Data bag for storing meta information associated with the function
+    * to be used through introspection.
+    *
+    * @param name function name
+    * @param argcMask bitwise mask to infer if function can be called with given count of args
+ */
     public record Meta(
         String name,
         int argcMask
-    ) {}
+    ) { }
 
-    // TODO remove once callsites add docs
+    /**
+     * Create lisp function.
+     *
+     * @param meta meta information
+     * @param callTarget call target
+     * @param isGeneric whether this is plain or generic function
+     * @param inline whether this function should be inlined when called directly
+     */
     public LispFunction(
         Closure closure,
         CallTarget callTarget,
@@ -48,17 +61,32 @@ public record LispFunction(
     ) {
         this(null, closure, callTarget, isGeneric, inline);
     }
-    
+
+    /**
+     * Create plain lisp function.
+     * @param meta meta information
+     * @param callTarget call target
+     */
+    public LispFunction(Meta meta, CallTarget callTarget) {
+        this(meta, new Closure(null, null, null), callTarget, false, false);
+    }
+
     /**
      * Create plain lisp function.
      * @param callTarget call target
      */
-    public LispFunction(Meta documentation, CallTarget callTarget) {
-        this(documentation, new Closure(null, null, null), callTarget, false, false);
-    }
-    // TODO remove once callsites add docs
     public LispFunction(CallTarget callTarget) {
         this(null, new Closure(null, null, null), callTarget, false, false);
+    }
+
+    /**
+     * Create lisp function with given frame as closure.
+     * @param meta meta information
+     * @param frame materialized closure frame
+     * @param callTarget call target
+     */
+    public LispFunction(Meta meta, MaterializedFrame frame, CallTarget callTarget) {
+        this(meta, new Closure(frame, null, null), callTarget, false, false);
     }
 
     /**
@@ -66,12 +94,20 @@ public record LispFunction(
      * @param frame materialized closure frame
      * @param callTarget call target
      */
-    public LispFunction(Meta documentation, MaterializedFrame frame, CallTarget callTarget) {
-        this(documentation, new Closure(frame, null, null), callTarget, false, false);
-    }
-    // TODO remove once callsites add docs
     public LispFunction(MaterializedFrame frame, CallTarget callTarget) {
         this(null, new Closure(frame, null, null), callTarget, false, false);
+    }
+
+    /**
+     * Create lisp function with given generic invocation context.
+     *
+     * @param meta meta information
+     * @param nextMethods applicable next methods
+     * @param args initial invocation arguments
+     * @param callTarget call target
+     */
+    public LispFunction(Meta meta, GenericMethodApplicableMethods nextMethods, Object[] args, CallTarget callTarget) {
+        this(meta, new Closure(null, nextMethods, args), callTarget, true, false);
     }
 
     /**
@@ -81,12 +117,18 @@ public record LispFunction(
      * @param args initial invocation arguments
      * @param callTarget call target
      */
-    public LispFunction(Meta documentation, GenericMethodApplicableMethods nextMethods, Object[] args, CallTarget callTarget) {
-        this(documentation, new Closure(null, nextMethods, args), callTarget, true, false);
-    }
-    // TODO remove once callsites add docs
     public LispFunction(GenericMethodApplicableMethods nextMethods, Object[] args, CallTarget callTarget) {
         this(null, new Closure(null, nextMethods, args), callTarget, true, false);
+    }
+
+    /**
+     * Create lisp function with given closure value.
+     * @param meta meta information
+     * @param closure closure
+     * @param callTarget call target
+     */
+    public LispFunction(Meta meta, Closure closure, CallTarget callTarget) {
+        this(meta, closure, callTarget, false, false);
     }
 
     /**
@@ -94,10 +136,6 @@ public record LispFunction(
      * @param closure closure
      * @param callTarget call target
      */
-    public LispFunction(Meta documentation, Closure closure, CallTarget callTarget) {
-        this(documentation, closure, callTarget, false, false);
-    }
-    // TODO remove once callsites add docs
     public LispFunction(Closure closure, CallTarget callTarget) {
         this(null, closure, callTarget, false, false);
     }

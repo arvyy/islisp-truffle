@@ -1,29 +1,26 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
-import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.RootNode;
 
-public class ISLISPSetDocumentation extends RootNode {
+/**
+ * Implements `set-documentation` function.
+ */
+public class ISLISPSetDocumentation extends ISLISPBuiltinFunctionRootNode {
 
-    @Child 
-    ISLISPErrorSignalerNode errorSignalerNode;
+    /**
+    * Construct node.
+    * @param language truffle language reference
+    */
+    public ISLISPSetDocumentation(TruffleLanguage<?> language) {
+        super("set-documentation", arg(3), language);
+    }
 
-	ISLISPSetDocumentation(TruffleLanguage<?> language) {
-		super(language);
-		errorSignalerNode = new ISLISPErrorSignalerNode(this);
-	}
-
-	@Override
-	public Object execute(VirtualFrame frame) {
-	    var args = frame.getArguments();
-		if (args.length != 4) {
-            return errorSignalerNode.signalWrongArgumentCount(args.length - 1, 3, 3);
-        }
+    @Override
+    public Object executeImpl(VirtualFrame frame) {
+        var args = frame.getArguments();
         var ctx = ISLISPContext.get(this);
         var doc = args[1];
         if (args[2] instanceof Symbol ns) {
@@ -35,10 +32,6 @@ public class ISLISPSetDocumentation extends RootNode {
         } else {
             return errorSignalerNode.signalWrongType(args[2], ctx.lookupClass("<symbol>"));
         }
-	}
-	
-	public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(new ISLISPSetDocumentation(lang).getCallTarget());
     }
-    
+
 }

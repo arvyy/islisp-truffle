@@ -183,7 +183,7 @@ public final class Main {
         try {
             var extractor = context.eval("islisp", """
                 (lambda (#:rest args)
-                    (let* ((doc (if (= (length args) 2) 
+                    (let* ((doc (if (= (length args) 2)
                                     (documentation (convert (elt args 0) <symbol>) (convert (elt args 1) <symbol>))
                                     (documentation (convert (elt args 0) <symbol>))))
                            (desc (assoc 'desc doc))
@@ -192,13 +192,13 @@ public final class Main {
                 """);
             Object[] args;
             if (namespace == null) {
-                args = new Object[]{ name };
+                args = new Object[]{name};
             } else {
-                args = new Object[]{ namespace, name };
+                args = new Object[]{namespace, name};
             }
             var desc = extractor.execute(args).asString();
             if (desc.isEmpty()) {
-                System.out.println("No docs UwU"); 
+                System.out.println("No docs UwU");
             } else {
                 System.out.println(markdownToPlaintext(desc));
             }
@@ -232,20 +232,22 @@ public final class Main {
 
     static void printReplHelp() {
         var pw = new PrintWriter(System.out);
+        // CHECKSTYLE:OFF
         new HelpFormatter().printWrapped(pw, HELP_WIDTH, """
             ,h
             This help message
-            
+
             ,q
             Quit
-            
+
             ,l path
             Load and evaluate file from given path
-            
+
             ,d [namespace] symbol
             Lookup documentation for a symbol in scope. Optionally can specify namespace (one of: function, setf, syntax, value) to disambiguate.
-            
+
             """);
+        // CHECKSTYLE:ON
         pw.flush();
     }
 
