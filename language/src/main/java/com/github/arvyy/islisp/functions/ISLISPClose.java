@@ -1,34 +1,27 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
-import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispStream;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.RootNode;
-
 import java.io.IOException;
 
 /**
  * Implements `close` function.
  */
-public class ISLISPClose extends RootNode {
+public class ISLISPClose extends ISLISPBuiltinFunctionRootNode {
 
-    @Child
-    private ISLISPErrorSignalerNode errorSignalerNode;
-
-    ISLISPClose(TruffleLanguage<?> language) {
-        super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode(this);
+    /**
+    * Construct node.
+    * @param language truffle language reference
+    */
+    public ISLISPClose(TruffleLanguage<?> language) {
+        super("close", arg(1), language);
     }
 
     @Override
-    public Object execute(VirtualFrame frame) {
-        if (frame.getArguments().length != 2) {
-            return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 1, 1);
-        }
+    public Object executeImpl(VirtualFrame frame) {
         var arg = frame.getArguments()[1];
         var ctx = ISLISPContext.get(this);
         if (arg instanceof LispStream stream) {
@@ -46,15 +39,6 @@ public class ISLISPClose extends RootNode {
             //TODO log something somehow?
             //spec doesn't specify about any conditions here.
         }
-    }
-
-    /**
-     * Construct LispFunction using this root node.
-     * @param lang truffle language reference
-     * @return lisp function
-     */
-    public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(new ISLISPClose(lang).getCallTarget());
     }
 
 

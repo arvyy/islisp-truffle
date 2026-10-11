@@ -6,6 +6,7 @@ import com.oracle.truffle.api.nodes.ControlFlowException;
 import com.oracle.truffle.api.nodes.Node;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -118,4 +119,20 @@ public final class Utils {
         var t = ctx.getT();
         return b ? t : nil;
     }
+
+    /**
+    * Convert java map to an alist usable in truffle runtime.
+    * @param map java map
+    * @return islisp alist
+ */
+    public static Object mapToAlist(HashMap<String, Object> map) {
+        var entries = new ArrayList<Pair>();
+        for (var e: map.entrySet()) {
+            var key = ISLISPContext.get(null).namedSymbol(e.getKey());
+            var p = new Pair(key, e.getValue());
+            entries.add(p);
+        }
+        return listToValue(entries);
+    }
+
 }

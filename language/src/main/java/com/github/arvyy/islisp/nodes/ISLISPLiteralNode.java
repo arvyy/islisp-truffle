@@ -21,6 +21,13 @@ public class ISLISPLiteralNode extends ISLISPExpressionNode {
         this.value = value;
     }
 
+    /**
+    * @return associated literal value of the node.
+    */
+    public Object getValue() {
+        return value;
+    }
+
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         return value;

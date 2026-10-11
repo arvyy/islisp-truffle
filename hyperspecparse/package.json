@@ -1,0 +1,23 @@
+{
+  "name": "hyperspecparse",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "parse": "tsx index.ts",
+    "build": "npm run --silent parse > ../language/src/main/resources/docs.lisp"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "node-html-markdown": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

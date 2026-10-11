@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -9,19 +8,13 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.DirectCallNode;
-import com.oracle.truffle.api.nodes.RootNode;
-
 import java.util.Arrays;
-
 import static com.github.arvyy.islisp.Utils.isNil;
 
 /**
  * Implements `create-array` function.
  */
-public abstract class ISLISPCreateArray extends RootNode {
-
-    @Child
-    ISLISPErrorSignalerNode errorSignalerNode;
+public abstract class ISLISPCreateArray extends ISLISPBuiltinFunctionRootNode {
 
     @Child
     DirectCallNode createVectorNode;
@@ -29,9 +22,12 @@ public abstract class ISLISPCreateArray extends RootNode {
     @Child
     DirectCallNode lengthNode;
 
-    ISLISPCreateArray(TruffleLanguage<?> language) {
-        super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode(this);
+    /**
+    * Construct node.
+    * @param language truffle language reference
+    */
+    public ISLISPCreateArray(TruffleLanguage<?> language) {
+        super("create-array", arg(1, 2), language);
     }
 
     DirectCallNode getCreateVectorNode() {
@@ -59,10 +55,7 @@ public abstract class ISLISPCreateArray extends RootNode {
     }
 
     @Override
-    public final Object execute(VirtualFrame frame) {
-        if (frame.getArguments().length != 2 && frame.getArguments().length != 3) {
-            return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 1, 2);
-        }
+    public final Object executeImpl(VirtualFrame frame) {
         Object initValue;
         if (frame.getArguments().length == 3) {
             initValue = frame.getArguments()[2];
@@ -128,12 +121,4 @@ public abstract class ISLISPCreateArray extends RootNode {
         return errorSignalerNode.signalWrongType(dimensions, ctx.lookupClass("<list>"));
     }
 
-    /**
-     * Construct LispFunction using this root node.
-     * @param lang truffle language reference
-     * @return lisp function
-     */
-    public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPCreateArrayNodeGen.create(lang).getCallTarget());
-    }
 }

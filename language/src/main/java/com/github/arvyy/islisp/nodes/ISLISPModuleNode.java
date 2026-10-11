@@ -45,6 +45,7 @@ public class ISLISPModuleNode extends ISLISPExpressionNode {
         if (ctx.getModule(source.name()) == null) {
             ctx.createModule(source.name(), source.requires(), source.provides());
         }
+        ctx.setCurrentModule(ctx.getModule(source.name()));
         var nonDefinitionRoot = parser.expandAndExecuteDefinitions(source.name(), source.content());
         nonDefinitionExecutionNode = DirectCallNode.create(nonDefinitionRoot.getCallTarget());
     }
@@ -56,7 +57,8 @@ public class ISLISPModuleNode extends ISLISPExpressionNode {
             initialized = true;
             initialize();
         }
-        nonDefinitionExecutionNode.call();
-        return ISLISPContext.get(this).getNil();
+        var ctx = ISLISPContext.get(this);
+        ctx.setCurrentModule(ctx.getModule(source.name()));
+        return nonDefinitionExecutionNode.call();
     }
 }

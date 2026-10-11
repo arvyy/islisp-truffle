@@ -3,6 +3,7 @@ package com.github.arvyy.islisp.parser;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPTruffleLanguage;
 import com.github.arvyy.islisp.Utils;
+import com.github.arvyy.islisp.functions.ISLISPBuiltinFunctionRootNode;
 import com.github.arvyy.islisp.functions.ISLISPDefaultHandler;
 import com.github.arvyy.islisp.nodes.*;
 import com.github.arvyy.islisp.runtime.*;
@@ -1140,9 +1141,27 @@ public class Parser {
         var bodyStatements = restList.stream()
                 .skip(2)
                 .map(v -> parseExpressionNode(slotsAndNewContext.context, v))
-                .toArray(ISLISPExpressionNode[]::new);
+                .toList();
+        // if body has multiple expressions, and first one is string literal,
+        // treat it as a documentation string
+        String documentation = null;
+        if (bodyStatements.size() > 1
+            && bodyStatements.get(0) instanceof ISLISPLiteralNode literalNode
+            && literalNode.getValue() instanceof String s
+        ) {
+            documentation = s;
+            bodyStatements = bodyStatements.subList(1, bodyStatements.size());
+        }
+        // TODO use these fields to generate set-documentation expression
+        String descriptionDocumentation = null;
+        String returnTypeDocumentation = null;
+        if (documentation != null) {
+            var r = DocstringParser.parseDocstring(documentation);
+            descriptionDocumentation = r.description();
+            returnTypeDocumentation = r.returnType();
+        }
         var body = new ISLISPPrognNode(
-                bodyStatements,
+                bodyStatements.toArray(ISLISPExpressionNode[]::new),
                 sexpr.source());
         body.setParserContext(slotsAndNewContext.context);
         var ctx = ISLISPContext.get(null);
@@ -1160,7 +1179,17 @@ public class Parser {
                 parserContext.frameBuilder.build());
         rootNode.setName(name.name());
         rootNode.setSourceSection(sexpr.source());
-        return new ISLISPDefunNode(parserContext.module, name, rootNode);
+        int argcMask;
+        if (slotsAndNewContext.restArgsSlot == -1) {
+            argcMask = ISLISPBuiltinFunctionRootNode.arg(slotsAndNewContext.namedArgsSlots.length);
+        } else {
+            argcMask = ISLISPBuiltinFunctionRootNode.vararg(slotsAndNewContext.namedArgsSlots.length);
+        }
+        var functionDocumentation = new LispFunction.Meta(
+            name.name(),
+            argcMask
+        );
+        return new ISLISPDefunNode(parserContext.module, name, rootNode, functionDocumentation);
     }
 
     SlotsAndNewContext processFrameDescriptorsForFunctionArguments(

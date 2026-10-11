@@ -41,6 +41,7 @@ public class ISLISPContext {
     private Symbol t;
 
     private final Map<String, ISLISPModule> modules;
+    private ISLISPModule currentModule = null;
 
     private final Map<SymbolReference, Map<SymbolReference, ValueReference>> symbolProperties;
     private final Map<String, SymbolReference> symbols;
@@ -61,7 +62,12 @@ public class ISLISPContext {
         this.env = env;
         modules = new HashMap<>();
         modules.put("ROOT", new ISLISPModule("main"));
-        modules.put("builtin/truffle.lisp", new ISLISPModule("builtin/truffle.lisp"));
+        var truffleModule = new ISLISPModule("builtin/truffle.lisp");
+        truffleModule.addImport(modules.get("ROOT"));
+        modules.put("builtin/truffle.lisp", truffleModule);
+        var introspectionModule = new ISLISPModule("builtin/introspection.lisp");
+        introspectionModule.addImport(modules.get("ROOT"));
+        modules.put("builtin/introspection.lisp", introspectionModule);
         symbolProperties = new HashMap<>();
         symbols = new HashMap<>();
         currentOutputStream = new ValueReference(null);
@@ -114,6 +120,22 @@ public class ISLISPContext {
     }
 
     /**
+    * Update information on which module is currently being executed.
+    * @param m module
+    */
+    public void setCurrentModule(ISLISPModule m) {
+        currentModule = m;
+    }
+
+    /**
+    * Get reference to currently executed module.
+    * @return current module
+    */
+    public ISLISPModule getCurrentModule() {
+        return currentModule;
+    }
+
+    /**
      * Push handler into active handler stack, making it first handler to be hit by the condition signal.
      * @param f handler function
      */
@@ -139,8 +161,20 @@ public class ISLISPContext {
         modules.get("ROOT").registerFunction(namedSymbol(name), f.apply(language));
     }
 
+    void initGlobalFunction(String name, LispFunction f) {
+        modules.get("ROOT").registerFunction(namedSymbol(name), f);
+    }
+
     void initTruffleLibFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
         modules.get("builtin/truffle.lisp").registerFunction(namedSymbol(name), f.apply(language));
+    }
+
+    void initIntrospectionLibFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
+        modules.get("builtin/introspection.lisp").registerFunction(namedSymbol(name), f.apply(language));
+    }
+
+    void initIntrospectionLibFunction(String name, LispFunction f) {
+        modules.get("builtin/introspection.lisp").registerFunction(namedSymbol(name), f);
     }
 
     /**
@@ -148,26 +182,28 @@ public class ISLISPContext {
      */
     void initGlobalFunctions() {
         // standard
-        initGlobalFunction("+", ISLISPAdd::makeLispFunction);
+        initGlobalFunction("+", ISLISPAddNodeGen.create(language).makeLispFunction());
         initGlobalFunction("-", ISLISPSubtract::makeLispFunction);
         initGlobalFunction("*", ISLISPMul::makeLispFunction);
         initGlobalFunction("=", ISLISPNumericEqual::makeLispFunction);
         initGlobalFunction(">", ISLISPNumericGt::makeLispFunction);
-        initGlobalFunction("aref", ISLISPAref::makeLispFunction);
-        initGlobalFunction("car", ISLISPCar::makeLispFunction);
-        initGlobalFunction("cdr", ISLISPCdr::makeLispFunction);
+        initGlobalFunction("aref", ISLISPArefNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("car", ISLISPCarNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("cdr", ISLISPCdrNodeGen.create(language).makeLispFunction());
         initGlobalFunction("ceiling", ISLISPRoundingFunctions::makeLispFunctionCeiling);
-        initGlobalFunction("char=", ISLISPCharEqual::makeLispFunction);
-        initGlobalFunction("char<", ISLISPCharLt::makeLispFunction);
-        initGlobalFunction("class-of", ISLISPClassOf::makeLispFunction);
-        initGlobalFunction("close", ISLISPClose::makeLispFunction);
-        initGlobalFunction("cons", ISLISPCons::makeLispFunction);
-        initGlobalFunction("continue-condition", ISLISPContinueCondition::makeLispFunction);
+        initGlobalFunction("char=", ISLISPCharEqualNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("char<", ISLISPCharLtNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("class-of", ISLISPClassOfNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("close", new ISLISPClose(language).makeLispFunction());
+        initGlobalFunction("cons", new ISLISPCons(language).makeLispFunction());
+        initGlobalFunction("continue-condition", new ISLISPContinueCondition(language).makeLispFunction());
         initGlobalFunction("cos", ISLISPTrigFunctions::makeLispFunctionCos);
-        initGlobalFunction("create-array", ISLISPCreateArray::makeLispFunction);
-        initGlobalFunction("create-string", ISLISPCreateString::makeLispFunction);
-        initGlobalFunction("create-string-input-stream", ISLISPCreateStringInputStream::makeLispFunction);
-        initGlobalFunction("create-string-output-stream", ISLISPCreateStringOutputStream::makeLispFunction);
+        initGlobalFunction("create-array", ISLISPCreateArrayNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("create-string", ISLISPCreateStringNodeGen.create(language).makeLispFunction());
+        initGlobalFunction("create-string-input-stream",
+            new ISLISPCreateStringInputStream(language).makeLispFunction());
+        initGlobalFunction("create-string-output-stream",
+            new ISLISPCreateStringOutputStream(language).makeLispFunction());
         initGlobalFunction("create-vector", ISLISPCreateVector::makeLispFunction);
         initGlobalFunction("elt", ISLISPElt::makeLispFunction);
         initGlobalFunction("error-output", ISLISPErrorOutputStream::makeLispFunction);
@@ -239,6 +275,8 @@ public class ISLISPContext {
         initGlobalFunction("exit", ISLISPExit::makeLispFunction);
         initGlobalFunction("closed-p", ISLISPClosedp::makeLispFunction);
         initGlobalFunction("delete-file", ISLISPDeleteFile::makeLispFunction);
+        initGlobalFunction("documentation", new ISLISPDocumentation(language).makeLispFunction());
+        initGlobalFunction("set-documentation", new ISLISPSetDocumentation(language).makeLispFunction());
 
         // truffle lib
         initTruffleLibFunction("truffle-object-fields", ISLISPTruffleObjectFields::makeLispFunction);
@@ -247,6 +285,12 @@ public class ISLISPContext {
         initTruffleLibFunction("load-native-library", ISLISPLoadNativeLibrary::makeLispFunction);
         initTruffleLibFunction("native-library-symbol", ISLISPNativeLibrarySymbol::makeLispFunction);
         modules.get("builtin/truffle.lisp").exportAll();
+
+        initIntrospectionLibFunction("lookup-module", new ISLISPLookupModule(language).makeLispFunction());
+        //initIntrospectionLibFunction("list-module-declarations", ISLISPListModuleDeclarations::makeLispFunction);
+        initIntrospectionLibFunction("list-module-documentations",
+            new ISLISPListModuleDocumentations(language).makeLispFunction());
+        modules.get("builtin/introspection.lisp").exportAll();
     }
 
     private void initInitializeObjectMethod() {
@@ -293,19 +337,21 @@ public class ISLISPContext {
 
     void initSetfExpanders() {
         // standard
-        initBasicSetfExpander("car", "set-car");
-        initBasicSetfExpander("cdr", "set-cdr");
-        initBasicSetfExpander("property", "set-property");
-        initBasicSetfExpander("aref", "set-aref");
-        initBasicSetfExpander("garef", "set-garef");
-        initBasicSetfExpander("dynamic", "set-dynamic");
-        initBasicSetfExpander("elt", "set-elt");
+        initBasicSetfExpander("ROOT", "car", "set-car");
+        initBasicSetfExpander("ROOT", "cdr", "set-cdr");
+        initBasicSetfExpander("ROOT", "property", "set-property");
+        initBasicSetfExpander("ROOT", "aref", "set-aref");
+        initBasicSetfExpander("ROOT", "garef", "set-garef");
+        initBasicSetfExpander("ROOT", "dynamic", "set-dynamic");
+        initBasicSetfExpander("ROOT", "elt", "set-elt");
 
         //extensions
-        initBasicSetfExpander("truffle-object-field", "set-truffle-object-field");
+        initBasicSetfExpander("ROOT", "documentation", "set-documentation");
+
+        initBasicSetfExpander("builtin/truffle.lisp", "truffle-object-field", "set-truffle-object-field");
     }
 
-    void initBasicSetfExpander(String setfForm, String expandedForm) {
+    void initBasicSetfExpander(String module, String setfForm, String expandedForm) {
         SetfTransformer transformer = (forms, value) -> {
             var lst = new ArrayList<>();
             lst.add(new SyntaxObject(namedSymbol(expandedForm), null));
@@ -353,6 +399,9 @@ public class ISLISPContext {
         initBuiltin("<truffle-object>", "<object>");
         initBuiltin("<truffle-native-library>", "<object>");
         initBuiltin("<truffle-vector>", "<basic-vector>");
+
+        // introspection
+        initBuiltin("<module>", "<object>");
     }
 
     /**

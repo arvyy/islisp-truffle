@@ -8,26 +8,19 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.RootNode;
 
 /**
  * Implements `aref` function.
  */
-public abstract class ISLISPAref extends RootNode {
-
-    @Child
-    ISLISPErrorSignalerNode errorSignalerNode;
+public abstract class ISLISPAref extends ISLISPBuiltinFunctionRootNode {
 
     ISLISPAref(TruffleLanguage<?> language) {
-        super(language);
+        super("aref", vararg(2), language);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
     @Override
-    public final Object execute(VirtualFrame frame) {
-        if (frame.getArguments().length < 3) {
-            return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length, 2, -1);
-        }
+    public final Object executeImpl(VirtualFrame frame) {
         int[] lookup = new int[frame.getArguments().length - 2];
         for (var i = 0; i < lookup.length; i++) {
             var arg = frame.getArguments()[i + 2];
@@ -115,15 +108,6 @@ public abstract class ISLISPAref extends RootNode {
     Object fallback(Object arr, int[] lookup) {
         var ctx = ISLISPContext.get(this);
         return errorSignalerNode.signalWrongType(arr, ctx.lookupClass("<basic-array>"));
-    }
-
-    /**
-     * Construct LispFunction using this root node.
-     * @param lang truffle language reference
-     * @return lisp function
-     */
-    public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPArefNodeGen.create(lang).getCallTarget());
     }
 
 }
