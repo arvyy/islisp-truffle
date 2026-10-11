@@ -39,7 +39,7 @@ public record LispFunction(
     *
     * @param name function name
     * @param argcMask bitwise mask to infer if function can be called with given count of args
- */
+    */
     public record Meta(
         String name,
         int argcMask
