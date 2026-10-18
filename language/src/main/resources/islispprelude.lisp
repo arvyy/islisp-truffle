@@ -1,3 +1,5 @@
+(defdynamic *args* (vector))
+
 (defmacro trace (:rest args)
   (let ((result (gensym)))
     `(let ((,result (,@args)))

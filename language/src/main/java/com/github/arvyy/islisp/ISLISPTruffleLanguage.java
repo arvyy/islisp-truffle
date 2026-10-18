@@ -59,7 +59,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
     @Override
     public CallTarget parse(ParsingRequest request) {
         var parser = new Parser();
-        var rootNode = parser.createMainModuleNode(this, "MAIN", request.getSource());
+        var rootNode = parser.createMainModuleNode(this, request.getSource().getName(), request.getSource());
         return rootNode.getCallTarget();
     }
 

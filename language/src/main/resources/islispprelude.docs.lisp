@@ -1,4 +1,9 @@
 ;;;;;;;;;;; CUSTOM / EXTENSION ENTRIES
+(setf (documentation 'dynvar '*args*)
+    '((kind . dynvar)
+      (value-type . "<general-vector>")
+      (desc . "Holds command-line arguments, as a vector of strings.")))
+      
 (setf (documentation 'syntax 'provides)
     '((kind . syntax)
       (syntax . "(provides symbol*)")
@@ -16,7 +21,7 @@
       (min-args . 1)
       (max-args . 2)
       (desc . "Retrieves documentation associated _symbol_.
-If _name-space_ is provided (which must be one of *class*, *function*, *syntax*, *setf*, *value*), only looks in given namespace.
+If _name-space_ is provided (which must be one of *class*, *function*, *syntax*, *setf*, *value*, *dynvar*), only looks in given namespace.
 Otherwise returns first entry from any namespace.
 Documentation is searched for both current module, and the modules it *requires*.
 If no documentation is found, *nil* is returned.
@@ -25,7 +30,7 @@ Documentation is an alist, which always has following keys:
 
 |===
 | key | value
-| `kind` | A symbol denoting the kind, one of: *class*, *function*, *local-function*, *generic-function*, *syntax*, *setf*, *constant*.
+| `kind` | A symbol denoting the kind, one of: *class*, *function*, *local-function*, *generic-function*, *syntax*, *setf*, *constant*, *dynvar*.
 | `desc` | A string for free-form description, using asciidoc syntax
 |===
 
@@ -37,7 +42,7 @@ Additionally, depending on kind, following keys are present:
 | return-type | function, local-function, generic-function, syntax | A string indicating what the expression returns, usually as a class reference.
 | min-args | function, local-function, generic-function | Minimum amount of arguments function requires
 | max-args | function, local-function, generic-function | Maximum amount of arguments function can handle; nil if unbound
-| value-type | constant | The type of constant's value, usually as a class reference.
+| value-type | dynvar, constant | The type of dynamic var's or constant's value, usually as a class reference.
 | superclasses | class | List of superclasses of a class, as a list of strings.
 | slots | class | List of slots of a class, as a list of symbols.
 | abstract | class | *t* if a class is abstract, *nil* otherwise.
@@ -62,32 +67,72 @@ Returns previously stored documentation entry.")))
 
 Returns previously stored documentation entry.")))
 
-;; TODO
-;; (setf (documentation 'syntax 'trace))
+(setf (documentation 'syntax 'trace)
+    '((kind . syntax)
+      (syntax . "(trace expr)")
+      (return-type . "<object>")
+      (desc . "\"print\" debugging helper. Outputs expr and it's evaluated result to stdout. Returns evaluated result.")))
 
-;; TODO
-;; (setf (documentation 'syntax 'debugger))
+(setf (documentation 'syntax 'debugger)
+    '((kind . syntax)
+      (syntax . "(debugger)")
+      (return-type . "<null>")
+      (desc . "Halts execution at this point when running in a debugger. Returns *nil*.")))
     
-;; TODO
-;; (setf (documentation 'dynvar '*stacktrace-formatter*))
+(setf (documentation 'dynvar '*stacktrace-formatter*)
+    '((kind . dynvar)
+      (value-type . "<function>")
+      (desc . "The active function used to format condition's stacktrace. Must be a function that accepts two arguments:
 
-;; TODO
-;; (setf (documentation 'function 'print-stacktrace))
+1. _stream_ -- a stream into which the result should be written to;
+2. _stacktrace_ -- a vector of stacktrace elements, where each element itself is a vector of (in order): module name, line start, column start, line end, column end.")))
 
-;; TODO
-;; (setf (documentation 'function 'fill-stacktrace))
+(setf (documentation 'function 'print-stacktrace)
+    '((kind . function)
+      (syntax . "(print-stacktrace stream condition)")
+      (return-type . "<null>")
+      (min-args . 2)
+      (max-args . 2)
+      (desc . "Prints given _condition_'s stacktrace to _stream_. Uses active *&#42;stacktrace-formatter&#42;*.")))
 
-;; TODO
-;; (setf (documentation 'function 'current-stacktrace))
+(setf (documentation 'function 'fill-stacktrace)
+    '((kind . generic-function)
+      (syntax . "(fill-stacktrace condition)")
+      (return-type . "boolean")
+      (min-args . 1)
+      (max-args . 1)
+      (desc . "Generic function to determine if for given condition a stacktrace should be filled in. Defaults to *t* for _<serious-condition>_. Add methods overriding it to return *nil* to disable it to remove cost of stacktrace fill in.")))
 
-;; TODO
-;; (setf (documentation 'function 'exit))
+(setf (documentation 'function 'current-stacktrace)
+    '((kind . function)
+      (syntax . "(current-stacktrace)")
+      (return-type . "<general-vector>")
+      (min-args . 0)
+      (max-args . 0)
+      (desc . "Returns stacktrace of current evaluation state. A stacktrace is a vector of stacktrace elements, where each element itself is a vector of (in order): module name, line start, column start, line end, column end.")))
 
-;; TODO
-;; (setf (documentation 'function 'closed-p))
+(setf (documentation 'function 'exit)
+    '((kind . function)
+      (syntax . "(exit code)")
+      (min-args . 1)
+      (max-args . 1)
+      (desc . "Immediately exits execution, with _code_ as return code (0 for success, anything else indicating failure).")))
 
-;; TODO
-;; (setf (documentation 'function 'delete-file))
+(setf (documentation 'function 'closed-p)
+    '((kind . function)
+      (syntax . "(closed-p stream)")
+      (return-type . "boolean")
+      (min-args . 1)
+      (max-args . 1)
+      (desc . "Returns *t* if _stream_ was explicitly closed, *nil* otherwise. If *closed-p* returns *t* it's not a guarantee that attemping to use _stream_ won't signal a condition.")))
+
+(setf (documentation 'function 'delete-file)
+    '((kind . function)
+      (syntax . "(delete-file filename)")
+      (return-type . "<null>")
+      (min-args . 1)
+      (max-args . 1)
+      (desc . "Deletes a file denoted by string path _filename_.")))
 
 ;;;;;;;;;;; CLASSES
 (setf (documentation 'class '<object>)

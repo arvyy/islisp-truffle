@@ -15,9 +15,6 @@ No next method available
     at stacktrace.lisp:45
     at stacktrace.lisp:53
 
-Error during truffle interop call: Unknown identifier: b
-    at stacktrace.lisp:64
-
 Undefined entity <doesntexist> in namespace class
     at stacktrace.lisp:74
 
@@ -32,7 +29,7 @@ Attempted to change immutable binding shouldbeimmutable
     at stacktrace.lisp:106
 
 Error with value: test
-    at islispprelude.lisp:71
+    at islispprelude.lisp:73
     at stacktrace.lisp:116
 
 Unexpected type. Expected a value of class #<class <number>>, got "1".

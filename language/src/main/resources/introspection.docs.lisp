@@ -1,3 +1,9 @@
+(setf (documentation 'class '<module>)
+    '((kind . class)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "Class representing an ISLISP module.")))
+
 (setf (documentation 'function 'lookup-module)
     '((kind . function)
       (syntax . "(lookup-module path)")

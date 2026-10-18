@@ -1,3 +1,21 @@
+(setf (documentation 'class '<truffle-object>)
+    '((kind . class)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "Class for interop truffle objects with fields.")))
+      
+(setf (documentation 'class '<truffle-vector>)
+    '((kind . class)
+      (superclasses . (<basic-vector>))
+      (slots . ())
+      (desc . "Class for interop truffle object which are vector-like.")))
+      
+(setf (documentation 'class '<truffle-native-library>)
+    '((kind . class)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "Class for interop truffle objects representing a library loaded through FFI facilities.")))
+
 (setf (documentation 'function 'truffle-object-fields)
     '((kind . function)
       (syntax . "(truffle-object-fields truffle-obj)")

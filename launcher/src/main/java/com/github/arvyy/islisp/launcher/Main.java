@@ -10,6 +10,7 @@ import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.io.IOAccess;
 
 import java.io.*;
+import java.util.ArrayList;
 
 /**
  * Main ISLISP interpreter entrypoint.
@@ -55,7 +56,7 @@ public final class Main {
         }
 
         if (commandLine.hasOption(helpOpt)) {
-            new HelpFormatter().printHelp("islisp [OPTION ...] [FILE]", options);
+            new HelpFormatter().printHelp("islisp [OPTION ...] [FILE [ARG ...]]", options);
             var pw = new PrintWriter(System.out);
             // disable checkstyle so it doesn't complain about
             // long lines and trailing spaces in empty lines
@@ -78,6 +79,8 @@ public final class Main {
                 If FILE is `-`, interpreter non-interactively evaluates standard input.
                 If FILE is a path, given FILE is evaluated and the program exits.
                 If FILE is not provided, interpreter enters interactive REPL mode.
+
+                ARGs if given will be stored in *arg* dynamic variable, as a vector of strings.
                 """);
             // CHECKSTYLE:ON
             pw.flush();
@@ -94,7 +97,13 @@ public final class Main {
             .allowPolyglotAccess(PolyglotAccess.ALL);
 
         String sourceArg = null;
+        var passthroughCommandlineArgs = new ArrayList<String>();
+        var sourceArgSeen = false;
         for (var arg: commandLine.getArgList()) {
+            if (sourceArgSeen) {
+                passthroughCommandlineArgs.add(arg);
+                continue;
+            }
             if ("--experimental-options".equals(arg)) {
                 contextBuilder.allowExperimentalOptions(true);
                 continue;
@@ -105,6 +114,7 @@ public final class Main {
                 contextBuilder.option(e[0], value);
             } else {
                 sourceArg = arg;
+                sourceArgSeen = true;
             }
         }
 
@@ -154,7 +164,7 @@ public final class Main {
                         .build();
                 } else {
                     source = Source
-                        .newBuilder("islisp", line, "<repl " + "#" + prompt + ">")
+                        .newBuilder("islisp", line, "REPL")
                         .interactive(true)
                         .cached(false)
                         .buildLiteral();
@@ -162,20 +172,32 @@ public final class Main {
                 try {
                     context.eval(source);
                 } catch (PolyglotException e) {
-                    System.out.println(e.getMessage());
+                    System.err.println(e.getMessage());
                 }
             }
-        } else if ("-".equals(sourceArg)) {
-            var source = Source.newBuilder("islisp", new InputStreamReader(System.in), "<stdin>").build();
-            context.eval(source);
         } else {
-            var source = Source.newBuilder("islisp", new File(sourceArg)).build();
+            var argsSetterSrc = Source
+                .newBuilder("islisp", """
+                    (lambda (#:rest args)
+                        (setf (dynamic *args*) (convert args <general-vector>)))
+                    """, "<args init>")
+                .interactive(false)
+                .buildLiteral();
+            var argsSetter = context.eval(argsSetterSrc);
+            argsSetter.execute(passthroughCommandlineArgs.toArray());
+            Source source;
+            if ("-".equals(sourceArg)) {
+                source = Source.newBuilder("islisp", new InputStreamReader(System.in), "<stdin>").build();
+            } else {
+                source = Source.newBuilder("islisp", new File(sourceArg)).build();
+            }
             try {
                 context.eval(source);
             } catch (PolyglotException e) {
                 System.err.println(e.getMessage());
             }
         }
+       
         context.close();
     }
 
