@@ -1,3 +1,352 @@
+;;;;;;;;;;; CUSTOM / EXTENSION ENTRIES
+(setf (documentation 'syntax 'provides)
+    '((kind . syntax)
+      (syntax . "(provides symbol*)")
+      (desc . "Exports functions / macros / values bound to _symbol_ to be visible in other modules that *requires* this module.")))
+      
+(setf (documentation 'syntax 'requires)
+    '((kind . syntax)
+      (syntax . "(require path)")
+      (desc . "Imports module from _path_ (which must be a string). _path_ is resolved relative set of active source roots.")))
+      
+(setf (documentation 'function 'documentation)
+    '((kind . function)
+      (syntax . "(documentation [name-space] symbol)")
+      (return-type . "<object>")
+      (min-args . 1)
+      (max-args . 2)
+      (desc . "Retrieves documentation associated _symbol_.
+If _name-space_ is provided (which must be one of *class*, *function*, *syntax*, *setf*, *value*), only looks in given namespace.
+Otherwise returns first entry from any namespace.
+Documentation is searched for both current module, and the modules it *requires*.
+If no documentation is found, *nil* is returned.
+
+Documentation is an alist, which always has following keys:
+
+|===
+| key | value
+| `kind` | A symbol denoting the kind, one of: *class*, *function*, *local-function*, *generic-function*, *syntax*, *setf*, *constant*.
+| `desc` | A string for free-form description, using asciidoc syntax
+|===
+
+Additionally, depending on kind, following keys are present:
+
+|===
+| key | required kind | value
+| syntax | function, local-function, generic-function, syntax, setf | A string denoting use. A `*` is used to indicate 0..n arrity, a `+` is used to indicate 1..n arrity, `[]` indicates optional parameter
+| return-type | function, local-function, generic-function, syntax | A string indicating what the expression returns, usually as a class reference.
+| min-args | function, local-function, generic-function | Minimum amount of arguments function requires
+| max-args | function, local-function, generic-function | Maximum amount of arguments function can handle; nil if unbound
+| value-type | constant | The type of constant's value, usually as a class reference.
+| superclasses | class | List of superclasses of a class, as a list of strings.
+| slots | class | List of slots of a class, as a list of symbols.
+| abstract | class | *t* if a class is abstract, *nil* otherwise.
+|===
+")))
+
+(setf (documentation 'function 'set-documentation)
+    '((kind . function)
+      (syntax . "(set-documentation docvalue name-space symbol)")
+      (return-type . "<object>")
+      (min-args . 3)
+      (max-args . 3)
+      (desc . "Sets documentation value for given name-space and symbol in current module. See *documentation* for details about documentation format.
+
+Returns previously stored documentation entry.")))
+
+(setf (documentation 'setf 'documentation)
+    '((kind . setf)
+      (syntax . "(setf (documentation name-space symbol) docvalue)")
+      (return-type . "<object>")
+      (desc . "Sets documentation value for given name-space and symbol in current module. See *documentation* for details about documentation format.
+
+Returns previously stored documentation entry.")))
+
+;; TODO
+;; (setf (documentation 'syntax 'trace))
+
+;; TODO
+;; (setf (documentation 'syntax 'debugger))
+    
+;; TODO
+;; (setf (documentation 'dynvar '*stacktrace-formatter*))
+
+;; TODO
+;; (setf (documentation 'function 'print-stacktrace))
+
+;; TODO
+;; (setf (documentation 'function 'fill-stacktrace))
+
+;; TODO
+;; (setf (documentation 'function 'current-stacktrace))
+
+;; TODO
+;; (setf (documentation 'function 'exit))
+
+;; TODO
+;; (setf (documentation 'function 'closed-p))
+
+;; TODO
+;; (setf (documentation 'function 'delete-file))
+
+;;;;;;;;;;; CLASSES
+(setf (documentation 'class '<object>)
+    '((kind . class)
+      (superclasses . ())
+      (slots . ())
+      (desc . "Root class")))
+      
+(setf (documentation 'class '<basic-array>)
+    '((kind . class)
+      (abstract . t)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "All arrays are of the abstract class _<basic-arraya>_, but (as with all abstract classes) there are no direct instances of this class. It is provided for type discrimination purposes only.
+
+ISLISP defines two direct subclasses of _<basic-array>_: _<basic-vector>_ and _<basic-array&#42;>_. These classes are mutually exclusive and form an exhaustive partition of the set of basic-arrays. There shall be no other direct subclasses of _<basic-array>_.")))
+
+(setf (documentation 'class '<basic-array*>)
+    '((kind . class)
+      (abstract . t)
+      (superclasses . (<basic-array>))
+      (slots . ())
+      (desc . "All non-one-dimensional arrays are of the abstract class _<basic-array&#42;>_, but (as with all abstract classes) there are no direct instances of this class. It is provided for type discrimination purposes only.
+
+ISLISP defines only one direct subclass of _<basic-array&#42;>_: _<general-array&#42;>_. There may be additional, implementation-defined subclasses of _<basic-array&#42;>_.")))
+      
+(setf (documentation 'class '<general-array*>)
+    '((kind . class)
+      (superclasses . (<basic-array*>))
+      (slots . ())
+      (desc . "An object of class _<general-array&#42;>_ is a non-one-dimensional array that is capable of holding elements of type _<object>_. When the function create-array is asked to create an array of dimensionality other than 1, the resulting array is of this class.")))
+      
+(setf (documentation 'class '<basic-vector>)
+    '((kind . class)
+      (abstract . t)
+      (superclasses . (<basic-array>))
+      (slots . ())
+      (desc . "All one-dimensional arrays are of the abstract class _<basic-vector>_, but (as with all abstract classes) there are no direct instances of this class. It is provided for type discrimination purposes only.
+
+ISLISP defines only two direct subclasses of _<basic-vector>_: _<general-vector>_ and _<string>_. There may be additional, implementation-defined subclasses of _<basic-vector>_.")))
+      
+(setf (documentation 'class '<general-vector>)
+    '((kind . class)
+      (superclasses . (<basic-vector>))
+      (slots . ())
+      (desc . "An object of class _<general-vector>_ is a one-dimensional array that is capable of holding elements of type _<object>_. When the function create-array is asked to create a one-dimensional array, the resulting array is of this class.")))
+      
+(setf (documentation 'class '<string>)
+    '((kind . class)
+      (superclasses . (<basic-vector>))
+      (slots . ())
+      (desc . "An object of class _<string>_ is a one-dimensional array that is capable only of holding elements of type _<character>_. When the function create-string is used, the result is of this class.")))
+      
+(setf (documentation 'class '<built-in-class>)
+    '((kind . class)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "The class _<built-in-class>_ is the class whose instances are classes that have special implementations or restricted capabilities. For example, it is not possible to define subclasses of a built-in class.")))
+      
+(setf (documentation 'class '<character>)
+    '((kind . class)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "Characters are represented as instances of the _<character>_ class. This insulates the programmer from particular character codes.")))
+
+(setf (documentation 'class '<function>)
+    '((kind . class)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "The class of all functions.")))
+
+(setf (documentation 'class '<generic-function>)
+    '((kind . class)
+      (abstract . t)
+      (superclasses . (<function>))
+      (slots . ())
+      (desc . "The superclass of all generic functions.")))
+
+(setf (documentation 'class '<standard-generic-function>)
+    '((kind . class)
+      (superclasses . (<generic-function>))
+      (slots . ())
+      (desc . "The default class of all generic functions.")))
+      
+(setf (documentation 'class '<list>)
+    '((kind . class)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "The _<list>_ class represents singly-linked sequence lists. It is partitioned into two subclasses _<cons>_ and _<null>_.")))
+      
+(setf (documentation 'class '<cons>)
+    '((kind . class)
+      (superclasses . (<list>))
+      (slots . ())
+      (desc . "A cons (sometimes also called \"dotted pair\") consists of two components; the left component is called car and the right component is called cdr. The constructor of this class is *cons*.")))
+      
+(setf (documentation 'class '<null>)
+    '((kind . class)
+      (superclasses . (<symbol> <list>))
+      (slots . ())
+      (desc . "This class consists of only one element, the object called *nil*. This object is the false value in boolean expressions.")))
+      
+(setf (documentation 'class '<symbol>)
+    '((kind . class)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "A symbol (an instance of class _<symbol>_) is an object. Symbols can be named or unnamed. A symbol's name is sometimes called a print name because it is used to identify the symbol during reading and printing. Symbols can have associated properties.")))
+      
+(setf (documentation 'class '<number>)
+    '((kind . class)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "The class number has the disjoint subclasses _<float>_ and _<integer>_.")))
+      
+(setf (documentation 'class '<float>)
+    '((kind . class)
+      (superclasses . (<number>))
+      (slots . ())
+      (desc . "This class represents the set of ﬂoating-point numbers. Each ﬂoating-point number is represented by a rational number with some given precision; see IEEE standard 754-1985 for details.")))
+      
+(setf (documentation 'class '<integer>)
+    '((kind . class)
+      (superclasses . (<number>))
+      (slots . ())
+      (desc . "Integer objects correspond to mathematical integers.")))
+      
+(setf (documentation 'class '<serious-condition>)
+    '((kind . class)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "When a problem situation is detected, a representation of that situation called a *condition* (or sometimes a \"condition object\" to emphasize its nature as an ordinary ISLISP object) is constructed and the situation represented by the condition is announced by a process called *signaling*. This signaling process allows a dynamically established *handler* an opportunity to resolve the problem.
+
+_<serious-condition>_ is the general superclass of condition objects.")))
+      
+(setf (documentation 'class '<error>)
+    '((kind . class)
+      (superclasses . (<serious-condition>))
+      (slots . ())
+      (desc . "Class of conditions signalled when dynamically detecting a program error.")))
+      
+(setf (documentation 'class '<arithmetic-error>)
+    '((kind . class)
+      (superclasses . (<error>))
+      (slots . (operation operands))
+      (desc . "Base class of arithmetic error conditions.
+
+The _operation_ is the function that was being performed, and the _operands_ is a list of the arguments it received.")))
+      
+(setf (documentation 'class '<division-by-zero>)
+    '((kind . class)
+      (superclasses . (<arithmetic-error>))
+      (slots . ())
+      (desc . "Class of condition signalled when a divison by zero is attempted.")))
+      
+(setf (documentation 'class '<floating-point-overflow>)
+    '((kind . class)
+      (superclasses . (<arithmetic-error>))
+      (slots . ())
+      (desc . "Class of condition signalled when an operation causes floating point overflow.")))
+      
+(setf (documentation 'class '<floating-point-underflow>)
+    '((kind . class)
+      (superclasses . (<arithmetic-error>))
+      (slots . ())
+      (desc . "Class of condition signalled when an operation causes floating point underflow.")))
+      
+(setf (documentation 'class '<control-error>)
+    '((kind . class)
+      (superclasses . (<error>))
+      (slots . ())
+      (desc . "Class of condition signalled when an attempt is made to leave a block more than once or when there is no outstanding catcher for a catch tag.")))
+      
+(setf (documentation 'class '<parse-error>)
+    '((kind . class)
+      (superclasses . (<error>))
+      (slots . (string expected-class))
+      (desc . "Class of condition signalled when failing to parse (e.g., calling *parse-number*).
+
+The _string_ is the string that was being parsed, and the _expected-class_ is the class that the textual notation in the string was expected to represent.")))
+      
+(setf (documentation 'class '<program-error>)
+    '((kind . class)
+      (superclasses . (<error>))
+      (slots . ())
+      (desc . "Class of conditions signalled when attempting invalid operations, such as mutating immutable bindings, or accessing elements by index outside valid range.")))
+      
+(setf (documentation 'class '<domain-error>)
+    '((kind . class)
+      (superclasses . (<program-error>))
+      (slots . ())
+      (desc . "Class of condition signalled when the object given as argument to a standard function for which an argument class restriction is in effect is not an instance of the class to which the argument is restricted.")))
+      
+(setf (documentation 'class '<undefined-entity>)
+    '((kind . class)
+      (superclasses . (<program-error>))
+      (slots . (name namespace))
+      (desc . "Class of condition signalled when the entity denoted by an identifier does not exist when an access to that entity is made.
+
+The _name_ is a symbol representing the identifier which was undefined. The _namespace_ is one of the symbols *variable*, *dynamic-variable*, *function*, or *class*.")))
+      
+(setf (documentation 'class '<unbound-variable>)
+    '((kind . class)
+      (superclasses . (<undefined-entity>))
+      (slots . ())
+      (desc . "Class of condition signalled when an attempt is made to access an unbound variable.")))
+      
+(setf (documentation 'class '<undefined-function>)
+    '((kind . class)
+      (superclasses . (<undefined-entity>))
+      (slots . ())
+      (desc . "Class of condition signalled when a function does not exist at its activation point.")))
+      
+(setf (documentation 'class '<simple-error>)
+    '((kind . class)
+      (superclasses . (<error>))
+      (slots . (format-string format-arguments))
+      (desc . "Generic error, usually raised using *error* or *cerror* functions.
+
+The _format-string_ (a string) and _format-arguments_ (a list of objects) are passed through to *format* to construct the error message. Each object in the list given as _format-arguments_ becomes a separate data argument, _obj_, in the call to *format*.")))
+      
+(setf (documentation 'class '<stream-error>)
+    '((kind . class)
+      (superclasses . (<error>))
+      (slots . (stream))
+      (desc . "Class of condition raised when error is detected with state of input/output stream.
+
+The _stream_ is the stream on which the error occurred.")))
+      
+(setf (documentation 'class '<end-of-stream>)
+    '((kind . class)
+      (superclasses . (<stream-error>))
+      (slots . ())
+      (desc . "Class of conditions raised when an attempt to read a character or byte at the end-of-stream when _eos-error-p_ argument is true, or when an attempt to read a more complex object is about to begin (e.g., by *read* or *read-line*) but the end-of-stream is seen before parsing of that object has finished.")))
+      
+(setf (documentation 'class '<storage-exhausted>)
+    '((kind . class)
+      (superclasses . (<serious-condition>))
+      (slots . ())
+      (desc . "Class of conditions raised when requested allocation fails.")))
+      
+(setf (documentation 'class '<standard-class>)
+    '((kind . class)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "Default class of classes (metaclass) defined by defclass.")))
+      
+(setf (documentation 'class '<standard-object>)
+    '((kind . class)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "Instance of the class _<standard-class>_ and is a superclass of every class that is an instance of _<standard-class>_ except itself.")))
+      
+(setf (documentation 'class '<stream>)
+    '((kind . class)
+      (superclasses . (<object>))
+      (slots . ())
+      (desc . "Class of objects that serve as sources or sinks of data.")))
+
+;;;;;;;;;;; STANDARD SPEC ENTRIES
 (setf (documentation 'function '-)
     '((kind . function)
       (syntax . "(- x+)")
