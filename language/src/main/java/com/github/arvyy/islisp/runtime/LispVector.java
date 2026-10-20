@@ -43,7 +43,7 @@ public record LispVector(Object[] values) implements TruffleObject {
     boolean isArrayElementReadable(long index) {
         return index < values.length;
     }
-    
+
     @ExportMessage
     boolean isArrayElementModifiable(long index) {
         return index < values.length;

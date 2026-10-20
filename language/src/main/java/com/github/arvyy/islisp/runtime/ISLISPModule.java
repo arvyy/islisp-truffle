@@ -589,9 +589,11 @@ public class ISLISPModule implements TruffleObject {
             if (v instanceof LispClass c) {
                 src = c.getSourceLocation();
             }
+            // TODO: module source section
+            /*
             if (v instanceof ISLISPModule m) {
-                // TODO? module source section
             }
+            */
             lst.add(new ISLISPModuleMemberString(e.getKey(), src));
         }
         return lst;

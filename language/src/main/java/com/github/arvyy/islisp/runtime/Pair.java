@@ -87,14 +87,14 @@ public final class Pair implements TruffleObject, Iterable<Object> {
     LispVector getMembers(boolean ignored) {
         return new LispVector(new Object[]{"car", "cdr"});
     }
-    
+
     @ExportMessage
     boolean isMemberReadable(String m) {
         switch (m) {
             case "car":
             case "cdr":
                 return true;
-            default: 
+            default:
                 return false;
         }
     }
@@ -107,7 +107,7 @@ public final class Pair implements TruffleObject, Iterable<Object> {
             default: return null;
         }
     }
-    
+
 }
 
 final class PairIterator implements Iterator<Object> {

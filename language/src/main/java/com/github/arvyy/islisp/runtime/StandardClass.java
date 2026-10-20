@@ -59,7 +59,7 @@ public record StandardClass(
         return sourceSection;
     }
 
-    @ExportMessage 
+    @ExportMessage
     boolean hasSourceLocation() {
         return sourceSection != null;
     }
@@ -82,7 +82,7 @@ public record StandardClass(
         }
     }
 
-    @ExportMessage 
+    @ExportMessage
     LispVector getMembers(boolean ignored) {
         return new LispVector(new Object[] {
            "superclasses",
@@ -92,28 +92,31 @@ public record StandardClass(
         });
     }
 
-    @ExportMessage 
-    Object readMember(String name) {
-        switch (name) {
-            case "superclasses": {
+    @ExportMessage
+    Object readMember(String member) {
+        switch (member) {
+            case "superclasses" -> {
                 var objArr = new Object[parents.length];
                 System.arraycopy(parents, 0, objArr, 0, objArr.length);
                 return new LispVector(objArr);
             }
-            case "slots": {
+            case "slots" -> {
                 var objArr = new Object[slots.length];
                 for (int i = 0; i < objArr.length; i++) {
                     objArr[i] = slots[i].name();
                 }
                 return new LispVector(objArr);
             }
-            case "abstract":
+            case "abstract" -> {
                 return Utils.booleanToSymbol(isAbstract);
-            case "name":
+            }
+            case "name" -> {
                 return name;
-            default:
+            }
+            default -> {
                 return null;
+            }
         }
     }
-    
+
 }
