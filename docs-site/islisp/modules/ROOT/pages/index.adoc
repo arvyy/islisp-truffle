@@ -1,0 +1,23 @@
+= Truffle ISLISP
+
+image:icon.svg[]
+
+link:http://islisp.org/docs/islisp-v23.pdf[ISLISP 2007 standard] implementation on
+link:https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/[GraalVM's Truffle framework].
+
+ISLISP, a spiritually CommonLisp-lite:
+
+* Adhoc polymorphism through generic methods;
+* Dynamic and lexical scoping;
+* Procedural macros.
+
+Gains from implementing through Truffle framework:
+
+* Reasonably fast performance (xref:benchmarks.adoc[]);
+* C FFI;
+* Tooling support such as a debugger through DAP or Chrome tools;
+* Interop with other Truffle implementations such as java, python, javascript, llvm, and more.
+
+
+[.text-center]
+xref:install.adoc[Install] xref:guide.adoc[Guide] link:https://github.com/arvyy/islisp-truffle[Source]

@@ -1,0 +1,107 @@
+// generated content, do not edit directly. Created with docs-site/apireference/generateadoc.sh
+= Truffle interop
+
+This module provides interop facilities with other truffle languages.
+
+[code,lisp]
+----
+(requires "builtin/truffle.lisp")
+----
+== [.namspace_class]_class_ +<truffle-native-library>+
+
+
+Class for interop truffle objects representing a library loaded through FFI facilities.
+
+== [.namspace_class]_class_ +<truffle-object>+
+
+
+Class for interop truffle objects with fields.
+
+== [.namspace_class]_class_ +<truffle-vector>+
+
+
+Class for interop truffle object which are vector-like.
+
+== [.namspace_function]_function_ +load-native-library+
+[subs="+quotes,+replacements"]
+----
+(load-native-library name)=> <truffle-native-library>
+----
+
+
+
+Loads a native library with given _name_.
+An error shall be signaled if  _name_ is not a string (error-id. _domain-error_).
+Interop errors are signalled as an instance of *<truffle-interop-error>*.
+
+== [.namspace_function]_function_ +native-library-symbol+
+[subs="+quotes,+replacements"]
+----
+(native-library-symbol native-library symbol signature=> <object>
+----
+
+
+
+Retrieves binding _symbol_ in given _native_library_. _signature_ specifies the shape of the binding such that it can be transposed into truffle runtime. See truffle's NFI documentation for details.
+An error shall be signaled if  _native-library_ is not an instance of *<truffle-native-library>* or if either _signature_ or _symbol_ is not a string (error-id. _domain-error_).
+Interop errors are signalled as an instance of *<truffle-interop-error>*.
+
+== [.namspace_function]_function_ +set-truffle-object-field+
+[subs="+quotes,+replacements"]
+----
+(set-truffle-object-field value truffle-obj field-name)=> <object>
+----
+
+
+
+Sets value of _field-name_ field in _truffle-obj_ to _value_. Returns _value_.
+An error shall be signaled if  _truffle-obj_ is not an instance of *<truffle-object>*, or if _field-name_ is not a string (error-id. _domain-error_).
+Interop errors are signalled as an instance of *<truffle-interop-error>*.
+
+== [.namspace_function]_function_ +truffle-interop-error-message+
+[subs="+quotes,+replacements"]
+----
+(truffle-interop-error-message error=> <string>
+----
+
+
+
+Retrieves message attached to _error_ raised during truffle interop operations.
+An error shall be signaled if  _error_ is not an instance of *<truffle-interop-error>*.
+
+== [.namspace_function]_function_ +truffle-object-field+
+[subs="+quotes,+replacements"]
+----
+(truffle-object-field truffle-obj field-name)=> <object>
+----
+
+
+
+Returns a value of a field named by _field-name_ in given _truffle-obj_.
+An error shall be signaled if  _truffle-obj_ is not an instance of *<truffle-object>*, or if _field-name_ is not a string (error-id. _domain-error_).
+Interop errors are signalled as an instance of *<truffle-interop-error>*.
+
+== [.namspace_setf]_setf_ +truffle-object-field+
+[subs="+quotes,+replacements"]
+----
+(setf (truffle-object-field truffle-obj field-name) value)=> <object>
+----
+
+
+
+Sets value of _field-name_ field in _truffle-obj_ to _value_. Returns _value_.
+An error shall be signaled if  _truffle-obj_ is not an instance of *<truffle-object>*, or if _field-name_ is not a string (error-id. _domain-error_).
+Interop errors are signalled as an instance of *<truffle-interop-error>*.
+
+== [.namspace_function]_function_ +truffle-object-fields+
+[subs="+quotes,+replacements"]
+----
+(truffle-object-fields truffle-obj)=> <vector>
+----
+
+
+
+Returns a vector of strings, listing fields exposed by given truffle obj.
+An error shall be signaled if  _truffle-obj_ is not an instance of *<truffle-object>* (error-id. _domain-error_).
+Interop errors are signalled as an instance of *<truffle-interop-error>*.
+

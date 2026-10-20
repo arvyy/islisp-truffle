@@ -1,0 +1,9 @@
+= Introspection facilities
+
+This module provides ways to query and reflectively use bindings defined in modules. Mostly useful for creating tooling, such as documentation generators or test runners.
+
+
+[code,lisp]
+----
+(requires "builtin/introspection.lisp")
+----

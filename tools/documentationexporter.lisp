@@ -7,7 +7,7 @@
             nil)))
 
 (defun print-heading (ns name)
-    (format (standard-output) "=== [.namspace_~A]_~A_ +~A+~%" ns ns name))
+    (format (standard-output) "== [.namspace_~A]_~A_ +~A+~%" ns ns name))
 
 (defun print-value-type (vt)
     (format (standard-output)
@@ -34,7 +34,7 @@
                (stx (assoc* 'syntax doc))
                (return-type (assoc* 'return-type doc))
                (value-type (assoc* 'value-type doc)))
-            ;;(format (standard-output) "=== +~A+~%~%~A~%~%" name desc)
+            ;;(format (standard-output) "== +~A+~%~%~A~%~%" name desc)
             (print-heading namespace name)
             (if stx
                 (print-syntax stx return-type))
@@ -44,11 +44,16 @@
             )))
 
 (defun print-module (name)
-    (format (standard-output) "== ~A ~%" name)
     (let* ((m (lookup-module name))
            (entries (list-module-documentations m)))
       (mapc #'print-entry (convert entries <list>))))
 
+#|
 (let ((modules '("ROOT" "builtin/truffle.lisp" "builtin/introspection.lisp")))
     (format (standard-output) "= Docs ~%:icons: font~%:toc: left~%:stem: latexmath~%~%")
     (mapc #'print-module modules))
+|#
+
+(if (= (length (dynamic *args*)) 0)
+    (format (error-output) "Missing args.~%Usage:~%    documentationexporter modulename")
+    (print-module (elt (dynamic *args*) 0)))

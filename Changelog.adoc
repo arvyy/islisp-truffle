@@ -6,6 +6,7 @@ Afterwards the version will match truffle version followed by a date, eg. `24.0.
 
 == Unreleased
 
+* Improve TruffleObject InteropLibrary implementations
 * Add &#42;args&#42; dynamic variable, hoding command line args as a vector of strings
 * Add `builtin/introspection.lisp` module, exporting `lookup-module` and `list-module-documentations` functions
 * Add `documentation`, `set-documentation`, `setf documentation` for setting and getting documentation info
