@@ -131,7 +131,6 @@
     <!-- Miscellaneous other checks.                   -->
     <!-- See https://checkstyle.org/checks/misc/index.html -->
     <module name="ArrayTypeStyle"/>
-    <module name="TodoComment"/>
     <module name="UpperEll"/>
 
     <module name="SuppressionCommentFilter"/>
