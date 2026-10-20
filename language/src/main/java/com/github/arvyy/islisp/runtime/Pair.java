@@ -2,7 +2,10 @@ package com.github.arvyy.islisp.runtime;
 
 import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.parser.SyntaxObject;
+import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
+import com.oracle.truffle.api.library.ExportLibrary;
+import com.oracle.truffle.api.library.ExportMessage;
 import com.github.arvyy.islisp.ISLISPContext;
 
 import java.util.Iterator;
@@ -10,6 +13,7 @@ import java.util.Iterator;
 /**
  * ISLISP cons cell / pair.
  */
+@ExportLibrary(InteropLibrary.class)
 public final class Pair implements TruffleObject, Iterable<Object> {
 
     private Object car;
@@ -73,6 +77,37 @@ public final class Pair implements TruffleObject, Iterable<Object> {
     public String toString() {
         return String.format("(%s . %s)", car, cdr);
     }
+
+    @ExportMessage
+    boolean hasMembers() {
+        return true;
+    }
+
+    @ExportMessage
+    LispVector getMembers(boolean ignored) {
+        return new LispVector(new Object[]{"car", "cdr"});
+    }
+    
+    @ExportMessage
+    boolean isMemberReadable(String m) {
+        switch (m) {
+            case "car":
+            case "cdr":
+                return true;
+            default: 
+                return false;
+        }
+    }
+
+    @ExportMessage
+    Object readMember(String m) {
+        switch (m) {
+            case "car": return car;
+            case "cdr": return cdr;
+            default: return null;
+        }
+    }
+    
 }
 
 final class PairIterator implements Iterator<Object> {

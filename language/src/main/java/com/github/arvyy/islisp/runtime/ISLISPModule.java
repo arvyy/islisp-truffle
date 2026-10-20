@@ -13,7 +13,6 @@ import com.oracle.truffle.api.source.SourceSection;
 import com.oracle.truffle.api.strings.TruffleString;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 /**
  * Encapsulate module's bindings.
@@ -68,6 +67,7 @@ public class ISLISPModule implements TruffleObject {
      */
     public void addImport(ISLISPModule m) {
         importedModules.add(m);
+        visibleMembers.put("module " + m.name, m);
     }
 
     /**
@@ -108,7 +108,7 @@ public class ISLISPModule implements TruffleObject {
         v.setValue(init);
         v.setReadOnly(readonly);
         globalVars.put(symbolReference, v);
-        visibleMembers.put(symbolReference.name(), v);
+        visibleMembers.put("var " + symbolReference.name(), v);
     }
 
     /**
@@ -170,7 +170,7 @@ public class ISLISPModule implements TruffleObject {
     @CompilerDirectives.TruffleBoundary
     public void registerDynamicVar(Symbol symbolReference, ValueReference v) {
         dynamicVars.put(symbolReference, v);
-        visibleMembers.put(symbolReference.name(), v);
+        visibleMembers.put("dynvar " + symbolReference.name(), v);
     }
 
     /**
@@ -201,7 +201,7 @@ public class ISLISPModule implements TruffleObject {
     @CompilerDirectives.TruffleBoundary
     public void registerFunction(Symbol symbolReference, LispFunction function) {
         globalFunctions.put(symbolReference, function);
-        visibleMembers.put(symbolReference.name(), function);
+        visibleMembers.put("fun " + symbolReference.name(), function);
     }
 
     /**
@@ -271,7 +271,7 @@ public class ISLISPModule implements TruffleObject {
             globalFunctions.put(symbolReference, function);
             genericFunctions.put(symbolReference, descriptor);
         }
-        visibleMembers.put(symbolReference.name(), function);
+        visibleMembers.put("genfun " + symbolReference.name(), function);
     }
 
     /**
@@ -316,7 +316,7 @@ public class ISLISPModule implements TruffleObject {
     @CompilerDirectives.TruffleBoundary
     public void registerMacro(Symbol symbolReference, LispFunction function) {
         macros.put(symbolReference, function);
-        visibleMembers.put(symbolReference.name(), function);
+        visibleMembers.put("macro " + symbolReference.name(), function);
     }
 
     /**
@@ -347,7 +347,7 @@ public class ISLISPModule implements TruffleObject {
     @CompilerDirectives.TruffleBoundary
     public void registerClass(Symbol symbolReference, LispClass clazz) {
         classes.put(symbolReference, clazz);
-        visibleMembers.put(symbolReference.name(), clazz);
+        visibleMembers.put("class " + symbolReference.name(), clazz);
     }
 
     /**
@@ -550,9 +550,11 @@ public class ISLISPModule implements TruffleObject {
     @CompilerDirectives.TruffleBoundary
     LispVector getMembers(boolean ignored) {
         var lst = new ArrayList<ISLISPModuleMemberString>(getMembersInternal(false));
+        /*
         for (var m: importedModules) {
             lst.addAll(m.getMembersInternal(true));
         }
+        */
         return new LispVector(lst.toArray(new ISLISPModuleMemberString[0]));
     }
 
@@ -565,11 +567,35 @@ public class ISLISPModule implements TruffleObject {
     @ExportMessage
     @CompilerDirectives.TruffleBoundary
     Object readMember(String memberName) {
-        return visibleMembers.get(memberName);
+        var value = visibleMembers.get(memberName);
+        if (value instanceof ValueReference r) {
+            return r.getValue();
+        }
+        return value;
     }
 
     @CompilerDirectives.TruffleBoundary
     private List<ISLISPModuleMemberString> getMembersInternal(boolean exportedOnly) {
+        var lst = new ArrayList<ISLISPModuleMemberString>();
+        for (var e: visibleMembers.entrySet()) {
+            var v = e.getValue();
+            SourceSection src = null;
+            if (v instanceof LispFunction f) {
+                src = f.getSourceLocation();
+            }
+            if (v instanceof ValueReference r) {
+                src = r.getSourceLocation();
+            }
+            if (v instanceof LispClass c) {
+                src = c.getSourceLocation();
+            }
+            if (v instanceof ISLISPModule m) {
+                // TODO? module source section
+            }
+            lst.add(new ISLISPModuleMemberString(e.getKey(), src));
+        }
+        return lst;
+        /*
         Predicate<Symbol> include = symbolName -> !exportedOnly || exports.contains(symbolName);
         var lst = new ArrayList<ISLISPModuleMemberString>();
         for (var e: globalFunctions.keySet()) {
@@ -609,6 +635,7 @@ public class ISLISPModule implements TruffleObject {
             lst.add(new ISLISPModuleMemberString(e.name(), globalVars.get(e).getSourceLocation()));
         }
         return lst;
+        */
     }
 
     /**

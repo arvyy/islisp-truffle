@@ -123,7 +123,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
 
     @Override
     protected Object getScope(ISLISPContext context) {
-        return context.getModule("ROOT");
+        return context.getCurrentModule();
     }
 
     @Override

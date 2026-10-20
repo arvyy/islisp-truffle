@@ -59,7 +59,7 @@ public class Parser {
                 new ISLISPExpressionNode[]{topLevelConditionHandler},
                 null
         );
-        root.setName("main");
+        root.setName(module);
         return root;
     }
 

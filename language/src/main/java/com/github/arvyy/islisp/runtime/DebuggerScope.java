@@ -77,7 +77,7 @@ public class DebuggerScope implements TruffleObject {
         for (int i = 0; i < frameIndex; i++) {
             f = ((Closure) f.getArguments()[0]).frame();
         }
-        return f.getObject(frameSlot);
+        return f.getValue(frameSlot);
     }
 
     @ExportMessage

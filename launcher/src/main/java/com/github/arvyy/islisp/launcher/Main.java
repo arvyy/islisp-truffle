@@ -182,6 +182,7 @@ public final class Main {
                         (setf (dynamic *args*) (convert args <general-vector>)))
                     """, "<args init>")
                 .interactive(false)
+                .internal(true)
                 .buildLiteral();
             var argsSetter = context.eval(argsSetterSrc);
             argsSetter.execute(passthroughCommandlineArgs.toArray());
