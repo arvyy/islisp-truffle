@@ -6,6 +6,7 @@ on:
       - '.github/workflows/build_interpreter.yml'
       - 'launcher/**'
       - 'language/**'
+      - 'tests/**' 
 jobs:
   test:
     runs-on: ubuntu-latest
