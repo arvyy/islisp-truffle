@@ -1,8 +1,5 @@
 package com.github.arvyy.islisp.nodes;
 
-import java.util.List;
-
-import com.github.arvyy.islisp.parser.LocalScopeVariable;
 import com.github.arvyy.islisp.parser.ParserContext;
 import com.github.arvyy.islisp.runtime.DebuggerScope;
 import com.oracle.truffle.api.CompilerDirectives;
