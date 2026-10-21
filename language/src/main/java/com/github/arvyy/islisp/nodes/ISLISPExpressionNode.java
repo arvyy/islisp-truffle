@@ -1,5 +1,8 @@
 package com.github.arvyy.islisp.nodes;
 
+import java.util.List;
+
+import com.github.arvyy.islisp.parser.LocalScopeVariable;
 import com.github.arvyy.islisp.parser.ParserContext;
 import com.github.arvyy.islisp.runtime.DebuggerScope;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -10,6 +13,7 @@ import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.*;
 import com.oracle.truffle.api.interop.NodeLibrary;
+import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 import com.oracle.truffle.api.nodes.Node;
@@ -147,7 +151,10 @@ public abstract class ISLISPExpressionNode extends Node implements Instrumentabl
     }
 
     @ExportMessage
-    Object getScope(Frame frame, boolean nodeEnter) {
+    Object getScope(Frame frame, boolean nodeEnter) throws UnsupportedMessageException {
+        if (getParserContext() == null) {
+            throw UnsupportedMessageException.create();
+        }
         return getScopeBoundary(frame.materialize());
     }
 

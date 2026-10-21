@@ -6,6 +6,7 @@ import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
+import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 
@@ -47,7 +48,10 @@ public class DebuggerScope implements TruffleObject {
     }
 
     @ExportMessage
-    Object getScopeParent() {
+    Object getScopeParent() throws UnsupportedMessageException {
+        if (!hasScopeParent()) {
+            throw UnsupportedMessageException.create();
+        }
         return new DebuggerScope(frame, scopeVariables.subList(1, scopeVariables.size()));
     }
 

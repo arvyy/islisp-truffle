@@ -195,7 +195,11 @@ public final class Main {
             try {
                 context.eval(source);
             } catch (PolyglotException e) {
-                System.err.println(e.getMessage());
+                if ("true".equals(System.getProperty("islispFullStacktraces"))) {
+                    throw e;
+                } else {
+                    System.err.println(e.getMessage());
+                }
             }
         }
 

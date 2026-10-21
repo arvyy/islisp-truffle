@@ -48,6 +48,7 @@ public class ISLISPModuleNode extends ISLISPExpressionNode {
         ctx.setCurrentModule(ctx.getModule(source.name()));
         var nonDefinitionRoot = parser.expandAndExecuteDefinitions(source.name(), source.content());
         nonDefinitionExecutionNode = DirectCallNode.create(nonDefinitionRoot.getCallTarget());
+        insert(nonDefinitionExecutionNode);
     }
 
     @Override
