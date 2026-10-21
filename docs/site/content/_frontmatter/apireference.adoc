@@ -1,7 +1,0 @@
----
-draft: false
-kind: page
-params:
-title: API Reference
-menus: main
----
