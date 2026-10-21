@@ -48,6 +48,15 @@ html {
 }
 
 .doc {
+
+  .islisp-kind {
+    color: black;
+    font-weight: bold;
+    background-color: var(--heading-color);
+    padding: 0.2em;
+    border-radius: 0.5em;
+    font-size: 1.25em;
+  }
   
   a {
       border-bottom: 2px solid var(--link-color);

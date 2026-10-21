@@ -1,51 +1,82 @@
-// generated content, do not edit directly. Created with docs-site/apireference/generateadoc.sh
+// generated content, do not edit directly. Created with docs-site/apireference/generateadoc.sh \n\n
 = Prelude
 
-This module is automatically imported. Contains standard ISLISP procuders, as well as core extensions such as importing / exporting.
-== [.namspace_function]_function_ +*+
-[subs="+quotes,+replacements"]
+This module is automatically imported. Contains standard ISLISP definitions, as well as core extensions such as importing / exporting.
+
+
+
+== +*+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(* x*)=> <number>
+(* x*) => <number>
 ----
 
 
 
 Returns the product of its arguments. If all arguments are integers, the result is an integer. If any argument is a ﬂoat, the result is a ﬂoat. When given no arguments *&#42;* returns 1. An error shall be signaled if any _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_value]_value_ +*most-negative-float*+
-[subs="+quotes,+replacements"]
+== +*args*+
+
+[.islisp-kind]_dynvar_
+
+[subs="verbatim"]
 ----
-<float>
+*args* => <general-vector>
+----
+
+
+
+Holds command-line arguments, as a vector of strings.
+
+== +*most-negative-float*+
+
+[.islisp-kind]_constant_
+
+[subs="verbatim"]
+----
+*most-negative-float* => <float>
 ----
 
 
 
 The value of *&#42;most-positive-float&#42;* is the implementation-dependent ﬂoating-point number closest to negative infinity.
 
-== [.namspace_value]_value_ +*most-positive-float*+
-[subs="+quotes,+replacements"]
+== +*most-positive-float*+
+
+[.islisp-kind]_constant_
+
+[subs="verbatim"]
 ----
-<float>
+*most-positive-float* => <float>
 ----
 
 
 
 The value of *&#42;most-positive-float&#42;* is the implementation-dependent ﬂoating-point number closest to positive infinity.
 
-== [.namspace_value]_value_ +*pi*+
-[subs="+quotes,+replacements"]
+== +*pi*+
+
+[.islisp-kind]_constant_
+
+[subs="verbatim"]
 ----
-<float>
+*pi* => <float>
 ----
 
 
 
 The value of this constant is an approximation of π.
 
-== [.namspace_dynvar]_dynvar_ +*stacktrace-formatter*+
-[subs="+quotes,+replacements"]
+== +*stacktrace-formatter*+
+
+[.islisp-kind]_dynvar_
+
+[subs="verbatim"]
 ----
-<function>
+*stacktrace-formatter* => <function>
 ----
 
 
@@ -55,20 +86,26 @@ The active function used to format condition's stacktrace. Must be a function th
 1. _stream_ -- a stream into which the result should be written to;
 2. _stacktrace_ -- a vector of stacktrace elements, where each element itself is a vector of (in order): module name, line start, column start, line end, column end.
 
-== [.namspace_function]_function_ +++
-[subs="+quotes,+replacements"]
+== +++
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(+ x*)=> <number>
+(+ x*) => <number>
 ----
 
 
 
 Returns the sum of its arguments. If all arguments are integers, the result is an integer. If any argument is a ﬂoat, the result is a ﬂoat. When given no arguments, *&#43;* returns 0. An error shall be signaled if any _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +-+
-[subs="+quotes,+replacements"]
+== +-+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(- x+)=> <number>
+(- x+) => <number>
 ----
 
 
@@ -77,20 +114,26 @@ Given one argument, _x_, this function returns its additive inverse. An error sh
 
 If an implementation supports a -0.0 that is distinct from 0.0, then (- 0.0) returns -0.0; in implementations where -0.0 and 0.0 are not distinct, (- 0.0) returns 0.0.
 
-== [.namspace_function]_function_ +/=+
-[subs="+quotes,+replacements"]
+== +/=+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(/= x1 x2)=> boolean
+(/= x1 x2) => boolean
 ----
 
 
 
 Returns *t* if _x~1~_ and _x~2~_ have mathematically distinct values; otherwise, returns *nil*. An error shall be signaled if either _x~1~_ or _x~2~_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +<+
-[subs="+quotes,+replacements"]
+== +<+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(< x1 x2)=> boolean
+(< x1 x2) => boolean
 ----
 
 
@@ -99,10 +142,13 @@ Returns *t* if _x~1~_ and _x~2~_ have mathematically distinct values; otherwise,
 
 The mathematical values of the arguments are compared. An error shall be signaled if either _x~1~_ or _x~2~_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +<=+
-[subs="+quotes,+replacements"]
+== +<=+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(<= x1 x2)=> boolean
+(<= x1 x2) => boolean
 ----
 
 
@@ -111,223 +157,485 @@ The mathematical values of the arguments are compared. An error shall be signale
 
 The mathematical values of the arguments are compared. An error shall be signaled if either _x~1~_ or _x~2~_ is not a number (error-id. _domain-error_).
 
-== [.namspace_class]_class_ +<arithmetic-error>+
+== +<arithmetic-error>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <error>
+
+.Slots
+* operation
+* operands
+
 
 
 Base class of arithmetic error conditions.
 
 The _operation_ is the function that was being performed, and the _operands_ is a list of the arguments it received.
 
-== [.namspace_class]_class_ +<basic-array*>+
+== +<basic-array*>+
+
+[.islisp-kind]_class_
+
+*Abstract*
+
+.Superclasses
+* <basic-array>
+
 
 
 All non-one-dimensional arrays are of the abstract class _<basic-array&#42;>_, but (as with all abstract classes) there are no direct instances of this class. It is provided for type discrimination purposes only.
 
 ISLISP defines only one direct subclass of _<basic-array&#42;>_: _<general-array&#42;>_. There may be additional, implementation-defined subclasses of _<basic-array&#42;>_.
 
-== [.namspace_class]_class_ +<basic-array>+
+== +<basic-array>+
+
+[.islisp-kind]_class_
+
+*Abstract*
+
+.Superclasses
+* <object>
+
 
 
 All arrays are of the abstract class _<basic-arraya>_, but (as with all abstract classes) there are no direct instances of this class. It is provided for type discrimination purposes only.
 
 ISLISP defines two direct subclasses of _<basic-array>_: _<basic-vector>_ and _<basic-array&#42;>_. These classes are mutually exclusive and form an exhaustive partition of the set of basic-arrays. There shall be no other direct subclasses of _<basic-array>_.
 
-== [.namspace_class]_class_ +<basic-vector>+
+== +<basic-vector>+
+
+[.islisp-kind]_class_
+
+*Abstract*
+
+.Superclasses
+* <basic-array>
+
 
 
 All one-dimensional arrays are of the abstract class _<basic-vector>_, but (as with all abstract classes) there are no direct instances of this class. It is provided for type discrimination purposes only.
 
 ISLISP defines only two direct subclasses of _<basic-vector>_: _<general-vector>_ and _<string>_. There may be additional, implementation-defined subclasses of _<basic-vector>_.
 
-== [.namspace_class]_class_ +<built-in-class>+
+== +<built-in-class>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <object>
+
 
 
 The class _<built-in-class>_ is the class whose instances are classes that have special implementations or restricted capabilities. For example, it is not possible to define subclasses of a built-in class.
 
-== [.namspace_class]_class_ +<character>+
+== +<character>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <object>
+
 
 
 Characters are represented as instances of the _<character>_ class. This insulates the programmer from particular character codes.
 
-== [.namspace_class]_class_ +<cons>+
+== +<cons>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <list>
+
 
 
 A cons (sometimes also called "dotted pair") consists of two components; the left component is called car and the right component is called cdr. The constructor of this class is *cons*.
 
-== [.namspace_class]_class_ +<control-error>+
+== +<control-error>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <error>
+
 
 
 Class of condition signalled when an attempt is made to leave a block more than once or when there is no outstanding catcher for a catch tag.
 
-== [.namspace_class]_class_ +<division-by-zero>+
+== +<division-by-zero>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <arithmetic-error>
+
 
 
 Class of condition signalled when a divison by zero is attempted.
 
-== [.namspace_class]_class_ +<domain-error>+
+== +<domain-error>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <program-error>
+
 
 
 Class of condition signalled when the object given as argument to a standard function for which an argument class restriction is in effect is not an instance of the class to which the argument is restricted.
 
-== [.namspace_class]_class_ +<end-of-stream>+
+== +<end-of-stream>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <stream-error>
+
 
 
 Class of conditions raised when an attempt to read a character or byte at the end-of-stream when _eos-error-p_ argument is true, or when an attempt to read a more complex object is about to begin (e.g., by *read* or *read-line*) but the end-of-stream is seen before parsing of that object has finished.
 
-== [.namspace_class]_class_ +<error>+
+== +<error>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <serious-condition>
+
 
 
 Class of conditions signalled when dynamically detecting a program error.
 
-== [.namspace_class]_class_ +<float>+
+== +<float>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <number>
+
 
 
 This class represents the set of ﬂoating-point numbers. Each ﬂoating-point number is represented by a rational number with some given precision; see IEEE standard 754-1985 for details.
 
-== [.namspace_class]_class_ +<floating-point-overflow>+
+== +<floating-point-overflow>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <arithmetic-error>
+
 
 
 Class of condition signalled when an operation causes floating point overflow.
 
-== [.namspace_class]_class_ +<floating-point-underflow>+
+== +<floating-point-underflow>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <arithmetic-error>
+
 
 
 Class of condition signalled when an operation causes floating point underflow.
 
-== [.namspace_class]_class_ +<function>+
+== +<function>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <object>
+
 
 
 The class of all functions.
 
-== [.namspace_class]_class_ +<general-array*>+
+== +<general-array*>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <basic-array*>
+
 
 
 An object of class _<general-array&#42;>_ is a non-one-dimensional array that is capable of holding elements of type _<object>_. When the function create-array is asked to create an array of dimensionality other than 1, the resulting array is of this class.
 
-== [.namspace_class]_class_ +<general-vector>+
+== +<general-vector>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <basic-vector>
+
 
 
 An object of class _<general-vector>_ is a one-dimensional array that is capable of holding elements of type _<object>_. When the function create-array is asked to create a one-dimensional array, the resulting array is of this class.
 
-== [.namspace_class]_class_ +<generic-function>+
+== +<generic-function>+
+
+[.islisp-kind]_class_
+
+*Abstract*
+
+.Superclasses
+* <function>
+
 
 
 The superclass of all generic functions.
 
-== [.namspace_class]_class_ +<integer>+
+== +<integer>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <number>
+
 
 
 Integer objects correspond to mathematical integers.
 
-== [.namspace_class]_class_ +<list>+
+== +<list>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <object>
+
 
 
 The _<list>_ class represents singly-linked sequence lists. It is partitioned into two subclasses _<cons>_ and _<null>_.
 
-== [.namspace_class]_class_ +<null>+
+== +<null>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <symbol>
+* <list>
+
 
 
 This class consists of only one element, the object called *nil*. This object is the false value in boolean expressions.
 
-== [.namspace_class]_class_ +<number>+
+== +<number>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <object>
+
 
 
 The class number has the disjoint subclasses _<float>_ and _<integer>_.
 
-== [.namspace_class]_class_ +<object>+
+== +<object>+
+
+[.islisp-kind]_class_
+
 
 
 Root class
 
-== [.namspace_class]_class_ +<parse-error>+
+== +<parse-error>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <error>
+
+.Slots
+* string
+* expected-class
+
 
 
 Class of condition signalled when failing to parse (e.g., calling *parse-number*).
 
 The _string_ is the string that was being parsed, and the _expected-class_ is the class that the textual notation in the string was expected to represent.
 
-== [.namspace_class]_class_ +<program-error>+
+== +<program-error>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <error>
+
 
 
 Class of conditions signalled when attempting invalid operations, such as mutating immutable bindings, or accessing elements by index outside valid range.
 
-== [.namspace_class]_class_ +<serious-condition>+
+== +<serious-condition>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <object>
+
 
 
 When a problem situation is detected, a representation of that situation called a *condition* (or sometimes a "condition object" to emphasize its nature as an ordinary ISLISP object) is constructed and the situation represented by the condition is announced by a process called *signaling*. This signaling process allows a dynamically established *handler* an opportunity to resolve the problem.
 
 _<serious-condition>_ is the general superclass of condition objects.
 
-== [.namspace_class]_class_ +<simple-error>+
+== +<simple-error>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <error>
+
+.Slots
+* format-string
+* format-arguments
+
 
 
 Generic error, usually raised using *error* or *cerror* functions.
 
 The _format-string_ (a string) and _format-arguments_ (a list of objects) are passed through to *format* to construct the error message. Each object in the list given as _format-arguments_ becomes a separate data argument, _obj_, in the call to *format*.
 
-== [.namspace_class]_class_ +<standard-class>+
+== +<standard-class>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <object>
+
 
 
 Default class of classes (metaclass) defined by defclass.
 
-== [.namspace_class]_class_ +<standard-generic-function>+
+== +<standard-generic-function>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <generic-function>
+
 
 
 The default class of all generic functions.
 
-== [.namspace_class]_class_ +<standard-object>+
+== +<standard-object>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <object>
+
 
 
 Instance of the class _<standard-class>_ and is a superclass of every class that is an instance of _<standard-class>_ except itself.
 
-== [.namspace_class]_class_ +<storage-exhausted>+
+== +<storage-exhausted>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <serious-condition>
+
 
 
 Class of conditions raised when requested allocation fails.
 
-== [.namspace_class]_class_ +<stream-error>+
+== +<stream-error>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <error>
+
+.Slots
+* stream
+
 
 
 Class of condition raised when error is detected with state of input/output stream.
 
 The _stream_ is the stream on which the error occurred.
 
-== [.namspace_class]_class_ +<stream>+
+== +<stream>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <object>
+
 
 
 Class of objects that serve as sources or sinks of data.
 
-== [.namspace_class]_class_ +<string>+
+== +<string>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <basic-vector>
+
 
 
 An object of class _<string>_ is a one-dimensional array that is capable only of holding elements of type _<character>_. When the function create-string is used, the result is of this class.
 
-== [.namspace_class]_class_ +<symbol>+
+== +<symbol>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <object>
+
 
 
 A symbol (an instance of class _<symbol>_) is an object. Symbols can be named or unnamed. A symbol's name is sometimes called a print name because it is used to identify the symbol during reading and printing. Symbols can have associated properties.
 
-== [.namspace_class]_class_ +<unbound-variable>+
+== +<unbound-variable>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <undefined-entity>
+
 
 
 Class of condition signalled when an attempt is made to access an unbound variable.
 
-== [.namspace_class]_class_ +<undefined-entity>+
+== +<undefined-entity>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <program-error>
+
+.Slots
+* name
+* namespace
+
 
 
 Class of condition signalled when the entity denoted by an identifier does not exist when an access to that entity is made.
 
 The _name_ is a symbol representing the identifier which was undefined. The _namespace_ is one of the symbols *variable*, *dynamic-variable*, *function*, or *class*.
 
-== [.namspace_class]_class_ +<undefined-function>+
+== +<undefined-function>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <undefined-entity>
+
 
 
 Class of condition signalled when a function does not exist at its activation point.
 
-== [.namspace_function]_function_ +=+
-[subs="+quotes,+replacements"]
+== +=+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(= x1 x2)=> boolean
+(= x1 x2) => boolean
 ----
 
 
@@ -337,10 +645,13 @@ Returns *t* if _x~1~_ has the same mathematical value as _x~2~_; otherwise, retu
 
 NOTE: *=* differs from *eql* because *=* compares only the mathematical values of its arguments, whereas *eql* also compares the representations.
 
-== [.namspace_function]_function_ +>+
-[subs="+quotes,+replacements"]
+== +>+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(> x1 x2)=> boolean
+(> x1 x2) => boolean
 ----
 
 
@@ -349,10 +660,13 @@ NOTE: *=* differs from *eql* because *=* compares only the mathematical values o
 
 The mathematical values of the arguments are compared. An error shall be signaled if either _x~1~_ or _x~2~_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +>=+
-[subs="+quotes,+replacements"]
+== +>=+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(>= x1 x2)=> boolean
+(>= x1 x2) => boolean
 ----
 
 
@@ -361,20 +675,26 @@ The mathematical values of the arguments are compared. An error shall be signale
 
 The mathematical values of the arguments are compared. An error shall be signaled if either _x~1~_ or _x~2~_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +abs+
-[subs="+quotes,+replacements"]
+== +abs+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(abs x)=> <number>
+(abs x) => <number>
 ----
 
 
 
 The function *abs* returns the absolute value of its argument. An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_syntax]_syntax_ +and+
-[subs="+quotes,+replacements"]
+== +and+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(and form*)=> <object>
+(and form*) => <object>
 ----
 
 
@@ -388,10 +708,13 @@ The function *abs* returns the absolute value of its argument. An error shall be
 (and _form~1~_ _form~2~_ … _form~n~_) = (if _form~1~_ (and _form~2~_ … _form~n~_) 'nil)
 ----
 
-== [.namspace_function]_function_ +append+
-[subs="+quotes,+replacements"]
+== +append+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(append list*)=> <list>
+(append list*) => <list>
 ----
 
 
@@ -402,10 +725,13 @@ This function does not modify its arguments. It is implementation defined whethe
 
 An error shall be signaled if the list cannot be allocated (error-id. _cannot-create-list_).
 
-== [.namspace_function]_function_ +apply+
-[subs="+quotes,+replacements"]
+== +apply+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(apply function obj* list)=> <object>
+(apply function obj* list) => <object>
 ----
 
 
@@ -414,10 +740,13 @@ Applies _function_ to the arguments, _obj&#42;_, followed by the elements of _li
 
 An error shall be signaled if _function_ is not a function (error-id. _domain-error_). Each _obj_ may be any ISLISP object. An error shall be signaled if _list_ is not a proper list (see §7) (error-id. _improper-argument-list_).
 
-== [.namspace_function]_function_ +aref+
-[subs="+quotes,+replacements"]
+== +aref+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(aref basic-array z*)=> <object>
+(aref basic-array z*) => <object>
 ----
 
 
@@ -426,60 +755,78 @@ An error shall be signaled if _function_ is not a function (error-id. _domain-er
 
 An error shall be signaled if _basic-array_ is not a basic-array (error-id. _domain-error_). An error shall be signaled if any _z_ is not a non-negative integer (error-id. _domain-error_).
 
-== [.namspace_setf]_setf_ +aref+
-[subs="+quotes,+replacements"]
+== +aref+
+
+[.islisp-kind]_setf_
+
+[subs="+quotes"]
 ----
-(setf (aref basic-array z*) obj)=> <object>
+(setf (aref basic-array z*) obj) => <object>
 ----
 
 
 
 Replaces the object obtainable by *aref* with _obj_. The returned value is _obj_. The constraints on the _basic-array_ and the sequence of indices _z_ is the same as for *aref*.
 
-== [.namspace_function]_function_ +arithmetic-error-operands+
-[subs="+quotes,+replacements"]
+== +arithmetic-error-operands+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(arithmetic-error-operands arithmetic-error)=> <list>
+(arithmetic-error-operands arithmetic-error) => <list>
 ----
 
 
 
 This function returns the _operands_ supplied as data when creating the _arithmetic-error_. An error shall be signaled if _arithmetic-error_ is not a condition of class *<arithmetic-error>* (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +arithmetic-error-operation+
-[subs="+quotes,+replacements"]
+== +arithmetic-error-operation+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(arithmetic-error-operation arithmetic-error)=> <function>
+(arithmetic-error-operation arithmetic-error) => <function>
 ----
 
 
 
 This function returns the _operation_ supplied as data when creating the _arithmetic-error_. An error shall be signaled if _arithmetic-error_ is not a condition of class *<arithmetic-error>* (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +array-dimensions+
-[subs="+quotes,+replacements"]
+== +array-dimensions+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(array-dimensions basic-array)=> <list>
+(array-dimensions basic-array) => <list>
 ----
 
 
 
 Returns a list of the dimensions of a given _basic-array_. An error shall be signaled if _basic-array_ is not a basic-array (error-id. _domain-error_). The consequences are undefined if the returned list is modified.
 
-== [.namspace_function]_function_ +assoc+
-[subs="+quotes,+replacements"]
+== +assoc+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(assoc obj association-list)=> <list>
+(assoc obj association-list) => <list>
 ----
 
 
 
 If _assocation-list_ contains at least one cons whose car is _obj_ (as determined by *eql*), the first such cons is returned. Otherwise, *nil* is returned. An error shall be signaled if _association-list_ is not a list of conses (error-id. _domain-error_).
 
-== [.namspace_syntax]_syntax_ +assure+
-[subs="+quotes,+replacements"]
+== +assure+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(assure class-name form)=> <object>
+(assure class-name form) => <object>
 ----
 
 
@@ -488,10 +835,13 @@ Evaluates _form_. If _form_ returns, the returned value is returned by the *assu
 
 An error shall be signaled if the value of _form_ is not of the class or a subclass of the class designated by _class-name_ (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +atan+
-[subs="+quotes,+replacements"]
+== +atan+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(atan x)=> <number>
+(atan x) => <number>
 ----
 
 
@@ -509,10 +859,13 @@ The following definition for (one-argument) arc tangent determines the range and
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +atan2+
-[subs="+quotes,+replacements"]
+== +atan2+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(atan2 x1 x2)=> <number>
+(atan2 x1 x2) => <number>
 ----
 
 
@@ -566,50 +919,65 @@ The value of *atan2* is always between −π (exclusive) and π (inclusive) when
 
 The signs of _x~1~_ (indicated as _y_) and _x~2~_ (indicated as _x_) are used to derive quadrant information. Figure 19.1 details various special cases. The asterisk (&#42;) indicates that the entry in the figure applies to implementations that support minus zero.
 
-== [.namspace_function]_function_ +atanh+
-[subs="+quotes,+replacements"]
+== +atanh+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(atanh x)=> <number>
+(atanh x) => <number>
 ----
 
 
 
 Returns the hyperbolic arc tangent of _x_. An error shall be signaled if _x_ is not a number with absolute value less than 1 (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +basic-array*-p+
-[subs="+quotes,+replacements"]
+== +basic-array*-p+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(basic-array*-p obj)=> boolean
+(basic-array*-p obj) => boolean
 ----
 
 
 
 *basic-array&#42;-p* returns *t* if _obj_ is a basic-array&#42; (instance of class *<basic-array&#42;>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +basic-array-p+
-[subs="+quotes,+replacements"]
+== +basic-array-p+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(basic-array-p obj)=> boolean
+(basic-array-p obj) => boolean
 ----
 
 
 
 *basic-array-p* returns *t* if _obj_ is a basic-array (instance of class *<basic-array>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +basic-vector-p+
-[subs="+quotes,+replacements"]
+== +basic-vector-p+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(basic-vector-p obj)=> boolean
+(basic-vector-p obj) => boolean
 ----
 
 
 
 *basic-vector-p* returns *t* if _obj_ is a basic-vector (instance of class *<basic-vector>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
 
-== [.namspace_syntax]_syntax_ +block+
-[subs="+quotes,+replacements"]
+== +block+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(block name form*)=> <object>
+(block name form*) => <object>
 ----
 
 
@@ -624,10 +992,13 @@ If a _return-from_ is executed, the *result-form* is evaluated. If this evaluati
 
 An error shall be signaled if an attempt is made to exit a *block* after it has been exited (error-id. _control-error_); It is a violation if _name_ is not an identifier. It is a violation if a *block* with a corresponding _name_ does not exist. See §14.7.2 for other errors.
 
-== [.namspace_function]_function_ +call-next-method+
-[subs="+quotes,+replacements"]
+== +call-next-method+
+
+[.islisp-kind]_local-function_
+
+[subs="+quotes"]
 ----
-(call-next-method)=> <object>
+(call-next-method) => <object>
 ----
 
 
@@ -648,46 +1019,39 @@ The functional binding of *call-next-method* is lexical within the body of the m
 
 An error shall be signaled if *call-next-method* is used in methods that do not support it. An error shall be signaled if *call-next-method* is executed and there is no next method.
 
-== [.namspace_function]_function_ +car+
-[subs="+quotes,+replacements"]
+== +car+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(car cons)=> <object>
+(car cons) => <object>
 ----
 
 
 
 The function *car* returns the left component of the _cons_. An error shall be signaled if _cons_ is not a cons (error-id. _domain-error_).
 
-== [.namspace_setf]_setf_ +car+
-[subs="+quotes,+replacements"]
+== +car+
+
+[.islisp-kind]_setf_
+
+[subs="+quotes"]
 ----
-(setf (car cons) obj)=> <object>
+(setf (car cons) obj) => <object>
 ----
 
 
 
 Updates the left component of _cons_ with _obj_. The returned value is _obj_. An error shall be signaled if _cons_ is not a cons (error-id. _domain-error_). _obj_ may be any ISLISP object.
 
-== [.namspace_syntax]_syntax_ +case+
-[subs="+quotes,+replacements"]
+== +case+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(case keyform ((key*) form*)* [(t form*)])=> <object>
-----
-
-
-
-The *case* and *case-using* special forms, called case forms, provide a mechanism to execute a matching clause from a series of clauses based on the value of a dispatching form _keyform_.
-
-The clause to be executed is identified by a set of keys. A _key_ can be any object. If the keylist of the last clause is *t* the associated clause is executed if no key matches the _keyform_.
-
-_keyform_ is a form to be computed at the beginning of execution of the case form. If the result of evaluating _keyform_ is equivalent to a _key_, then the _forms_, if any, in the corresponding clause are evaluated sequentially and the value of the last one is returned as value of the whole case form. *case* determines match equivalence by using *eql*; *case-using* match determines equivalence by using the result of evaluating _predform_. _predform_ must be a boolean or quasi-boolean function that accepts two arguments, the value returned by _keyform_ and _key_. If no _form_ exists for a matching _key_, the case form evaluates to *nil*. If the value of _keyform_ is different from every _key_, and there is a default clause, its forms, if any, are evaluated sequentially, and the value of the last one is the result of the case form.
-
-The same _key_ (as determined by the match predicate) may occur only once in a case form.
-
-== [.namspace_syntax]_syntax_ +case-using+
-[subs="+quotes,+replacements"]
-----
-(case-using predform keyform ((key*) form*)* [(t form*)])=> <object>
+(case keyform ((key*) form*)* [(t form*)]) => <object>
 ----
 
 
@@ -700,10 +1064,32 @@ _keyform_ is a form to be computed at the beginning of execution of the case for
 
 The same _key_ (as determined by the match predicate) may occur only once in a case form.
 
-== [.namspace_syntax]_syntax_ +catch+
-[subs="+quotes,+replacements"]
+== +case-using+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(catch tag-form form*)=> <object>
+(case-using predform keyform ((key*) form*)* [(t form*)]) => <object>
+----
+
+
+
+The *case* and *case-using* special forms, called case forms, provide a mechanism to execute a matching clause from a series of clauses based on the value of a dispatching form _keyform_.
+
+The clause to be executed is identified by a set of keys. A _key_ can be any object. If the keylist of the last clause is *t* the associated clause is executed if no key matches the _keyform_.
+
+_keyform_ is a form to be computed at the beginning of execution of the case form. If the result of evaluating _keyform_ is equivalent to a _key_, then the _forms_, if any, in the corresponding clause are evaluated sequentially and the value of the last one is returned as value of the whole case form. *case* determines match equivalence by using *eql*; *case-using* match determines equivalence by using the result of evaluating _predform_. _predform_ must be a boolean or quasi-boolean function that accepts two arguments, the value returned by _keyform_ and _key_. If no _form_ exists for a matching _key_, the case form evaluates to *nil*. If the value of _keyform_ is different from every _key_, and there is a default clause, its forms, if any, are evaluated sequentially, and the value of the last one is the result of the case form.
+
+The same _key_ (as determined by the match predicate) may occur only once in a case form.
+
+== +catch+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
+----
+(catch tag-form form*) => <object>
 ----
 
 
@@ -718,40 +1104,52 @@ If a *throw* special form is executed, it evaluates the _tag-form_ producing a _
 
 An error shall be signaled if there is no outstanding catcher for a _T~1~_ (error-id. _control-error_). See §14.7.2 for other errors.
 
-== [.namspace_function]_function_ +cdr+
-[subs="+quotes,+replacements"]
+== +cdr+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(cdr cons)=> <object>
+(cdr cons) => <object>
 ----
 
 
 
 The function *cdr* returns the right component of the _cons_. An error shall be signaled if _cons_ is not a cons (error-id. _domain-error_).
 
-== [.namspace_setf]_setf_ +cdr+
-[subs="+quotes,+replacements"]
+== +cdr+
+
+[.islisp-kind]_setf_
+
+[subs="+quotes"]
 ----
-(setf (cdr cons) obj)=> <object>
+(setf (cdr cons) obj) => <object>
 ----
 
 
 
 Updates the right component of _cons_ with _obj_. The returned value is _obj_ . An error shall be signaled if _cons_ is not a cons (error-id. _domain-error_). _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +ceiling+
-[subs="+quotes,+replacements"]
+== +ceiling+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(ceiling x)=> <integer>
+(ceiling x) => <integer>
 ----
 
 
 
 Returns the smallest integer that is not smaller than _x_. That is, _x_ is truncated towards positive infinity. An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +cerror+
-[subs="+quotes,+replacements"]
+== +cerror+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(cerror continue-string error-string obj*)=> <object>
+(cerror continue-string error-string obj*) => <object>
 ----
 
 
@@ -771,10 +1169,13 @@ This is equivalent to:
     (get-output-stream-string str)))
 ----
 
-== [.namspace_function]_function_ +char-index+
-[subs="+quotes,+replacements"]
+== +char-index+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(char-index char string [start-position])=> <object>
+(char-index char string [start-position]) => <object>
 ----
 
 
@@ -783,10 +1184,13 @@ Returns the position of _char_ in _string_, The search starts from the position 
 
 An error shall be signaled if _char_ is not a character or if _string_ is not a string (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +char/=+
-[subs="+quotes,+replacements"]
+== +char/=+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(char/= char1 char2)=> boolean
+(char/= char1 char2) => boolean
 ----
 
 
@@ -795,10 +1199,13 @@ Two characters are *char/=* if and only if they are not *char=*. If the test is 
 
 An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +char<+
-[subs="+quotes,+replacements"]
+== +char<+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(char< char1 char2)=> boolean
+(char< char1 char2) => boolean
 ----
 
 
@@ -807,10 +1214,13 @@ The function *char<* tests whether _char~1~_ is less than _char~2~_. The orderin
 
 An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +char<=+
-[subs="+quotes,+replacements"]
+== +char<=+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(char<= char1 char2)=> boolean
+(char<= char1 char2) => boolean
 ----
 
 
@@ -819,10 +1229,13 @@ The function *char<=* tests whether _char~1~_ is less than or equal to _char~2~_
 
 An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +char=+
-[subs="+quotes,+replacements"]
+== +char=+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(char= char1 char2)=> boolean
+(char= char1 char2) => boolean
 ----
 
 
@@ -831,10 +1244,13 @@ The function *char=* tests whether _char~1~_ is the same character as _char~2~_.
 
 An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +char>+
-[subs="+quotes,+replacements"]
+== +char>+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(char> char1 char2)=> boolean
+(char> char1 char2) => boolean
 ----
 
 
@@ -843,10 +1259,13 @@ Two characters are *char>* if and only if they are not *char<=*.
 
 An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +char>=+
-[subs="+quotes,+replacements"]
+== +char>=+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(char>= char1 char2)=> boolean
+(char>= char1 char2) => boolean
 ----
 
 
@@ -855,60 +1274,78 @@ Two characters are *char>=* if and only if they are not *char<*.
 
 An error shall be signaled if either _char~1~_ or _char~2~_ is not a character (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +characterp+
-[subs="+quotes,+replacements"]
+== +characterp+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(characterp obj)=> boolean
+(characterp obj) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is a character (instance of class *<character>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
 
-== [.namspace_syntax]_syntax_ +class+
-[subs="+quotes,+replacements"]
+== +class+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(class class-name)=> <class>
+(class class-name) => <class>
 ----
 
 
 
 Returns the class object that corresponds to the class named _class-name_.
 
-== [.namspace_function]_function_ +class-of+
-[subs="+quotes,+replacements"]
+== +class-of+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(class-of obj)=> <class>
+(class-of obj) => <class>
 ----
 
 
 
 Returns the class of which the given _obj_ is a direct instance. _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +close+
-[subs="+quotes,+replacements"]
+== +close+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(close stream)=> nil
+(close stream) => nil
 ----
 
 
 
 The function *close* closes the stream _stream_. If _stream_ is closed it may no longer be used in input or output operations. Closing a file stream ends the association between the stream and its file. If the stream was already closed this function performs nothing. The result value is implementation defined. An error shall be signaled if stream is not a stream (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +closed-p+
-[subs="+quotes,+replacements"]
+== +closed-p+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(closed-p stream)=> boolean
+(closed-p stream) => boolean
 ----
 
 
 
 Returns *t* if _stream_ was explicitly closed, *nil* otherwise. If *closed-p* returns *t* it's not a guarantee that attemping to use _stream_ won't signal a condition.
 
-== [.namspace_syntax]_syntax_ +cond+
-[subs="+quotes,+replacements"]
+== +cond+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(cond (test form*)*)=> <object>
+(cond (test form*)*) => <object>
 ----
 
 
@@ -924,50 +1361,65 @@ Executing the prepared *cond*, the clauses (_test_ _form_&#42;) are scanned sequ
 (cond (test1 form1&#43;) (test2 form2&#42;) ...) = (if test1 (progn form1&#43;) (cond (test2 form2&#42;) ...))
 ----
 
-== [.namspace_function]_function_ +condition-continuable+
-[subs="+quotes,+replacements"]
+== +condition-continuable+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(condition-continuable condition)=> <object>
+(condition-continuable condition) => <object>
 ----
 
 
 
 Returns *nil* if _condition_ is not continuable, or a string describing the effect of continuing otherwise.
 
-== [.namspace_function]_function_ +cons+
-[subs="+quotes,+replacements"]
+== +cons+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(cons obj1 obj2)=> <cons>
+(cons obj1 obj2) => <cons>
 ----
 
 
 
 This function builds a cons from two objects, with _obj~1~_ as its car (or `left') part and with _obj~2~_ as its cdr (or `right') part. An error shall be signaled if the requested cons cannot be allocated (error-id. _cannot-create-cons_). Both _obj~1~_ and _obj~2~_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +consp+
-[subs="+quotes,+replacements"]
+== +consp+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(consp obj)=> boolean
+(consp obj) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is a cons (instance of class *<cons>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +continue-condition+
-[subs="+quotes,+replacements"]
+== +continue-condition+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(continue-condition condition [value]) transfers control and data=> nil
+(continue-condition condition [value]) transfers control and data => nil
 ----
 
 
 
 "Continues" from _condition_ by finding the call to *signal-condition* and arranging for it to perform a normal return of the value, which defaults to *nil*. The consequences are undefined if the _condition_ is not continuable.
 
-== [.namspace_syntax]_syntax_ +convert+
-[subs="+quotes,+replacements"]
+== +convert+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(convert obj class-name)=> <object>
+(convert obj class-name) => <object>
 ----
 
 
@@ -1020,10 +1472,13 @@ Returns an object of class _class-name_ which corresponds to the object _obj_ ac
         
 If an implementation provides implementation-defined classes, it may also provide implementation-defined coercions for the names of those classes using convert.
 
-== [.namspace_function]_function_ +cos+
-[subs="+quotes,+replacements"]
+== +cos+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(cos x)=> <number>
+(cos x) => <number>
 ----
 
 
@@ -1032,10 +1487,13 @@ The function *cos* returns the cosine of _x_. _x_ must be given in radians.
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +cosh+
-[subs="+quotes,+replacements"]
+== +cosh+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(cosh x)=> <number>
+(cosh x) => <number>
 ----
 
 
@@ -1044,10 +1502,13 @@ The function *cosh* returns the hyperbolic cosine of _x_.
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +create+
-[subs="+quotes,+replacements"]
+== +create+
+
+[.islisp-kind]_generic-function_
+
+[subs="+quotes"]
 ----
-(create class {initarg initval }*)=> <object>
+(create class {initarg initval }*) => <object>
 ----
 
 
@@ -1056,10 +1517,13 @@ The function *create* creates and returns a new instance of a _class_. The argum
 
 The initialization of a new instance consists of several distinct steps, including the following: allocating storage for the instance, filling slots with values, and executing user-supplied methods that perform additional initialization. The last two steps of *create* are implemented by the generic function *initialize-object* to provide a mechanism for customizing those steps. The initialization arguments (the _initargs_ and _initvals_) are given as a single list argument to *initialize-object*. The instance returned by *create* is the new instance, which has been modified and returned by *initialize-object*.
 
-== [.namspace_function]_function_ +create-array+
-[subs="+quotes,+replacements"]
+== +create-array+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(create-array dimensions [initial-element])=> <basic-array>
+(create-array dimensions [initial-element]) => <basic-array>
 ----
 
 
@@ -1074,80 +1538,104 @@ An error shall be signaled if the requested array cannot be allocated (error-id.
 
 An error shall be signaled if _dimensions_ is not a proper list of non-negative integers (error-id. _domain-error_). _initial-element_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +create-list+
-[subs="+quotes,+replacements"]
+== +create-list+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(create-list i [initial-element])=> <list>
+(create-list i [initial-element]) => <list>
 ----
 
 
 
 Returns a list of length _i_. If _initial-element_ is given, the elements of the new list are initialized with this object; otherwise, the initialization is implementation defined. An error shall be signaled if the requested list cannot be allocated (error-id. _cannot-create-list_). An error shall be signaled if _i_ is not a non-negative integer (error-id. _domain-error_). _initial-element_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +create-string+
-[subs="+quotes,+replacements"]
+== +create-string+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(create-string i [initial-character ])=> <string>
+(create-string i [initial-character ]) => <string>
 ----
 
 
 
 Returns a string of length _i_. If _initial-character_ is given, then the characters of the new string are initialized with this character, otherwise the initialization is implementation defined. An error shall be signaled if the requested string cannot be allocated (error-id. _cannot-create-string_). An error shall be signaled if _i_ is not a non-negative integer or if _initial-character_ is not a character (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +create-string-input-stream+
-[subs="+quotes,+replacements"]
+== +create-string-input-stream+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(create-string-input-stream string)=> <stream>
+(create-string-input-stream string) => <stream>
 ----
 
 
 
 Creates and returns an input stream from the string. An error shall be signaled if string is not a string (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +create-string-output-stream+
-[subs="+quotes,+replacements"]
+== +create-string-output-stream+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(create-string-output-stream)=> <stream>
+(create-string-output-stream) => <stream>
 ----
 
 
 
 This function creates and returns a string output stream. The output to a string stream can be retrieved by *get-output-stream-string*.
 
-== [.namspace_function]_function_ +create-vector+
-[subs="+quotes,+replacements"]
+== +create-vector+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(create-vector i [initial-element])=> <general-vector>
+(create-vector i [initial-element]) => <general-vector>
 ----
 
 
 
 Returns a general-vector of length _i_. If _initial-element_ is given, the elements of the new vector are initialized with this object, otherwise the initialization is implementation defined. An error shall be signaled if the requested vector cannot be allocated (error-id. _cannot-create-vector_). An error shall be signaled if _i_ is not a non-negative integer (error-id. _domain-error_). _initial-element_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +current-stacktrace+
-[subs="+quotes,+replacements"]
+== +current-stacktrace+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(current-stacktrace)=> <general-vector>
+(current-stacktrace) => <general-vector>
 ----
 
 
 
 Returns stacktrace of current evaluation state. A stacktrace is a vector of stacktrace elements, where each element itself is a vector of (in order): module name, line start, column start, line end, column end.
 
-== [.namspace_syntax]_syntax_ +debugger+
-[subs="+quotes,+replacements"]
+== +debugger+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(debugger)=> <null>
+(debugger) => <null>
 ----
 
 
 
 Halts execution at this point when running in a debugger. Returns *nil*.
 
-== [.namspace_syntax]_syntax_ +defclass+
-[subs="+quotes,+replacements"]
+== +defclass+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(defclass class-name (sc-name*) (slot-spec*) class-opt*)=> <symbol>
+(defclass class-name (sc-name*) (slot-spec*) class-opt*) => <symbol>
 ----
 
 
@@ -1223,10 +1711,13 @@ If no slot accessors are specified for a slot, the slot cannot be accessed.
 
 When a class is defined, the order in which its direct superclasses are mentioned in the defining form is important. The new class has a local precedence order, which is a list consisting of the class followed by its direct superclasses in the order mentioned in its defclass defining form.
 
-== [.namspace_syntax]_syntax_ +defconstant+
-[subs="+quotes,+replacements"]
+== +defconstant+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(defconstant name form)=> <symbol>
+(defconstant name form) => <symbol>
 ----
 
 
@@ -1237,10 +1728,13 @@ Although _name_ is globally constant, a variable binding for _name_ can be local
 
 The result of the evaluation of _form_ is bound to the variable named by _name_. The binding and the object created as the result of evaluating the second argument are immutable. The symbol named _name_ is returned.
 
-== [.namspace_syntax]_syntax_ +defdynamic+
-[subs="+quotes,+replacements"]
+== +defdynamic+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(defdynamic name form)=> <symbol>
+(defdynamic name form) => <symbol>
 ----
 
 
@@ -1249,10 +1743,13 @@ This form is used to define a dynamic variable identifier in the dynamic variabl
 
 The symbol named _name_ is returned.
 
-== [.namspace_syntax]_syntax_ +defgeneric+
-[subs="+quotes,+replacements"]
+== +defgeneric+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(defgeneric func-spec lambda-list {option | method-desc}*)=> <symbol>
+(defgeneric func-spec lambda-list {option | method-desc}*) => <symbol>
 ----
 
 
@@ -1303,10 +1800,13 @@ The _lambda-list_ argument of *defgeneric* specifies the shape of lambda-lists f
 
 Implementations can extend *defgeneric* to include other implementation-defined options.
 
-== [.namspace_syntax]_syntax_ +defglobal+
-[subs="+quotes,+replacements"]
+== +defglobal+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(defglobal name form)=> <symbol>
+(defglobal name form) => <symbol>
 ----
 
 
@@ -1318,20 +1818,26 @@ _form_ is evaluated to compute an initializing value for the variable named _nam
 
 A lexical variable binding for _name_ can still be locally established by a binding form; in that case, the local binding lexically shadows the outer binding of name defined by *defglobal*.
 
-== [.namspace_syntax]_syntax_ +defmacro+
-[subs="+quotes,+replacements"]
+== +defmacro+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(defmacro macro-name lambda-list form*)=> <symbol>
+(defmacro macro-name lambda-list form*) => <symbol>
 ----
 
 
 
 Defines a named (toplevel) macro. No implicit block with the macro name is established when the macro-expansion function is invoked. _macro-name_ must be an identifier whose scope is the current toplevel scope in which the defmacro form appears. _lambda-list_ is as defined in page 23. The definition point of _macro-name_ is the closing parenthesis of the _lambda-list_.
 
-== [.namspace_syntax]_syntax_ +defmethod+
-[subs="+quotes,+replacements"]
+== +defmethod+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(defmethod func-spec method-qualifier* parameter-profile form*)=> <symbol>
+(defmethod func-spec method-qualifier* parameter-profile form*) => <symbol>
 ----
 
 
@@ -1376,10 +1882,13 @@ No two methods with agreeing parameter specializers and qualifiers may be define
 
 A method is not a function and cannot be invoked as a function.
 
-== [.namspace_syntax]_syntax_ +defun+
-[subs="+quotes,+replacements"]
+== +defun+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(defun function-name lambda-list form*)=> <symbol>
+(defun function-name lambda-list form*) => <symbol>
 ----
 
 
@@ -1390,20 +1899,26 @@ The scope of _function-name_ is the whole current toplevel scope. Therefore, the
 
 *defun* returns the function name which is the symbol named _function-name_. The free identifiers in the body _form_&#42; (i.e., those which are not contained in the lambda list) follow the rules of lexical scoping.
 
-== [.namspace_function]_function_ +delete-file+
-[subs="+quotes,+replacements"]
+== +delete-file+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(delete-file filename)=> <null>
+(delete-file filename) => <null>
 ----
 
 
 
 Deletes a file denoted by string path _filename_.
 
-== [.namspace_function]_function_ +div+
-[subs="+quotes,+replacements"]
+== +div+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(div z1 z2)=> <integer>
+(div z1 z2) => <integer>
 ----
 
 
@@ -1422,10 +1937,13 @@ That is, the evaluation of the above form always return *t*.
 
 An error shall be signaled if either _z~1~_ or _z~2~_ is not an integer (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +documentation+
-[subs="+quotes,+replacements"]
+== +documentation+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(documentation [name-space] symbol)=> <object>
+(documentation [name-space] symbol) => <object>
 ----
 
 
@@ -1459,10 +1977,13 @@ Additionally, depending on kind, following keys are present:
 |===
 
 
-== [.namspace_setf]_setf_ +documentation+
-[subs="+quotes,+replacements"]
+== +documentation+
+
+[.islisp-kind]_setf_
+
+[subs="+quotes"]
 ----
-(setf (documentation name-space symbol) docvalue)=> <object>
+(setf (documentation name-space symbol) docvalue) => <object>
 ----
 
 
@@ -1471,30 +1992,39 @@ Sets documentation value for given name-space and symbol in current module. See 
 
 Returns previously stored documentation entry.
 
-== [.namspace_function]_function_ +domain-error-expected-class+
-[subs="+quotes,+replacements"]
+== +domain-error-expected-class+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(domain-error-expected-class domain-error)=> <class>
+(domain-error-expected-class domain-error) => <class>
 ----
 
 
 
 These function returns the _expected-class_ supplied as data when creating the _domain-error_. An error shall be signaled if _domain-error_ is not a condition of class *<domain-error>* (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +domain-error-object+
-[subs="+quotes,+replacements"]
+== +domain-error-object+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(domain-error-object domain-error)=> <object>
+(domain-error-object domain-error) => <object>
 ----
 
 
 
 These functions returns the _object_  supplied as data when creating the _domain-error_. An error shall be signaled if _domain-error_ is not a condition of class *<domain-error>* (error-id. _domain-error_).
 
-== [.namspace_setf]_setf_ +dynamic+
-[subs="+quotes,+replacements"]
+== +dynamic+
+
+[.islisp-kind]_setf_
+
+[subs="+quotes"]
 ----
-(setf (dynamic var) form)=> <object>
+(setf (dynamic var) form) => <object>
 ----
 
 
@@ -1505,10 +2035,13 @@ _form_ is evaluated and the result of the evaluation is used to change the dynam
 
 An error shall be signaled if _var_ has no dynamic value (error-id. _unbound-variable_). *setf* of *dynamic* can be used only for modifying bindings, and not for establishing them.
 
-== [.namspace_syntax]_syntax_ +dynamic+
-[subs="+quotes,+replacements"]
+== +dynamic+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(dynamic var)=> <object>
+(dynamic var) => <object>
 ----
 
 
@@ -1517,10 +2050,13 @@ This special form denotes a reference to the identifier denoting a dynamic varia
 
 During activation, the current dynamic binding of the variable _var_ is returned that was established most recently and is still in effect. An error shall be signaled if such a binding does not exist (error-id. _unbound-variable_).
 
-== [.namspace_syntax]_syntax_ +dynamic-let+
-[subs="+quotes,+replacements"]
+== +dynamic-let+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(dynamic-let ((var form)*) body-form*)=> <object>
+(dynamic-let ((var form)*) body-form*) => <object>
 ----
 
 
@@ -1531,10 +2067,13 @@ References to a dynamic variable named by _var_ must be made through the *dynami
 
 All the initializing forms are evaluated sequentially from left to right, and then the values are associated with the corresponding _vars_. Using these additional dynamic bindings and the already existing bindings of visible identifiers, the forms _body-form_&#42; are evaluated in sequential order. The returned value of *dynamic-let* is that of the last _body-form_ of the body (or *nil* if there is none). The bindings are undone when control leaves the prepared *dynamic-let* special form.
 
-== [.namspace_function]_function_ +elt+
-[subs="+quotes,+replacements"]
+== +elt+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(elt sequence z)=> <object>
+(elt sequence z) => <object>
 ----
 
 
@@ -1543,10 +2082,13 @@ Given a _sequence_ and an integer _z_ satisfying 0 ≤ _z_ < (*length sequence*)
 
 An error shall be signaled if _sequence_ is not a basic-vector or a list or if _z_ is not an integer (error-id. _domain-error_).
 
-== [.namspace_setf]_setf_ +elt+
-[subs="+quotes,+replacements"]
+== +elt+
+
+[.islisp-kind]_setf_
+
+[subs="+quotes"]
 ----
-(setf (elt sequence z) obj)=> <object>
+(setf (elt sequence z) obj) => <object>
 ----
 
 
@@ -1555,10 +2097,13 @@ These replace the object obtainable by *elt* with _obj_. The returned value is _
 
 An error shall be signaled if _z_ is an integer outside of the valid range of indices (error-id. _index-out-of-range_). An error shall be signaled if _sequence_ is not a basic-vector or a list or if _z_ is not an integer (error-id. _domain-error_). obj may be any ISLISP object.
 
-== [.namspace_function]_function_ +eq+
-[subs="+quotes,+replacements"]
+== +eq+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(eq obj1 obj2)=> boolean
+(eq obj1 obj2) => boolean
 ----
 
 
@@ -1567,10 +2112,13 @@ An error shall be signaled if _z_ is an integer outside of the valid range of in
 
 For *eq*, the consequences are implementation defined if both _obj~1~_ and _obj~2~_ are numbers or both are characters.
 
-== [.namspace_function]_function_ +eql+
-[subs="+quotes,+replacements"]
+== +eql+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(eql obj1 obj2)=> boolean
+(eql obj1 obj2) => boolean
 ----
 
 
@@ -1583,10 +2131,13 @@ For *eql* the meaning for numbers and characters is defined as follows:
 If an implementation supports positive and negative zeros as distinct values, then (eql 0.0 -0.0) returns nil. When the syntax -0.0 is read and it is interpreted as the value 0.0 then (eql 0.0 -0.0) returns t.
 * If obj1 and obj2 are characters, eql tests whether they are the same character (see char=).
 
-== [.namspace_function]_function_ +equal+
-[subs="+quotes,+replacements"]
+== +equal+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(equal obj1 obj2)=> boolean
+(equal obj1 obj2) => boolean
 ----
 
 
@@ -1623,10 +2174,13 @@ Otherwise the value is *nil*.
 
 _obj~1~_ and _obj~2~_ may be any ISLISP objects.
 
-== [.namspace_function]_function_ +error+
-[subs="+quotes,+replacements"]
+== +error+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(error error-string obj*)=> <object>
+(error error-string obj*) => <object>
 ----
 
 
@@ -1646,10 +2200,13 @@ This is equivalent to:
           nil)
 ----
 
-== [.namspace_function]_function_ +error-output+
-[subs="+quotes,+replacements"]
+== +error-output+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(error-output)=> <stream>
+(error-output) => <stream>
 ----
 
 
@@ -1658,8 +2215,11 @@ The function *error-output* returns the stream used as the default stream for wa
 
 The value returned by the function is initially implementation-defined, but can be dynamically bound; see *with-error-output*.
 
-== [.namspace_function]_function_ +exit+
-[subs="+quotes,+replacements"]
+== +exit+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
 (exit code)
 ----
@@ -1668,40 +2228,52 @@ The value returned by the function is initially implementation-defined, but can 
 
 Immediately exits execution, with _code_ as return code (0 for success, anything else indicating failure).
 
-== [.namspace_function]_function_ +exp+
-[subs="+quotes,+replacements"]
+== +exp+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(exp x)=> <number>
+(exp x) => <number>
 ----
 
 
 
 Returns _e_ raised to the power _x_, where _e_ is the base of the natural logarithm. An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +expt+
-[subs="+quotes,+replacements"]
+== +expt+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(expt x1 x2)=> <number>
+(expt x1 x2) => <number>
 ----
 
 
 
 Returns _x~1~_ raised to the power _x~2~_. The result will be an integer if _x~1~_ is an integer and _x~2~_ is a non-negative integer. An error shall be signaled if _x~1~_ is zero and _x~2~_ is negative, or if _x~1~_ is zero and _x~2~_ is a zero ﬂoat, or if _x~1~_ is negative and _x~2~_ is not an integer.
 
-== [.namspace_function]_function_ +file-length+
-[subs="+quotes,+replacements"]
+== +file-length+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(file-length filename element-class)=> <object>
+(file-length filename element-class) => <object>
 ----
 
 
 
 Returns the length of the file named by _filename_, or returns *nil* if the length cannot be determined. The _element-class_ determines the units. An error shall be signaled if _filename_ is not a string (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +file-position+
-[subs="+quotes,+replacements"]
+== +file-position+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(file-position stream)=> <integer>
+(file-position stream) => <integer>
 ----
 
 
@@ -1744,30 +2316,39 @@ For character streams, the file position is increased by an implementation-defin
 ----
 The amount may depend on the output and on the file position itself. It is implementation-defined which integer represents the first element of the file. An error shall be signaled if _stream_ is not a stream to or from a file (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +fill-stacktrace+
-[subs="+quotes,+replacements"]
+== +fill-stacktrace+
+
+[.islisp-kind]_generic-function_
+
+[subs="+quotes"]
 ----
-(fill-stacktrace condition)=> boolean
+(fill-stacktrace condition) => boolean
 ----
 
 
 
 Generic function to determine if for given condition a stacktrace should be filled in. Defaults to *t* for _<serious-condition>_. Add methods overriding it to return *nil* to disable it to remove cost of stacktrace fill in.
 
-== [.namspace_function]_function_ +finish-output+
-[subs="+quotes,+replacements"]
+== +finish-output+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(finish-output stream)=> <null>
+(finish-output stream) => <null>
 ----
 
 
 
 Completes any pending output to the destination designated by _stream_. Waits until the pending output is complete and then returns *nil*. For instance, pending output might be stored in a buffer; in this case *finish-output* forces the buffer to be written to the stream's destination. An error shall be signaled if stream is not a stream that can handle output operations (error-id. _domain-error_).
 
-== [.namspace_syntax]_syntax_ +flet+
-[subs="+quotes,+replacements"]
+== +flet+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(flet ((function-name lambda-list form*)*) body-form*)=> <object>
+(flet ((function-name lambda-list form*)*) body-form*) => <object>
 ----
 
 
@@ -1781,40 +2362,52 @@ During activation, the prepared *flet* establishes function bindings and then ev
 
 No _function-name_ may appear more than once in the function bindings.
 
-== [.namspace_function]_function_ +float+
-[subs="+quotes,+replacements"]
+== +float+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(float x)=> <float>
+(float x) => <float>
 ----
 
 
 
 Returns _x_ itself if it is an instance of the class *<float>* and returns a ﬂoating-point approximation of _x_ otherwise. An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +floatp+
-[subs="+quotes,+replacements"]
+== +floatp+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(floatp obj)=> boolean
+(floatp obj) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is a ﬂoat (instance of class *<float>*); otherwise, returns *nil*. The _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +floor+
-[subs="+quotes,+replacements"]
+== +floor+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(floor x)=> <integer>
+(floor x) => <integer>
 ----
 
 
 
 Returns the greatest integer less than or equal to _x_. That is, _x_ is truncated towards negative infinity. An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_syntax]_syntax_ +for+
-[subs="+quotes,+replacements"]
+== +for+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(for (iteration-spec*) (end-test result*) form*)=> <object>
+(for (iteration-spec*) (end-test result*) form*) => <object>
 ----
 
 
@@ -1832,10 +2425,13 @@ The *for* special form is executed as follows: The _init_ forms are evaluated se
 
 Each iteration begins by evaluating _end-test_. If the result is *nil*, the forms in the _body_ are evaluated sequentially (for side-effects). Afterwards, the _step-forms_ are evaluated sequentially order from left to right. Then their values are assigned to the corresponding variables and the next iteration begins. If _end-test_ returns a non-nil value, then the _result_&#42; are evaluated sequentially and the value of the last one is returned as value of the whole *for* macro. If no result is present, then the value of the for macro is *nil*.
 
-== [.namspace_function]_function_ +format+
-[subs="+quotes,+replacements"]
+== +format+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(format output-stream format-string obj*)=> <null>
+(format output-stream format-string obj*) => <null>
 ----
 
 
@@ -1871,50 +2467,65 @@ _obj_ refers to the next item of the set of _obj_&#42; to be processed.
 &#126;&#126;::
     tilde: output a tilde (&#126;).
 
-== [.namspace_function]_function_ +format-char+
-[subs="+quotes,+replacements"]
+== +format-char+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(format-char output-stream char)=> <null>
+(format-char output-stream char) => <null>
 ----
 
 
 
 An error shall be signaled if _obj_ is not a character. _obj_ is output directly without any conversion.
 
-== [.namspace_function]_function_ +format-float+
-[subs="+quotes,+replacements"]
+== +format-float+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(format-float output-stream float)=> <null>
+(format-float output-stream float) => <null>
 ----
 
 
 
 An error shall be signaled if _obj_ is not a number. _obj_ is printed as a ﬂoat.
 
-== [.namspace_function]_function_ +format-fresh-line+
-[subs="+quotes,+replacements"]
+== +format-fresh-line+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(format-fresh-line output-stream)=> <null>
+(format-fresh-line output-stream) => <null>
 ----
 
 
 
 Output a #\newline character if it cannot be determined that the output stream is at the beginning of a fresh line.
 
-== [.namspace_function]_function_ +format-integer+
-[subs="+quotes,+replacements"]
+== +format-integer+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(format-integer output-stream integer radix)=> <null>
+(format-integer output-stream integer radix) => <null>
 ----
 
 
 
 An error shall be signaled if _obj_ is not an integer. _obj_ is printed in given radix.
 
-== [.namspace_function]_function_ +format-object+
-[subs="+quotes,+replacements"]
+== +format-object+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(format-object output-stream obj escape-p)=> <null>
+(format-object output-stream obj escape-p) => <null>
 ----
 
 
@@ -1922,20 +2533,26 @@ An error shall be signaled if _obj_ is not an integer. _obj_ is printed in given
 _obj_ is any object. This format directive outputs the textual representation of _obj_. If _escape-p_ is not *nil*, the output generated using this format directive is suitable for input to the function *read*.
 Otherwise characters are output directly without any conversion. That is, the output generated using this format directive is suitable for being read by a human reader.
 
-== [.namspace_function]_function_ +format-tab+
-[subs="+quotes,+replacements"]
+== +format-tab+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(format-tab output-stream column)=> <null>
+(format-tab output-stream column) => <null>
 ----
 
 
 
 Output enough spaces to move to column _n_ (where column 0 represents the left margin). If already at or beyond column _n_, one space is output. If an implementation cannot determine the current column position, the behavior is implementation defined, but at least one space will be output.
 
-== [.namspace_function]_function_ +funcall+
-[subs="+quotes,+replacements"]
+== +funcall+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(funcall function obj*)=> <object>
+(funcall function obj*) => <object>
 ----
 
 
@@ -1950,10 +2567,13 @@ Activates the specified function _function_ and returns the value that the _func
                 
  An error shall be signaled if _function_ is not a function (error-id. _domain-error_). Each _obj_ may be any ISLISP object.
 
-== [.namspace_syntax]_syntax_ +function+
-[subs="+quotes,+replacements"]
+== +function+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(function function-name)=> <function>
+(function function-name) => <function>
 ----
 
 
@@ -1966,40 +2586,52 @@ It returns the function object named by _function-name_.
 
 An error shall be signaled if no binding has been established for the identifier in the function namespace of current lexical environment (see §9.2) (error-id. _undefined-function_). The consequences are undefined if the _function-name_ names a macro or special form.
 
-== [.namspace_function]_function_ +functionp+
-[subs="+quotes,+replacements"]
+== +functionp+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(functionp obj)=> boolean
+(functionp obj) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is a (normal or generic) function; otherwise, returns *nil*. _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +garef+
-[subs="+quotes,+replacements"]
+== +garef+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(garef general-array z*)=> <object>
+(garef general-array z*) => <object>
 ----
 
 
 
 *garef* is like *aref* but an error shall be signaled if its first argument, _general-array_, is not an object of class *<general-vector>* or of class *<general-array&#42;>* (error-id. _domain-error_).
 
-== [.namspace_setf]_setf_ +garef+
-[subs="+quotes,+replacements"]
+== +garef+
+
+[.islisp-kind]_setf_
+
+[subs="+quotes"]
 ----
-(setf (garef general-array z*) obj)=> <object>
+(setf (garef general-array z*) obj) => <object>
 ----
 
 
 
 Replaces the object obtainable by *garef* with _obj_. The returned value is _obj_. The constraints on the _basic-array_, the _general-array_, and the sequence of indices _z_ is the same as for *garef*.
 
-== [.namspace_function]_function_ +gcd+
-[subs="+quotes,+replacements"]
+== +gcd+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(gcd z1 z2)=> <integer>
+(gcd z1 z2) => <integer>
 ----
 
 
@@ -2008,80 +2640,104 @@ Replaces the object obtainable by *garef* with _obj_. The returned value is _obj
 
 An error shall be signaled if either _z~1~_ or _z~2~_ is not an integer (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +general-array*-p+
-[subs="+quotes,+replacements"]
+== +general-array*-p+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(general-array*-p obj)=> boolean
+(general-array*-p obj) => boolean
 ----
 
 
 
 *general-array&#42;-p* returns *t* if _obj_ is a general-array&#42; (instance of class *<general-array&#42;>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +general-vector-p+
-[subs="+quotes,+replacements"]
+== +general-vector-p+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(general-vector-p obj)=> boolean
+(general-vector-p obj) => boolean
 ----
 
 
 
 *general-vector-p* returns *t* if _obj_ is a general-vector (instance of class *<general-vector>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +generic-function-p+
-[subs="+quotes,+replacements"]
+== +generic-function-p+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(generic-function-p obj)=> boolean
+(generic-function-p obj) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is a generic function; otherwise, returns *nil*. _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +gensym+
-[subs="+quotes,+replacements"]
+== +gensym+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(gensym)=> <symbol>
+(gensym) => <symbol>
 ----
 
 
 
 Returns an unnamed symbol. *gensym* is useful for writing macros. It is impossible for an identifier to name an unnamed symbol.
 
-== [.namspace_function]_function_ +get-internal-real-time+
-[subs="+quotes,+replacements"]
+== +get-internal-real-time+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(get-internal-real-time)=> <integer>
+(get-internal-real-time) => <integer>
 ----
 
 
 
 *get-internal-real-time* returns as an integer the current time in internal time units, relative to an arbitrary time base. The difference between the values of two calls to this function is the amount of elapsed real time (i.e., clock time) between the two calls.
 
-== [.namspace_function]_function_ +get-internal-run-time+
-[subs="+quotes,+replacements"]
+== +get-internal-run-time+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(get-internal-run-time)=> <integer>
+(get-internal-run-time) => <integer>
 ----
 
 
 
 *get-internal-run-time* returns as an integer the current run time in internal time units. The precise meaning of this quantity is implementation defined. The difference between the values of two calls to this function is the amount of time between the two calls during which computational effort was expended on behalf of the executing program.
 
-== [.namspace_function]_function_ +get-output-stream-string+
-[subs="+quotes,+replacements"]
+== +get-output-stream-string+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(get-output-stream-string stream)=> <string>
+(get-output-stream-string stream) => <string>
 ----
 
 
 
 Returns a string containing all characters written to _stream_ since the last call to this function or since the creation of the _stream_, if this function has not been called with _stream_ before. An error shall be signaled if stream is not a stream created with *create-string-output-stream* (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +get-universal-time+
-[subs="+quotes,+replacements"]
+== +get-universal-time+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(get-universal-time)=> <integer>
+(get-universal-time) => <integer>
 ----
 
 
@@ -2090,30 +2746,39 @@ Returns an approximation to the "current time" in Universal Time Format. The uni
 
 No implementation is required to have a way to verify that the time returned is correct. However, an error shall be signaled if an implementation can determine that the time it would return would not be correct (e.g., it can determine that the clock was never initialized).
 
-== [.namspace_syntax]_syntax_ +go+
-[subs="+quotes,+replacements"]
+== +go+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(go tagbody-tag) transfers control=> nil
+(go tagbody-tag) transfers control => nil
 ----
 
 
 
 Used to transfer control to a tag _tag_ that appears among the _tagbody-tags_ in the surrounding *tagbody* form. See *tagbody* for details.
 
-== [.namspace_function]_function_ +identity+
-[subs="+quotes,+replacements"]
+== +identity+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(identity obj)=> <object>
+(identity obj) => <object>
 ----
 
 
 
 Returns an object that is the same as obj under eql. obj may be any ISLISP object.
 
-== [.namspace_syntax]_syntax_ +if+
-[subs="+quotes,+replacements"]
+== +if+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(if test-form then-form [else-form])=> <object>
+(if test-form then-form [else-form]) => <object>
 ----
 
 
@@ -2122,20 +2787,26 @@ The _test-form_ is evaluated. If its result is anything non-nil, the _then-form_
 
 If no _else-form_ is provided, it defaults to *nil*.
 
-== [.namspace_syntax]_syntax_ +ignore-errors+
-[subs="+quotes,+replacements"]
+== +ignore-errors+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(ignore-errors form*)=> <object>
+(ignore-errors form*) => <object>
 ----
 
 
 
 Establishes a handler for *<error>*, such that if an error occurs during execution of _forms_, *ignore-errors* will immediately return *nil*. Then it executes forms, returning the value returned by the last form (or *nil* if there were no _forms_) if execution terminates normally.
 
-== [.namspace_function]_function_ +initialize-object+
-[subs="+quotes,+replacements"]
+== +initialize-object+
+
+[.islisp-kind]_generic-function_
+
+[subs="+quotes"]
 ----
-(initialize-object instance initialization-arguments)=> <object>
+(initialize-object instance initialization-arguments) => <object>
 ----
 
 
@@ -2146,60 +2817,78 @@ The system-supplied primary method on *initialize-object* initializes the slots 
 
 The _instance_ argument is the object to be initialized. The modified instance is returned as the result. Programmers can define methods for *initialize-object* to specify actions to be taken when an instance is initialized. If only *:after* methods are defined, they will be run after the system-supplied primary method for initialization and therefore will not interfere with the default behavior of *initialize-object*. The consequences are undefined if a programmer-defined primary method for this generic function does not return instance.
 
-== [.namspace_function]_function_ +input-stream-p+
-[subs="+quotes,+replacements"]
+== +input-stream-p+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(input-stream-p obj)=> boolean
+(input-stream-p obj) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is a stream that can handle input operations; otherwise, returns *nil*.
 
-== [.namspace_function]_function_ +instancep+
-[subs="+quotes,+replacements"]
+== +instancep+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(instancep obj class)=> boolean
+(instancep obj class) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is an instance (directly or otherwise) of the class _class_; otherwise, returns *nil*. _obj_ may be any ISLISP object. An error shall be signaled if class is not a class object (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +integerp+
-[subs="+quotes,+replacements"]
+== +integerp+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(integerp obj)=> boolean
+(integerp obj) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is an integer (instance of class *<integer>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +internal-time-units-per-second+
-[subs="+quotes,+replacements"]
+== +internal-time-units-per-second+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(internal-time-units-per-second)=> <integer>
+(internal-time-units-per-second) => <integer>
 ----
 
 
 
 *internal-time-units-per-second* returns the number of time units per second for the implementation.
 
-== [.namspace_function]_function_ +isqrt+
-[subs="+quotes,+replacements"]
+== +isqrt+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(isqrt z)=> <integer>
+(isqrt z) => <integer>
 ----
 
 
 
 Returns the greatest integer less than or equal to the exact positive square root of _z_. An error shall be signaled if _z_ is not a non-negative integer (error-id. _domain-error_).
 
-== [.namspace_syntax]_syntax_ +labels+
-[subs="+quotes,+replacements"]
+== +labels+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(labels ((function-name lambda-list form*)*) body-form*)=> <object>
+(labels ((function-name lambda-list form*)*) body-form*) => <object>
 ----
 
 
@@ -2214,10 +2903,13 @@ During activation, the prepared *labels* establishes function bindings and then 
 
 No _function-name_ may appear more than once in the function bindings.
 
-== [.namspace_syntax]_syntax_ +lambda+
-[subs="+quotes,+replacements"]
+== +lambda+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(lambda lambda-list form*)=> <function>
+(lambda lambda-list form*) => <function>
 ----
 
 
@@ -2240,10 +2932,13 @@ Once the lambda variables have been bound, the body is executed. If the body is 
 
 If the function receives a *&#38;rest* or *:rest* parameter _R_, the list _L~1~_ to which that parameter is bound has indefinite extent. _L~1~_ is newly allocated unless the function was called with apply and _R_ corresponds to the final argument, _L~2~_, to that call to *apply* (or some subtail of _L~2~)_, in which case it is implementation defined whether _L~1~_ shares structure with _L~2~_.
 
-== [.namspace_function]_function_ +lcm+
-[subs="+quotes,+replacements"]
+== +lcm+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(lcm z1 z2)=> <integer>
+(lcm z1 z2) => <integer>
 ----
 
 
@@ -2258,10 +2953,13 @@ That is, the evaluation of the above form always return *t*.
 
 An error shall be signaled if either _z~1~_ or _z~2~_ is not an integer (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +length+
-[subs="+quotes,+replacements"]
+== +length+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(length sequence)=> <integer>
+(length sequence) => <integer>
 ----
 
 
@@ -2274,10 +2972,13 @@ When _sequence_ is a list, the result is the number of elements in the list; if 
 
 An error shall be signaled if _sequence_ is not a basic-vector or a list (error-id. _domain-error_).
 
-== [.namspace_syntax]_syntax_ +let+
-[subs="+quotes,+replacements"]
+== +let+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(let ((var form)*) body-form*)=> <object>
+(let ((var form)*) body-form*) => <object>
 ----
 
 
@@ -2296,10 +2997,13 @@ NOTE: Although this form is a special form, one can think of it as a macro whose
 | (let ((var1 form1) (var2 form2) … (varn formn)) body-form&#42;) | ((lambda (var1 var2 … varn) body-form&#42;) form1 form2 … formn)
 |===
 
-== [.namspace_syntax]_syntax_ +let*+
-[subs="+quotes,+replacements"]
+== +let*+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(let* ((var form)*) body-form*)=> <object>
+(let* ((var form)*) body-form*) => <object>
 ----
 
 
@@ -2316,40 +3020,52 @@ NOTE: Although this form is a special form, one can think of it as a macro whose
 | (let&#42; ((var1 form1) (var2 form2) … (varn formn)) body-form&#42;) | (let ((var1 form1)) (let ((var2 form2)) … (let ((varn formn)) body-form&#42;)...))
 |===
 
-== [.namspace_function]_function_ +list+
-[subs="+quotes,+replacements"]
+== +list+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(list obj*)=> <list>
+(list obj*) => <list>
 ----
 
 
 
 Returns a new list whose length is the number of arguments and whose elements are the arguments in the same order as in the *list*-form. An error shall be signaled if the requested list cannot be allocated (error-id. _cannot-create-list_). Each _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +listp+
-[subs="+quotes,+replacements"]
+== +listp+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(listp obj)=> boolean
+(listp obj) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is a list (instance of class *<list>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +log+
-[subs="+quotes,+replacements"]
+== +log+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(log x)=> <number>
+(log x) => <number>
 ----
 
 
 
 Returns the natural logarithm of _x_. An error shall be signaled if _x_ is not a positive number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +map-into+
-[subs="+quotes,+replacements"]
+== +map-into+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(map-into destination function sequence*)=> <sequence>
+(map-into destination function sequence*) => <sequence>
 ----
 
 
@@ -2364,10 +3080,13 @@ An error shall be signaled if _destination_ is not a basic-vector or a list (err
 
 An error shall be signaled if any _sequence_ is not a basic-vector or a list (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +mapc+
-[subs="+quotes,+replacements"]
+== +mapc+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(mapc function list+)=> <list>
+(mapc function list+) => <list>
 ----
 
 
@@ -2379,10 +3098,13 @@ An error shall be signaled if _function_ is not a function (error-id. _domain-er
 
 The calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.
 
-== [.namspace_function]_function_ +mapcan+
-[subs="+quotes,+replacements"]
+== +mapcan+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(mapcan function list+)=> <list>
+(mapcan function list+) => <list>
 ----
 
 
@@ -2394,10 +3116,13 @@ An error shall be signaled if _function_ is not a function (error-id. _domain-er
 
 The calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.
 
-== [.namspace_function]_function_ +mapcar+
-[subs="+quotes,+replacements"]
+== +mapcar+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(mapcar function list+)=> <list>
+(mapcar function list+) => <list>
 ----
 
 
@@ -2409,10 +3134,13 @@ An error shall be signaled if _function_ is not a function (error-id. _domain-er
 
 The calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.
 
-== [.namspace_function]_function_ +mapcon+
-[subs="+quotes,+replacements"]
+== +mapcon+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(mapcon function list+)=> <list>
+(mapcon function list+) => <list>
 ----
 
 
@@ -2424,10 +3152,13 @@ An error shall be signaled if _function_ is not a function (error-id. _domain-er
 
 The calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.
 
-== [.namspace_function]_function_ +mapl+
-[subs="+quotes,+replacements"]
+== +mapl+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(mapl function list+)=> <list>
+(mapl function list+) => <list>
 ----
 
 
@@ -2439,10 +3170,13 @@ An error shall be signaled if _function_ is not a function (error-id. _domain-er
 
 The calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.
 
-== [.namspace_function]_function_ +maplist+
-[subs="+quotes,+replacements"]
+== +maplist+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(maplist function list+)=> <list>
+(maplist function list+) => <list>
 ----
 
 
@@ -2454,10 +3188,13 @@ An error shall be signaled if _function_ is not a function (error-id. _domain-er
 
 The calls to _function_ proceed from left to right, so that if _function_ has side-effects, it can rely upon being called first on all of the elements with index 0, then on all of those numbered 1, and so on.
 
-== [.namspace_function]_function_ +max+
-[subs="+quotes,+replacements"]
+== +max+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(max x+)=> <number>
+(max x+) => <number>
 ----
 
 
@@ -2466,20 +3203,26 @@ The function *max* returns the greatest (closest to positive infinity) of its ar
 
 An error shall be signaled if any _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +member+
-[subs="+quotes,+replacements"]
+== +member+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(member obj list)=> <list>
+(member obj list) => <list>
 ----
 
 
 
 If _list_ contains at least one occurrence of _obj_ (as determined by *eql*), the first sublist of _list_ whose car is _obj_ is returned. Otherwise, *nil* is returned. An error shall be signaled if _list_ is not a list (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +min+
-[subs="+quotes,+replacements"]
+== +min+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(min x+)=> <number>
+(min x+) => <number>
 ----
 
 
@@ -2488,10 +3231,13 @@ The function *min* returns the least (closest to negative infinity) of its argum
 
 An error shall be signaled if any _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +mod+
-[subs="+quotes,+replacements"]
+== +mod+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(mod z1 z2)=> <integer>
+(mod z1 z2) => <integer>
 ----
 
 
@@ -2508,10 +3254,13 @@ That is, the evaluation of the above form always return *t*.
 
 An error shall be signaled if either _z~1~_ or _z~2~_ is not an integer (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +next-method-p+
-[subs="+quotes,+replacements"]
+== +next-method-p+
+
+[.islisp-kind]_local-function_
+
+[subs="+quotes"]
 ----
-(next-method-p)=> boolean
+(next-method-p) => boolean
 ----
 
 
@@ -2520,30 +3269,39 @@ The *next-method-p* function can be used within the body of a method defined by 
 
 The functional binding of *next-method-p* is lexical within the body of the method-defining form; i.e., it is as if it were established by *labels*. The function object to which the binding refers has indefinite extent.
 
-== [.namspace_value]_value_ +nil+
-[subs="+quotes,+replacements"]
+== +nil+
+
+[.islisp-kind]_constant_
+
+[subs="verbatim"]
 ----
-<null>
+nil => <null>
 ----
 
 
 
 *nil* is a named constant whose value is the symbol *nil* itself.
 
-== [.namspace_function]_function_ +not+
-[subs="+quotes,+replacements"]
+== +not+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(not obj)=> boolean
+(not obj) => boolean
 ----
 
 
 
 This predicate is the logical “not” (or “¬”). It returns *t* if _obj_ is *nil* and *nil* otherwise. _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +nreverse+
-[subs="+quotes,+replacements"]
+== +nreverse+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(nreverse list)=> <list>
+(nreverse list) => <list>
 ----
 
 
@@ -2552,30 +3310,39 @@ This predicate is the logical “not” (or “¬”). It returns *t* if _obj_ i
 
 The conses which make up the top level of the given _list_ are permitted, but not required, to be side-effected in order to produce this new list. *nreverse* should never be called on a literal object.
 
-== [.namspace_function]_function_ +null+
-[subs="+quotes,+replacements"]
+== +null+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(null obj)=> boolean
+(null obj) => boolean
 ----
 
 
 
 Returns t if _obj_ is *nil*; otherwise, returns *nil*. _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +numberp+
-[subs="+quotes,+replacements"]
+== +numberp+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(numberp obj)=> boolean
+(numberp obj) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is a number (instance of class *<number>*); otherwise, returns *nil*. The _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +open-input-file+
-[subs="+quotes,+replacements"]
+== +open-input-file+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(open-input-file filename [element-class])=> <stream>
+(open-input-file filename [element-class]) => <stream>
 ----
 
 
@@ -2588,10 +3355,13 @@ The _element-class_ can be either the class *<character>* (the default) or a pos
 
 NOTE: When a binary stream is used, the order of bits within bytes and bytes within words (i.e., whether it is right to left or left to right) are each implementation defined.
 
-== [.namspace_function]_function_ +open-io-file+
-[subs="+quotes,+replacements"]
+== +open-io-file+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(open-io-file filename [element-class])=> <stream>
+(open-io-file filename [element-class]) => <stream>
 ----
 
 
@@ -2604,10 +3374,13 @@ The _element-class_ can be either the class *<character>* (the default) or a pos
 
 NOTE: When a binary stream is used, the order of bits within bytes and bytes within words (i.e., whether it is right to left or left to right) are each implementation defined.
 
-== [.namspace_function]_function_ +open-output-file+
-[subs="+quotes,+replacements"]
+== +open-output-file+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(open-output-file filename [element-class])=> <stream>
+(open-output-file filename [element-class]) => <stream>
 ----
 
 
@@ -2620,20 +3393,26 @@ The _element-class_ can be either the class *<character>* (the default) or a pos
 
 NOTE: When a binary stream is used, the order of bits within bytes and bytes within words (i.e., whether it is right to left or left to right) are each implementation defined.
 
-== [.namspace_function]_function_ +open-stream-p+
-[subs="+quotes,+replacements"]
+== +open-stream-p+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(open-stream-p obj)=> boolean
+(open-stream-p obj) => boolean
 ----
 
 
 
 Returns t if obj is an open stream; otherwise, returns nil.
 
-== [.namspace_syntax]_syntax_ +or+
-[subs="+quotes,+replacements"]
+== +or+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(or form*)=> <object>
+(or form*) => <object>
 ----
 
 
@@ -2647,40 +3426,52 @@ Returns t if obj is an open stream; otherwise, returns nil.
 (or _form~1~_ _form~2~_ … _form~n~_) = ((lambda (var) (if var var (or _form~2~_ … _form~n~_))) _form~1~_)
 ----
 
-== [.namspace_function]_function_ +output-stream-p+
-[subs="+quotes,+replacements"]
+== +output-stream-p+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(output-stream-p obj)=> boolean
+(output-stream-p obj) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is a stream that can handle output operations; otherwise, returns *nil*.
 
-== [.namspace_function]_function_ +parse-error-expected-class+
-[subs="+quotes,+replacements"]
+== +parse-error-expected-class+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(parse-error-expected-class parse-error)=> <class>
+(parse-error-expected-class parse-error) => <class>
 ----
 
 
 
 Returns the _expected-class_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class ** (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +parse-error-string+
-[subs="+quotes,+replacements"]
+== +parse-error-string+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(parse-error-string parse-error)=> <string>
+(parse-error-string parse-error) => <string>
 ----
 
 
 
 Returns the _string_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class ** (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +parse-number+
-[subs="+quotes,+replacements"]
+== +parse-number+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(parse-number string)=> <number>
+(parse-number string) => <number>
 ----
 
 
@@ -2689,10 +3480,13 @@ The characters belonging to _string_ are scanned (as if by *read*) and if the re
 
 An error shall be signaled if _string_ is not a string (error-id. _domain-error_). An error shall be signaled if _string_ is not the textual representation of a number (error-id. _cannot-parse-number_).
 
-== [.namspace_function]_function_ +preview-char+
-[subs="+quotes,+replacements"]
+== +preview-char+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(preview-char [input-stream [eos-error-p [eos-value]]])=> <object>
+(preview-char [input-stream [eos-error-p [eos-value]]]) => <object>
 ----
 
 
@@ -2701,30 +3495,39 @@ Returns the next character of _input-stream_, if any. The character is not consu
 
 See §27.1 for information about how _input-stream_, _eos-error-p_, and _eos-value_ are treated.
 
-== [.namspace_function]_function_ +print-stacktrace+
-[subs="+quotes,+replacements"]
+== +print-stacktrace+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(print-stacktrace stream condition)=> <null>
+(print-stacktrace stream condition) => <null>
 ----
 
 
 
 Prints given _condition_'s stacktrace to _stream_. Uses active *&#42;stacktrace-formatter&#42;*.
 
-== [.namspace_function]_function_ +probe-file+
-[subs="+quotes,+replacements"]
+== +probe-file+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(probe-file filename)=> boolean
+(probe-file filename) => boolean
 ----
 
 
 
 Returns *t* if the file specified by _filename_ exists; otherwise, returns *nil*. An error shall be signaled if _filename_ is not a string (error-id. _domain-error_).
 
-== [.namspace_syntax]_syntax_ +progn+
-[subs="+quotes,+replacements"]
+== +progn+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(progn form*)=> <object>
+(progn form*) => <object>
 ----
 
 
@@ -2733,10 +3536,13 @@ This special form allows a series of forms to be evaluated, where normally only 
 
 The result of evaluation of the last form of _form_&#42; is returned. All the _forms_ are evaluated from left to right. The values of all the _forms_ but the last are discarded, so they are executed only for their side-effects. *progn* without forms returns *nil*.
 
-== [.namspace_function]_function_ +property+
-[subs="+quotes,+replacements"]
+== +property+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(property symbol property-name [obj])=> <object>
+(property symbol property-name [obj]) => <object>
 ----
 
 
@@ -2745,10 +3551,13 @@ Returns the value of the property named _property-name_ associated with the symb
 
 An error shall be signaled if either symbol or property-name is not a symbol (error-id. _domain-error_). obj may be any ISLISP object
 
-== [.namspace_setf]_setf_ +property+
-[subs="+quotes,+replacements"]
+== +property+
+
+[.islisp-kind]_setf_
+
+[subs="+quotes"]
 ----
-(setf (property symbol property-name) obj)=> <object>
+(setf (property symbol property-name) obj) => <object>
 ----
 
 
@@ -2757,8 +3566,11 @@ Causes _obj_ to be the new value of the property named _property-name_ asssociat
 
 An error shall be signaled if either symbol or property-name is not a symbol (error-id. _domain-error_). obj may be any ISLISP object
 
-== [.namspace_syntax]_syntax_ +provides+
-[subs="+quotes,+replacements"]
+== +provides+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
 (provides symbol*)
 ----
@@ -2767,10 +3579,13 @@ An error shall be signaled if either symbol or property-name is not a symbol (er
 
 Exports functions / macros / values bound to _symbol_ to be visible in other modules that *requires* this module.
 
-== [.namspace_syntax]_syntax_ +quote+
-[subs="+quotes,+replacements"]
+== +quote+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(quote obj)=> <object>
+(quote obj) => <object>
 ----
 
 
@@ -2781,10 +3596,13 @@ The character *'* (apostrophe or single quote) is syntax for quotation. That is,
 
 The result of the evaluation of the *quote* special form is _obj_.
 
-== [.namspace_function]_function_ +quotient+
-[subs="+quotes,+replacements"]
+== +quotient+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(quotient dividend divisor+)=> <number>
+(quotient dividend divisor+) => <number>
 ----
 
 
@@ -2799,10 +3617,13 @@ Given more than two arguments, *quotient* operates iteratively on each of the _d
 ----
 An error shall be signaled if _dividend_ is not a number (error-id. _domain-error_). An error shall be signaled if any _divisor_ is not a number (error-id. _domain-error_). An error shall be signaled if any _divisor_ is zero (error-id. _division-by-zero_).
 
-== [.namspace_function]_function_ +read+
-[subs="+quotes,+replacements"]
+== +read+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(read [input-stream [eos-error-p [eos-value]]])=> <object>
+(read [input-stream [eos-error-p [eos-value]]]) => <object>
 ----
 
 
@@ -2811,10 +3632,13 @@ The function *read* returns the ISLISP object that is created as the result of r
 
 See §27.1 for information about how input-stream, eos-error-p, and eos-value are treated.
 
-== [.namspace_function]_function_ +read-byte+
-[subs="+quotes,+replacements"]
+== +read-byte+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(read-byte input-stream [eos-error-p [eos-value]])=> <integer>
+(read-byte input-stream [eos-error-p [eos-value]]) => <integer>
 ----
 
 
@@ -2823,10 +3647,13 @@ Reads a byte from the _input-stream_ and returns it. The number of bits in a byt
 
 See §27.1 for information about how _input-stream_, _eos-error-p_, and _eos-value_ are treated.
 
-== [.namspace_function]_function_ +read-char+
-[subs="+quotes,+replacements"]
+== +read-char+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(read-char [input-stream [eos-error-p [eos-value]]])=> <object>
+(read-char [input-stream [eos-error-p [eos-value]]]) => <object>
 ----
 
 
@@ -2835,10 +3662,13 @@ See §27.1 for information about how _input-stream_, _eos-error-p_, and _eos-val
 
 See §27.1 for information about how _input-stream_, _eos-error-p_, and _eos-value_ are treated.
 
-== [.namspace_function]_function_ +read-line+
-[subs="+quotes,+replacements"]
+== +read-line+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(read-line [input-stream [eos-error-p [eos-value]]])=> <object>
+(read-line [input-stream [eos-error-p [eos-value]]]) => <object>
 ----
 
 
@@ -2847,20 +3677,26 @@ Reads a line of characters from _input-stream_ and returns them as a string (wit
 
 See §27.1 for information about how _input-stream_, _eos-error-p_, and _eos-value_ are treated.
 
-== [.namspace_function]_function_ +reciprocal+
-[subs="+quotes,+replacements"]
+== +reciprocal+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(reciprocal x)=> <number>
+(reciprocal x) => <number>
 ----
 
 
 
 The function *reciprocal* returns the reciprocal of its argument _x_; that is, 1/_x_. An error shall be signaled if _x_ is zero (error-id. _division-by-zero_).
 
-== [.namspace_function]_function_ +remove-property+
-[subs="+quotes,+replacements"]
+== +remove-property+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(remove-property symbol property-name)=> <object>
+(remove-property symbol property-name) => <object>
 ----
 
 
@@ -2869,18 +3705,24 @@ Removes the property _property-name_ associated with _symbol_ and returns the pr
 
 An error shall be signaled if either _symbol_ or _property-name_ is not a symbol (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +report-condition+
-[subs="+quotes,+replacements"]
+== +report-condition+
+
+[.islisp-kind]_generic-function_
+
+[subs="+quotes"]
 ----
-(report-condition condition stream)=> <condition>
+(report-condition condition stream) => <condition>
 ----
 
 
 
 Presents a natural language description of _condition_ to _stream_. This generic function may be specialized for user-defined condition classes.
 
-== [.namspace_syntax]_syntax_ +requires+
-[subs="+quotes,+replacements"]
+== +requires+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
 (require path)
 ----
@@ -2889,20 +3731,26 @@ Presents a natural language description of _condition_ to _stream_. This generic
 
 Imports module from _path_ (which must be a string). _path_ is resolved relative set of active source roots.
 
-== [.namspace_syntax]_syntax_ +return-from+
-[subs="+quotes,+replacements"]
+== +return-from+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(return-from name result-form=> nil
+(return-from name result-form => nil
 ----
 
 
 
 Returns from named block. See *block* for details.
 
-== [.namspace_function]_function_ +reverse+
-[subs="+quotes,+replacements"]
+== +reverse+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(reverse list)=> <list>
+(reverse list) => <list>
 ----
 
 
@@ -2911,50 +3759,65 @@ Returns a list whose elements are those of the given _list_, but in reverse orde
 
 For *reverse*, no side-effect to the given _list_ occurs. The resulting list is permitted but not required to share structure with the input _list_.
 
-== [.namspace_function]_function_ +round+
-[subs="+quotes,+replacements"]
+== +round+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(round x)=> <integer>
+(round x) => <integer>
 ----
 
 
 
 Returns the integer nearest to x. If x is exactly halfway between two integers, the even one is chosen. An error shall be signaled if x is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +set-aref+
-[subs="+quotes,+replacements"]
+== +set-aref+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(set-aref obj basic-array z*)=> <object>
+(set-aref obj basic-array z*) => <object>
 ----
 
 
 
 Replaces the object obtainable by *aref* with _obj_. The returned value is _obj_. The constraints on the _basic-array_ and the sequence of indices _z_ is the same as for *aref*.
 
-== [.namspace_function]_function_ +set-car+
-[subs="+quotes,+replacements"]
+== +set-car+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(set-car obj cons)=> <object>
+(set-car obj cons) => <object>
 ----
 
 
 
 Updates the left component of _cons_ with _obj_. The returned value is _obj_. An error shall be signaled if _cons_ is not a cons (error-id. _domain-error_). _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +set-cdr+
-[subs="+quotes,+replacements"]
+== +set-cdr+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(set-cdr obj cons)=> <object>
+(set-cdr obj cons) => <object>
 ----
 
 
 
 Updates the right component of _cons_ with _obj_. The returned value is _obj_ . An error shall be signaled if _cons_ is not a cons (error-id. _domain-error_). _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +set-documentation+
-[subs="+quotes,+replacements"]
+== +set-documentation+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(set-documentation docvalue name-space symbol)=> <object>
+(set-documentation docvalue name-space symbol) => <object>
 ----
 
 
@@ -2963,10 +3826,13 @@ Sets documentation value for given name-space and symbol in current module. See 
 
 Returns previously stored documentation entry.
 
-== [.namspace_syntax]_syntax_ +set-dynamic+
-[subs="+quotes,+replacements"]
+== +set-dynamic+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(set-dynamic form var)=> <object>
+(set-dynamic form var) => <object>
 ----
 
 
@@ -2977,10 +3843,13 @@ _form_ is evaluated and the result of the evaluation is used to change the dynam
 
 An error shall be signaled if _var_ has no dynamic value (error-id. _unbound-variable_). *setf* of *dynamic* can be used only for modifying bindings, and not for establishing them.
 
-== [.namspace_function]_function_ +set-elt+
-[subs="+quotes,+replacements"]
+== +set-elt+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(set-elt obj sequence z)=> <object>
+(set-elt obj sequence z) => <object>
 ----
 
 
@@ -2989,10 +3858,13 @@ Replaces the object obtainable by *elt* with _obj_. The returned value is _obj_.
 
 An error shall be signaled if _z_ is an integer outside of the valid range of indices (error-id. _index-out-of-range_). An error shall be signaled if _sequence_ is not a basic-vector or a list or if _z_ is not an integer (error-id. _domain-error_). obj may be any ISLISP object.
 
-== [.namspace_function]_function_ +set-file-position+
-[subs="+quotes,+replacements"]
+== +set-file-position+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(set-file-position stream z)=> <integer>
+(set-file-position stream z) => <integer>
 ----
 
 
@@ -3001,20 +3873,26 @@ Attempts to change the file position (see *file-position*) of the stream _stream
 
 An error shall be signaled if _stream_ is not a stream to or from a file, or if _z_ is not a non-negative integer (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +set-garef+
-[subs="+quotes,+replacements"]
+== +set-garef+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(set-garef obj general-array z*)=> <object>
+(set-garef obj general-array z*) => <object>
 ----
 
 
 
 Replace the object obtainable by *garef* with _obj_. The returned value is _obj_. The constraints on the _general-array_ and the sequence of indices _z_ is the same as for *garef*.
 
-== [.namspace_function]_function_ +set-property+
-[subs="+quotes,+replacements"]
+== +set-property+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(set-property obj symbol property-name)=> <object>
+(set-property obj symbol property-name) => <object>
 ----
 
 
@@ -3023,10 +3901,13 @@ Causes _obj_ to be the new value of the property named _property-name_ asssociat
 
 An error shall be signaled if either symbol or property-name is not a symbol (error-id. _domain-error_). obj may be any ISLISP object
 
-== [.namspace_syntax]_syntax_ +setf+
-[subs="+quotes,+replacements"]
+== +setf+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(setf place form)=> <object>
+(setf place form) => <object>
 ----
 
 
@@ -3051,10 +3932,13 @@ This macro is used for generalized assignment.
 
 A place can also be a macro form that expands (during preparation for execution) into a place or a function application form with operator _op_ for which *setf* is defined or for which a generic function named (*setf* _op_) has been defined. In these last two cases, that function will receive as arguments the new value to be assigned followed by the objects that resulted from evaluating the arguments of the function application form.
 
-== [.namspace_syntax]_syntax_ +setq+
-[subs="+quotes,+replacements"]
+== +setq+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(setq var form)=> <object>
+(setq var form) => <object>
 ----
 
 
@@ -3063,10 +3947,13 @@ This form represents an assignment to the variable denoted by the _identifier_. 
 
 The result of the evaluation of _form_ is returned. This result is used to modify the variable binding denoted by the identifier _var_ (if it is mutable). *setq* can be used only for modifying bindings, and not for establishing a variable. The *setq* special form must be contained in the scope of _var_ , established by *defglobal*, *let*, *let&#42;*, *for*, or a *lambda* expression.
 
-== [.namspace_function]_function_ +signal-condition+
-[subs="+quotes,+replacements"]
+== +signal-condition+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(signal-condition condition continuable)=> <object>
+(signal-condition condition continuable) => <object>
 ----
 
 
@@ -3077,30 +3964,39 @@ If _continuable_ is *nil*, the results of attempting to “continue” (see *con
 
 If _continuable_ is not *nil*, it will be possible to return from the call to *signal-condition* (see *continue-condition*). In this case, the specific value of continuable may be a string indicating the effect of continuing, or it may be the symbol *t*, indicating that an implementation-defined string such as "Continue with no special action." is to be used.
 
-== [.namspace_function]_function_ +simple-error-format-arguments+
-[subs="+quotes,+replacements"]
+== +simple-error-format-arguments+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(simple-error-format-arguments simple-error)=> <list>
+(simple-error-format-arguments simple-error) => <list>
 ----
 
 
 
 Returns the _format-arguments_ supplied as data when creating the _simple-error_. An error shall be signaled if _simple-error_ is not a condition of class *<simple-error>* (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +simple-error-format-string+
-[subs="+quotes,+replacements"]
+== +simple-error-format-string+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(simple-error-format-string simple-error)=> <string>
+(simple-error-format-string simple-error) => <string>
 ----
 
 
 
 Returns the _format-string_ supplied as data when creating the _simple-error_. An error shall be signaled if _simple-error_ is not a condition of class *<simple-error>* (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +sin+
-[subs="+quotes,+replacements"]
+== +sin+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(sin x)=> <number>
+(sin x) => <number>
 ----
 
 
@@ -3109,10 +4005,13 @@ The function *sin* returns the sine of _x_ ._x_ must be given in radians.
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +sinh+
-[subs="+quotes,+replacements"]
+== +sinh+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(sinh x)=> <number>
+(sinh x) => <number>
 ----
 
 
@@ -3121,20 +4020,26 @@ The function *sinh* returns the hyperbolic sine of _x_.
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +sqrt+
-[subs="+quotes,+replacements"]
+== +sqrt+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(sqrt x)=> <number>
+(sqrt x) => <number>
 ----
 
 
 
 Returns the non-negative square root of _x_. An error shall be signaled if _x_ is not a non-negative number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +standard-input+
-[subs="+quotes,+replacements"]
+== +standard-input+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(standard-input)=> <stream>
+(standard-input) => <stream>
 ----
 
 
@@ -3143,10 +4048,13 @@ The function *standard-input* returns the stream used as the default stream for 
 
 The value returned by this function is initially implementation-defined, but can be dynamically bound; see *with-standard-input*.
 
-== [.namspace_function]_function_ +standard-output+
-[subs="+quotes,+replacements"]
+== +standard-output+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(standard-output)=> <stream>
+(standard-output) => <stream>
 ----
 
 
@@ -3155,40 +4063,52 @@ The function *standard-output* returns the stream used as the default stream for
 
 The value returned by this function is initially implementation-defined, but can be dynamically bound; see *with-standard-output*.
 
-== [.namspace_function]_function_ +stream-error-stream+
-[subs="+quotes,+replacements"]
+== +stream-error-stream+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(stream-error-stream stream-error)=> <stream>
+(stream-error-stream stream-error) => <stream>
 ----
 
 
 
 Returns the _stream_ supplied as data when creating the _stream-error_. An error shall be signaled if *stream-error* is not a condition of class *<stream-error>* (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +stream-ready-p+
-[subs="+quotes,+replacements"]
+== +stream-ready-p+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(stream-ready-p input-stream)=> boolean
+(stream-ready-p input-stream) => boolean
 ----
 
 
 
 Returns *t* if an attempt to obtain the next element from the _stream_ will not cause the processor to have to wait; otherwise, returns *nil*. An error shall be signaled if _stream_ is not a stream that can handle input operations (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +streamp+
-[subs="+quotes,+replacements"]
+== +streamp+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(streamp obj)=> boolean
+(streamp obj) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is a stream (instance of class *<stream>*); otherwise, returns *nil*. _obj_ may be any ISLISP object. *streamp* is unaffected by whether its argument, if an instance of the class *<stream>*, is open or closed.
 
-== [.namspace_function]_function_ +string-append+
-[subs="+quotes,+replacements"]
+== +string-append+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(string-append string*)=> <string>
+(string-append string*) => <string>
 ----
 
 
@@ -3199,10 +4119,13 @@ This function does not modify its arguments. It is implementation defined whethe
 
 An error shall be signaled if the string cannot be allocated (error-id. _cannot-create-string_).
 
-== [.namspace_function]_function_ +string-index+
-[subs="+quotes,+replacements"]
+== +string-index+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(string-index substring string [start-position])=> <object>
+(string-index substring string [start-position]) => <object>
 ----
 
 
@@ -3211,10 +4134,13 @@ Returns the position of the given _substring_ within _string_. The search starts
 
 An error shall be signaled if either _substring_ or _string_ is not a string (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +string/=+
-[subs="+quotes,+replacements"]
+== +string/=+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(string/= string1 string2)=> quasi-boolean
+(string/= string1 string2) => quasi-boolean
 ----
 
 
@@ -3223,10 +4149,13 @@ Two strings are *string/=* if and only if they are not *string=*. If the test is
 
 An error shall be signaled if either _string~1~_ or _string~2~_ is not a string (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +string<+
-[subs="+quotes,+replacements"]
+== +string<+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(string< string1 string2)=> quasi-boolean
+(string< string1 string2) => quasi-boolean
 ----
 
 
@@ -3241,10 +4170,13 @@ If the test is satisfied, an implementation-defined non-nil value is returned; o
 
 An error shall be signaled if either _string~1~_ or _string~2~_ is not a string (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +string<=+
-[subs="+quotes,+replacements"]
+== +string<=+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(string<= string1 string2)=> quasi-boolean
+(string<= string1 string2) => quasi-boolean
 ----
 
 
@@ -3255,10 +4187,13 @@ If the test is satisfied, an implementation-defined non-nil value is returned; o
 
 An error shall be signaled if either _string~1~_ or _string~2~_ is not a string (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +string=+
-[subs="+quotes,+replacements"]
+== +string=+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(string= string1 string2)=> quasi-boolean
+(string= string1 string2) => quasi-boolean
 ----
 
 
@@ -3269,10 +4204,13 @@ If the test is satisfied, an implementation-defined non-nil value is returned; o
 
 An error shall be signaled if either _string~1~_ or _string~2~_ is not a string (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +string>+
-[subs="+quotes,+replacements"]
+== +string>+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(string> string1 string2)=> quasi-boolean
+(string> string1 string2) => quasi-boolean
 ----
 
 
@@ -3283,10 +4221,13 @@ If the test is satisfied, an implementation-defined non-nil value is returned; o
 
 An error shall be signaled if either _string~1~_ or _string~2~_ is not a string (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +string>=+
-[subs="+quotes,+replacements"]
+== +string>=+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(string>= string1 string2)=> quasi-boolean
+(string>= string1 string2) => quasi-boolean
 ----
 
 
@@ -3297,30 +4238,39 @@ If the test is satisfied, an implementation-defined non-nil value is returned; o
 
 An error shall be signaled if either _string~1~_ or _string~2~_ is not a string (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +stringp+
-[subs="+quotes,+replacements"]
+== +stringp+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(stringp obj)=> boolean
+(stringp obj) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is a string (instance of class *<string>*); otherwise, returns *nil*. _obj_ may be any ISLISP object.
 
-== [.namspace_function]_function_ +subclassp+
-[subs="+quotes,+replacements"]
+== +subclassp+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(subclassp class1 class2)=> boolean
+(subclassp class1 class2) => boolean
 ----
 
 
 
 Returns *t* if the class _class~1~_ is a subclass of the class _class~2~_; otherwise, returns *nil*. An error shall be signaled if either _class~1~_ or _class~2~_ is not a class object (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +subseq+
-[subs="+quotes,+replacements"]
+== +subseq+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(subseq sequence z1 z2)=> <sequence>
+(subseq sequence z1 z2) => <sequence>
 ----
 
 
@@ -3329,30 +4279,39 @@ Given a sequence _sequence_ and two integers _z~1~_ and _z~2~_ satisfying 0 ≤ 
 
 An error shall be signaled if the requested subsequence cannot be allocated (error-id. _cannot-create-sequence_). An error shall be signaled if _z~1~_ or _z~2~_ are outside of the bounds mentioned (error-id. _index-out-of-range_). An error shall be signaled if _sequence_ is not a basic-vector or a list, or if _z~1~_ is not an integer, or if _z~2~_ is not an integer (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +symbolp+
-[subs="+quotes,+replacements"]
+== +symbolp+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(symbolp obj)=> boolean
+(symbolp obj) => boolean
 ----
 
 
 
 Returns *t* if _obj_ is a symbol (instance of class *<symbol>*); otherwise, returns *nil*. The _obj_ may be any ISLISP object.
 
-== [.namspace_value]_value_ +t+
-[subs="+quotes,+replacements"]
+== +t+
+
+[.islisp-kind]_constant_
+
+[subs="verbatim"]
 ----
-<symbol>
+t => <symbol>
 ----
 
 
 
 *t* is a named constant whose value is the symbol *t* itself. *nil* is a named constant whose value is the symbol *nil* itself.
 
-== [.namspace_syntax]_syntax_ +tagbody+
-[subs="+quotes,+replacements"]
+== +tagbody+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(tagbody {tagbody-tag | form}*)=> <object>
+(tagbody {tagbody-tag | form}*) => <object>
 ----
 
 
@@ -3373,10 +4332,13 @@ It is a violation if a _tagbody tag_ is other than an identifier. See §14.7.2 f
 
 NOTE: As a stylistic matter, programmers are not encouraged to use *tagbody* and *go* in everyday programming. The primary uses for which these forms are intended are for implementing other control abstractions (using macros), and for the occassional real-world situation that uses unstructured imperative transfer of control (such as a finite state machine).
 
-== [.namspace_function]_function_ +tan+
-[subs="+quotes,+replacements"]
+== +tan+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(tan x)=> <number>
+(tan x) => <number>
 ----
 
 
@@ -3385,10 +4347,13 @@ The function tan returns the tangent of _x_. _x_ must be given in radians.
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +tanh+
-[subs="+quotes,+replacements"]
+== +tanh+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(tanh x)=> <number>
+(tanh x) => <number>
 ----
 
 
@@ -3397,10 +4362,13 @@ The function *tanh* returns the hyperbolic tangent of _x_.
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_syntax]_syntax_ +the+
-[subs="+quotes,+replacements"]
+== +the+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(the class-name form)=> <object>
+(the class-name form) => <object>
 ----
 
 
@@ -3409,10 +4377,13 @@ This form evaluates _form_. If _form_ returns, the returned value is returned by
 
 The consequences are undefined if the value of _form_ is not of the class or a subclass of the class designated by _class-name_.
 
-== [.namspace_syntax]_syntax_ +throw+
-[subs="+quotes,+replacements"]
+== +throw+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(throw tag-form result-form)=> nil
+(throw tag-form result-form) => nil
 ----
 
 
@@ -3427,40 +4398,52 @@ If a *throw* special form is executed, it evaluates the _tag-form_ producing a _
 
 An error shall be signaled if there is no outstanding catcher for a _T~1~_ (error-id. _control-error_). See §14.7.2 for other errors.
 
-== [.namspace_syntax]_syntax_ +trace+
-[subs="+quotes,+replacements"]
+== +trace+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(trace expr)=> <object>
+(trace expr) => <object>
 ----
 
 
 
 "print" debugging helper. Outputs expr and it's evaluated result to stdout. Returns evaluated result.
 
-== [.namspace_function]_function_ +truncate+
-[subs="+quotes,+replacements"]
+== +truncate+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(truncate x)=> <integer>
+(truncate x) => <integer>
 ----
 
 
 
 Returns the integer between 0 and _x_ (inclusive) that is nearest to _x_. That is, _x_ is truncated towards zero. An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +undefined-entity-name+
-[subs="+quotes,+replacements"]
+== +undefined-entity-name+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(undefined-entity-name undefined-entity)=> <symbol>
+(undefined-entity-name undefined-entity) => <symbol>
 ----
 
 
 
 Returns the _name_ supplied as data when creating the _undefined-entity_. An error shall be signaled if _undefined-entity_ is not a condition of class *<undefined-entity>* (error-id. _domain-error_).
 
-== [.namspace_function]_function_ +undefined-entity-namespace+
-[subs="+quotes,+replacements"]
+== +undefined-entity-namespace+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(undefined-entity-namespace undefined-entity)=> <symbol>
+(undefined-entity-namespace undefined-entity) => <symbol>
 ----
 
 
@@ -3469,10 +4452,13 @@ Returns the _namespace_ supplied as data when creating the _undefined-entity_. A
 
 The result of *undefined-entity-namespace* will be one of the symbols *variable*, *dynamic-variable*, *function*, or *class*.
 
-== [.namspace_syntax]_syntax_ +unwind-protect+
-[subs="+quotes,+replacements"]
+== +unwind-protect+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(unwind-protect form cleanup-form*)=> <object>
+(unwind-protect form cleanup-form*) => <object>
 ----
 
 
@@ -3489,20 +4475,26 @@ An error shall be signaled if during execution of the _cleanup-forms_ of an *unw
 
 NOTE: Because ISLISP does not specify an interactive debugger, it is unspecified whether or how error recovery can occur interactively if programmatic handling fails. The intent is that if the ISLISP processor does not terminate abnormally, normal mechanisms for non-local exit (*return-from*, *throw*, or *go*) would be used as necessary and would respect these _cleanup-forms_.
 
-== [.namspace_function]_function_ +vector+
-[subs="+quotes,+replacements"]
+== +vector+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(vector obj*)=> <general-vector>
+(vector obj*) => <general-vector>
 ----
 
 
 
 Returns a new general-vector whose elements are its _obj_ arguments. The length of the newly created vector is, therefore, the number of _objs_ passed as arguments. The vector is indexed by integers ranging from 0 to dimension−1. An error shall be signaled if the requested vector cannot be allocated (error-id. _cannot-create-vector_). Each _obj_ may be any ISLISP object.
 
-== [.namspace_syntax]_syntax_ +while+
-[subs="+quotes,+replacements"]
+== +while+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(while test-form body-form*)=> <null>
+(while test-form body-form*) => <null>
 ----
 
 
@@ -3514,30 +4506,39 @@ Iterates while the _test-form_ returns a true value. Specifically:
 3. Otherwise, if Vt is non-nil, the forms body-form&#42; are evaluated sequentially (from left to right).
 4. Upon successful completion of the body-forms&#42;, the while form begins again with step 1.
 
-== [.namspace_syntax]_syntax_ +with-error-output+
-[subs="+quotes,+replacements"]
+== +with-error-output+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(with-error-output stream-form form*)=> <object>
+(with-error-output stream-form form*) => <object>
 ----
 
 
 
 This special form first evaluate its _stream-form_ argument to produce a stream _s_ and then evaluate its body _forms_ in a dynamic environment where the function *error-output* returns the stream _s_. The returned value is the result of the evaluation of the last _form_ of its body (or *nil* if there is none).
 
-== [.namspace_syntax]_syntax_ +with-handler+
-[subs="+quotes,+replacements"]
+== +with-handler+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(with-handler handler form*)=> <object>
+(with-handler handler form*) => <object>
 ----
 
 
 
 Evaluates _handler_, which must yield a function (called the “handler function”). The handler function is established as active handler (see §29.2) and then the forms are executed. If execution of _forms_ finishes normally, the value of the last _form_ (or *nil* if there are no forms) is returned.
 
-== [.namspace_syntax]_syntax_ +with-open-input-file+
-[subs="+quotes,+replacements"]
+== +with-open-input-file+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(with-open-input-file (name filename [element-class]) form*)=> <object>
+(with-open-input-file (name filename [element-class]) form*) => <object>
 ----
 
 
@@ -3548,10 +4549,13 @@ The _filename_ and _element-class_ are evaluated and passed as arguments to the 
 
 The stream is closed on exit, whether or not exit from these special forms is normal. For this reason, these special forms are usually preferred over the corresponding functions for opening and closing files.
 
-== [.namspace_syntax]_syntax_ +with-open-io-file+
-[subs="+quotes,+replacements"]
+== +with-open-io-file+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(with-open-io-file (name filename [element-class]) form*)=> <object>
+(with-open-io-file (name filename [element-class]) form*) => <object>
 ----
 
 
@@ -3562,10 +4566,13 @@ The _filename_ and _element-class_ are evaluated and passed as arguments to the 
 
 The stream is closed on exit, whether or not exit from these special forms is normal. For this reason, these special forms are usually preferred over the corresponding functions for opening and closing files.
 
-== [.namspace_syntax]_syntax_ +with-open-output-file+
-[subs="+quotes,+replacements"]
+== +with-open-output-file+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(with-open-output-file (name filename [element-class]) form*)=> <object>
+(with-open-output-file (name filename [element-class]) form*) => <object>
 ----
 
 
@@ -3576,30 +4583,39 @@ The _filename_ and _element-class_ are evaluated and passed as arguments to the 
 
 The stream is closed on exit, whether or not exit from these special forms is normal. For this reason, these special forms are usually preferred over the corresponding functions for opening and closing files.
 
-== [.namspace_syntax]_syntax_ +with-standard-input+
-[subs="+quotes,+replacements"]
+== +with-standard-input+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(with-standard-input stream-form form*)=> <object>
+(with-standard-input stream-form form*) => <object>
 ----
 
 
 
 This special form first evaluate its _stream-form_ argument to produce a stream _s_ and then evaluate its body _forms_ in a dynamic environment where the function *standard-input* returns the stream _s_. The returned value is the result of the evaluation of the last _form_ of its body (or *nil* if there is none).
 
-== [.namspace_syntax]_syntax_ +with-standard-output+
-[subs="+quotes,+replacements"]
+== +with-standard-output+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
 ----
-(with-standard-output stream-form form*)=> <object>
+(with-standard-output stream-form form*) => <object>
 ----
 
 
 
 This special form first evaluate its _stream-form_ argument to produce a stream _s_ and then evaluate its body _forms_ in a dynamic environment where the function *standard-output* returns the stream _s_. The returned value is the result of the evaluation of the last _form_ of its body (or *nil* if there is none).
 
-== [.namspace_function]_function_ +write-byte+
-[subs="+quotes,+replacements"]
+== +write-byte+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
 ----
-(write-byte z output-stream)=> <integer>
+(write-byte z output-stream) => <integer>
 ----
 
 

@@ -8,6 +8,9 @@ Author Name
 :page-pagination:
 :description: A "preview" site for the UI.
 
+[.islisp-kind]_class_ T1
+
+
 [.lead]
 You are looking at the preview site for the Antora default UI.
 

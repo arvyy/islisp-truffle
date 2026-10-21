@@ -6,23 +6,43 @@
             (cdr e)
             nil)))
 
-(defun print-heading (ns name)
-    (format (standard-output) "== [.namspace_~A]_~A_ +~A+~%" ns ns name))
+(defun print-heading (kind name)
+    (format (standard-output) "== +~A+~%~%[.islisp-kind]_~A_~%~%" name kind))
 
-(defun print-value-type (vt)
+(defun print-value-syntax (name type)
     (format (standard-output)
-"[subs=\"+quotes,+replacements\"]
+"[subs=\"verbatim\"]
 ----
-~A
-----~%~%" vt))
+~A => ~A
+----~%~%" name type))
+
+(defun print-class-info (abstract superclasses slots)
+    (if abstract
+        (format (standard-output) "*Abstract*~%~%"))
+    (if superclasses
+        (progn
+            (format (standard-output) ".Superclasses~%")
+            (mapc 
+                (lambda (cls)
+                    (format (standard-output) "* ~A~%" cls))
+                superclasses)
+            (format (standard-output) "~%")))
+    (if slots
+        (progn
+            (format (standard-output) ".Slots~%")
+            (mapc 
+                (lambda (slot)
+                    (format (standard-output) "* ~A~%" slot))
+                slots)
+            (format (standard-output) "~%"))))
 
 (defun print-syntax (stx return-type)
     (format (standard-output)
-"[subs=\"+quotes,+replacements\"]
+"[subs=\"+quotes\"]
 ----
 ~A" stx)
     (if return-type
-        (format (standard-output) "=> ~A" return-type))
+        (format (standard-output) " => ~A" return-type))
     (format (standard-output) "~%----~%~%"))
 
 (defun print-entry (e)
@@ -30,18 +50,22 @@
         (let* ((namespace (elt e 0))
                (name (elt e 1))
                (doc (elt e 2))
+               (kind (assoc* 'kind doc))
                (desc (assoc* 'desc doc))
                (stx (assoc* 'syntax doc))
                (return-type (assoc* 'return-type doc))
-               (value-type (assoc* 'value-type doc)))
-            ;;(format (standard-output) "== +~A+~%~%~A~%~%" name desc)
-            (print-heading namespace name)
+               (value-type (assoc* 'value-type doc))
+               (abstract (assoc* 'abstract doc))
+               (superclasses (assoc* 'superclasses doc))
+               (slots (assoc* 'slots doc)))
+            (print-heading kind name)
+            (if (equal 'class kind)
+                (print-class-info abstract superclasses slots))
             (if stx
                 (print-syntax stx return-type))
             (if value-type
-                (print-value-type value-type))
-            (format (standard-output) "~%~%~A~%~%" desc)
-            )))
+                (print-value-syntax name value-type))
+            (format (standard-output) "~%~%~A~%~%" desc))))
 
 (defun print-module (name)
     (let* ((m (lookup-module name))
