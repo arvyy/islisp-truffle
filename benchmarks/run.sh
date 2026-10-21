@@ -1,4 +1,4 @@
-export ISLISP="sh islisp.sh"
+export ISLISP="bash ../launcher/islisp.sh --islisp.IncludeDocumentation=false"
 
 SBCL_EXE="${SBCL_EXE:-sbcl}"
 CLOZURE_EXE="${CLOZURE_EXE:-lx86cl64}"
@@ -18,7 +18,7 @@ function run_benchmark() {
     -n "$SBCL_NAME" \
     -n "$CLOZURE_NAME"
 
-  node svggenerator/dist/index.js results/$1.json ../docs/images/$1.svg
+  node svggenerator/dist/index.js results/$1.json ../docs-site/islisp/modules/ROOT/images/benchmarks/$1.svg
 }
 
 run_benchmark fib
