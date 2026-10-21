@@ -1,7 +1,0 @@
----
-draft: false
-kind: page
-params:
-title: Benchmarks
-menus: main
----

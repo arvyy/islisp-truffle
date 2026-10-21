@@ -1,35 +1,25 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
-import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.Pair;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.RootNode;
 
 /**
  * Implements `car` function, returning pair's first slot.
  */
-public abstract class ISLISPCar extends RootNode {
-
-    @Child
-    ISLISPErrorSignalerNode errorSignalerNode;
+public abstract class ISLISPCar extends ISLISPBuiltinFunctionRootNode {
 
     ISLISPCar(TruffleLanguage<?> language) {
-        super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode(this);
+        super("car", arg(1, 1), language);
     }
 
     abstract Object executeGeneric(Object arg);
 
     @Override
-    public final Object execute(VirtualFrame frame) {
-        if (frame.getArguments().length != 2) {
-            return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 1, 1);
-        }
+    public final Object executeImpl(VirtualFrame frame) {
         return executeGeneric(frame.getArguments()[1]);
     }
 
@@ -41,16 +31,6 @@ public abstract class ISLISPCar extends RootNode {
     @Fallback
     Object fallback(Object o) {
         return errorSignalerNode.signalWrongType(o, ISLISPContext.get(this).lookupClass("<cons>"));
-    }
-
-    /**
-     * Construct LispFunction using this root node.
-     *
-     * @param lang truffle language reference
-     * @return lisp function
-     */
-    public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPCarNodeGen.create(lang).getCallTarget());
     }
 
 }

@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "antora": "3.2.1"
+  },
+  "dependencies": {
+    "@antora/lunr-extension": "^1.0.0-alpha.13"
+  }
+}

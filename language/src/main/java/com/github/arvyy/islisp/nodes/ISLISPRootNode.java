@@ -81,7 +81,7 @@ public class ISLISPRootNode extends RootNode {
     }
 
     @Override
-    public boolean isCaptureFramesForTrace() {
+    public boolean isCaptureFramesForTrace(boolean compiled) {
         return true;
     }
 

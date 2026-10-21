@@ -41,11 +41,12 @@ public record LispVector(Object[] values) implements TruffleObject {
 
     @ExportMessage
     boolean isArrayElementReadable(long index) {
-        return true;
+        return index < values.length;
     }
+
     @ExportMessage
     boolean isArrayElementModifiable(long index) {
-        return true;
+        return index < values.length;
     }
 
     @ExportMessage

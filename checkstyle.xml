@@ -125,12 +125,12 @@
     <module name="InterfaceIsType"/>
     <module name="VisibilityModifier">
       <property name="packageAllowed" value="true"/>
+      <property name="protectedAllowed" value="true"/>
     </module>
 
     <!-- Miscellaneous other checks.                   -->
     <!-- See https://checkstyle.org/checks/misc/index.html -->
     <module name="ArrayTypeStyle"/>
-    <module name="TodoComment"/>
     <module name="UpperEll"/>
 
     <module name="SuppressionCommentFilter"/>

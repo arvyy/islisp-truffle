@@ -1,12 +1,9 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPTypes;
 import com.github.arvyy.islisp.nodes.ISLISPTypesGen;
-import com.github.arvyy.islisp.runtime.Closure;
 import com.github.arvyy.islisp.runtime.LispBigInteger;
-import com.github.arvyy.islisp.runtime.LispFunction;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleSafepoint;
@@ -15,7 +12,6 @@ import com.oracle.truffle.api.dsl.ReportPolymorphism;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
@@ -25,19 +21,15 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 @TypeSystemReference(ISLISPTypes.class)
 @ReportPolymorphism
-public abstract class ISLISPAdd extends RootNode {
+public abstract class ISLISPAdd extends ISLISPBuiltinFunctionRootNode {
 
     @Override
     public boolean isCloningAllowed() {
         return true;
     }
 
-    @Child
-    private ISLISPErrorSignalerNode errorSignalerNode;
-
     ISLISPAdd(TruffleLanguage<?> language) {
-        super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode(this);
+        super("+", vararg(0), language);
     }
 
     @Override
@@ -164,20 +156,6 @@ public abstract class ISLISPAdd extends RootNode {
         var ctx = ISLISPContext.get(this);
         var numberClass = ctx.lookupClass("<number>");
         return errorSignalerNode.signalWrongType(value, numberClass);
-    }
-
-    /**
-     * Construct LispFunction using this root node.
-     * @param lang truffle language reference
-     * @return lisp function
-     */
-    public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        var callTarget = ISLISPAddNodeGen.create(lang).getCallTarget();
-        return new LispFunction(
-            new Closure(null, null, null),
-            callTarget,
-            false,
-            true);
     }
 
 }

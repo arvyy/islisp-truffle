@@ -1,7 +1,6 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -11,28 +10,20 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.library.CachedLibrary;
-import com.oracle.truffle.api.nodes.RootNode;
 
 /**
  * Implements `class-of` function, returning given object's class.
  */
-public abstract class ISLISPClassOf extends RootNode {
-
-    @Child
-    ISLISPErrorSignalerNode errorSignalerNode;
+public abstract class ISLISPClassOf extends ISLISPBuiltinFunctionRootNode {
 
     ISLISPClassOf(TruffleLanguage<?> language) {
-        super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode(this);
+        super("class-of", arg(1), language);
     }
 
     abstract Object executeGeneric(Object value);
 
     @Override
-    public final Object execute(VirtualFrame frame) {
-        if (frame.getArguments().length != 2) {
-            return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length - 1, 1, 1);
-        }
+    public final Object executeImpl(VirtualFrame frame) {
         var value = (Object) frame.getArguments()[1];
         return executeGeneric(value);
     }
@@ -150,6 +141,14 @@ public abstract class ISLISPClassOf extends RootNode {
         return libClass;
     }
 
+    @Specialization
+    LispClass doNativeLibrary(
+        ISLISPModule module,
+        @Cached("loadModuleClass()") LispClass libClass
+    ) {
+        return libClass;
+    }
+
     @Specialization(guards = {
         "interop.hasMembers(o)",
         "!interop.hasArrayElements(o)"
@@ -241,6 +240,10 @@ public abstract class ISLISPClassOf extends RootNode {
         return loadClass("<truffle-native-library>");
     }
 
+    LispClass loadModuleClass() {
+        return loadClass("<module>");
+    }
+
     LispClass loadObjectClass() {
         return loadClass("<object>");
     }
@@ -251,12 +254,4 @@ public abstract class ISLISPClassOf extends RootNode {
         return clazz;
     }
 
-    /**
-     * Construct LispFunction using this root node.
-     * @param lang truffle language reference
-     * @return lisp function
-     */
-    public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPClassOfNodeGen.create(lang).getCallTarget());
-    }
 }

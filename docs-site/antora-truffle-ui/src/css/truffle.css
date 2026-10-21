@@ -1,0 +1,130 @@
+:root {
+    --bg-color: #151515;
+    --bg-color2: #212b25;
+    --text-color: #ccc;
+    --text-color-muted: #aaa;
+    --link-color: #27c2e6;
+    --heading-color: #4bbb4b;
+    --shadow-color: #4bbb9b30;
+    --border-color: #0c6f52;
+    --text-color-muted: #aaa;
+    --wip-bg-color: #9d2424;
+
+    --code-bg-color: #444;
+    --code-color: white;
+}
+
+html {
+    color: var(--text-color);
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.background {
+    position: fixed;
+    z-index: -1;
+    width: 200vw;
+    height: 200vh;
+    transform: translate(-100vw, -100vh) rotate(20deg) translate(100vw, 0);
+    background-repeat: repeat;
+    background-size: 100px;
+    background-image:
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 95 30">\
+            <rect x="-10" y="-10" fill="%23151515" width="200" height="100"></rect>\
+            <text x="0" y="20" fill="%23212b25">truffle islisp</text></svg>');
+}
+
+
+.doc, .sidebar {
+  background-color: color-mix(in srgb, var(--bg-color), transparent 20%);
+  box-shadow: 0 0 20px 10px color-mix(in srgb, var(--bg-color), transparent 20%);
+}
+
+.toc.sidebar {
+  position: sticky;
+  top: 6em;
+  align-self: start;
+}
+
+.doc {
+
+  .islisp-kind {
+    color: black;
+    font-weight: bold;
+    background-color: var(--heading-color);
+    padding: 0.2em;
+    border-radius: 0.5em;
+    font-size: 1.25em;
+  }
+  
+  a {
+      border-bottom: 2px solid var(--link-color);
+      background-color: #0000;
+      color: var(--link-color);
+      text-decoration: none;
+  }
+  
+  a:hover {
+      color: var(--text-color);
+      background-color: var(--link-color);
+  }
+
+  
+  h1, h2 {
+      font-size: 2em;
+      font-weight: bold;
+      color: var(--heading-color);
+      margin-bottom: 0.5em;
+      margin-top: 0.5em;
+  }
+  
+  h3 {
+      font-size: 1em;
+      font-weight: bold;
+      color: var(--heading-color);
+      margin-bottom: 0.5em;
+      margin-top: 0.5em;
+  }
+  
+  li {
+      margin-left: 1em;
+  }
+  
+  li::marker {
+    color: var(--heading-color);
+  }
+  
+  .list-group {
+      margin-top: 1em;
+      margin-bottom: 1em;
+  }
+  
+  .list-group__title {
+      color: var(--text-color-muted);
+  }
+  
+  p {
+      margin-top: 1em;
+  }
+  
+  li > p {
+      display: inline;
+  }
+  
+  code {
+      font-family: monospace;
+      line-height: 14px;
+      font-size: 12px;
+      display: inline-block;
+      padding: 0.5em;
+      border-radius: 4px;
+  }
+  
+  .sect2 {
+      padding-bottom: 1em;
+      border-bottom: 1px solid var(--heading-color);
+      margin-left: 4em;
+      margin-top: 2em;
+  }
+}

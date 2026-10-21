@@ -1,0 +1,52 @@
+// generated content, do not edit directly. Created with docs-site/apireference/generateadoc.sh \n\n
+= Introspection facilities
+
+This module provides ways to query and reflectively use bindings defined in modules. Mostly useful for creating tooling, such as documentation generators or test runners.
+
+
+[code,lisp]
+----
+(requires "builtin/introspection.lisp")
+----
+
+
+
+== +<module>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <object>
+
+
+
+Class representing an ISLISP module.
+
+== +lookup-module+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
+----
+(lookup-module path) => <module>
+----
+
+
+
+Returns reference to a module defined at _path_ as an instance of *<module>*, or *nil* if it doesn't exist. Uses same rules as provide form.
+An error shall be signaled if  _path_ is not a string (error-id. _domain-error_).
+
+== +lookup-module-documentations+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
+----
+(list-module-documentations module) => <vector>
+----
+
+
+
+Returns all documentation entries registered in _module_. Each entry is itself a vector length of 3, containing namespace, name, and documentation alist. See *documentation* method for details on its structure.
+An error shall be signaled if  _module_ is not an instance of *<module>* (error-id. _domain-error_).
+

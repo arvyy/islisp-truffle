@@ -1,35 +1,28 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
-import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.runtime.LispChar;
-import com.github.arvyy.islisp.runtime.LispFunction;
 import com.github.arvyy.islisp.runtime.LispMutableString;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.RootNode;
 
 /**
  * Implements `create-string` function.
  */
-public abstract class ISLISPCreateString extends RootNode {
+public abstract class ISLISPCreateString extends ISLISPBuiltinFunctionRootNode {
 
-    @Child
-    ISLISPErrorSignalerNode errorSignalerNode;
-
-    ISLISPCreateString(TruffleLanguage<?> language) {
-        super(language);
-        errorSignalerNode = new ISLISPErrorSignalerNode(this);
+    /**
+    * Construct node.
+    * @param language truffle language reference
+    */
+    public ISLISPCreateString(TruffleLanguage<?> language) {
+        super("create-string", arg(1, 2), language);
     }
 
     @Override
-    public final Object execute(VirtualFrame frame) {
-        if (frame.getArguments().length != 2 && frame.getArguments().length != 3) {
-            return errorSignalerNode.signalWrongArgumentCount(
-                frame.getArguments().length - 1, 1, 2);
-        }
+    public final Object executeImpl(VirtualFrame frame) {
         var count = frame.getArguments()[1];
         var character = frame.getArguments().length == 3
             ? frame.getArguments()[2]
@@ -56,16 +49,6 @@ public abstract class ISLISPCreateString extends RootNode {
         } else {
             return errorSignalerNode.signalWrongType(lispChar, ctx.lookupClass("<character>"));
         }
-    }
-
-    /**
-     * Construct LispFunction using this root node.
-     *
-     * @param lang truffle language reference
-     * @return lisp function
-     */
-    public static LispFunction makeLispFunction(TruffleLanguage<?> lang) {
-        return new LispFunction(ISLISPCreateStringNodeGen.create(lang).getCallTarget());
     }
 
 }

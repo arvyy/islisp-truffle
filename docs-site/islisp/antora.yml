@@ -1,0 +1,5 @@
+name: 'truffle_islisp'
+title: 'Truffle ISLISP'
+nav:
+  - 'modules/ROOT/nav.adoc'
+  - 'modules/apireference/nav.adoc'

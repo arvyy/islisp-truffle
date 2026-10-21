@@ -1,0 +1,16 @@
+site:
+  title: 'Truffle ISLISP'
+  start_page: truffle_islisp:ROOT:index.adoc
+content:
+  sources:
+    #- url: './docs'
+    #  version: LATEST
+    - url: '../'  
+      start_path: 'docs-site/islisp'  
+      version: LATEST
+ui:
+  bundle:
+    url: ./antora-truffle-ui/build/ui-bundle.zip
+antora:
+  extensions:
+  - '@antora/lunr-extension'

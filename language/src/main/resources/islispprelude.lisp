@@ -1,10 +1,12 @@
+(defdynamic *args* (vector))
+
 (defmacro trace (:rest args)
   (let ((result (gensym)))
     `(let ((,result (,@args)))
        (format (error-output) "TRACE ~A = ~A~%" ',args ,result)
        ,result)))
 
-(defmacro or  (:rest args)
+(defmacro or (:rest args)
   (if (= 0 (length args))
       nil
       (if (= 1 (length args))
@@ -448,7 +450,6 @@
     (for ((i 0 (+ i 1))
           (next-args (args 0) (args (+ 1 i))))
          ((not next-args) dest)
-      ;;(format (error-output) "i = ~A, args = ~A ~%" i next-args)
       (setf (elt dest i) (apply fn next-args)))))
 
 (defun garef (array :rest indices)

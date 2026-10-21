@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.launcher;
 
 import com.github.arvyy.islisp.buildinfo.BuildInfo;
 import org.apache.commons.cli.*;
+import org.commonmark.renderer.text.TextContentRenderer;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotAccess;
 import org.graalvm.polyglot.PolyglotException;
@@ -9,6 +10,7 @@ import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.io.IOAccess;
 
 import java.io.*;
+import java.util.ArrayList;
 
 /**
  * Main ISLISP interpreter entrypoint.
@@ -31,7 +33,7 @@ public final class Main {
         var versionOpt = versionOpt();
 
         var options = new Options();
-        //options.addOption(helpOpt);
+        options.addOption(helpOpt);
         options.addOption(versionOpt);
 
         var parser = DefaultParser.builder()
@@ -54,7 +56,7 @@ public final class Main {
         }
 
         if (commandLine.hasOption(helpOpt)) {
-            new HelpFormatter().printHelp("islisp [OPTION ...] [FILE]", options);
+            new HelpFormatter().printHelp("islisp [OPTION ...] [FILE [ARG ...]]", options);
             var pw = new PrintWriter(System.out);
             // disable checkstyle so it doesn't complain about
             // long lines and trailing spaces in empty lines
@@ -66,7 +68,9 @@ public final class Main {
                 
                 ISLISP specific options:
                 * islisp.Sourcepath - when using `require` form, islisp searches from roots provided through this option.
-                Option value: set of paths, separated by `:`.
+                Option value: set of paths, separated by `:`, defaults to `.`.
+                * islisp.IncludeDocumentation - flag if documentation should be loaded. Disabling might improve startup time.
+                Optional value: true or false, defaults to true.
                 
                 Use `--experimental-options` to enable experimental options.
                 
@@ -75,6 +79,8 @@ public final class Main {
                 If FILE is `-`, interpreter non-interactively evaluates standard input.
                 If FILE is a path, given FILE is evaluated and the program exits.
                 If FILE is not provided, interpreter enters interactive REPL mode.
+
+                ARGs if given will be stored in *arg* dynamic variable, as a vector of strings.
                 """);
             // CHECKSTYLE:ON
             pw.flush();
@@ -91,7 +97,13 @@ public final class Main {
             .allowPolyglotAccess(PolyglotAccess.ALL);
 
         String sourceArg = null;
+        var passthroughCommandlineArgs = new ArrayList<String>();
+        var sourceArgSeen = false;
         for (var arg: commandLine.getArgList()) {
+            if (sourceArgSeen) {
+                passthroughCommandlineArgs.add(arg);
+                continue;
+            }
             if ("--experimental-options".equals(arg)) {
                 contextBuilder.allowExperimentalOptions(true);
                 continue;
@@ -102,6 +114,7 @@ public final class Main {
                 contextBuilder.option(e[0], value);
             } else {
                 sourceArg = arg;
+                sourceArgSeen = true;
             }
         }
 
@@ -128,6 +141,20 @@ public final class Main {
                 if (line.equals(",q")) {
                     break;
                 }
+                if (line.startsWith(",d ")) {
+                    var words = line.split("\\s+");
+                    if (words.length != 3 && words.length != 2) {
+                        System.out.println("Unrecognized ,d command format");
+                        printReplHelp();
+                        continue;
+                    }
+                    if (words.length == 2) {
+                        printDocumentation(context, null, words[1]);
+                    } else {
+                        printDocumentation(context, words[1], words[2]);
+                    }
+                    continue;
+                }
 
                 Source source;
                 if (line.startsWith(",l ")) {
@@ -137,7 +164,7 @@ public final class Main {
                         .build();
                 } else {
                     source = Source
-                        .newBuilder("islisp", line, "<repl " + "#" + prompt + ">")
+                        .newBuilder("islisp", line, "REPL")
                         .interactive(true)
                         .cached(false)
                         .buildLiteral();
@@ -145,21 +172,73 @@ public final class Main {
                 try {
                     context.eval(source);
                 } catch (PolyglotException e) {
-                    System.out.println(e.getMessage());
+                    System.err.println(e.getMessage());
                 }
             }
-        } else if ("-".equals(sourceArg)) {
-            var source = Source.newBuilder("islisp", new InputStreamReader(System.in), "<stdin>").build();
-            context.eval(source);
         } else {
-            var source = Source.newBuilder("islisp", new File(sourceArg)).build();
+            var argsSetterSrc = Source
+                .newBuilder("islisp", """
+                    (lambda (#:rest args)
+                        (setf (dynamic *args*) (convert args <general-vector>)))
+                    """, "<args init>")
+                .interactive(false)
+                .internal(true)
+                .buildLiteral();
+            var argsSetter = context.eval(argsSetterSrc);
+            argsSetter.execute(passthroughCommandlineArgs.toArray());
+            Source source;
+            if ("-".equals(sourceArg)) {
+                source = Source.newBuilder("islisp", new InputStreamReader(System.in), "<stdin>").build();
+            } else {
+                source = Source.newBuilder("islisp", new File(sourceArg)).build();
+            }
             try {
                 context.eval(source);
             } catch (PolyglotException e) {
-                System.err.println(e.getMessage());
+                if ("true".equals(System.getProperty("islispFullStacktraces"))) {
+                    throw e;
+                } else {
+                    System.err.println(e.getMessage());
+                }
             }
         }
+
         context.close();
+    }
+
+    static void printDocumentation(Context context, String namespace, String name) {
+        try {
+            var extractor = context.eval("islisp", """
+                (lambda (#:rest args)
+                    (let* ((doc (if (= (length args) 2)
+                                    (documentation (convert (elt args 0) <symbol>) (convert (elt args 1) <symbol>))
+                                    (documentation (convert (elt args 0) <symbol>))))
+                           (desc (assoc 'desc doc))
+                           (result (if desc (cdr desc) "")))
+                      result))
+                """);
+            Object[] args;
+            if (namespace == null) {
+                args = new Object[]{name};
+            } else {
+                args = new Object[]{namespace, name};
+            }
+            var desc = extractor.execute(args).asString();
+            if (desc.isEmpty()) {
+                System.out.println("No docs UwU");
+            } else {
+                System.out.println(markdownToPlaintext(desc));
+            }
+        } catch (PolyglotException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    static String markdownToPlaintext(String m) {
+        var parser = org.commonmark.parser.Parser.builder().build();
+        var document = parser.parse(m);
+        var renderer = TextContentRenderer.builder().build();
+        return renderer.render(document);
     }
 
     static Option helpOpt() {
@@ -180,11 +259,22 @@ public final class Main {
 
     static void printReplHelp() {
         var pw = new PrintWriter(System.out);
+        // CHECKSTYLE:OFF
         new HelpFormatter().printWrapped(pw, HELP_WIDTH, """
-            ,h - This help message
-            ,q - Quit
-            ,l path - Load and evaluate file from given path
+            ,h
+            This help message
+
+            ,q
+            Quit
+
+            ,l path
+            Load and evaluate file from given path
+
+            ,d [namespace] symbol
+            Lookup documentation for a symbol in scope. Optionally can specify namespace (one of: function, setf, syntax, value) to disambiguate.
+
             """);
+        // CHECKSTYLE:ON
         pw.flush();
     }
 

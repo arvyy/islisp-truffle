@@ -1,0 +1,5 @@
+* xref:index.adoc[]
+** xref:install.adoc[]
+** xref:building.adoc[]
+** xref:benchmarks.adoc[]
+** xref:guide.adoc[]

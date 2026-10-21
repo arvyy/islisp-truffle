@@ -1,0 +1,17 @@
+// Project tasks configuration. See https://zed.dev/docs/tasks for documentation.
+[{
+  "label": "Compile",
+  "command": "mvn -DskipTests=true package",
+  "cwd": "$ZED_WORKTREE_ROOT"
+}, {
+  "label": "Test",
+  "command": "mvn test",
+  "cwd": "$ZED_WORKTREE_ROOT"
+}, {
+   "label": "Run REPL",
+   "command": "java -p ./launcher/target/deps:./launcher/target/launcher-0.0.1-local.jar -m com.github.arvyy.islisp.launcher/com.github.arvyy.islisp.launcher.Main"
+}, {
+  "label": "Run open file",
+  "command": "java -p $ZED_WORKTREE_ROOT/launcher/target/deps:$ZED_WORKTREE_ROOT/launcher/target/launcher-0.0.1-local.jar -m com.github.arvyy.islisp.launcher/com.github.arvyy.islisp.launcher.Main $ZED_FILE",
+  "cwd": "$ZED_DIRNAME"
+}]

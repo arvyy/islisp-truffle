@@ -1,6 +1,7 @@
 package com.github.arvyy.islisp;
 
 import com.github.arvyy.islisp.nodes.ISLISPDebuggerNode;
+import com.github.arvyy.islisp.nodes.ISLISPRootNode;
 import com.github.arvyy.islisp.parser.Parser;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Option;
@@ -33,14 +34,21 @@ import java.io.InputStreamReader;
 })
 public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
 
+    // ignore name casing, since Option DLS has its own ideas how the name should be done
+    // which conflicts with checkstyle.
+    // CHECKSTYLE:OFF
     @Option(help =
         "Paths joined by system separator, relative to which modules are resolved. "
         + "Defaults to working dir.",
         category = OptionCategory.USER, stability = OptionStability.STABLE)
-    // ignore name casing, since Option DLS has its own ideas how the name should be done
-    // which conflicts with checkstyle.
-    // CHECKSTYLE:OFF
     public static final OptionKey<String> Sourcepath = new OptionKey<>(".");
+    
+    @Option(help =
+        "Whether documentation (retreavable using `documentation` function) for standard library should be loaded. " +
+        "Disabling might improve startup time. " + 
+        "Defaults to true.",
+        category = OptionCategory.USER, stability = OptionStability.STABLE)
+    public static final OptionKey<Boolean> IncludeDocumentation = new OptionKey<>(true);
     // CHECKSTYLE:ON
 
     @Override
@@ -51,7 +59,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
     @Override
     public CallTarget parse(ParsingRequest request) {
         var parser = new Parser();
-        var rootNode = parser.createMainModuleNode(this, "MAIN", request.getSource());
+        var rootNode = parser.createMainModuleNode(this, request.getSource().getName(), request.getSource());
         return rootNode.getCallTarget();
     }
 
@@ -74,6 +82,38 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
         var rootNode = parser.createMainModuleNode(this, "ROOT", preludeSource);
         rootNode.getCallTarget().call();
         ISLISPContext.get(null).getModule("ROOT").exportAll();
+        var includeDocs = context.getEnv().getOptions().get(IncludeDocumentation);
+        if (includeDocs) {
+            Source docsSource;
+            ISLISPRootNode docsRootNode;
+
+            docsSource = Source
+                .newBuilder(
+                    "islisp",
+                    new InputStreamReader(ISLISPTruffleLanguage.class.getResourceAsStream("/islispprelude.docs.lisp")),
+                    "islispprelude.docs.lisp")
+                .build();
+            docsRootNode = parser.createMainModuleNode(this, "ROOT", docsSource);
+            docsRootNode.getCallTarget().call();
+
+            docsSource = Source
+                .newBuilder(
+                    "islisp",
+                    new InputStreamReader(ISLISPTruffleLanguage.class.getResourceAsStream("/truffle.docs.lisp")),
+                    "truffle.docs.lisp")
+                .build();
+            docsRootNode = parser.createMainModuleNode(this, "builtin/truffle.lisp", docsSource);
+            docsRootNode.getCallTarget().call();
+
+            docsSource = Source
+                .newBuilder(
+                    "islisp",
+                    new InputStreamReader(ISLISPTruffleLanguage.class.getResourceAsStream("/introspection.docs.lisp")),
+                    "introspection.docs.lisp")
+                .build();
+            docsRootNode = parser.createMainModuleNode(this, "builtin/introspection.lisp", docsSource);
+            docsRootNode.getCallTarget().call();
+        }
     }
 
     @Override
@@ -83,7 +123,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
 
     @Override
     protected Object getScope(ISLISPContext context) {
-        return context.getModule("ROOT");
+        return context.getCurrentModule();
     }
 
     @Override

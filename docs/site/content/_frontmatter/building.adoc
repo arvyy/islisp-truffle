@@ -1,7 +1,0 @@
----
-draft: false
-kind: page
-params:
-title: Building
-menus: main
----

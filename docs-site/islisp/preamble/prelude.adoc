@@ -1,0 +1,3 @@
+= Prelude
+
+This module is automatically imported. Contains standard ISLISP definitions, as well as core extensions such as importing / exporting.

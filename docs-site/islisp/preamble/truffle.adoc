@@ -1,0 +1,8 @@
+= Truffle interop
+
+This module provides interop facilities with other truffle languages.
+
+[code,lisp]
+----
+(requires "builtin/truffle.lisp")
+----

@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp.runtime;
 
+import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.ISLISPTruffleLanguage;
 import com.github.arvyy.islisp.SetfTransformer;
 import com.github.arvyy.islisp.parser.Declaration;
@@ -12,7 +13,6 @@ import com.oracle.truffle.api.source.SourceSection;
 import com.oracle.truffle.api.strings.TruffleString;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 /**
  * Encapsulate module's bindings.
@@ -32,7 +32,9 @@ public class ISLISPModule implements TruffleObject {
     private final Map<Symbol, ValueReference> dynamicVars;
     private final Map<Symbol, ValueReference> globalVars;
     private final Map<Symbol, SetfTransformer> setfTransformers;
+    private final Map<Symbol, Map<Symbol, Object>> documentation;
     private final List<Declaration> declarations;
+
 
     private final Map<String, Object> visibleMembers;
     /**
@@ -55,6 +57,7 @@ public class ISLISPModule implements TruffleObject {
         globalVars = new HashMap<>();
         declarations = new ArrayList<>();
         visibleMembers = new HashMap<>();
+        documentation = new HashMap<>();
     }
 
     /**
@@ -64,6 +67,7 @@ public class ISLISPModule implements TruffleObject {
      */
     public void addImport(ISLISPModule m) {
         importedModules.add(m);
+        visibleMembers.put("module " + m.name, m);
     }
 
     /**
@@ -104,7 +108,7 @@ public class ISLISPModule implements TruffleObject {
         v.setValue(init);
         v.setReadOnly(readonly);
         globalVars.put(symbolReference, v);
-        visibleMembers.put(symbolReference.name(), v);
+        visibleMembers.put("var " + symbolReference.name(), v);
     }
 
     /**
@@ -166,7 +170,7 @@ public class ISLISPModule implements TruffleObject {
     @CompilerDirectives.TruffleBoundary
     public void registerDynamicVar(Symbol symbolReference, ValueReference v) {
         dynamicVars.put(symbolReference, v);
-        visibleMembers.put(symbolReference.name(), v);
+        visibleMembers.put("dynvar " + symbolReference.name(), v);
     }
 
     /**
@@ -197,7 +201,7 @@ public class ISLISPModule implements TruffleObject {
     @CompilerDirectives.TruffleBoundary
     public void registerFunction(Symbol symbolReference, LispFunction function) {
         globalFunctions.put(symbolReference, function);
-        visibleMembers.put(symbolReference.name(), function);
+        visibleMembers.put("fun " + symbolReference.name(), function);
     }
 
     /**
@@ -267,7 +271,7 @@ public class ISLISPModule implements TruffleObject {
             globalFunctions.put(symbolReference, function);
             genericFunctions.put(symbolReference, descriptor);
         }
-        visibleMembers.put(symbolReference.name(), function);
+        visibleMembers.put("genfun " + symbolReference.name(), function);
     }
 
     /**
@@ -312,7 +316,7 @@ public class ISLISPModule implements TruffleObject {
     @CompilerDirectives.TruffleBoundary
     public void registerMacro(Symbol symbolReference, LispFunction function) {
         macros.put(symbolReference, function);
-        visibleMembers.put(symbolReference.name(), function);
+        visibleMembers.put("macro " + symbolReference.name(), function);
     }
 
     /**
@@ -343,7 +347,7 @@ public class ISLISPModule implements TruffleObject {
     @CompilerDirectives.TruffleBoundary
     public void registerClass(Symbol symbolReference, LispClass clazz) {
         classes.put(symbolReference, clazz);
-        visibleMembers.put(symbolReference.name(), clazz);
+        visibleMembers.put("class " + symbolReference.name(), clazz);
     }
 
     /**
@@ -363,6 +367,129 @@ public class ISLISPModule implements TruffleObject {
             }
         }
         return null;
+    }
+
+    /**
+    * Sets documentation obj for given symbol and namespace.
+    * @param namespace namespace
+    * @param s symbol
+    * @param doc documentation object
+    * @return previously stored documentation object
+    */
+    @CompilerDirectives.TruffleBoundary
+    public Object setDocumentation(Symbol namespace, Symbol s, Object doc) {
+        Map<Symbol, Object> namespaceDocumentation;
+        if (!documentation.containsKey(namespace)) {
+            namespaceDocumentation = new HashMap<>();
+            documentation.put(namespace, namespaceDocumentation);
+        } else {
+            namespaceDocumentation = documentation.get(namespace);
+        }
+        var prev = namespaceDocumentation.put(s, doc);
+        if (prev == null) {
+            return ISLISPContext.get(null).getNil();
+        } else {
+            return prev;
+        }
+    }
+
+    /**
+    * Finds documentation obj for given symbol and namespace.
+    * @param namespace namespace
+    * @param s symbol
+    * @return documentation object or nil
+    */
+    @CompilerDirectives.TruffleBoundary
+    public Object getDocumentation(Symbol namespace, Symbol s) {
+        var ns = documentation.get(namespace);
+        if (ns == null) {
+            return ISLISPContext.get(null).getNil();
+        }
+        var doc = ns.get(s);
+        if (doc == null) {
+            return ISLISPContext.get(null).getNil();
+        }
+        return doc;
+    }
+
+    /**
+    * Finds documentation obj for given symbol from any namespace.
+    * @param s symbol
+    * @return documentation object or nil
+    */
+    @CompilerDirectives.TruffleBoundary
+    public Object getDocumentation(Symbol s) {
+        for (var e: documentation.entrySet()) {
+            var ns = e.getValue();
+            var doc = ns.get(s);
+            if (doc != null) {
+                return doc;
+            }
+        }
+        return ISLISPContext.get(null).getNil();
+    }
+
+    /**
+    * Finds documentation obj for given symbol and namespace.
+    * If not found searches in included modules.
+    * @param namespace namespace
+    * @param s symbol
+    * @return documentation object or nil
+    */
+    @CompilerDirectives.TruffleBoundary
+    public Object getDocumentationIncludeImports(Symbol namespace, Symbol s) {
+        var nil = ISLISPContext.get(null).getNil();
+        var mine = getDocumentation(namespace, s);
+        if (mine != nil) {
+            return mine;
+        }
+        for (var m: importedModules) {
+            var doc = m.getDocumentation(namespace, s);
+            if (doc != nil) {
+                return doc;
+            }
+        }
+        return nil;
+    }
+
+    /**
+    * @return List of all documentation entries in this module.
+    */
+    @CompilerDirectives.TruffleBoundary
+    public List<DocumentationEntry> getModuleDocumentations() {
+        var lst = new ArrayList<DocumentationEntry>();
+        for (var e1: documentation.entrySet()) {
+            for (var e2: e1.getValue().entrySet()) {
+                var e = new DocumentationEntry(e1.getKey(), e2.getKey(), e2.getValue());
+                lst.add(e);
+            }
+        }
+        Comparator<DocumentationEntry> c = (d1, d2) -> d1.symbol().name().compareTo(d2.symbol().name());
+        c = c.thenComparing((d1, d2) -> d1.namespace().name().compareTo(d2.namespace().name()));
+        lst.sort(c);
+        return lst;
+    }
+
+    /**
+    * Finds documentation obj for given symbol, from any namespace.
+    * If not found searches in included modules.
+    * @param s symbol
+    * @return documentation object or nil
+    */
+    @CompilerDirectives.TruffleBoundary
+    public Object getDocumentationIncludeImports(Symbol s) {
+        var nil = ISLISPContext.get(null).getNil();
+        var mine = getDocumentation(s);
+        if (mine != nil) {
+            return mine;
+        }
+        for (var m: importedModules) {
+            var doc = m.getDocumentation(s);
+            if (doc != nil) {
+                return doc;
+            }
+        }
+        return nil;
     }
 
     /**
@@ -423,9 +550,11 @@ public class ISLISPModule implements TruffleObject {
     @CompilerDirectives.TruffleBoundary
     LispVector getMembers(boolean ignored) {
         var lst = new ArrayList<ISLISPModuleMemberString>(getMembersInternal(false));
+        /*
         for (var m: importedModules) {
             lst.addAll(m.getMembersInternal(true));
         }
+        */
         return new LispVector(lst.toArray(new ISLISPModuleMemberString[0]));
     }
 
@@ -438,11 +567,37 @@ public class ISLISPModule implements TruffleObject {
     @ExportMessage
     @CompilerDirectives.TruffleBoundary
     Object readMember(String memberName) {
-        return visibleMembers.get(memberName);
+        var value = visibleMembers.get(memberName);
+        if (value instanceof ValueReference r) {
+            return r.getValue();
+        }
+        return value;
     }
 
     @CompilerDirectives.TruffleBoundary
     private List<ISLISPModuleMemberString> getMembersInternal(boolean exportedOnly) {
+        var lst = new ArrayList<ISLISPModuleMemberString>();
+        for (var e: visibleMembers.entrySet()) {
+            var v = e.getValue();
+            SourceSection src = null;
+            if (v instanceof LispFunction f) {
+                src = f.getSourceLocation();
+            }
+            if (v instanceof ValueReference r) {
+                src = r.getSourceLocation();
+            }
+            if (v instanceof LispClass c) {
+                src = c.getSourceLocation();
+            }
+            // TODO: module source section
+            /*
+            if (v instanceof ISLISPModule m) {
+            }
+            */
+            lst.add(new ISLISPModuleMemberString(e.getKey(), src));
+        }
+        return lst;
+        /*
         Predicate<Symbol> include = symbolName -> !exportedOnly || exports.contains(symbolName);
         var lst = new ArrayList<ISLISPModuleMemberString>();
         for (var e: globalFunctions.keySet()) {
@@ -482,7 +637,16 @@ public class ISLISPModule implements TruffleObject {
             lst.add(new ISLISPModuleMemberString(e.name(), globalVars.get(e).getSourceLocation()));
         }
         return lst;
+        */
     }
+
+    /**
+    *  Data-bag for documentation entry.
+    * @param namespace namespace
+    * @param symbol name
+    * @param doc documentation object
+    */
+    public static record DocumentationEntry(Symbol namespace, Symbol symbol, Object doc) { }
 
 }
 

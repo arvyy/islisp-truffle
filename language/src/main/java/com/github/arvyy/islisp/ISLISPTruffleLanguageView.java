@@ -27,6 +27,16 @@ public class ISLISPTruffleLanguageView implements TruffleObject {
     }
 
     @ExportMessage
+    boolean hasLanguage() {
+        return true;
+    }
+
+    @ExportMessage
+    Class<ISLISPTruffleLanguage> getLanguage() {
+        return ISLISPTruffleLanguage.class;
+    }
+
+    @ExportMessage
     Object toDisplayString(boolean ignored) {
         return ISLISPFormatObject.format(object, false);
     }

@@ -4,28 +4,28 @@ on:
   push:
     paths:
       - '.github/workflows/build_site.yml'
-      - 'docs/**'
-      - 'bebchmarks/results/*'
+      - 'docs-site/**'
 jobs:
   build_site:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: peaceiris/actions-hugo@v3
+      - name: Use Node 24
+        uses: actions/setup-node@v7
         with:
-          hugo-version: '0.121.0'
-      - name: 'Install dependencies'
-        run: |
-          sudo apt-get update
-          sudo apt-get -y install asciidoctor
+          node-version: '24.x'
       - name: 'Build docs'
         run: |
-          cd docs/site
-          bash copycontent.sh;
-          hugo;
+          cd docs-site/antora-truffle-ui
+          npm i
+          npx gulp build
+          npx gulp bundle:pack
+          cd ../
+          npm i
+          npx antora antora-playbook.yml
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: 'docs/site/public'
+          path: 'docs-site/build/site'
   deploy_site:
     needs: [build_site]
     if: ${{ startsWith(github.ref, 'refs/heads/master') }}
