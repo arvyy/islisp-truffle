@@ -4,7 +4,7 @@ This document provide notable changes in Truffle ISLISP project.
 Before first stable release, the versions will follow format `0.0.x`.
 Afterwards the version will match truffle version followed by a date, eg. `24.0.1-2025.01.01`.
 
-== Unreleased
+== 0.0.3 (2026-10-22)
 
 * Improve TruffleObject InteropLibrary implementations
 * Add &#42;args&#42; dynamic variable, hoding command line args as a vector of strings
