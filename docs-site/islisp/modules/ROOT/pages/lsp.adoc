@@ -1,0 +1,8 @@
+= LSP
+
+A very rudimentary "better than nothing" LSP server implementation is provided in https://github.com/arvyy/islisp-truffle/releases/ .
+Currently LSP only gives completion list for standard library / prelude definitions.
+
+Add the lsp binary to path, and follow your editor's instructions.
+
+Start without arguments for stdin/stdout, or pass a port as first argument for TCP-based connection.

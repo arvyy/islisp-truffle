@@ -69,6 +69,8 @@ jobs:
         run: |
           mv launcher/target/islisp islisp-linux
           gh release upload nightly islisp-linux --clobber
+          mv lsp/target/islisp-lsp islisp-lsp-linux
+          gh release upload nightly islisp-lsp-linux --clobber
       - uses: actions/upload-artifact@v4
         with:
           name: islisp-linux
@@ -96,6 +98,8 @@ jobs:
         run: |
           mv launcher/target/islisp.exe islisp.exe
           gh release upload nightly islisp.exe --clobber
+          mv lsp/target/islisp-lsp.exe islisp-lsp.exe
+          gh release upload nightly islisp-lsp.exe --clobber
 
   build-macos:
     needs: [test]
@@ -119,6 +123,8 @@ jobs:
         run: |
           mv launcher/target/islisp islisp-macos
           gh release upload nightly islisp-macos --clobber
+          mv lsp/target/islisp-lsp islisp-lsp-macos
+          gh release upload nightly islisp-lsp-macos --clobber
 
   publish-docker:
     needs: [build-linux]

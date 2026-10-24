@@ -20,6 +20,7 @@
     <modules>
         <module>language</module>
         <module>launcher</module>
+        <module>lsp</module>
     </modules>
 
     <dependencyManagement>

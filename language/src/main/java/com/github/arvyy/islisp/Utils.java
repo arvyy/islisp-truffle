@@ -8,6 +8,7 @@ import com.oracle.truffle.api.nodes.Node;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Misc static utilities.
@@ -124,7 +125,7 @@ public final class Utils {
     * Convert java map to an alist usable in truffle runtime.
     * @param map java map
     * @return islisp alist
- */
+    */
     public static Object mapToAlist(HashMap<String, Object> map) {
         var entries = new ArrayList<Pair>();
         for (var e: map.entrySet()) {
@@ -133,6 +134,24 @@ public final class Utils {
             entries.add(p);
         }
         return listToValue(entries);
+    }
+
+    /**
+     * Convert islisp alist to java list.
+     * @param alist islisp alist
+     * @return java map
+     */
+    public static Map<String, Object> alistToMap(Object alist) {
+        var map = new HashMap<String, Object>();
+        var entryList = readList(alist);
+        for (var e: entryList) {
+            if (e instanceof Pair p) {
+                if (p.car() instanceof Symbol s) {
+                    map.put(s.name(), p.cdr());
+                }
+            }
+        }
+        return map;
     }
 
 }

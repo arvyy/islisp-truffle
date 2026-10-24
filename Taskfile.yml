@@ -9,6 +9,8 @@ tasks:
     cmds:
       - find . -name ".project" -type f -delete
       - find . -name ".classpath" -type f -delete
+      - find . -name '*.iml' -type f -delete
+      - find . -name '.settings' -type d -delete
 
   build:java:
     desc: 'Build java'
@@ -24,3 +26,8 @@ tasks:
     desc: 'Run file'
     cmds:
       - 'bash launcher/islisp.sh {{.CLI_ARGS}}'
+
+  lint:
+    desc: 'Lint java'
+    cmds:
+      - 'mvn checkstyle:check'
