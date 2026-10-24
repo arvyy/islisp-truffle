@@ -131,8 +131,8 @@ jobs:
         run: |
           mv launcher/target/islisp islisp-macos
           gh release upload ${{ github.ref_name }} islisp-macos --clobber
-          mv lsp/target/islisp islisp-macos
-          gh release upload ${{ github.ref_name }} islisp-macos --clobber
+          mv lsp/target/islisp-lsp islisp-lsp-macos
+          gh release upload ${{ github.ref_name }} islisp-lsp-macos --clobber
 
   publish-docker:
     needs: [build-linux]
