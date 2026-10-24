@@ -1,0 +1,26 @@
+version: '3'
+tasks:
+  clean:java:
+    desc: 'Clean java'
+    cmds:
+      - 'mvn clean'
+  clean:jdtls:
+    desc: 'Clean jdtls files'
+    cmds:
+      - find . -name ".project" -type f -delete
+      - find . -name ".classpath" -type f -delete
+
+  build:java:
+    desc: 'Build java'
+    cmds:
+      - 'mvn -DskipTests=true package'
+
+  run:repl:
+    desc: 'Run REPL'
+    cmds:
+      - 'bash launcher/islisp.sh'
+
+  run:file:
+    desc: 'Run file'
+    cmds:
+      - 'bash launcher/islisp.sh {{.CLI_ARGS}}'
