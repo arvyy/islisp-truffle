@@ -6,5 +6,7 @@ module com.github.arvyy.islisp {
   requires org.graalvm.truffle;
 
   provides com.oracle.truffle.api.provider.TruffleLanguageProvider with com.github.arvyy.islisp.ISLISPTruffleLanguageProvider;
+  exports com.github.arvyy.islisp;
+  exports com.github.arvyy.islisp.runtime;
   exports com.github.arvyy.islisp.buildinfo;
 }

@@ -51,6 +51,10 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
     public static final OptionKey<Boolean> IncludeDocumentation = new OptionKey<>(true);
     // CHECKSTYLE:ON
 
+
+    public static final TruffleLanguage.LanguageReference<ISLISPTruffleLanguage> REFERENCE
+            = TruffleLanguage.LanguageReference.create(ISLISPTruffleLanguage.class);
+
     @Override
     public ISLISPContext createContext(Env env) {
         return new ISLISPContext(this, env);
