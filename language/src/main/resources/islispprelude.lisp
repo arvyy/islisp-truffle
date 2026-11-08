@@ -61,6 +61,12 @@
 (defclass <floating-point-overflow> (<arithmetic-error>) ())
 (defclass <floating-point-underflow> (<arithmetic-error>) ())
 
+(defclass <control-error> (<error>) ())
+(defclass <parse-error> (<error>)
+    ((string :reader parse-error-string :initarg string)
+     (message :reader parse-error-message :initarg message)
+     (expected-class :reader parse-error-expected-class :initarg expected-class)))
+
 (defclass <stream-error> (<error>) ())
 
 (defclass <end-of-stream> (<stream-error>) ())
@@ -110,6 +116,10 @@
 
 (defclass <no-next-method-error> (<program-error>) ())
 
+(defclass <no-matching-primary-methods-error> (<program-error>)
+    ((name :reader no-matching-primary-methods-error-name :initarg name)
+     (arguments :reader no-matching-primary-methods-error-arguments :initarg arguments)))
+
 (defclass <undefined-entity> (<program-error>)
     ((name :reader undefined-entity-name :initarg name)
      (namespace :reader undefined-entity-namespace :initarg namespace)))
@@ -119,6 +129,8 @@
 
 (defclass <undefined-function> (<undefined-entity>)
     ((name :reader undefined-function-name :initarg name)))
+
+(defclass <storage-exhausted> (<serious-condition>) ())
 
 (defgeneric fill-stacktrace (condition))
 (defmethod fill-stacktrace ((condition <serious-condition>))
@@ -174,6 +186,12 @@
     (format stream "No next method available~%")
     (print-stacktrace stream condition))
 
+(defmethod report-condition ((condition <no-matching-primary-methods-error>) (stream <stream>))
+    (format stream "No matching primary methods exist for generic function ~A invoked with argument types ~A.~%"
+        (no-matching-primary-methods-error-name condition)
+        (no-matching-primary-methods-error-arguments condition))
+    (print-stacktrace stream condition))
+
 (defmethod report-condition ((condition <truffle-interop-error>) (stream <stream>))
     (format stream "Error during truffle interop call: ~A~%" (truffle-interop-error-message condition))
     (print-stacktrace stream condition))
@@ -196,6 +214,10 @@
     (format stream ". Expected a value of class ~S, got ~S.~%"
         (domain-error-expected-class condition)
         (domain-error-object condition))
+    (print-stacktrace stream condition))
+
+(defmethod report-condition ((condition <parse-error>) (stream <stream>))
+    (format stream "Failure parsing: ~S.~%" (parse-error-message condition))
     (print-stacktrace stream condition))
 
 (defun min (first :rest xs)
@@ -467,3 +489,15 @@
         (create (class <domain-error>) 'message "Unexpected type" 'object array 'expected-class (class <general-array*>))
         nil))
   (apply #'set-aref obj array indices))
+
+(defun parse-number (str)
+  (let* ((in (create-string-input-stream str))
+         (token (read in)))
+    (if (numberp token)
+        token
+        (signal-condition 
+           (create (class <parse-error>)
+                   'string str
+                   'message "Failed to parse number"
+                   'expected-class (class <number>))
+            nil))))

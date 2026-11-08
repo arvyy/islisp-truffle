@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.runtime.LispClass;
+import com.github.arvyy.islisp.runtime.LispVector;
 import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.interop.InteropException;
@@ -34,10 +35,11 @@ public class ISLISPErrorSignalerNode extends Node {
     DirectCallNode createCallNode;
 
     @CompilerDirectives.CompilationFinal
-    Symbol sActual, sRequiredMin, sRequiredMax, sMessage, sObject, sExpectedClass, sBounds;
+    Symbol sActual, sRequiredMin, sRequiredMax, sMessage, sObject, sExpectedClass, sBounds, sString, sName, sArguments;
 
     @CompilerDirectives.CompilationFinal
-    LispClass cArityError, cDomainError, cIndexOutOfRangeError, cTruffleInteropError;
+    LispClass cArityError, cDomainError, cIndexOutOfRangeError, cTruffleInteropError,
+              cParseError, cNoMatchingPrimaryMethodsError;
 
     Symbol sActual() {
         if (sActual == null) {
@@ -95,6 +97,30 @@ public class ISLISPErrorSignalerNode extends Node {
         return sBounds;
     }
 
+    Symbol sString() {
+        if (sString == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            sString = ISLISPContext.get(this).namedSymbol("string");
+        }
+        return sString;
+    }
+
+    Symbol sName() {
+        if (sName == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            sName = ISLISPContext.get(this).namedSymbol("name");
+        }
+        return sName;
+    }
+
+    Symbol sArguments() {
+        if (sArguments == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            sArguments = ISLISPContext.get(this).namedSymbol("arguments");
+        }
+        return sArguments;
+    }
+
     LispClass cArityError() {
         if (cArityError == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
@@ -135,6 +161,27 @@ public class ISLISPErrorSignalerNode extends Node {
         return cTruffleInteropError;
     }
 
+    LispClass cParseError() {
+        if (cParseError == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            var ctx = ISLISPContext.get(this);
+            cParseError = ctx.lookupClass(
+                "ROOT",
+                ctx.namedSymbol("<parse-error>"));
+        }
+        return cParseError;
+    }
+
+    LispClass cNoMatchingPrimaryMethodsError() {
+        if (cNoMatchingPrimaryMethodsError == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            var ctx = ISLISPContext.get(this);
+            cNoMatchingPrimaryMethodsError = ctx.lookupClass(
+                "ROOT",
+                ctx.namedSymbol("<no-matching-primary-methods-error>"));
+        }
+        return cNoMatchingPrimaryMethodsError;
+    }
 
     /**
      * Signal error about wrong count of supplied arguments.
@@ -422,4 +469,44 @@ public class ISLISPErrorSignalerNode extends Node {
         );
         return getSignalCallNode().call(null, condition, ctx.getT());
     }
+
+    /**
+     * Signal <parsing-error> when encountering issues during parsing (eg, when calling read).
+     *
+     * @param string text input that was attempted to be parsed
+     * @param message diagnostic message
+     * @param expectedClass expected type of the parsing
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
+    public Object signalParsingError(String string, String message, LispClass expectedClass) {
+        var ctx = ISLISPContext.get(this);
+        var condition = getCreateCallNode().call(
+            null,
+            cParseError(),
+            sString(), string,
+            sMessage(), message,
+            sExpectedClass(), expectedClass
+        );
+        return getSignalCallNode().call(null, condition, ctx.getT());
+    }
+
+    /**
+     * Signal error when a generic method is tried to be called but no primary
+     * methods can be resolved.
+     *
+     * @param name method name
+     * @param classes arguments' classes
+     * @return undefined object, value of which shouldn't be relied upon.
+     */
+    public Object signalNoApplicableGenericMethods(Symbol name, LispClass[] classes) {
+        var ctx = ISLISPContext.get(this);
+        var condition = getCreateCallNode().call(
+            null,
+            cNoMatchingPrimaryMethodsError(),
+            sName(), name,
+            sArguments(), new LispVector(classes)
+        );
+        return getSignalCallNode().call(null, condition, ctx.getT());
+    }
+
 }

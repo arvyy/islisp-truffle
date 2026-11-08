@@ -27,6 +27,8 @@
         (foo1)
         (test-equal t nil)))
 
+;; test correct class-of reporting
+(test-equal (class-of #'foo1) (class <function>))
 
 (format (standard-output) "defun.lisp end")
 (finish-output (standard-output))

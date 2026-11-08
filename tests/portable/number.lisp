@@ -156,5 +156,28 @@
          (< (tan 1) 1.558))
     t)
 
+;; parse number
+;; examples from spec
+(test-equal 123.34 (parse-number "123.34"))
+(test-equal 64206 (parse-number "#XFACE"))
+(block exit
+  (with-handler
+    (lambda (condition)
+        (test-equal (instancep condition (class <parse-error>)) t)
+        (test-equal "-37." (parse-error-string condition))
+        (test-equal (class <number>) (parse-error-expected-class condition))
+        (return-from exit nil))
+    (parse-number "-37.")
+    (test-equal nil t)))
+(block exit
+  (with-handler
+    (lambda (condition)
+        (test-equal (instancep condition (class <parse-error>)) t)
+        (test-equal "-.5" (parse-error-string condition))
+        (test-equal (class <number>) (parse-error-expected-class condition))
+        (return-from exit nil))
+    (parse-number "-.5")
+    (test-equal nil t)))
+
 (format-object (standard-output) "number.lisp end" nil)
 (finish-output (standard-output))

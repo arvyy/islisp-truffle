@@ -55,7 +55,6 @@ public abstract class ISLISPGenericFunctionDispatchNode extends Node {
                 new ArraySlice<>(new CallTarget[0]),
                 new ArraySlice<>(new CallTarget[0])
             );
-            //TODO handle when primary methods empty?
             var closure = new Closure(null, newApplicableMethods, args);
             var fun = new LispFunction(closure, applicableMethods.primaryMethods().get(0));
             var result = functionDispatchNode.executeDispatch(fun, args);
@@ -113,7 +112,6 @@ public abstract class ISLISPGenericFunctionDispatchNode extends Node {
                 new ArraySlice<>(new CallTarget[0]),
                 new ArraySlice<>(new CallTarget[0])
             );
-            //TODO handle when primary methods empty?
             var closure = new Closure(null, newApplicableMethods, args);
             var fun = new LispFunction(closure, applicableMethods.primaryMethods().get(0));
             var result = functionDispatchNode.executeDispatch(fun, args);

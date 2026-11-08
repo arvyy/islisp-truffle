@@ -378,6 +378,8 @@ public class ISLISPContext {
         initBuiltin("<object>");
         initBuiltin("<standard-class>", "<object>");
         initBuiltin("<function>", "<object>");
+        initBuiltin("<generic-function>", "<function>");
+        initBuiltin("<standard-generic-function>", "<generic-function>");
         initBuiltin("<number>", "<object>");
         initBuiltin("<symbol>", "<object>");
         initBuiltin("<list>", "<object>");
@@ -394,6 +396,8 @@ public class ISLISPContext {
         initBuiltin("<general-array*>", "<basic-array*>");
         initBuiltin("<stream>", "<object>");
         initBuiltin("<character>", "<object>");
+        initBuiltin("<standard-object>", "<object>");
+        initBuiltin("<standard-class>", "<object>");
 
         //truffle interop
         initBuiltin("<truffle-object>", "<object>");

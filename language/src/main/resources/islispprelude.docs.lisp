@@ -1,4 +1,32 @@
 ;;;;;;;;;;; CUSTOM / EXTENSION ENTRIES
+(setf (documentation 'class '<no-next-method-error>)
+    '((kind . class)
+      (superclasses . (<program-error>))
+      (slots . ())
+      (desc . "Condition raised when next-method is called by no next method exists.")))
+
+(setf (documentation 'class '<no-matching-primary-methods-error>)
+    '((kind . class)
+      (superclasses . (<program-error>))
+      (slots . (name arguments))
+      (desc . "Condition raised generic method is called with arguments for which no matching method exists. _name_ is a symbol naming the generic method, _arguments_ is a vector of classes with which it was called.")))
+
+(setf (documentation 'function 'no-matching-primary-methods-error-name)
+    '((kind . function)
+      (syntax . "(no-matching-primary-methods-error-name no-matching-primary-methods-error)")
+      (return-type . "<symbol>")
+      (min-args . 1)
+      (max-args . 1)
+      (desc . "Returns the _name_ supplied as data when creating the _no-matching-primary-methods-error_.")))
+
+(setf (documentation 'function 'no-matching-primary-methods-error-arguments)
+    '((kind . function)
+      (syntax . "(no-matching-primary-methods-error-arguments no-matching-primary-methods-error)")
+      (return-type . "<general-vector>")
+      (min-args . 1)
+      (max-args . 1)
+      (desc . "Returns the _arguments_ vector of classes supplied as data when creating the _no-matching-primary-methods-error_.")))
+
 (setf (documentation 'dynvar '*args*)
     '((kind . dynvar)
       (value-type . "<general-vector>")
@@ -308,7 +336,7 @@ The _operation_ is the function that was being performed, and the _operands_ is 
 (setf (documentation 'class '<parse-error>)
     '((kind . class)
       (superclasses . (<error>))
-      (slots . (string expected-class))
+      (slots . (string message expected-class))
       (desc . "Class of condition signalled when failing to parse (e.g., calling *parse-number*).
 
 The _string_ is the string that was being parsed, and the _expected-class_ is the class that the textual notation in the string was expected to represent.")))
@@ -2314,7 +2342,7 @@ NOTE: When a binary stream is used, the order of bits within bytes and bytes wit
       (return-type . "<class>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "Returns the _expected-class_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class ** (error-id. _domain-error_).")))
+      (desc . "Returns the _expected-class_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class *<parse-error>* (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'parse-error-string)
     '((kind . function)
@@ -2322,7 +2350,15 @@ NOTE: When a binary stream is used, the order of bits within bytes and bytes wit
       (return-type . "<string>")
       (min-args . 1)
       (max-args . 1)
-      (desc . "Returns the _string_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class ** (error-id. _domain-error_).")))
+      (desc . "Returns the _string_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class *<parse-error>* (error-id. _domain-error_).")))
+
+(setf (documentation 'function 'parse-error-message)
+    '((kind . function)
+      (syntax . "(parse-error-message parse-error)")
+      (return-type . "<string>")
+      (min-args . 1)
+      (max-args . 1)
+      (desc . "Returns the _message_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class *<parse-error>* (error-id. _domain-error_).")))
 
 (setf (documentation 'function 'parse-number)
     '((kind . function)

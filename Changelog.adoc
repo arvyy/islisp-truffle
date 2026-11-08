@@ -6,6 +6,12 @@ Afterwards the version will match truffle version followed by a date, eg. `24.0.
 
 == Unreleased
 
+* Fix `class-of` on a class value not returning metaclass.
+* Fix `class-of` not returning correct class for a generic function.
+* Add error signalling for `read` for wrong input.
+* Add error signalling when calling generic function which doesn't have applicable primary methods.
+* Fix parser parsing numbers that don't strictly match required format.
+* Fix missing definitions for `<control-error>`, `<parse-error>`, `<storage-exhausted>` classes; `parse-error-string`, `parse-error-expected-class`, `parse-number` functions.
 * Add basic LSP
 
 == 0.0.3 (2026-10-22)

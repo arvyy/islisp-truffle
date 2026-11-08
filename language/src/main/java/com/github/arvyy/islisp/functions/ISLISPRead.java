@@ -3,6 +3,8 @@ package com.github.arvyy.islisp.functions;
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.Utils;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
+import com.github.arvyy.islisp.parser.NumberParsingException;
+import com.github.arvyy.islisp.parser.ParsingException;
 import com.github.arvyy.islisp.parser.Reader;
 import com.github.arvyy.islisp.parser.SyntaxObject;
 import com.github.arvyy.islisp.runtime.LispFunction;
@@ -93,6 +95,12 @@ public abstract class ISLISPRead extends RootNode {
             maybeDatum = reader.readSingle();
         } catch (IOException e) {
             return errorSignalerNode.signalIOError(e);
+        } catch (NumberParsingException e) {
+            var ctx = ISLISPContext.get(this);
+            return errorSignalerNode.signalParsingError(e.getInput(), e.getMessage(), ctx.lookupClass("<number>"));
+        } catch (ParsingException e) {
+            var ctx = ISLISPContext.get(this);
+            return errorSignalerNode.signalParsingError("", e.getMessage(), ctx.lookupClass("<object>"));
         }
         if (maybeDatum.isPresent()) {
             return maybeDatum.get().syntaxToDatum();

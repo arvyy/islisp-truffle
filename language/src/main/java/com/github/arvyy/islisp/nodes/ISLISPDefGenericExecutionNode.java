@@ -11,6 +11,7 @@ import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.ReportPolymorphism;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.DirectCallNode;
@@ -21,6 +22,7 @@ import com.oracle.truffle.api.source.SourceSection;
  * Helper node that acts as an entry point when invoking a generic function. Collects applicable
  * methods before initiating dispatch chain.
  */
+@ReportPolymorphism
 public abstract class ISLISPDefGenericExecutionNode extends RootNode {
 
     private final String module;
@@ -98,6 +100,7 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
     abstract Object executeGeneric(LispClass[] classes, Object[] arguments);
 
     @Specialization(
+            limit = "3",
             guards = "classesEqual(classes, lastClasses)",
             assumptions = "genericFunctionDidntChange")
     Object doCached(
@@ -107,6 +110,9 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
         @Cached("getApplicableMethods(classes)") GenericMethodApplicableMethods applicableMethods,
         @Cached("genericFunctionDescriptor.getAssumption()") Assumption genericFunctionDidntChange
     ) {
+        if (applicableMethods.primaryMethods().size() == 0) {
+            return errorSignalerNode.signalNoApplicableGenericMethods(name, classes);
+        }
         return dispatchNode.executeDispatch(applicableMethods, arguments);
     }
 
@@ -115,7 +121,11 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
         LispClass[] classes,
         Object[] arguments
     ) {
-        return dispatchNode.executeDispatch(getApplicableMethods(classes), arguments);
+        var applicableMethods = getApplicableMethods(classes);
+        if (applicableMethods.primaryMethods().size() == 0) {
+            return errorSignalerNode.signalNoApplicableGenericMethods(name, classes);
+        }
+        return dispatchNode.executeDispatch(applicableMethods, arguments);
     }
 
     GenericMethodApplicableMethods getApplicableMethods(LispClass[] classes) {

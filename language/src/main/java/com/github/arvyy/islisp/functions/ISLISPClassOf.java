@@ -1,11 +1,14 @@
 package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
+import com.github.arvyy.islisp.exceptions.ISLISPError;
 import com.github.arvyy.islisp.runtime.*;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.NeverDefault;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.interop.InteropLibrary;
@@ -30,29 +33,32 @@ public abstract class ISLISPClassOf extends ISLISPBuiltinFunctionRootNode {
 
     @Specialization
     LispClass doInt(
-            int integer,
-            @Cached("loadIntegerClass()") LispClass lispClass) {
+        int integer,
+        @Shared("ints") @Cached("loadIntegerClass()") LispClass lispClass
+    ) {
         return lispClass;
     }
 
     @Specialization
     LispClass doBigInt(
         LispBigInteger integer,
-        @Cached("loadIntegerClass()") LispClass lispClass) {
+        @Shared("ints") @Cached("loadIntegerClass()") LispClass lispClass
+    ) {
         return lispClass;
     }
 
     @Specialization
     LispClass doFloat(
         double flt,
-        @Cached("loadFloatClass()") LispClass lispClass) {
+        @Cached("loadFloatClass()") LispClass lispClass
+    ) {
         return lispClass;
     }
 
     @Specialization
     LispClass doString(
         String str,
-        @Cached("loadStringClass()") LispClass lispClass
+        @Shared("strings") @Cached("loadStringClass()") LispClass lispClass
     ) {
         return lispClass;
     }
@@ -60,7 +66,7 @@ public abstract class ISLISPClassOf extends ISLISPBuiltinFunctionRootNode {
     @Specialization
     LispClass doStringBuffer(
         LispMutableString str,
-        @Cached("loadStringClass()") LispClass lispClass
+        @Shared("strings") @Cached("loadStringClass()") LispClass lispClass
     ) {
         return lispClass;
     }
@@ -68,8 +74,10 @@ public abstract class ISLISPClassOf extends ISLISPBuiltinFunctionRootNode {
     @Specialization
     LispClass doFunction(
             LispFunction fun,
-            @Cached("loadFunctionClass()") LispClass lispClass) {
-        return lispClass;
+            @Cached("loadFunctionClass()") LispClass funClass,
+            @Cached("loadStandardGenericFunctionClass()") LispClass genFunClass
+    ) {
+        return fun.isGeneric() ? genFunClass : funClass;
     }
 
     @Specialization
@@ -91,7 +99,15 @@ public abstract class ISLISPClassOf extends ISLISPBuiltinFunctionRootNode {
     @Specialization
     LispClass doStandardClass(
             StandardClass clazz,
-            @Cached("loadStandardClass()") LispClass builtinClass
+            @Cached("loadStandardClass()") LispClass standardClass
+    ) {
+        return standardClass;
+    }
+
+    @Specialization
+    LispClass doBuiltinClass(
+            BuiltinClass clazz,
+            @Cached("loadBuiltinClass()") LispClass builtinClass
     ) {
         return builtinClass;
     }
@@ -181,69 +197,97 @@ public abstract class ISLISPClassOf extends ISLISPBuiltinFunctionRootNode {
         return objClass;
     }
 
+    @NeverDefault
     LispClass loadIntegerClass() {
         return loadClass("<integer>");
     }
+
+    @NeverDefault
     LispClass loadFloatClass() {
         return loadClass("<float>");
     }
+
+    @NeverDefault
     LispClass loadFunctionClass() {
         return loadClass("<function>");
     }
+
+    @NeverDefault
+    LispClass loadStandardGenericFunctionClass() {
+        return loadClass("<standard-generic-function>");
+    }
+
+    @NeverDefault
     LispClass loadNullClass() {
         return loadClass("<null>");
     }
+
+    @NeverDefault
     LispClass loadSymbolClass() {
         return loadClass("<symbol>");
     }
+
+    @NeverDefault
     LispClass loadPairClass() {
         return loadClass("<cons>");
     }
 
+    @NeverDefault
     LispClass loadBuiltinClass() {
         return loadClass("<built-in-class>");
     }
 
+    @NeverDefault
     LispClass loadStandardClass() {
         return loadClass("<standard-class>");
     }
 
+    @NeverDefault
     LispClass loadStringClass() {
         return loadClass("<string>");
     }
 
+    @NeverDefault
     LispClass loadVectorClass() {
         return loadClass("<general-vector>");
     }
 
+    @NeverDefault
     LispClass loadStreamClass() {
         return loadClass("<stream>");
     }
 
+    @NeverDefault
     LispClass loadCharacterClass() {
         return loadClass("<character>");
     }
 
+    @NeverDefault
     LispClass loadArrayClass() {
         return loadClass("<general-array*>");
     }
 
+    @NeverDefault
     LispClass loadTruffleObjectClass() {
         return loadClass("<truffle-object>");
     }
 
+    @NeverDefault
     LispClass loadTruffleVectorClass() {
         return loadClass("<truffle-vector>");
     }
 
+    @NeverDefault
     LispClass loadNativeLibraryClass() {
         return loadClass("<truffle-native-library>");
     }
 
+    @NeverDefault
     LispClass loadModuleClass() {
         return loadClass("<module>");
     }
 
+    @NeverDefault
     LispClass loadObjectClass() {
         return loadClass("<object>");
     }
@@ -251,6 +295,11 @@ public abstract class ISLISPClassOf extends ISLISPBuiltinFunctionRootNode {
     LispClass loadClass(String name) {
         var ctx = ISLISPContext.get(this);
         var clazz = ctx.lookupClass(name);
+        if (clazz == null) {
+            throw new ISLISPError(
+                    "Unexpected failure to locate object's class: " + name,
+                    this);
+        }
         return clazz;
     }
 

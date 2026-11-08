@@ -16,4 +16,4 @@
             (format-char (standard-output) #\newline))))))
 
 (provides
-    test-equal)
+    test-equal):

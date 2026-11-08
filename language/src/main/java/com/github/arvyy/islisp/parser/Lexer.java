@@ -133,8 +133,6 @@ public class Lexer {
                 reset();
                 var numberToken = readNumberToken(10);
                 return Optional.of(new TokenWithSource(numberToken, startLine, startCol, line, col));
-            } else {
-                reset();
             }
         }
         if (c == '"') {
@@ -271,10 +269,22 @@ public class Lexer {
             sb.appendCodePoint(c);
         }
         var numberString = sb.toString();
-        if (radix == 10 && (numberString.contains(".") || numberString.contains("e") || numberString.contains("E"))) {
-            return new Token.InexactNumberToken(Double.parseDouble(numberString));
-        } else {
-            return new Token.ExactNumberToken(new BigInteger(numberString, radix));
+        try {
+            if (radix == 10
+                    && (numberString.contains(".")
+                        || numberString.contains("e")
+                        || numberString.contains("E"))
+            ) {
+                if (numberString.endsWith(".")) {
+                    throw new NumberFormatException();
+                }
+                return new Token.InexactNumberToken(Double.parseDouble(numberString));
+            } else {
+                return new Token.ExactNumberToken(new BigInteger(numberString, radix));
+            }
+        } catch (NumberFormatException nfe) {
+            var section = source.lexemeSourceSection(line, col).orElse(null);
+            throw new NumberParsingException(section, numberString);
         }
     }
 

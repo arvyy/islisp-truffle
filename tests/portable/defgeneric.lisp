@@ -1,3 +1,5 @@
+(requires "testing.lisp")
+
 (defun test-print (int)
     (format-integer (standard-output) int 10)
     (format-char (standard-output) #\newline))
@@ -43,6 +45,9 @@
             (return-from exit nil))
         (foo3 1)
         (print "FAIL")))
+
+;; test correct class-of
+(test-equal (class-of #'foo1) (class <standard-generic-function>))
 
 (format (standard-output) "defgeneric.lisp end")
 (finish-output (standard-output))
