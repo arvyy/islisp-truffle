@@ -8,6 +8,10 @@ import com.github.arvyy.islisp.parser.Parser;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleStackTrace;
 import com.oracle.truffle.api.frame.Frame;
+import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.interop.InvalidArrayIndexException;
+import com.oracle.truffle.api.interop.NodeLibrary;
+import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.source.Source;
@@ -55,6 +59,15 @@ public class ISLISPInteractiveDebugger extends Node {
             }
         }
         if (signallingNode != null && debuggingFrame != null) {
+            var nodeLibrary = NodeLibrary.getUncached();
+            var interopLibrary = InteropLibrary.getUncached();
+            Object scope = null;
+            if (nodeLibrary.hasScope(signallingNode, debuggingFrame)) {
+                try {
+                    scope = nodeLibrary.getScope(signallingNode, debuggingFrame, true);
+                } catch (UnsupportedMessageException e1) {
+                }
+            }
             var conditionLocation = signallingNode.getSourceSection();
             var reader = new BufferedReader(new InputStreamReader(System.in));
             var parser = new Parser();
@@ -67,15 +80,48 @@ public class ISLISPInteractiveDebugger extends Node {
                     conditionLocation.getStartLine(),
                     conditionLocation.getCharacters());
             }
+            if (scope != null) {
+                System.out.println(",s [<index>] \tList bindings in a scope for a given index (or 0 if unspecified), "
+                    + "indexed from 0 for immediate scope and incrementing for parent scopes.");
+            }
             System.out.println(",c <expression>\t"
                 + "Resume from condition using <expression> as the value from nearest node");
-            System.out.println(",q\tAbort to top level REPL");
             System.out.println("<expression>\tEvaluate given expression at the point of condition signalling");
+            System.out.println(",q\tAbort to top level REPL");
             while (true) {
                 try {
                     System.out.print("debug> ");
                     var line = reader.readLine();
-                    if (line.startsWith(",c")) {
+                    if (line.startsWith(",s")) {
+                        if (scope == null) {
+                            continue;
+                        }
+                        try {
+                            int index = 0;
+                            var indexStr = line.substring(",s".length()).trim();
+                            if (!indexStr.isEmpty()) {
+                                try {
+                                    index = Integer.parseInt(indexStr);
+                                } catch (RuntimeException ignored) {
+                                }
+                            }
+                            Object currentScope = scope;
+                            for (var i = 0; i < index; i++) {
+                                if (interopLibrary.hasScopeParent(currentScope)) {
+                                    currentScope = interopLibrary.getScopeParent(currentScope);
+                                }
+                            }
+                            Object members = interopLibrary.getMembers(currentScope);
+                            var membersLen = interopLibrary.getArraySize(members);
+                            for (var i = 0; i < membersLen; i++) {
+                                var member = interopLibrary.readArrayElement(members, i);
+                                var name = interopLibrary.toDisplayString(member);
+                                System.out.println(" " + name);
+                            }
+                        } catch (InvalidArrayIndexException | UnsupportedMessageException exc) {
+                            throw new RuntimeException(exc);
+                        }
+                    } else if (line.startsWith(",c")) {
                         var language = ISLISPContext.get(this).getLanguage();
                         var source = Source
                             .newBuilder("islisp", line.substring(",c".length()), "<debug>")

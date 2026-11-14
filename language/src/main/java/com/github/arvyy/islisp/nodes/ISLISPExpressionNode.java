@@ -157,7 +157,7 @@ public abstract class ISLISPExpressionNode extends Node implements Instrumentabl
 
 
     @CompilerDirectives.TruffleBoundary
-    Object getScopeBoundary(MaterializedFrame frame) {
+    DebuggerScope getScopeBoundary(MaterializedFrame frame) {
         return new DebuggerScope(frame, getParserContext().getLocalScopeVariables());
     }
 
