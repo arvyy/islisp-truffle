@@ -55,6 +55,8 @@ Command line arguments are available through `\*args\*` dynamic variable, as a v
 
 == Debugging
 
+=== Chrome debugger
+
 Truffle provides debugging facilities out of the box. Start launcher with `--inspect=_port_` to run in debug mode.
 You should see a message: `E.g. in Chrome open: devtools://devtools/bundled/js_app.html?ws=127.0.0.1:4242/...`.
 Open the link in chrome, and use standard chrome dev tools to inspect and step around.
@@ -62,6 +64,44 @@ Open the link in chrome, and use standard chrome dev tools to inspect and step a
 image:debugger.png[]
 
 Use `(debugger)` to setup breakpoints from code.
+
+=== Interactive condition handler
+
+If running through REPL, an interactive condition handler is installed, which allows inspecting and choosing a resumption value
+for resumable conditions that reach it.
+
+[code,shell]
+----
+#1> (defun foo (n) (let ((a 1) (b 2)) (+ a b n)))
+nil
+#2> (foo "3")
+Unexpected type. Expected a value of class #<class <number>>, got "3".
+    at REPL:1
+    at REPL:1
+    at REPL:1
+Entering interactive condition handler
+Paused at REPL:1
+        (+ a b n)
+,s [<index>]    List bindings in a scope for a given index (or 0 if unspecified), indexed from 0 for immediate scope and incrementing for parent scopes.
+,c <expression> Resume from condition using <expression> as the value from nearest node
+<expression>    Evaluate given expression at the point of condition signalling
+,q      Abort to top level REPL
+debug> ,s
+ a
+ b
+ n
+debug> a
+1
+debug> b
+2
+debug> n
+"3"
+debug> ,c (+ a b 3)
+6
+#3>
+----
+
+=== Tracing macro
 
 Additionally, a simple print-style debugging macro `trace` is provided. 
 `(trace _form ..._)` prints expression representation and its value to error stream, and returns the value.
