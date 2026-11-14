@@ -6,6 +6,7 @@ Afterwards the version will match truffle version followed by a date, eg. `24.0.
 
 == Unreleased
 
+* Fix module lookup failure during interactive debugger repl state.
 * Use escaped presentation for truffle values, fix missing escapes for strings.
 * Fix `class-of` on a class value not returning metaclass.
 * Fix `class-of` not returning correct class for a generic function.

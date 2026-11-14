@@ -175,7 +175,10 @@ public final class Main {
                     if ("true".equals(System.getProperty("islispFullStacktraces"))) {
                         throw e;
                     } else {
-                        System.err.println(e.getMessage());
+                        var m = e.getMessage();
+                        if (m != null) {
+                            System.err.println(e.getMessage());
+                        }
                     }
                 }
             }

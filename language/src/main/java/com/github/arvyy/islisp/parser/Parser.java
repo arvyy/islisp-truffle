@@ -144,6 +144,7 @@ public class Parser {
         var nonDefinitionExprs = new ArrayList<ISLISPExpressionNode>();
         for (var v: sexprs) {
             var expression = parseExpressionNode(parserContext, v, true);
+            expression.setParserContext(parserContext);
             if (expression.isDefinitionNode()) {
                 executeExpression(expression, parserContext.frameBuilder.build());
             } else {
