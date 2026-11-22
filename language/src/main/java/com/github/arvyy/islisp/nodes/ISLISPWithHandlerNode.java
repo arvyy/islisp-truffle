@@ -61,9 +61,10 @@ public class ISLISPWithHandlerNode extends ISLISPExpressionNode {
                 ctx.popHandler();
             }
         } else {
+            ISLISPContext r = ISLISPContext.get(this);
             return errorSignalerNode.signalWrongType(
                 handlerFunctionValue,
-                ISLISPContext.get(this).lookupClass("<function>"));
+                r.getRootModule().lookupClass(r.namedSymbol("<function>")));
         }
     }
 }

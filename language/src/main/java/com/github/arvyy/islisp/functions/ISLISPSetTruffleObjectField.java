@@ -59,7 +59,7 @@ public abstract class ISLISPSetTruffleObjectField extends RootNode {
     @Fallback
     Object fallback(Object value, Object o, Object member) {
         var ctx = ISLISPContext.get(this);
-        var expectedClass = ctx.lookupClass("<truffle-object>");
+        var expectedClass = ctx.getRootModule().lookupClass(ctx.namedSymbol("<truffle-object>"));
         return errorSignalerNode.signalWrongType(o, expectedClass);
     }
 

@@ -38,7 +38,7 @@ public class ISLISPFinishOutput extends RootNode {
             flush(stream);
             return ctx.getNil();
         }
-        return errorSignalerNode.signalWrongType(frame.getArguments()[1], ctx.lookupClass("<stream>"));
+        return errorSignalerNode.signalWrongType(frame.getArguments()[1], ctx.getRootModule().lookupClass(ctx.namedSymbol("<stream>")));
     }
 
     @CompilerDirectives.TruffleBoundary

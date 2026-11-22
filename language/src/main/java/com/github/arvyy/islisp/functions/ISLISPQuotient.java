@@ -94,7 +94,7 @@ public abstract class ISLISPQuotient extends RootNode {
     @Fallback
     Object notNumbers(Object a, Object b) {
         var ctx = ISLISPContext.get(this);
-        var numberClass = ctx.lookupClass("<number>");
+        var numberClass = ctx.getRootModule().lookupClass(ctx.namedSymbol("<number>"));
         return errorSignalerNode.signalWrongType(b, numberClass);
     }
 

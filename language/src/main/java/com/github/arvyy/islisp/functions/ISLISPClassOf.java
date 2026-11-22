@@ -294,7 +294,7 @@ public abstract class ISLISPClassOf extends ISLISPBuiltinFunctionRootNode {
 
     LispClass loadClass(String name) {
         var ctx = ISLISPContext.get(this);
-        var clazz = ctx.lookupClass(name);
+        var clazz = ctx.getRootModule().lookupClass(ctx.namedSymbol(name));
         if (clazz == null) {
             throw new ISLISPError(
                     "Unexpected failure to locate object's class: " + name,

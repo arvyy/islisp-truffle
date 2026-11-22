@@ -333,8 +333,8 @@ public class Parser {
                 }
                 var placeList = requireList(place, 1, -1);
                 var setfDispatchSymbol = downcast(placeList.get(0), Symbol.class);
-                var setfDispatch = ISLISPContext.get(null)
-                        .lookupSetfTransformer(parserContext.module, setfDispatchSymbol);
+                var setfDispatch = ISLISPContext.get(null).getModule(parserContext.module)
+                        .lookupSetfTransformer(setfDispatchSymbol);
                 if (setfDispatch == null) {
                     return parseDirectSetfFunctionCall(parserContext, sexpr, placeList, value);
                 }
@@ -694,7 +694,7 @@ public class Parser {
                 break macro;
             }
             var symbol = maybeSymbol.get();
-            var maybeMacro = ISLISPContext.get(null).lookupMacro(module, symbol);
+            var maybeMacro = ISLISPContext.get(null).getModule(module).lookupMacro(symbol);
             if (maybeMacro != null) {
                 var args = new ArrayList<Object>();
                 args.add(null); // closure param

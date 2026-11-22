@@ -28,7 +28,7 @@ public class ISLISPClose extends ISLISPBuiltinFunctionRootNode {
             close(stream);
             return ctx.getNil();
         }
-        return errorSignalerNode.signalWrongType(arg, ctx.lookupClass("<stream>"));
+        return errorSignalerNode.signalWrongType(arg, ctx.getRootModule().lookupClass(ctx.namedSymbol("<stream>")));
     }
 
     @CompilerDirectives.TruffleBoundary

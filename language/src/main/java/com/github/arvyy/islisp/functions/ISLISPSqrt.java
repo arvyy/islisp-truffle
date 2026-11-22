@@ -73,14 +73,14 @@ public abstract class ISLISPSqrt extends RootNode {
 
     Object signalNegativeNumber(Object o) {
         var ctx = ISLISPContext.get(this);
-        var numberClass = ctx.lookupClass("<number>");
+        var numberClass = ctx.getRootModule().lookupClass(ctx.namedSymbol("<number>"));
         return errorSignalerNode.signalDomainError("Argument to sqrt not a non-negative number", o, numberClass);
     }
 
     @Fallback
     Object notNumbers(Object v) {
         var ctx = ISLISPContext.get(this);
-        var numberClass = ctx.lookupClass("<number>");
+        var numberClass = ctx.getRootModule().lookupClass(ctx.namedSymbol("<number>"));
         return errorSignalerNode.signalWrongType(v, numberClass);
     }
 

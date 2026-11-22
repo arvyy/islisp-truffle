@@ -97,10 +97,10 @@ public abstract class ISLISPRead extends RootNode {
             return errorSignalerNode.signalIOError(e);
         } catch (NumberParsingException e) {
             var ctx = ISLISPContext.get(this);
-            return errorSignalerNode.signalParsingError(e.getInput(), e.getMessage(), ctx.lookupClass("<number>"));
+            return errorSignalerNode.signalParsingError(e.getInput(), e.getMessage(), ctx.getRootModule().lookupClass(ctx.namedSymbol("<number>")));
         } catch (ParsingException e) {
             var ctx = ISLISPContext.get(this);
-            return errorSignalerNode.signalParsingError("", e.getMessage(), ctx.lookupClass("<object>"));
+            return errorSignalerNode.signalParsingError("", e.getMessage(), ctx.getRootModule().lookupClass(ctx.namedSymbol("<object>")));
         }
         if (maybeDatum.isPresent()) {
             return maybeDatum.get().syntaxToDatum();
@@ -115,7 +115,7 @@ public abstract class ISLISPRead extends RootNode {
     @Fallback
     Object doFallback(Object stream, Object eosErrorP, Object eosValue) {
         var ctx = ISLISPContext.get(this);
-        return errorSignalerNode.signalWrongType(stream, ctx.lookupClass("<stream>"));
+        return errorSignalerNode.signalWrongType(stream, ctx.getRootModule().lookupClass(ctx.namedSymbol("<stream>")));
     }
 
     /**

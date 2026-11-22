@@ -40,12 +40,14 @@ public abstract class ISLISPFormatFloat extends RootNode {
 
     @Specialization
     Object doFallbackNonStream(Object stream, double f) {
-        return errorSignalerNode.signalWrongType(stream, ISLISPContext.get(this).lookupClass("<stream>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(stream, r.getRootModule().lookupClass(r.namedSymbol("<stream>")));
     }
 
     @Fallback
     Object doFallbackNonFloat(Object stream, Object f) {
-        return errorSignalerNode.signalWrongType(f, ISLISPContext.get(this).lookupClass("<float>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(f, r.getRootModule().lookupClass(r.namedSymbol("<float>")));
     }
 
 

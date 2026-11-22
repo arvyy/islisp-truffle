@@ -148,7 +148,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
         var superclasses = new ArrayList<LispClass>();
         // collect inherited slots from parent classes
         for (var superclass: superclassName) {
-            var clazz = ctx.lookupClass(module, superclass);
+            var clazz = ctx.getModule(module).lookupClass(superclass);
             if (clazz == null) {
                 errorSignalerNode.signalUndefinedClass(superclass);
             }
@@ -205,7 +205,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                 isAbstract,
                 getSourceSection()
         );
-        ctx.registerClass(module, name, newClass);
+        ctx.getModule(module).registerClass(name, newClass);
     }
 
     @Override

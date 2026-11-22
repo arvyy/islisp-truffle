@@ -50,7 +50,7 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
             functionNode.getCallTarget(),
             false,
             ctx.getModule(module).shouldInline(name));
-        ctx.registerFunction(module, name, fun);
+        ctx.getModule(module).registerFunction(name, fun);
         return name;
     }
 

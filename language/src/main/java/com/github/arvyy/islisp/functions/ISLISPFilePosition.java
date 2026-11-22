@@ -48,15 +48,17 @@ public abstract class ISLISPFilePosition extends RootNode {
                 return errorSignalerNode.signalIOError(e);
             }
         }
+        ISLISPContext r = ISLISPContext.get(this);
         return errorSignalerNode.signalDomainError(
             "file-position called on non-file stream",
             stream,
-            ISLISPContext.get(this).lookupClass("<stream>"));
+            r.getRootModule().lookupClass(r.namedSymbol("<stream>")));
     }
 
     @Fallback
     Object doFallback(Object obj) {
-        return errorSignalerNode.signalWrongType(obj, ISLISPContext.get(this).lookupClass("<stream>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(obj, r.getRootModule().lookupClass(r.namedSymbol("<stream>")));
     }
 
     /**

@@ -42,7 +42,7 @@ public abstract class ISLISPSetAref extends RootNode {
                 lookup[i] = bigIntValue((LispBigInteger) arg);
             } else {
                 var ctx = ISLISPContext.get(this);
-                return errorSignalerNode.signalWrongType(arg, ctx.lookupClass("<integer>"));
+                return errorSignalerNode.signalWrongType(arg, ctx.getRootModule().lookupClass(ctx.namedSymbol("<integer>")));
             }
         }
         return executeGeneric(frame.getArguments()[1], frame.getArguments()[2], lookup);
@@ -91,10 +91,11 @@ public abstract class ISLISPSetAref extends RootNode {
 
     @Specialization
     Object doString(Object value, String str, int[] lookup) {
+        ISLISPContext r = ISLISPContext.get(this);
         return errorSignalerNode.signalDomainError(
             "Cannot change immutable value",
             str,
-            ISLISPContext.get(this).lookupClass("<string>"));
+            r.getRootModule().lookupClass(r.namedSymbol("<string>")));
     }
 
     @Specialization
@@ -128,15 +129,16 @@ public abstract class ISLISPSetAref extends RootNode {
     @Fallback
     Object fallback(Object value, Object arr, int[] lookup) {
         var ctx = ISLISPContext.get(this);
-        return errorSignalerNode.signalWrongType(arr, ctx.lookupClass("<basic-array>"));
+        return errorSignalerNode.signalWrongType(arr, ctx.getRootModule().lookupClass(ctx.namedSymbol("<basic-array>")));
     }
 
     @CompilerDirectives.TruffleBoundary
     Object signalWrongDimension(Object obj, int expected, int actual) {
+        ISLISPContext r = ISLISPContext.get(this);
         return errorSignalerNode.signalDomainError(
             "Expected dimension size " + expected + "; received " + actual,
             obj,
-            ISLISPContext.get(this).lookupClass("<basic-array>"));
+            r.getRootModule().lookupClass(r.namedSymbol("<basic-array>")));
     }
 
     /**

@@ -105,7 +105,7 @@ public abstract class ISLISPPreviewChar extends RootNode {
     @Fallback
     Object doFallback(Object stream, Object eosErrorP, Object eosValue) {
         var ctx = ISLISPContext.get(this);
-        return errorSignalerNode.signalWrongType(stream, ctx.lookupClass("<stream>"));
+        return errorSignalerNode.signalWrongType(stream, ctx.getRootModule().lookupClass(ctx.namedSymbol("<stream>")));
     }
 
     /**

@@ -315,12 +315,7 @@ public class ISLISPContext {
             false,
             getLanguage(),
             null);
-        registerGenericFunction(
-            namedSymbol("ROOT"),
-            namedSymbol("initialize-object"),
-            false,
-            new LispFunction(initializeObjectExecutionNode.getCallTarget()),
-            initializeObjectDescriptor);
+        getModule(namedSymbol("ROOT")).registerGenericFunction(namedSymbol("initialize-object"), false, new LispFunction(initializeObjectExecutionNode.getCallTarget()), initializeObjectDescriptor);
     }
 
     private void initCreateMethod() {
@@ -336,12 +331,7 @@ public class ISLISPContext {
             false,
             getLanguage(),
             null);
-        registerGenericFunction(
-            namedSymbol("ROOT"),
-            namedSymbol("create"),
-            false,
-            new LispFunction(createExecutionNode.getCallTarget()),
-            createDescriptor);
+        getModule(namedSymbol("ROOT")).registerGenericFunction(namedSymbol("create"), false, new LispFunction(createExecutionNode.getCallTarget()), createDescriptor);
     }
 
     void initSetfExpanders() {
@@ -429,26 +419,6 @@ public class ISLISPContext {
     }
 
     /**
-     * Register global variable (mutable or immutable).
-     *
-     * @param module module name holding the binding
-     * @param symbolReference variable name
-     * @param init initialization value
-     * @param readonly if the variable is a constant
-     * @param sourceSection source section corresponding to declaration site
-     */
-    @CompilerDirectives.TruffleBoundary
-    public void registerGlobalVar(
-        Symbol module,
-        Symbol symbolReference,
-        Object init,
-        boolean readonly,
-        SourceSection sourceSection
-    ) {
-        getModule(module).registerGlobalVar(symbolReference, init, readonly, sourceSection);
-    }
-
-    /**
      * Find an associated property's value reference with a symbol. Creates if missing.
      *
      * @param symbol symbol
@@ -461,237 +431,6 @@ public class ISLISPContext {
         var properties = symbolProperties.get(symbol);
         properties.putIfAbsent(property, new ValueReference(null));
         return properties.get(property);
-    }
-
-    /**
-     * Find global variable by name.
-     *
-     * @param module module name holding the binding
-     * @param symbolReference name
-     * @return variable's value reference or null if not found
-     */
-    @CompilerDirectives.TruffleBoundary
-    public ValueReference lookupGlobalVar(Symbol module, Symbol symbolReference) {
-        return getModule(module).lookupGlobalVar(symbolReference);
-    }
-
-    /**
-     * Register setf transformer for a given name. When encountering `(setf (name form ...) value)`
-     * the given transformer will be used to expand it into a non-setf expression.
-     *
-     * @param module module name holding the binding
-     * @param symbolReference transformer name.
-     * @param transformer transformer.
-     */
-    @CompilerDirectives.TruffleBoundary
-    public void registerSetfTransformer(Symbol module, Symbol symbolReference, SetfTransformer transformer) {
-        getModule(module).registerSetfTransformer(symbolReference, transformer);
-    }
-
-    /**
-     * Find a setf transformer for a given name.
-     *
-     * @param module module name holding the binding
-     * @param symbolReference transformer name.
-     * @return setf transformer or null if undefined
-     */
-    @CompilerDirectives.TruffleBoundary
-    public SetfTransformer lookupSetfTransformer(Symbol module, Symbol symbolReference) {
-        return getModule(module).lookupSetfTransformer(symbolReference);
-    }
-
-    /**
-     * Register dynamic variable.
-     *
-     * @param module module name holding the binding
-     * @param symbolReference variable name.
-     * @param v value reference.
-     */
-    @CompilerDirectives.TruffleBoundary
-    public void registerDynamicVar(Symbol module, Symbol symbolReference, ValueReference v) {
-        getModule(module).registerDynamicVar(symbolReference, v);
-    }
-
-    /**
-     * Find dynamic variable value reference for a given name.
-     *
-     * @param module module name holding the binding
-     * @param symbolReference dynamic variable name
-     * @return dynamic variable value reference
-     */
-    @CompilerDirectives.TruffleBoundary
-    public ValueReference lookupDynamicVar(Symbol module, Symbol symbolReference) {
-        return getModule(module).lookupDynamicVar(symbolReference);
-    }
-
-    public ValueReference lookupDynamicVar(String module, Symbol symbolReference) {
-        return getModule(module).lookupDynamicVar(symbolReference);
-    }
-
-    /**
-     * Register function into function namespace.
-     *
-     * @param module module name holding the binding
-     * @param symbolReference function name
-     * @param function function value
-     */
-    @CompilerDirectives.TruffleBoundary
-    public void registerFunction(Symbol module, Symbol symbolReference, LispFunction function) {
-        getModule(module).registerFunction(symbolReference, function);
-    }
-
-    /**
-     * Find function by name. Function can be a generic function or plain.
-     *
-     * @param module module name holding the binding
-     * @param symbolReference function name
-     * @return function or null if undefined
-    @CompilerDirectives.TruffleBoundary
-    public LispFunction lookupFunction(Symbol module, Symbol symbolReference) {
-        return lookupFunction(module, symbolReference, false);
-    }
-
-    public LispFunction lookupFunction(String module, Symbol symbolReference) {
-        return lookupFunction(namedSymbol(module), symbolReference, false);
-    }
-
-    /**
-     * Find function by name. Function can be a generic function or plain.
-     *
-     * @param module module name holding the binding
-     * @param symbolReference function name
-     * @param setf whether function is of setf form in case it's generic.
-     * @return function or null if undefined
-    @CompilerDirectives.TruffleBoundary
-    public LispFunction lookupFunction(Symbol module, Symbol symbolReference, boolean setf) {
-        return getModule(module).lookupFunction(symbolReference, setf);
-    }
-    */
-
-    /**
-     * Register a generic function.
-     *
-     * @param module module name holding the binding
-     * @param symbolReference function name
-     * @param setf whether it's of setf form
-     * @param function function call entrypoint function implementation
-     * @param descriptor generic descriptor
-     */
-    @CompilerDirectives.TruffleBoundary
-    public void registerGenericFunction(
-            Symbol module,
-            Symbol symbolReference,
-            boolean setf,
-            LispFunction function,
-            GenericFunctionDescriptor descriptor
-    ) {
-        getModule(module).registerGenericFunction(symbolReference, setf, function, descriptor);
-    }
-
-    /**
-     * Find generic descriptor for a given generic function name.
-     *
-     * @param module the module where to look for the binding
-     * @param symbolReference generic function name
-     * @param setf if the function is of setf form
-     * @return generic function descriptor or null if undefined
-     */
-    @CompilerDirectives.TruffleBoundary
-    public GenericFunctionDescriptor lookupGenericFunctionDispatchTree(
-        Symbol module,
-        Symbol symbolReference,
-        boolean setf
-    ) {
-        return getModule(module).lookupGenericFunctionDispatchTree(symbolReference, setf);
-    }
-
-    /**
-     * Register macro with a given name.
-     *
-     * @param module the module where to look for the binding
-     * @param symbolReference macro name
-     * @param function macro implementation function
-     */
-    @CompilerDirectives.TruffleBoundary
-    public void registerMacro(Symbol module, Symbol symbolReference, LispFunction function) {
-        getModule(module).registerMacro(symbolReference, function);
-    }
-
-    /**
-     * Find macro by given symbol reference name.
-     *
-     * @param module the module where to look for the binding
-     * @param symbolReference reference
-     * @return macro function or null if undefined
-     */
-    @CompilerDirectives.TruffleBoundary
-    public LispFunction lookupMacro(Symbol module, Symbol symbolReference) {
-        return getModule(module).lookupMacro(symbolReference);
-    }
-
-    /**
-     * Add a new class to context.
-     *
-     * @param module the module where to look for the binding
-     * @param symbolReference class name's reference
-     * @param clazz class instance
-     */
-    @CompilerDirectives.TruffleBoundary
-    public void registerClass(Symbol module, Symbol symbolReference, LispClass clazz) {
-        getModule(module).registerClass(symbolReference, clazz);
-    }
-
-    /**
-     * Find a class by symbol reference.
-     *
-     * @param module the module where to look for the binding
-     * @param symbolReference class symbolic name's reference
-     * @return class or null if doesn't exist
-     */
-    @CompilerDirectives.TruffleBoundary
-    public LispClass lookupClass(Symbol module, Symbol symbolReference) {
-        return getModule(module).lookupClass(symbolReference);
-    }
-
-    /**
-     * Find a class by string name.
-     *
-     * @param module module name holding the binding
-     * @param name class name
-     * @return class or null if doesn't exit
-     */
-    @CompilerDirectives.TruffleBoundary
-    public LispClass lookupClass(Symbol module, String name) {
-        return lookupClass(module, namedSymbol(name));
-    }
-
-    public LispClass lookupClass(String module, Symbol name) {
-        return lookupClass(namedSymbol(module), name);
-    }
-
-    public LispClass lookupClass(String module, String name) {
-        return lookupClass(namedSymbol(module), namedSymbol(name));
-    }
-
-    /**
-     * Find root class by name.
-     *
-     * @param name class name
-     * @return class instance or null
-     */
-    public LispClass lookupClass(String name) {
-        return lookupClass("ROOT", name);
-    }
-
-
-    /**
-     * Find root class by symbol.
-     *
-     * @param ref class name's symbol reference
-     * @return class instance or null
-     */
-    public LispClass lookupClass(Symbol ref) {
-        return lookupClass("ROOT", ref);
     }
 
     /**

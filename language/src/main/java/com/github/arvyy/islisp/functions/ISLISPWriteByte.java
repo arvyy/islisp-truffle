@@ -42,7 +42,8 @@ public abstract class ISLISPWriteByte extends RootNode {
     })
     Object doInt(int b, LispStream stream) {
         if (b < 0 || b > 255) {
-            var intClass = ISLISPContext.get(this).lookupClass("<integer>");
+            ISLISPContext r = ISLISPContext.get(this);
+            var intClass = r.getRootModule().lookupClass(r.namedSymbol("<integer>"));
             return errorSignalerNode.signalDomainError(
                 "Given byte value out of bounds, it must be between 0 and 255",
                 b,
@@ -63,7 +64,7 @@ public abstract class ISLISPWriteByte extends RootNode {
     @Fallback
     Object fallback(Object num, Object stream) {
         var ctx = ISLISPContext.get(this);
-        return errorSignalerNode.signalWrongType(stream, ctx.lookupClass("<stream>"));
+        return errorSignalerNode.signalWrongType(stream, ctx.getRootModule().lookupClass(ctx.namedSymbol("<stream>")));
     }
 
     @CompilerDirectives.TruffleBoundary

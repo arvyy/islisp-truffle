@@ -82,17 +82,20 @@ public abstract class ISLISPNumericGt extends RootNode {
 
     @Specialization
     Object doFallbackFirstNotNumber(Object a, double b) {
-        return errorSignalerNode.signalWrongType(a, ISLISPContext.get(this).lookupClass("<number>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(a, r.getRootModule().lookupClass(r.namedSymbol("<number>")));
     }
 
     @Specialization
     Object doFallbackFirstNotNumber(Object a, LispBigInteger b) {
-        return errorSignalerNode.signalWrongType(a, ISLISPContext.get(this).lookupClass("<number>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(a, r.getRootModule().lookupClass(r.namedSymbol("<number>")));
     }
 
     @Fallback
     Object doFallbackSecondNotNumber(Object a, Object b) {
-        return errorSignalerNode.signalWrongType(b, ISLISPContext.get(this).lookupClass("<number>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(b, r.getRootModule().lookupClass(r.namedSymbol("<number>")));
     }
 
     /**

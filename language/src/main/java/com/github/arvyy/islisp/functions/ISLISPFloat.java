@@ -85,7 +85,8 @@ public abstract class ISLISPFloat extends RootNode {
     Object fallback(Object o) {
         if (numberClass == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            numberClass = ISLISPContext.get(this).lookupClass("<number>");
+            ISLISPContext r = ISLISPContext.get(this);
+            numberClass = r.getRootModule().lookupClass(r.namedSymbol("<number>"));
         }
         return errorSignalerNode.signalDomainError("Can't use 'float' function on not a number", o, numberClass);
     }

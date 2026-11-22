@@ -40,7 +40,8 @@ public abstract class ISLISPSetCdr extends RootNode {
 
     @Fallback
     Object fallback(Object arg1, Object arg2) {
-        return errorSignalerNode.signalWrongType(arg2, ISLISPContext.get(this).lookupClass("<pair>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(arg2, r.getRootModule().lookupClass(r.namedSymbol("<pair>")));
     }
 
     /**

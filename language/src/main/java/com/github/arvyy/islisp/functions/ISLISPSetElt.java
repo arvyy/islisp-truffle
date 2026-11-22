@@ -62,9 +62,10 @@ public abstract class ISLISPSetElt extends RootNode {
             try {
                 return errorSignalerNode.signalIndexOutOfRange(index, getListSize(p));
             } catch (Utils.NotAList e) {
+                ISLISPContext r = ISLISPContext.get(this);
                 return errorSignalerNode.signalWrongType(
                     p,
-                    ISLISPContext.get(this).lookupClass("<list>"));
+                    r.getRootModule().lookupClass(r.namedSymbol("<list>")));
             }
         }
         for (int i = 0; i < index; i++) {
@@ -76,16 +77,17 @@ public abstract class ISLISPSetElt extends RootNode {
                 try {
                     return errorSignalerNode.signalIndexOutOfRange(index,  getListSize(p));
                 } catch (Utils.NotAList e) {
+                    ISLISPContext r = ISLISPContext.get(this);
                     return errorSignalerNode.signalWrongType(
                         p,
-                        ISLISPContext.get(this).lookupClass("<list>"));
+                        r.getRootModule().lookupClass(r.namedSymbol("<list>")));
                 }
             } else {
                 var ctx = ISLISPContext.get(this);
                 return errorSignalerNode.signalDomainError(
                     "Not a proper list",
                     cell.cdr(),
-                    ctx.lookupClass("<list>"));
+                    ctx.getRootModule().lookupClass(ctx.namedSymbol("<list>")));
             }
         }
         cell.setCar(value);
@@ -108,10 +110,11 @@ public abstract class ISLISPSetElt extends RootNode {
 
     @Specialization
     Object doString(Object obj, String str, int index) {
+        ISLISPContext r = ISLISPContext.get(this);
         return errorSignalerNode.signalDomainError(
             "Cannot change immutable value",
             str,
-            ISLISPContext.get(this).lookupClass("<string>"));
+            r.getRootModule().lookupClass(r.namedSymbol("<string>")));
     }
 
     @Specialization
@@ -142,7 +145,8 @@ public abstract class ISLISPSetElt extends RootNode {
 
     @Fallback
     Object fallback(Object value, Object seq, Object index) {
-        return errorSignalerNode.signalWrongType(seq, ISLISPContext.get(this).lookupClass("<list>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(seq, r.getRootModule().lookupClass(r.namedSymbol("<list>")));
     }
 
     /**

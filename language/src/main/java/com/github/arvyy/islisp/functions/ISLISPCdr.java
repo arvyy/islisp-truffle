@@ -30,7 +30,8 @@ public abstract class ISLISPCdr extends ISLISPBuiltinFunctionRootNode {
 
     @Fallback
     Object fallback(Object o) {
-        return errorSignalerNode.signalWrongType(o, ISLISPContext.get(this).lookupClass("<cons>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(o, r.getRootModule().lookupClass(r.namedSymbol("<cons>")));
     }
 
 }

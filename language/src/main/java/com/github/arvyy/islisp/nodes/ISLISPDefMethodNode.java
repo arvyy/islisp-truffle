@@ -69,8 +69,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
-        var genericFunctionDescriptor = ctx.lookupGenericFunctionDispatchTree(
-            module, name, setf);
+        var genericFunctionDescriptor = ctx.getModule(module).lookupGenericFunctionDispatchTree(name, setf);
         if (argsClassNames.length != genericFunctionDescriptor.getRequiredArgCount()) {
             throw new ParsingException(getSourceSection(),
                 "defmethod signature doesn't match defgeneric signature");
@@ -81,8 +80,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
         }
         var classes = new LispClass[argsClassNames.length];
         for (int i = 0; i < argsClassNames.length; i++) {
-            classes[i] = ctx.lookupClass(
-                module, argsClassNames[i]);
+            classes[i] = ctx.getModule(module).lookupClass(argsClassNames[i]);
         }
         var callTarget = functionNode.getCallTarget();
         switch (methodQualifier) {

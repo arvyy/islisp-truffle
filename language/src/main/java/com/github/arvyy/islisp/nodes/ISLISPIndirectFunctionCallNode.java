@@ -60,9 +60,10 @@ public class ISLISPIndirectFunctionCallNode extends ISLISPExpressionNode {
             try {
                 restArgValues = Utils.readListAsArray(restValue);
             } catch (Utils.NotAList ignored) {
+                ISLISPContext r = ISLISPContext.get(this);
                 return errorSignalerNode.signalWrongType(
                     restValue,
-                    ISLISPContext.get(this).lookupClass("<list>"));
+                    r.getRootModule().lookupClass(r.namedSymbol("<list>")));
             }
             argValues = new Object[restArgValues.length + arguments.length - 1];
             for (int i = 0; i < arguments.length - 1; i++) {
