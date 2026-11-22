@@ -2,7 +2,7 @@
 ;; source code location information of sexprs
 ;; they operate on
 
-(requires "testing.lisp")
+(requires testing)
 
 (defun foo ()
     (bar))

@@ -20,7 +20,7 @@ import java.util.*;
 @ExportLibrary(InteropLibrary.class)
 public class ISLISPModule implements TruffleObject {
 
-    private final String name;
+    private final Symbol name;
     private final List<ISLISPModule> importedModules;
     private final Set<Symbol> exports;
     private final Map<Symbol, LispFunction> globalFunctions;
@@ -42,7 +42,7 @@ public class ISLISPModule implements TruffleObject {
      *
      * @param name module name
      */
-    public ISLISPModule(String name) {
+    public ISLISPModule(Symbol name) {
         this.name = name;
         exports = new HashSet<>();
         importedModules = new ArrayList<>();

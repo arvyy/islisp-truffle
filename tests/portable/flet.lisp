@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (flet ((f (x) (+ x 3)))
     (flet ((f (x) (+ x (f x))))

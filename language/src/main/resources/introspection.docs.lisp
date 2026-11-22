@@ -1,3 +1,5 @@
+(module builtin.introspection)
+
 (setf (documentation 'class '<module>)
     '((kind . class)
       (superclasses . (<object>))

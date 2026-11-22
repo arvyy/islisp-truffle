@@ -24,7 +24,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
 
     private final MethodQualifier methodQualifier;
 
-    private final String module;
+    private final Symbol module;
     private final Symbol name;
 
     private final Symbol[] argsClassNames;
@@ -47,7 +47,7 @@ public class ISLISPDefMethodNode extends ISLISPExpressionNode {
      * @param sourceSection relevant source section.
      */
     public ISLISPDefMethodNode(
-            String module,
+            Symbol module,
             MethodQualifier methodQualifier,
             Symbol name,
             boolean setf,

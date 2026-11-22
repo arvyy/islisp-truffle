@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (defmacro incf (var value)
     `(setq ,var (+ ,var ,value)))

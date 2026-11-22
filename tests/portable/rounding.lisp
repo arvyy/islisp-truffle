@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (test-equal (floor  3.0) 3 )
 (test-equal (floor  3.4) 3 )

@@ -25,7 +25,7 @@ import com.oracle.truffle.api.source.SourceSection;
 @ReportPolymorphism
 public abstract class ISLISPDefGenericExecutionNode extends RootNode {
 
-    private final String module;
+    private final Symbol module;
     private final Symbol name;
     private final boolean setf;
     private final SourceSection sourceSection;
@@ -55,7 +55,7 @@ public abstract class ISLISPDefGenericExecutionNode extends RootNode {
      * @param sourceSection corresponding source section to this node
      */
     public ISLISPDefGenericExecutionNode(
-        String module,
+        Symbol module,
         Symbol name,
         boolean setf,
         TruffleLanguage<?> language,

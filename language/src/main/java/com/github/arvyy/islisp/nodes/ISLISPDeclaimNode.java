@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.nodes;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.parser.Declaration;
+import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.source.SourceSection;
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public class ISLISPDeclaimNode extends ISLISPExpressionNode {
 
-    private final String module;
+    private final Symbol module;
     private final List<Declaration> declarations;
 
     /**
@@ -23,7 +24,7 @@ public class ISLISPDeclaimNode extends ISLISPExpressionNode {
      * @param declarations list of declarations
      * @param sourceSection source section
      */
-    public ISLISPDeclaimNode(String module, List<Declaration> declarations, SourceSection sourceSection) {
+    public ISLISPDeclaimNode(Symbol module, List<Declaration> declarations, SourceSection sourceSection) {
         super(sourceSection);
         this.declarations = declarations;
         this.module = module;

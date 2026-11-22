@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (test-equal (reverse (list 1 2 3)) (list 3 2 1))
 (test-equal (nreverse (list 1 2 3)) (list 3 2 1))

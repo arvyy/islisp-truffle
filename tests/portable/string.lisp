@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (test-equal (create-string 3 #\1) "111")
 (test-equal (string= (create-string 3 #\1) "111") t)

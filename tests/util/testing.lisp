@@ -1,3 +1,6 @@
+(module testing
+    (provides test-equal))
+
 (defmacro test-equal (expr value)
   (let ((actual (gensym)))
     `(let ((,actual ,expr))
@@ -14,6 +17,3 @@
             (format-char (standard-output) #\newline)
             (format-object (standard-output) "-------" nil)
             (format-char (standard-output) #\newline))))))
-
-(provides
-    test-equal):

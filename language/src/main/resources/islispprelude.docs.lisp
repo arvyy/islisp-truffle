@@ -1,3 +1,5 @@
+(module ROOT)
+
 ;;;;;;;;;;; CUSTOM / EXTENSION ENTRIES
 (setf (documentation 'class '<no-next-method-error>)
     '((kind . class)

@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (let ((arr #2a((1 2) (3 4))))
   (test-equal (aref arr 0 0) 1)

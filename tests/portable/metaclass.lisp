@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (defglobal builtin-classes
     (vector

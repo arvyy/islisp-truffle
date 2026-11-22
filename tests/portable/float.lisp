@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (test-equal (floatp 1) nil)
 (test-equal (floatp "1.0") nil)

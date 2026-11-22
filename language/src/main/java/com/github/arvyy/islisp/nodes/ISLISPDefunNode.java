@@ -13,7 +13,7 @@ import com.oracle.truffle.api.instrumentation.Tag;
  */
 public class ISLISPDefunNode extends ISLISPExpressionNode {
 
-    final String module;
+    final Symbol module;
     final Symbol name;
 
     ISLISPRootNode functionNode;
@@ -29,7 +29,7 @@ public class ISLISPDefunNode extends ISLISPExpressionNode {
      * @param functionMetaInfo meta information about function for introspection
      */
     public ISLISPDefunNode(
-        String module,
+        Symbol module,
         Symbol name,
         ISLISPRootNode functionNode,
         LispFunction.Meta functionMetaInfo

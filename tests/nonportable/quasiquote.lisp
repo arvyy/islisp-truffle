@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (defun foo ()
     `(1 2 ,@(progn 1)))

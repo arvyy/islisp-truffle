@@ -40,7 +40,7 @@ public class ISLISPContext {
     @CompilerDirectives.CompilationFinal
     private Symbol t;
 
-    private final Map<String, ISLISPModule> modules;
+    private final Map<Symbol, ISLISPModule> modules;
     private ISLISPModule currentModule = null;
 
     private final Map<SymbolReference, Map<SymbolReference, ValueReference>> symbolProperties;
@@ -60,16 +60,16 @@ public class ISLISPContext {
     public ISLISPContext(ISLISPTruffleLanguage language, Env env) {
         this.language = language;
         this.env = env;
-        modules = new HashMap<>();
-        modules.put("ROOT", new ISLISPModule("main"));
-        var truffleModule = new ISLISPModule("builtin/truffle.lisp");
-        truffleModule.addImport(modules.get("ROOT"));
-        modules.put("builtin/truffle.lisp", truffleModule);
-        var introspectionModule = new ISLISPModule("builtin/introspection.lisp");
-        introspectionModule.addImport(modules.get("ROOT"));
-        modules.put("builtin/introspection.lisp", introspectionModule);
-        symbolProperties = new HashMap<>();
         symbols = new HashMap<>();
+        modules = new HashMap<>();
+        modules.put(namedSymbol("ROOT"), new ISLISPModule(namedSymbol("ROOT")));
+        var truffleModule = new ISLISPModule(namedSymbol("builtin.truffle"));
+        truffleModule.addImport(modules.get(namedSymbol("ROOT")));
+        modules.put(namedSymbol("builtin.truffle"), truffleModule);
+        var introspectionModule = new ISLISPModule(namedSymbol("builtin.introspection"));
+        introspectionModule.addImport(modules.get(namedSymbol("ROOT")));
+        modules.put(namedSymbol("builtin.introspection"), introspectionModule);
+        symbolProperties = new HashMap<>();
         currentOutputStream = new ValueReference(null);
         currentOutputStream.setValue(new LispStream(null, env.out()));
         currentInputStream = new ValueReference(null);
@@ -89,8 +89,12 @@ public class ISLISPContext {
      * @return module instance, or null if not defined
      */
     @CompilerDirectives.TruffleBoundary
-    public ISLISPModule getModule(String module) {
+    public ISLISPModule getModule(Symbol module) {
         return modules.get(module);
+    }
+
+    private ISLISPModule getModule(String module) {
+        return modules.get(namedSymbol(module));
     }
 
     /**
@@ -101,12 +105,12 @@ public class ISLISPContext {
      * @param requiredModules list of required modules, must exist.
      * @param exports list of exports.
      */
-    public void createModule(String module, List<String> requiredModules, List<Symbol> exports) {
+    public void createModule(Symbol module, List<Symbol> requiredModules, List<Symbol> exports) {
         if (modules.containsKey(module)) {
             throw new ParsingException(null, "Module already defined: " + module);
         }
         var m = new ISLISPModule(module);
-        m.addImport(modules.get("ROOT"));
+        m.addImport(getModule("ROOT"));
         for (var req: requiredModules) {
             if (!modules.containsKey(req)) {
                 throw new ParsingException(null, "No module found: " + req);
@@ -158,23 +162,23 @@ public class ISLISPContext {
     }
 
     void initGlobalFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
-        modules.get("ROOT").registerFunction(namedSymbol(name), f.apply(language));
+        getModule("ROOT").registerFunction(namedSymbol(name), f.apply(language));
     }
 
     void initGlobalFunction(String name, LispFunction f) {
-        modules.get("ROOT").registerFunction(namedSymbol(name), f);
+        getModule("ROOT").registerFunction(namedSymbol(name), f);
     }
 
     void initTruffleLibFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
-        modules.get("builtin/truffle.lisp").registerFunction(namedSymbol(name), f.apply(language));
+        getModule("builtin.truffle").registerFunction(namedSymbol(name), f.apply(language));
     }
 
     void initIntrospectionLibFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
-        modules.get("builtin/introspection.lisp").registerFunction(namedSymbol(name), f.apply(language));
+        getModule("builtin.introspection").registerFunction(namedSymbol(name), f.apply(language));
     }
 
     void initIntrospectionLibFunction(String name, LispFunction f) {
-        modules.get("builtin/introspection.lisp").registerFunction(namedSymbol(name), f);
+        getModule("builtin.introspection").registerFunction(namedSymbol(name), f);
     }
 
     /**
@@ -284,30 +288,30 @@ public class ISLISPContext {
         initTruffleLibFunction("set-truffle-object-field", ISLISPSetTruffleObjectField::makeLispFunction);
         initTruffleLibFunction("load-native-library", ISLISPLoadNativeLibrary::makeLispFunction);
         initTruffleLibFunction("native-library-symbol", ISLISPNativeLibrarySymbol::makeLispFunction);
-        modules.get("builtin/truffle.lisp").exportAll();
+        getModule("builtin.truffle").exportAll();
 
         initIntrospectionLibFunction("lookup-module", new ISLISPLookupModule(language).makeLispFunction());
         //initIntrospectionLibFunction("list-module-declarations", ISLISPListModuleDeclarations::makeLispFunction);
         initIntrospectionLibFunction("list-module-documentations",
             new ISLISPListModuleDocumentations(language).makeLispFunction());
-        modules.get("builtin/introspection.lisp").exportAll();
+        getModule("builtin.introspection").exportAll();
     }
 
     private void initInitializeObjectMethod() {
-        var object = modules.get("ROOT").lookupClass(namedSymbol("<object>"));
+        var object = getModule("ROOT").lookupClass(namedSymbol("<object>"));
         var initializeObjectDescriptor = new GenericFunctionDescriptor(1, true);
         initializeObjectDescriptor.addPrimaryMethod(
             new LispClass[] {object},
             ISLISPInitializeObject.makeLispFunction(language).callTarget(),
             null);
         var initializeObjectExecutionNode = ISLISPDefGenericExecutionNodeGen.create(
-            "ROOT",
+            namedSymbol("ROOT"),
             namedSymbol("initialize-object"),
             false,
             getLanguage(),
             null);
         registerGenericFunction(
-            "ROOT",
+            namedSymbol("ROOT"),
             namedSymbol("initialize-object"),
             false,
             new LispFunction(initializeObjectExecutionNode.getCallTarget()),
@@ -315,20 +319,20 @@ public class ISLISPContext {
     }
 
     private void initCreateMethod() {
-        var stdClass = modules.get("ROOT").lookupClass(namedSymbol("<standard-class>"));
+        var stdClass = getModule("ROOT").lookupClass(namedSymbol("<standard-class>"));
         var createDescriptor = new GenericFunctionDescriptor(1, true);
         createDescriptor.addPrimaryMethod(
                 new LispClass[] {stdClass},
                 ISLISPCreateStandardClassObject.makeLispFunction(language).callTarget(),
                 null);
         var createExecutionNode = ISLISPDefGenericExecutionNodeGen.create(
-            "ROOT",
+            namedSymbol("ROOT"),
             namedSymbol("create"),
             false,
             getLanguage(),
             null);
         registerGenericFunction(
-            "ROOT",
+            namedSymbol("ROOT"),
             namedSymbol("create"),
             false,
             new LispFunction(createExecutionNode.getCallTarget()),
@@ -348,7 +352,7 @@ public class ISLISPContext {
         //extensions
         initBasicSetfExpander("ROOT", "documentation", "set-documentation");
 
-        initBasicSetfExpander("builtin/truffle.lisp", "truffle-object-field", "set-truffle-object-field");
+        initBasicSetfExpander("builtin.truffle", "truffle-object-field", "set-truffle-object-field");
     }
 
     void initBasicSetfExpander(String module, String setfForm, String expandedForm) {
@@ -359,11 +363,11 @@ public class ISLISPContext {
             lst.addAll(forms.subList(1, forms.size()));
             return new SyntaxObject(Utils.listToValue(lst), null);
         };
-        modules.get("ROOT").registerSetfTransformer(namedSymbol(setfForm), transformer);
+        getModule("ROOT").registerSetfTransformer(namedSymbol(setfForm), transformer);
     }
 
     void initBuiltin(String name, String... parents) {
-        var root = modules.get("ROOT");
+        var root = getModule("ROOT");
         var symbol = namedSymbol(name);
         var parentClasses = Arrays.stream(parents)
                 .map(pname -> root.lookupClass(namedSymbol(pname)))
@@ -412,10 +416,11 @@ public class ISLISPContext {
      * Initialize builtin constants.
      */
     void initBuiltinVars() {
-        modules.get("ROOT").registerGlobalVar(getNil(), getNil(), true, null);
-        modules.get("ROOT").registerGlobalVar(getT(), getT(), true, null);
-        modules.get("ROOT").registerGlobalVar(namedSymbol("*most-positive-float*"), Double.MAX_VALUE, true, null);
-        modules.get("ROOT").registerGlobalVar(namedSymbol("*most-negative-float*"), -Double.MAX_VALUE, true, null);
+        var root = getModule("ROOT");
+        root.registerGlobalVar(getNil(), getNil(), true, null);
+        root.registerGlobalVar(getT(), getT(), true, null);
+        root.registerGlobalVar(namedSymbol("*most-positive-float*"), Double.MAX_VALUE, true, null);
+        root.registerGlobalVar(namedSymbol("*most-negative-float*"), -Double.MAX_VALUE, true, null);
     }
 
     /**
@@ -429,13 +434,13 @@ public class ISLISPContext {
      */
     @CompilerDirectives.TruffleBoundary
     public void registerGlobalVar(
-        String module,
+        Symbol module,
         Symbol symbolReference,
         Object init,
         boolean readonly,
         SourceSection sourceSection
     ) {
-        modules.get(module).registerGlobalVar(symbolReference, init, readonly, sourceSection);
+        getModule(module).registerGlobalVar(symbolReference, init, readonly, sourceSection);
     }
 
     /**
@@ -461,8 +466,8 @@ public class ISLISPContext {
      * @return variable's value reference or null if not found
      */
     @CompilerDirectives.TruffleBoundary
-    public ValueReference lookupGlobalVar(String module, Symbol symbolReference) {
-        return modules.get(module).lookupGlobalVar(symbolReference);
+    public ValueReference lookupGlobalVar(Symbol module, Symbol symbolReference) {
+        return getModule(module).lookupGlobalVar(symbolReference);
     }
 
     /**
@@ -474,8 +479,8 @@ public class ISLISPContext {
      * @param transformer transformer.
      */
     @CompilerDirectives.TruffleBoundary
-    public void registerSetfTransformer(String module, Symbol symbolReference, SetfTransformer transformer) {
-        modules.get(module).registerSetfTransformer(symbolReference, transformer);
+    public void registerSetfTransformer(Symbol module, Symbol symbolReference, SetfTransformer transformer) {
+        getModule(module).registerSetfTransformer(symbolReference, transformer);
     }
 
     /**
@@ -486,8 +491,8 @@ public class ISLISPContext {
      * @return setf transformer or null if undefined
      */
     @CompilerDirectives.TruffleBoundary
-    public SetfTransformer lookupSetfTransformer(String module, Symbol symbolReference) {
-        return modules.get(module).lookupSetfTransformer(symbolReference);
+    public SetfTransformer lookupSetfTransformer(Symbol module, Symbol symbolReference) {
+        return getModule(module).lookupSetfTransformer(symbolReference);
     }
 
     /**
@@ -498,8 +503,8 @@ public class ISLISPContext {
      * @param v value reference.
      */
     @CompilerDirectives.TruffleBoundary
-    public void registerDynamicVar(String module, Symbol symbolReference, ValueReference v) {
-        modules.get(module).registerDynamicVar(symbolReference, v);
+    public void registerDynamicVar(Symbol module, Symbol symbolReference, ValueReference v) {
+        getModule(module).registerDynamicVar(symbolReference, v);
     }
 
     /**
@@ -510,8 +515,12 @@ public class ISLISPContext {
      * @return dynamic variable value reference
      */
     @CompilerDirectives.TruffleBoundary
+    public ValueReference lookupDynamicVar(Symbol module, Symbol symbolReference) {
+        return getModule(module).lookupDynamicVar(symbolReference);
+    }
+
     public ValueReference lookupDynamicVar(String module, Symbol symbolReference) {
-        return modules.get(module).lookupDynamicVar(symbolReference);
+        return getModule(module).lookupDynamicVar(symbolReference);
     }
 
     /**
@@ -522,8 +531,8 @@ public class ISLISPContext {
      * @param function function value
      */
     @CompilerDirectives.TruffleBoundary
-    public void registerFunction(String module, Symbol symbolReference, LispFunction function) {
-        modules.get(module).registerFunction(symbolReference, function);
+    public void registerFunction(Symbol module, Symbol symbolReference, LispFunction function) {
+        getModule(module).registerFunction(symbolReference, function);
     }
 
     /**
@@ -534,8 +543,12 @@ public class ISLISPContext {
      * @return function or null if undefined
      */
     @CompilerDirectives.TruffleBoundary
-    public LispFunction lookupFunction(String module, Symbol symbolReference) {
+    public LispFunction lookupFunction(Symbol module, Symbol symbolReference) {
         return lookupFunction(module, symbolReference, false);
+    }
+
+    public LispFunction lookupFunction(String module, Symbol symbolReference) {
+        return lookupFunction(namedSymbol(module), symbolReference, false);
     }
 
     /**
@@ -547,8 +560,8 @@ public class ISLISPContext {
      * @return function or null if undefined
      */
     @CompilerDirectives.TruffleBoundary
-    public LispFunction lookupFunction(String module, Symbol symbolReference, boolean setf) {
-        return modules.get(module).lookupFunction(symbolReference, setf);
+    public LispFunction lookupFunction(Symbol module, Symbol symbolReference, boolean setf) {
+        return getModule(module).lookupFunction(symbolReference, setf);
     }
 
     /**
@@ -562,13 +575,13 @@ public class ISLISPContext {
      */
     @CompilerDirectives.TruffleBoundary
     public void registerGenericFunction(
-            String module,
+            Symbol module,
             Symbol symbolReference,
             boolean setf,
             LispFunction function,
             GenericFunctionDescriptor descriptor
     ) {
-        modules.get(module).registerGenericFunction(symbolReference, setf, function, descriptor);
+        getModule(module).registerGenericFunction(symbolReference, setf, function, descriptor);
     }
 
     /**
@@ -581,11 +594,11 @@ public class ISLISPContext {
      */
     @CompilerDirectives.TruffleBoundary
     public GenericFunctionDescriptor lookupGenericFunctionDispatchTree(
-        String module,
+        Symbol module,
         Symbol symbolReference,
         boolean setf
     ) {
-        return modules.get(module).lookupGenericFunctionDispatchTree(symbolReference, setf);
+        return getModule(module).lookupGenericFunctionDispatchTree(symbolReference, setf);
     }
 
     /**
@@ -596,8 +609,8 @@ public class ISLISPContext {
      * @param function macro implementation function
      */
     @CompilerDirectives.TruffleBoundary
-    public void registerMacro(String module, Symbol symbolReference, LispFunction function) {
-        modules.get(module).registerMacro(symbolReference, function);
+    public void registerMacro(Symbol module, Symbol symbolReference, LispFunction function) {
+        getModule(module).registerMacro(symbolReference, function);
     }
 
     /**
@@ -608,8 +621,8 @@ public class ISLISPContext {
      * @return macro function or null if undefined
      */
     @CompilerDirectives.TruffleBoundary
-    public LispFunction lookupMacro(String module, Symbol symbolReference) {
-        return modules.get(module).lookupMacro(symbolReference);
+    public LispFunction lookupMacro(Symbol module, Symbol symbolReference) {
+        return getModule(module).lookupMacro(symbolReference);
     }
 
     /**
@@ -620,8 +633,8 @@ public class ISLISPContext {
      * @param clazz class instance
      */
     @CompilerDirectives.TruffleBoundary
-    public void registerClass(String module, Symbol symbolReference, LispClass clazz) {
-        modules.get(module).registerClass(symbolReference, clazz);
+    public void registerClass(Symbol module, Symbol symbolReference, LispClass clazz) {
+        getModule(module).registerClass(symbolReference, clazz);
     }
 
     /**
@@ -632,8 +645,8 @@ public class ISLISPContext {
      * @return class or null if doesn't exist
      */
     @CompilerDirectives.TruffleBoundary
-    public LispClass lookupClass(String module, Symbol symbolReference) {
-        return modules.get(module).lookupClass(symbolReference);
+    public LispClass lookupClass(Symbol module, Symbol symbolReference) {
+        return getModule(module).lookupClass(symbolReference);
     }
 
     /**
@@ -644,8 +657,16 @@ public class ISLISPContext {
      * @return class or null if doesn't exit
      */
     @CompilerDirectives.TruffleBoundary
-    public LispClass lookupClass(String module, String name) {
+    public LispClass lookupClass(Symbol module, String name) {
         return lookupClass(module, namedSymbol(name));
+    }
+
+    public LispClass lookupClass(String module, Symbol name) {
+        return lookupClass(namedSymbol(module), name);
+    }
+
+    public LispClass lookupClass(String module, String name) {
+        return lookupClass(namedSymbol(module), namedSymbol(name));
     }
 
     /**

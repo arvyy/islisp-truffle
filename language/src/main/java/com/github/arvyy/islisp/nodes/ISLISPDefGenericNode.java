@@ -12,7 +12,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPDefGenericNode extends ISLISPExpressionNode {
 
-    private final String module;
+    private final Symbol module;
     private final Symbol name;
     private final boolean setf;
     private final int requiredArgsCount;
@@ -32,7 +32,7 @@ public class ISLISPDefGenericNode extends ISLISPExpressionNode {
      * @param sourceSection corresponding source section to this node
      */
     public ISLISPDefGenericNode(
-        String module,
+        Symbol module,
         Symbol name,
         boolean setf,
         int requiredArgsCount,

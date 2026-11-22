@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (test-equal (ignore-errors) nil)
 (test-equal

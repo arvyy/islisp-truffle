@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (defdynamic *dyn1* 1)
 

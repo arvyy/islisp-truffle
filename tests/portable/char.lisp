@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (test-equal (characterp #\a) t)
 (test-equal (characterp "a") nil)

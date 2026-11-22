@@ -12,7 +12,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPSetDynamicNode extends ISLISPExpressionNode {
 
-    private final String module;
+    private final Symbol module;
     private final Symbol symbol;
 
     @CompilerDirectives.CompilationFinal
@@ -33,7 +33,7 @@ public class ISLISPSetDynamicNode extends ISLISPExpressionNode {
      * @param sourceSection corresponding source section to this node
      */
     public ISLISPSetDynamicNode(
-        String module,
+        Symbol module,
         Symbol symbol,
         ISLISPExpressionNode expression,
         SourceSection sourceSection

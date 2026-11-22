@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (let ((v1 (vector 1 2))
       (v2 (create-vector 3 3))

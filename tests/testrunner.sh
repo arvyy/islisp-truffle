@@ -15,7 +15,7 @@ do
   name=${f::-5}
   name=${name:9}
   testContent=$(<"$f" )
-  echo ${testContent//(requires \"testing.lisp\")/$testingRequireReplacement} > tmp.lisp
+  echo ${testContent//(requires testing)/$testingRequireReplacement} > tmp.lisp
   command=${commandTemplate/'FILE'/'tmp.lisp'}
   eval "$command" > tmp.txt
   if ! cmp --silent "tmp.txt" "portable/$name.expect.txt"

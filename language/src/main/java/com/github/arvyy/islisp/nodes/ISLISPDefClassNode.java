@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class ISLISPDefClassNode extends ISLISPExpressionNode {
 
-    private final String module;
+    private final Symbol module;
     private final Symbol name;
     private final List<Symbol> superclassName;
     private final List<SlotDefinition> slots;
@@ -47,7 +47,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
      */
     public ISLISPDefClassNode(
             TruffleLanguage<?> language,
-            String module,
+            Symbol module,
             Symbol name,
             List<Symbol> superclassName,
             List<SlotDefinition> slots,

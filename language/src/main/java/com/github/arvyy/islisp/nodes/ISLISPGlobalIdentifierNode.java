@@ -18,7 +18,7 @@ public class ISLISPGlobalIdentifierNode extends ISLISPExpressionNode {
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
-    private final String module;
+    private final Symbol module;
     private final Symbol name;
 
     /**
@@ -28,7 +28,7 @@ public class ISLISPGlobalIdentifierNode extends ISLISPExpressionNode {
      * @param name variable name
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPGlobalIdentifierNode(String module, Symbol name, SourceSection sourceSection) {
+    public ISLISPGlobalIdentifierNode(Symbol module, Symbol name, SourceSection sourceSection) {
         super(sourceSection);
         this.module = module;
         this.name = name;

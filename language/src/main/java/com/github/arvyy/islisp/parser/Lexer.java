@@ -246,7 +246,7 @@ public class Lexer {
             return true;
         }
         return switch (codepoint) {
-            case '-', '+' -> true;
+            case '-', '+', '.' -> true;
             default -> false;
         };
     }

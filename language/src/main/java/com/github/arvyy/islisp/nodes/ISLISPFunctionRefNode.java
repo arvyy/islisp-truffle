@@ -12,7 +12,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPFunctionRefNode extends ISLISPExpressionNode {
 
-    private final String module;
+    private final Symbol module;
     private final Symbol name;
 
     @CompilerDirectives.CompilationFinal
@@ -27,7 +27,7 @@ public class ISLISPFunctionRefNode extends ISLISPExpressionNode {
      * @param name function name in the function namespace.
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPFunctionRefNode(String module, Symbol name, SourceSection sourceSection) {
+    public ISLISPFunctionRefNode(Symbol module, Symbol name, SourceSection sourceSection) {
         super(sourceSection);
         this.module = module;
         this.name = name;

@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (test-equal (convert #\a <character>) #\a)
 (test-equal (convert 97 <character>) #\a)

@@ -14,7 +14,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
 
-    private final String module;
+    private final Symbol module;
     @CompilerDirectives.CompilationFinal(dimensions = 1)
     private ValueReference[] vars;
     private final Symbol[] symbols;
@@ -35,7 +35,7 @@ public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
      * @param sourceSection corresponding source section to this node
      */
     public ISLISPDynamicLetNode(
-            String module,
+            Symbol module,
             Symbol[] symbols,
             ISLISPExpressionNode[] initializers,
             ISLISPExpressionNode[] body,

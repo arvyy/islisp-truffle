@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (test-equal (+ 1 2) 3)
 (test-equal (funcall #'+ 1 2) 3)

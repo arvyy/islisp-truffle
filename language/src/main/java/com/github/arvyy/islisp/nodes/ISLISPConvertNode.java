@@ -27,7 +27,7 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
     @Child
     ISLISPErrorSignalerNode errorSignalerNode;
 
-    final String module;
+    final Symbol module;
     final Symbol className;
 
     /**
@@ -39,7 +39,7 @@ public class ISLISPConvertNode extends ISLISPExpressionNode {
      * @param sourceSection matching source section
      */
     public ISLISPConvertNode(
-        String module,
+        Symbol module,
         ISLISPExpressionNode valueExpression,
         Symbol className,
         SourceSection sourceSection

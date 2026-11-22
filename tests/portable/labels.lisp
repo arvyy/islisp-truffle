@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (labels ((evenp (n)
            (if (= n 0)

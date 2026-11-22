@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (let ((s (create-string-output-stream)))
   (with-standard-output s

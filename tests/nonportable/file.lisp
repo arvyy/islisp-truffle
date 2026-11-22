@@ -1,5 +1,5 @@
 ;; nonportable, because string -> file resolution is implementation dependent.
-(requires "testing.lisp")
+(requires testing)
 
 (delete-file "../tests/nonportable/file.txt")
 (delete-file "../tests/nonportable/file2.txt")

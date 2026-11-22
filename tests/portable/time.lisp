@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 ;; frivolous function to fake compution for long enough that at least some time passes.
 ;; prints empty string so that runtime cannot optimize action away

@@ -1,5 +1,6 @@
 package com.github.arvyy.islisp.parser;
 
+import com.github.arvyy.islisp.runtime.Symbol;
 import com.github.arvyy.islisp.runtime.SymbolReference;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.source.SourceSection;
@@ -15,7 +16,7 @@ import java.util.Map;
  * inline parsing context from debugger.
  */
 public class ParserContext {
-    final String module;
+    final Symbol module;
     final int frameDepth;
     final LexicalScope<SymbolReference, VariableContext> variables;
     final LexicalScope<SymbolReference, VariableContext> localFunctions;
@@ -25,7 +26,7 @@ public class ParserContext {
 
     final FrameDescriptor.Builder frameBuilder;
 
-    ParserContext(String module) {
+    ParserContext(Symbol module) {
         this(
                 module,
                 0,
@@ -38,7 +39,7 @@ public class ParserContext {
     }
 
     ParserContext(
-            String module,
+            Symbol module,
             int frameDepth,
             LexicalScope<SymbolReference, VariableContext> variables,
             LexicalScope<SymbolReference, VariableContext> localFunctions,

@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (test-equal (or (= 2 2) (> 2 1)) t)
 (test-equal (or (= 2 2) (> 1 2)) t)

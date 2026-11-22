@@ -2,6 +2,7 @@ package com.github.arvyy.islisp.functions;
 
 import com.github.arvyy.islisp.ISLISPContext;
 import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
+import com.github.arvyy.islisp.runtime.Symbol;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
@@ -23,7 +24,7 @@ public class ISLISPLookupModule extends ISLISPBuiltinFunctionRootNode {
     public final Object executeImpl(VirtualFrame frame) {
         var arg = frame.getArguments()[1];
         var c = ISLISPContext.get(this);
-        if (arg instanceof String name) {
+        if (arg instanceof Symbol name) {
             var m = c.getModule(name);
             if (m == null) {
                 return c.getNil();
