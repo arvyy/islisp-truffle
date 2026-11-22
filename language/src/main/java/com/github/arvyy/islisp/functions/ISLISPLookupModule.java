@@ -34,7 +34,7 @@ public class ISLISPLookupModule extends ISLISPBuiltinFunctionRootNode {
         } else {
             return errorSignalerNode.signalWrongType(
                 arg,
-                c.getRootModule().lookupClass(c.namedSymbol("string")));
+                c.getRootModule().lookupClass(c.namedSymbol("<symbol>")));
         }
     }
 

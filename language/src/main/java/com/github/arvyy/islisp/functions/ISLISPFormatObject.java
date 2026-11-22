@@ -37,10 +37,10 @@ public abstract class ISLISPFormatObject extends RootNode {
 
     @Specialization
     Object doProper(LispStream stream, Object obj, Object escape) {
-        var nil = ISLISPContext.get(this).getNil();
+        var ctx = ISLISPContext.get(this);
         try {
-            doPrint(stream, obj, escape != nil);
-            return nil;
+            doPrint(stream, obj, !Utils.isNil(this, escape));
+            return ctx.getNil();
         } catch (IOException e) {
             return errorSignalerNode.signalIOError(e);
         }

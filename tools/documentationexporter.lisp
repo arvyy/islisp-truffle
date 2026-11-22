@@ -1,4 +1,4 @@
-(requires "builtin/introspection.lisp")
+(requires builtin.introspection)
 
 (defun assoc* (key alist)
     (let ((e (assoc key alist)))
@@ -72,12 +72,6 @@
            (entries (list-module-documentations m)))
       (mapc #'print-entry (convert entries <list>))))
 
-#|
-(let ((modules '("ROOT" "builtin/truffle.lisp" "builtin/introspection.lisp")))
-    (format (standard-output) "= Docs ~%:icons: font~%:toc: left~%:stem: latexmath~%~%")
-    (mapc #'print-module modules))
-|#
-
 (if (= (length (dynamic *args*)) 0)
     (format (error-output) "Missing args.~%Usage:~%    documentationexporter modulename")
-    (print-module (elt (dynamic *args*) 0)))
+    (print-module (convert (elt (dynamic *args*) 0) <symbol>)))

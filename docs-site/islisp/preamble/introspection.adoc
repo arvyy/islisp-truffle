@@ -5,5 +5,5 @@ This module provides ways to query and reflectively use bindings defined in modu
 
 [code,lisp]
 ----
-(requires "builtin/introspection.lisp")
+(requires builtin.introspection)
 ----
