@@ -36,7 +36,7 @@ public abstract class ISLISPCreateArray extends ISLISPBuiltinFunctionRootNode {
             var ctx = ISLISPContext.get(this);
             createVectorNode = this.insert(
                 DirectCallNode.create(
-                    ctx.lookupFunction("ROOT", ctx.namedSymbol("create-vector"))
+                    ctx.getRootModule().lookupFunction(ctx.namedSymbol("create-vector"))
                         .callTarget()));
         }
         return createVectorNode;
@@ -48,7 +48,7 @@ public abstract class ISLISPCreateArray extends ISLISPBuiltinFunctionRootNode {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             lengthNode = this.insert(
                 DirectCallNode.create(
-                    ctx.lookupFunction("ROOT", ctx.namedSymbol("length"))
+                    ctx.getRootModule().lookupFunction(ctx.namedSymbol("length"))
                         .callTarget()));
         }
         return lengthNode;

@@ -316,7 +316,7 @@ public class ISLISPErrorSignalerNode extends Node {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
-                ctx.lookupFunction("ROOT", ctx.namedSymbol("signal-condition"))
+                ctx.getRootModule().lookupFunction(ctx.namedSymbol("signal-condition"))
                     .callTarget());
             signalCallNode = insert(callNode);
         }
@@ -329,7 +329,7 @@ public class ISLISPErrorSignalerNode extends Node {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
-                ctx.lookupFunction("ROOT", ctx.namedSymbol("create"))
+                ctx.getRootModule().lookupFunction(ctx.namedSymbol("create"))
                     .callTarget());
             createCallNode = insert(callNode);
         }

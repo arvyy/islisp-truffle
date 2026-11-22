@@ -93,6 +93,11 @@ public class ISLISPContext {
         return modules.get(module);
     }
 
+    @CompilerDirectives.TruffleBoundary
+    public ISLISPModule getRootModule() {
+        return modules.get(namedSymbol("ROOT"));
+    }
+
     private ISLISPModule getModule(String module) {
         return modules.get(namedSymbol(module));
     }
@@ -541,7 +546,6 @@ public class ISLISPContext {
      * @param module module name holding the binding
      * @param symbolReference function name
      * @return function or null if undefined
-     */
     @CompilerDirectives.TruffleBoundary
     public LispFunction lookupFunction(Symbol module, Symbol symbolReference) {
         return lookupFunction(module, symbolReference, false);
@@ -558,11 +562,11 @@ public class ISLISPContext {
      * @param symbolReference function name
      * @param setf whether function is of setf form in case it's generic.
      * @return function or null if undefined
-     */
     @CompilerDirectives.TruffleBoundary
     public LispFunction lookupFunction(Symbol module, Symbol symbolReference, boolean setf) {
         return getModule(module).lookupFunction(symbolReference, setf);
     }
+    */
 
     /**
      * Register a generic function.

@@ -62,8 +62,7 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
     public Object executeGeneric(VirtualFrame frame) {
         if (function == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            function = ISLISPContext.get(this).lookupFunction(
-                module, name, setf);
+            function = ISLISPContext.get(this).getModule(module).lookupFunction(name, setf);
             if (function == null) {
                 return errorSignalerNode.signalUndefinedFunction(name);
             }

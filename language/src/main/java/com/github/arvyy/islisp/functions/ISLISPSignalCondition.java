@@ -9,6 +9,7 @@ import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNode;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNodeGen;
 import com.github.arvyy.islisp.runtime.LispFunction;
+import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -44,31 +45,26 @@ public class ISLISPSignalCondition extends RootNode {
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
     }
 
+    private DirectCallNode createFor(String fnName) {
+        var ctx = ISLISPContext.get(this);
+        var fn = ctx.getRootModule().lookupFunction(ctx.namedSymbol(fnName));
+        return DirectCallNode.create(fn.callTarget());
+    }
+
     @Override
     public Object execute(VirtualFrame frame) {
         var ctx = ISLISPContext.get(this);
         if (fillStacktrace == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            var fillStacktraceFunction = ctx.lookupFunction(
-                "ROOT",
-                ctx.namedSymbol("fill-stacktrace"));
-            fillStacktrace = insert(DirectCallNode.create(fillStacktraceFunction.callTarget()));
+            fillStacktrace = createFor("fill-stacktrace");
         }
         if (setContinuable == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            var setContinuableFunction = ctx.lookupFunction(
-                "ROOT",
-                ctx.namedSymbol("set-condition-continuable")
-            );
-            setContinuable = insert(DirectCallNode.create(setContinuableFunction.callTarget()));
+            setContinuable = createFor("set-condition-continuable");
         }
         if (setStacktrace == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            var setStacktraceFunction = ctx.lookupFunction(
-                "ROOT",
-                ctx.namedSymbol("set-condition-stacktrace")
-            );
-            setStacktrace = insert(DirectCallNode.create(setStacktraceFunction.callTarget()));
+            setStacktrace = createFor("set-condition-stacktrace");
         }
         if (frame.getArguments().length != 3) {
             return errorSignalerNode.signalWrongArgumentCount(frame.getArguments().length, 2, 2);

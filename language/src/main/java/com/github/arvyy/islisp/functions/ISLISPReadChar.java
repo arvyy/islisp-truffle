@@ -40,7 +40,7 @@ public abstract class ISLISPReadChar extends RootNode {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
-                ctx.lookupFunction("ROOT", ctx.namedSymbol("standard-input"))
+                ctx.getRootModule().lookupFunction(ctx.namedSymbol("standard-input"))
                     .callTarget());
             standardInput = insert(callNode);
         }
