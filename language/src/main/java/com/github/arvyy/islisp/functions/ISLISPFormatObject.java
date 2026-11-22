@@ -49,7 +49,9 @@ public abstract class ISLISPFormatObject extends RootNode {
     @Fallback
     Object doFallback(Object stream, Object obj, Object escape) {
         ISLISPContext r = ISLISPContext.get(this);
-        return errorSignalerNode.signalWrongType(stream, r.getRootModule().lookupClass(r.namedSymbol("<output-stream>")));
+        return errorSignalerNode.signalWrongType(
+                stream,
+                r.getRootModule().lookupClass(r.namedSymbol("<output-stream>")));
     }
 
     /**

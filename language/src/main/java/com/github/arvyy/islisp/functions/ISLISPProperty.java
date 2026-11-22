@@ -65,7 +65,9 @@ public abstract class ISLISPProperty extends RootNode {
     Object doFallback(Object symbol, Object property, Object defaultValue) {
         var offender = symbol instanceof Symbol ? property : symbol;
         var ctx = ISLISPContext.get(this);
-        return errorSignalerNode.signalWrongType(offender, ctx.getRootModule().lookupClass(ctx.namedSymbol("<symbol>")));
+        return errorSignalerNode.signalWrongType(
+                offender,
+                ctx.getRootModule().lookupClass(ctx.namedSymbol("<symbol>")));
     }
 
     ValueReference getPropertyReference(Symbol symbol, Symbol property) {

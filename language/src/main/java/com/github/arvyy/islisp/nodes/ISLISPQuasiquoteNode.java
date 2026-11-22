@@ -48,7 +48,9 @@ public class ISLISPQuasiquoteNode extends ISLISPExpressionNode {
             return QuasiquoteTree.evalQuasiquoteTree(tree, values);
         } catch (QuasiquoteTree.UnquoteSpliceNotAListException e) {
             var ctx = ISLISPContext.get(this);
-            return errorSignalerNode.signalWrongType(e.getValue(), ctx.getRootModule().lookupClass(ctx.namedSymbol("<list>")));
+            return errorSignalerNode.signalWrongType(
+                    e.getValue(),
+                    ctx.getRootModule().lookupClass(ctx.namedSymbol("<list>")));
         }
     }
 }

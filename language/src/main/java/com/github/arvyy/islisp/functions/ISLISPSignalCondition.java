@@ -9,7 +9,6 @@ import com.github.arvyy.islisp.nodes.ISLISPErrorSignalerNode;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNode;
 import com.github.arvyy.islisp.nodes.ISLISPFunctionDispatchNodeGen;
 import com.github.arvyy.islisp.runtime.LispFunction;
-import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;

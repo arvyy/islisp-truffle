@@ -9,7 +9,6 @@ import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.nodes.Node;
-import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.*;
 import java.util.function.Function;
@@ -93,6 +92,11 @@ public class ISLISPContext {
         return modules.get(module);
     }
 
+    /**
+     * Get root (prelude) module.
+     *
+     * @return module instance.
+     */
     @CompilerDirectives.TruffleBoundary
     public ISLISPModule getRootModule() {
         return modules.get(namedSymbol("ROOT"));
@@ -109,13 +113,14 @@ public class ISLISPContext {
      * @param module module name
      * @param requiredModules list of required modules, must exist.
      * @param exports list of exports.
+     * @return reference to created module object
      */
-    public void createModule(Symbol module, List<Symbol> requiredModules, List<Symbol> exports) {
+    public ISLISPModule createModule(Symbol module, List<Symbol> requiredModules, List<Symbol> exports) {
         if (modules.containsKey(module)) {
             throw new ParsingException(null, "Module already defined: " + module);
         }
         var m = new ISLISPModule(module);
-        m.addImport(getModule("ROOT"));
+        m.addImport(getRootModule());
         for (var req: requiredModules) {
             if (!modules.containsKey(req)) {
                 throw new ParsingException(null, "No module found: " + req);
@@ -126,6 +131,7 @@ public class ISLISPContext {
             m.addExport(export);
         }
         modules.put(module, m);
+        return m;
     }
 
     /**
@@ -167,11 +173,11 @@ public class ISLISPContext {
     }
 
     void initGlobalFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
-        getModule("ROOT").registerFunction(namedSymbol(name), f.apply(language));
+        getRootModule().registerFunction(namedSymbol(name), f.apply(language));
     }
 
     void initGlobalFunction(String name, LispFunction f) {
-        getModule("ROOT").registerFunction(namedSymbol(name), f);
+        getRootModule().registerFunction(namedSymbol(name), f);
     }
 
     void initTruffleLibFunction(String name, Function<TruffleLanguage<?>, LispFunction> f) {
@@ -303,7 +309,7 @@ public class ISLISPContext {
     }
 
     private void initInitializeObjectMethod() {
-        var object = getModule("ROOT").lookupClass(namedSymbol("<object>"));
+        var object = getRootModule().lookupClass(namedSymbol("<object>"));
         var initializeObjectDescriptor = new GenericFunctionDescriptor(1, true);
         initializeObjectDescriptor.addPrimaryMethod(
             new LispClass[] {object},
@@ -315,11 +321,15 @@ public class ISLISPContext {
             false,
             getLanguage(),
             null);
-        getModule(namedSymbol("ROOT")).registerGenericFunction(namedSymbol("initialize-object"), false, new LispFunction(initializeObjectExecutionNode.getCallTarget()), initializeObjectDescriptor);
+        getRootModule().registerGenericFunction(
+                namedSymbol("initialize-object"),
+                false,
+                new LispFunction(initializeObjectExecutionNode.getCallTarget()),
+                initializeObjectDescriptor);
     }
 
     private void initCreateMethod() {
-        var stdClass = getModule("ROOT").lookupClass(namedSymbol("<standard-class>"));
+        var stdClass = getRootModule().lookupClass(namedSymbol("<standard-class>"));
         var createDescriptor = new GenericFunctionDescriptor(1, true);
         createDescriptor.addPrimaryMethod(
                 new LispClass[] {stdClass},
@@ -331,7 +341,11 @@ public class ISLISPContext {
             false,
             getLanguage(),
             null);
-        getModule(namedSymbol("ROOT")).registerGenericFunction(namedSymbol("create"), false, new LispFunction(createExecutionNode.getCallTarget()), createDescriptor);
+        getRootModule().registerGenericFunction(
+                namedSymbol("create"),
+                false,
+                new LispFunction(createExecutionNode.getCallTarget()),
+                createDescriptor);
     }
 
     void initSetfExpanders() {
@@ -358,11 +372,11 @@ public class ISLISPContext {
             lst.addAll(forms.subList(1, forms.size()));
             return new SyntaxObject(Utils.listToValue(lst), null);
         };
-        getModule("ROOT").registerSetfTransformer(namedSymbol(setfForm), transformer);
+        getRootModule().registerSetfTransformer(namedSymbol(setfForm), transformer);
     }
 
     void initBuiltin(String name, String... parents) {
-        var root = getModule("ROOT");
+        var root = getRootModule();
         var symbol = namedSymbol(name);
         var parentClasses = Arrays.stream(parents)
                 .map(pname -> root.lookupClass(namedSymbol(pname)))
@@ -411,7 +425,7 @@ public class ISLISPContext {
      * Initialize builtin constants.
      */
     void initBuiltinVars() {
-        var root = getModule("ROOT");
+        var root = getRootModule();
         root.registerGlobalVar(getNil(), getNil(), true, null);
         root.registerGlobalVar(getT(), getT(), true, null);
         root.registerGlobalVar(namedSymbol("*most-positive-float*"), Double.MAX_VALUE, true, null);

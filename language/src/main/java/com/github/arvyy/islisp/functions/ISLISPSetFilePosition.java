@@ -78,10 +78,14 @@ public abstract class ISLISPSetFilePosition extends RootNode {
     Object doFallback(Object stream, Object position) {
         if (stream instanceof LispStream) {
             ISLISPContext r = ISLISPContext.get(this);
-            return errorSignalerNode.signalWrongType(position, r.getRootModule().lookupClass(r.namedSymbol("<integer>")));
+            return errorSignalerNode.signalWrongType(
+                    position,
+                    r.getRootModule().lookupClass(r.namedSymbol("<integer>")));
         } else {
             ISLISPContext r = ISLISPContext.get(this);
-            return errorSignalerNode.signalWrongType(stream, r.getRootModule().lookupClass(r.namedSymbol("<stream>")));
+            return errorSignalerNode.signalWrongType(
+                    stream,
+                    r.getRootModule().lookupClass(r.namedSymbol("<stream>")));
         }
     }
 

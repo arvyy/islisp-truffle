@@ -42,7 +42,6 @@ public class Parser {
      * Handles installing base condition handler.
      *
      * @param language language reference
-     * @param module the 'main' module name that will entrypoint
      * @param source source for the module. If source is marked as interactive,
      *               in case of unexpected error do not exit with status code
      * @return root node
@@ -117,7 +116,9 @@ public class Parser {
                         List<Symbol> l = switch (head.name()) {
                             case "requires" -> requires;
                             case "provides" -> provides;
-                            default -> throw new ParsingException(obj.source(), "Unrecognized `module` form part: " + head.name());
+                            default -> throw new ParsingException(
+                                    obj.source(),
+                                    "Unrecognized `module` form part: " + head.name());
                         };
                         for (var e: reqOrProvideLst.subList(1, reqOrProvideLst.size())) {
                             l.add(downcast(e, Symbol.class));
@@ -1554,7 +1555,12 @@ public class Parser {
             var moduleSource = parseModuleSource(source);
             ensureRequiresLoaded(moduleSource.requires());
             ctx.createModule(moduleSource.name(), moduleSource.requires(), moduleSource.provides());
-            new ISLISPModuleNode(this, moduleSource).initialize();
+            var root = new ISLISPRootNode(
+                    ctx.getLanguage(),
+                    new ISLISPExpressionNode[]{new ISLISPModuleNode(this, moduleSource)},
+                    null
+            );
+            root.getCallTarget().call();
         } catch (IOException e) {
             throw new ParsingException(
                 null,

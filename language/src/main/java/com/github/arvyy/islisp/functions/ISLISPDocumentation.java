@@ -26,17 +26,23 @@ public class ISLISPDocumentation extends ISLISPBuiltinFunctionRootNode {
             if (args[1] instanceof Symbol s) {
                 return ctx.getCurrentModule().getDocumentationIncludeImports(s);
             } else {
-                return errorSignalerNode.signalWrongType(args[1], ctx.getRootModule().lookupClass(ctx.namedSymbol("<symbol>")));
+                return errorSignalerNode.signalWrongType(
+                        args[1],
+                        ctx.getRootModule().lookupClass(ctx.namedSymbol("<symbol>")));
             }
         } else {
             if (args[1] instanceof Symbol ns) {
                 if (args[2] instanceof Symbol s) {
                     return ctx.getCurrentModule().getDocumentationIncludeImports(ns, s);
                 } else {
-                    return errorSignalerNode.signalWrongType(args[2], ctx.getRootModule().lookupClass(ctx.namedSymbol("<symbol>")));
+                    return errorSignalerNode.signalWrongType(
+                            args[2],
+                            ctx.getRootModule().lookupClass(ctx.namedSymbol("<symbol>")));
                 }
             } else {
-                return errorSignalerNode.signalWrongType(args[1], ctx.getRootModule().lookupClass(ctx.namedSymbol("<symbol>")));
+                return errorSignalerNode.signalWrongType(
+                        args[1],
+                        ctx.getRootModule().lookupClass(ctx.namedSymbol("<symbol>")));
             }
         }
     }

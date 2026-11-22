@@ -81,7 +81,9 @@ public abstract class ISLISPCreateArray extends ISLISPBuiltinFunctionRootNode {
                     dimensionsArr[i] = bigIntValue(biginteger);
                 } else {
                     var ctx = ISLISPContext.get(this);
-                    return errorSignalerNode.signalWrongType(dimensions.car(), ctx.getRootModule().lookupClass(ctx.namedSymbol("<integer>")));
+                    return errorSignalerNode.signalWrongType(
+                            dimensions.car(),
+                            ctx.getRootModule().lookupClass(ctx.namedSymbol("<integer>")));
                 }
                 if (dimensionsArr[i] < 0) {
                     var ctx = ISLISPContext.get(this);
@@ -118,7 +120,9 @@ public abstract class ISLISPCreateArray extends ISLISPBuiltinFunctionRootNode {
     @Fallback
     Object fallback(Object dimensions, Object initValue) {
         var ctx = ISLISPContext.get(this);
-        return errorSignalerNode.signalWrongType(dimensions, ctx.getRootModule().lookupClass(ctx.namedSymbol("<list>")));
+        return errorSignalerNode.signalWrongType(
+                dimensions,
+                ctx.getRootModule().lookupClass(ctx.namedSymbol("<list>")));
     }
 
 }

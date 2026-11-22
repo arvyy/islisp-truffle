@@ -125,7 +125,8 @@ public class ISLISPErrorSignalerNode extends Node {
         if (cArityError == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            cArityError = ctx.getModule(ctx.namedSymbol("ROOT")).lookupClass(ctx.namedSymbol("<arity-error>"));
+            cArityError = ctx.getRootModule()
+                .lookupClass(ctx.namedSymbol("<arity-error>"));
         }
         return cArityError;
     }
@@ -134,7 +135,8 @@ public class ISLISPErrorSignalerNode extends Node {
         if (cDomainError == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            cDomainError = ctx.getModule(ctx.namedSymbol("ROOT")).lookupClass(ctx.namedSymbol("<domain-error>"));
+            cDomainError = ctx.getRootModule()
+                .lookupClass(ctx.namedSymbol("<domain-error>"));
         }
         return cDomainError;
     }
@@ -143,7 +145,8 @@ public class ISLISPErrorSignalerNode extends Node {
         if (cIndexOutOfRangeError == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            cIndexOutOfRangeError = ctx.getModule(ctx.namedSymbol("ROOT")).lookupClass(ctx.namedSymbol("<index-out-of-range-error>"));
+            cIndexOutOfRangeError = ctx.getRootModule()
+                .lookupClass(ctx.namedSymbol("<index-out-of-range-error>"));
         }
         return cIndexOutOfRangeError;
     }
@@ -152,7 +155,8 @@ public class ISLISPErrorSignalerNode extends Node {
         if (cTruffleInteropError == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            cTruffleInteropError = ctx.getModule(ctx.namedSymbol("ROOT")).lookupClass(ctx.namedSymbol("<truffle-interop-error>"));
+            cTruffleInteropError = ctx.getRootModule()
+                .lookupClass(ctx.namedSymbol("<truffle-interop-error>"));
         }
         return cTruffleInteropError;
     }
@@ -161,7 +165,8 @@ public class ISLISPErrorSignalerNode extends Node {
         if (cParseError == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            cParseError = ctx.getModule(ctx.namedSymbol("ROOT")).lookupClass(ctx.namedSymbol("<parse-error>"));
+            cParseError = ctx.getRootModule()
+                .lookupClass(ctx.namedSymbol("<parse-error>"));
         }
         return cParseError;
     }
@@ -170,7 +175,8 @@ public class ISLISPErrorSignalerNode extends Node {
         if (cNoMatchingPrimaryMethodsError == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
-            cNoMatchingPrimaryMethodsError = ctx.getModule(ctx.namedSymbol("ROOT")).lookupClass(ctx.namedSymbol("<no-matching-primary-methods-error>"));
+            cNoMatchingPrimaryMethodsError = ctx.getRootModule()
+                .lookupClass(ctx.namedSymbol("<no-matching-primary-methods-error>"));
         }
         return cNoMatchingPrimaryMethodsError;
     }

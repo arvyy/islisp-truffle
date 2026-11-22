@@ -42,7 +42,9 @@ public abstract class ISLISPSetAref extends RootNode {
                 lookup[i] = bigIntValue((LispBigInteger) arg);
             } else {
                 var ctx = ISLISPContext.get(this);
-                return errorSignalerNode.signalWrongType(arg, ctx.getRootModule().lookupClass(ctx.namedSymbol("<integer>")));
+                return errorSignalerNode.signalWrongType(
+                        arg,
+                        ctx.getRootModule().lookupClass(ctx.namedSymbol("<integer>")));
             }
         }
         return executeGeneric(frame.getArguments()[1], frame.getArguments()[2], lookup);
@@ -129,7 +131,9 @@ public abstract class ISLISPSetAref extends RootNode {
     @Fallback
     Object fallback(Object value, Object arr, int[] lookup) {
         var ctx = ISLISPContext.get(this);
-        return errorSignalerNode.signalWrongType(arr, ctx.getRootModule().lookupClass(ctx.namedSymbol("<basic-array>")));
+        return errorSignalerNode.signalWrongType(
+                arr,
+                ctx.getRootModule().lookupClass(ctx.namedSymbol("<basic-array>")));
     }
 
     @CompilerDirectives.TruffleBoundary

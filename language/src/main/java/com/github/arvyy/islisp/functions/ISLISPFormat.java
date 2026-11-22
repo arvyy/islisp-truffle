@@ -67,13 +67,17 @@ public class ISLISPFormat extends RootNode {
         if (frame.getArguments()[2] instanceof String s) {
             formatString = s;
         } else {
-            return errorSignalerNode.signalWrongType(frame.getArguments()[2], ctx.getRootModule().lookupClass(ctx.namedSymbol("<string>")));
+            return errorSignalerNode.signalWrongType(
+                    frame.getArguments()[2],
+                    ctx.getRootModule().lookupClass(ctx.namedSymbol("<string>")));
         }
         LispStream os;
         if (frame.getArguments()[1] instanceof LispStream out) {
             os = out;
         } else {
-            return errorSignalerNode.signalWrongType(frame.getArguments()[1], ctx.getRootModule().lookupClass(ctx.namedSymbol("<stream>")));
+            return errorSignalerNode.signalWrongType(
+                    frame.getArguments()[1],
+                    ctx.getRootModule().lookupClass(ctx.namedSymbol("<stream>")));
         }
         var args = new Object[frame.getArguments().length];
         System.arraycopy(frame.getArguments(), 0, args, 0, frame.getArguments().length);

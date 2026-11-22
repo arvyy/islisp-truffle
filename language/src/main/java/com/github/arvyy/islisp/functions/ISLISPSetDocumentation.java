@@ -27,10 +27,14 @@ public class ISLISPSetDocumentation extends ISLISPBuiltinFunctionRootNode {
             if (args[3] instanceof Symbol s) {
                 return ctx.getCurrentModule().setDocumentation(ns, s, doc);
             } else {
-                return errorSignalerNode.signalWrongType(args[3], ctx.getRootModule().lookupClass(ctx.namedSymbol("<symbol>")));
+                return errorSignalerNode.signalWrongType(
+                        args[3],
+                        ctx.getRootModule().lookupClass(ctx.namedSymbol("<symbol>")));
             }
         } else {
-            return errorSignalerNode.signalWrongType(args[2], ctx.getRootModule().lookupClass(ctx.namedSymbol("<symbol>")));
+            return errorSignalerNode.signalWrongType(
+                    args[2],
+                    ctx.getRootModule().lookupClass(ctx.namedSymbol("<symbol>")));
         }
     }
 

@@ -30,7 +30,9 @@ public abstract class ISLISPAref extends ISLISPBuiltinFunctionRootNode {
                 lookup[i] = bigintValue((LispBigInteger) arg);
             } else {
                 var ctx = ISLISPContext.get(this);
-                return errorSignalerNode.signalWrongType(arg, ctx.getRootModule().lookupClass(ctx.namedSymbol("<integer>")));
+                return errorSignalerNode.signalWrongType(
+                        arg,
+                        ctx.getRootModule().lookupClass(ctx.namedSymbol("<integer>")));
             }
         }
         return executeGeneric(frame.getArguments()[1], lookup);
@@ -108,7 +110,9 @@ public abstract class ISLISPAref extends ISLISPBuiltinFunctionRootNode {
     @Fallback
     Object fallback(Object arr, int[] lookup) {
         var ctx = ISLISPContext.get(this);
-        return errorSignalerNode.signalWrongType(arr, ctx.getRootModule().lookupClass(ctx.namedSymbol("<basic-array>")));
+        return errorSignalerNode.signalWrongType(
+                arr,
+                ctx.getRootModule().lookupClass(ctx.namedSymbol("<basic-array>")));
     }
 
 }

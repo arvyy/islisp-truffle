@@ -33,7 +33,9 @@ public abstract class ISLISPCharLt extends ISLISPBuiltinFunctionRootNode {
     Object fallback(Object a, Object b) {
         var ctx = ISLISPContext.get(this);
         var offender = (a instanceof LispChar) ? b : a;
-        return errorSignalerNode.signalWrongType(offender, ctx.getRootModule().lookupClass(ctx.namedSymbol("<character>")));
+        return errorSignalerNode.signalWrongType(
+                offender,
+                ctx.getRootModule().lookupClass(ctx.namedSymbol("<character>")));
     }
 
 }
