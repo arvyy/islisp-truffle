@@ -250,7 +250,7 @@ Characters are represented as instances of the _<character>_ class. This insulat
 
 
 
-A cons (sometimes also called \"dotted pair\") consists of two components; the left component is called car and the right component is called cdr. The constructor of this class is *cons*.
+A cons (sometimes also called "dotted pair") consists of two components; the left component is called car and the right component is called cdr. The constructor of this class is *cons*.
 
 == +<control-error>+
 
@@ -503,7 +503,7 @@ Class of conditions signalled when attempting invalid operations, such as mutati
 
 
 
-When a problem situation is detected, a representation of that situation called a *condition* (or sometimes a \"condition object\" to emphasize its nature as an ordinary ISLISP object) is constructed and the situation represented by the condition is announced by a process called *signaling*. This signaling process allows a dynamically established *handler* an opportunity to resolve the problem.
+When a problem situation is detected, a representation of that situation called a *condition* (or sometimes a "condition object" to emphasize its nature as an ordinary ISLISP object) is constructed and the situation represented by the condition is announced by a process called *signaling*. This signaling process allows a dynamically established *handler* an opportunity to resolve the problem.
 
 _<serious-condition>_ is the general superclass of condition objects.
 
@@ -726,9 +726,9 @@ The function *abs* returns the absolute value of its argument. An error shall be
 
 
 
-*and* is the sequential logical \"and\" (or \"∧\"). _forms_ are evaluated from left to right until either one of them evaluates to *nil* or else none are left. If one of them evaluates to *nil*, then *nil* is returned from the *and*; otherwise, the value of the last evaluated _form_ is returned. The form *and* is equivalent to the following:
+*and* is the sequential logical "and" (or "∧"). _forms_ are evaluated from left to right until either one of them evaluates to *nil* or else none are left. If one of them evaluates to *nil*, then *nil* is returned from the *and*; otherwise, the value of the last evaluated _form_ is returned. The form *and* is equivalent to the following:
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 (and) = 't
 (and _form_) = _form_
@@ -881,7 +881,7 @@ The following definition for (one-argument) arc tangent determines the range and
 
 [stem]
 ++++
-\\arctan x = \\frac{log(1 + ix) - log(1 - ix)}{2i}
+\arctan x = \frac{log(1 + ix) - log(1 - ix)}{2i}
 ++++
 
 An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
@@ -904,7 +904,7 @@ An error shall be signaled if _x_ is not a number (error-id. _domain-error_).
 The value of *atan2* is always between −π (exclusive) and π (inclusive) when minus zero is not supported; when minus zero is supported, the range includes −π.
 
 
-[cols=\"1,1,1,1\"]
+[cols="1,1,1,1"]
 |===
 | y Condition | x Condition | Cartesian locus | Range of result
 
@@ -1185,7 +1185,7 @@ Like *error*, but the error that it signals is “continuable” (see continue-c
 
 This is equivalent to:
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 (signal-condition
   (create (class *<simple-error>*)
@@ -1381,7 +1381,7 @@ Executing the prepared *cond*, the clauses (_test_ _form_&#42;) are scanned sequ
 
 *cond* obeys the following equivalences:
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 (cond) = nil
 (cond (test1) (test2 form2&#42;) ...) = (or test1 (cond (test2 form2&#42;) ...))
@@ -1438,7 +1438,7 @@ Returns *t* if _obj_ is a cons (instance of class *<cons>*); otherwise, returns 
 
 
 
-\"Continues\" from _condition_ by finding the call to *signal-condition* and arranging for it to perform a normal return of the value, which defaults to *nil*. The consequences are undefined if the _condition_ is not continuable.
+"Continues" from _condition_ by finding the call to *signal-condition* and arranging for it to perform a normal return of the value, which defaults to *nil*. The consequences are undefined if the _condition_ is not continuable.
 
 == +convert+
 
@@ -1454,7 +1454,7 @@ Returns *t* if _obj_ is a cons (instance of class *<cons>*); otherwise, returns 
 Returns an object of class _class-name_ which corresponds to the object _obj_ according to one of the following projections, called a coercion function. The table shows _obj_ along the left-hand column and class-name along the top row (with <>'s in class names omitted here only for textual brevity):
 
 
-[cols=\"1,1,1,1,1,1,1,1\"]
+[cols="1,1,1,1,1,1,1,1"]
 |===
 |  | character | integer | ﬂoat | symbol | string | general-vector | list
 
@@ -1667,7 +1667,7 @@ Halts execution at this point when running in a debugger. Returns *nil*.
 
 
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 Where:
 _class-name_           ::= _identifier_
@@ -1781,7 +1781,7 @@ The symbol named _name_ is returned.
 
 
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 Where:
 _func-spec_                  ::= _identifier_ | (*setf* _identifier_)
@@ -1869,7 +1869,7 @@ Defines a named (toplevel) macro. No implicit block with the macro name is estab
 
 
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 Where:
 _func-spec_                  ::= _identifier_ | (*setf* _identifier_)
@@ -1956,7 +1956,7 @@ Deletes a file denoted by string path _filename_.
 
 *div* and *mod* satisfy:
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 (= z1 (&#43; (&#42; (div z~1~ z~2~) z~2~) (mod z~1~ z~2~)))
 ----
@@ -2218,7 +2218,7 @@ _error-string_ and the _objs_ are advice to the implementation about how the err
 
 This is equivalent to:
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 (signal-condition
   (create (class *<simple-error>*)
@@ -2309,7 +2309,7 @@ Returns the file position associated with _stream_.
 
 A file position is a non-negative integer that represents a position in the _stream_. For binary streams, the file position represents the number of preceding bytes in the _stream_. It is increased by one each time one of the following is done:
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 (read-byte stream)
 
@@ -2317,7 +2317,7 @@ A file position is a non-negative integer that represents a position in the _str
 ----
 For character streams, the file position is increased by an implementation-defined non-negative amount each time one of the following is done:
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 (format stream...)
 
@@ -2439,7 +2439,7 @@ Returns the greatest integer less than or equal to _x_. That is, _x_ is truncate
 
 
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 Where:
 _iteration-spec_ ::= (_var_ _init_ [_step_])
@@ -2488,9 +2488,9 @@ _obj_ refers to the next item of the set of _obj_&#42; to be processed.
 &#126;X::
     Hexadecimal: An error shall be signaled if _obj_ is not an integer. _obj_ is printed in hexadecimal radix (radix 16).
 &#126;%::
-    newline: output a #\\newline character;
+    newline: output a #\newline character;
 &#126;&#38;::
-    conditional newline: output a #\\newline character if it cannot be determined that the output stream is at the beginning of a fresh line;
+    conditional newline: output a #\newline character if it cannot be determined that the output stream is at the beginning of a fresh line;
 &#126;&#126;::
     tilde: output a tilde (&#126;).
 
@@ -2531,7 +2531,7 @@ An error shall be signaled if _obj_ is not a number. _obj_ is printed as a ﬂoa
 
 
 
-Output a #\\newline character if it cannot be determined that the output stream is at the beginning of a fresh line.
+Output a #\newline character if it cannot be determined that the output stream is at the beginning of a fresh line.
 
 == +format-integer+
 
@@ -2586,7 +2586,7 @@ Output enough spaces to move to column _n_ (where column 0 represents the left m
 
 Activates the specified function _function_ and returns the value that the _function_ returns. The _i_th argument (2 ≤ _i_) of *funcall* becomes the (_i_ − 1)th argument of the *function*. *funcall* could have been defined using *apply* as follows:
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 (defun funcall (function :rest arguments)
   (apply function arguments))
@@ -2769,7 +2769,7 @@ Returns a string containing all characters written to _stream_ since the last ca
 
 
 
-Returns an approximation to the \"current time\" in Universal Time Format. The units are seconds. Universal Time Format represents time as an integer number of seconds since the beginning (i.e., midnight), January 1, 1900 UT (ignoring leap seconds). If *get-universal-time* is called twice, the first value shall be less than or equal to the second value.
+Returns an approximation to the "current time" in Universal Time Format. The units are seconds. Universal Time Format represents time as an integer number of seconds since the beginning (i.e., midnight), January 1, 1900 UT (ignoring leap seconds). If *get-universal-time* is called twice, the first value shall be less than or equal to the second value.
 
 No implementation is required to have a way to verify that the time returned is correct. However, an error shall be signaled if an implementation can determine that the time it would return would not be correct (e.g., it can determine that the clock was never initialized).
 
@@ -2941,7 +2941,7 @@ No _function-name_ may appear more than once in the function bindings.
 
 
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 Where:
 _lambda-list_ ::= (_identifier&#42;_ [*&#38;rest* _identifier_]) |
@@ -2972,7 +2972,7 @@ If the function receives a *&#38;rest* or *:rest* parameter _R_, the list _L~1~_
 
 *lcm* returns the least common multiple of its integer arguments. *gcd* and *lcm* satisfies:
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 (= (&#42; (gcd m n) (lcm m n)) (abs (&#42; m n)))
 ----
@@ -3018,7 +3018,7 @@ No _var_ may appear more than once in *let* variable list.
 
 NOTE: Although this form is a special form, one can think of it as a macro whose rewriting rules are as follows:
 
-[cols=\"1,1\"]
+[cols="1,1"]
 |===
 | (let () body-form&#42;) | (progn body-form&#42;)
 | (let ((var1 form1) (var2 form2) … (varn formn)) body-form&#42;) | ((lambda (var1 var2 … varn) body-form&#42;) form1 form2 … formn)
@@ -3041,7 +3041,7 @@ For each pair (_var_ _form_) the following is done: _form_ is evaluated in the c
 
 NOTE: Although this form is a special form, one can think of it as a macro whose rewriting rules are as follows:
 
-[cols=\"1,1\"]
+[cols="1,1"]
 |===
 | (let&#42; () body-form&#42;) | (progn body-form&#42;)
 | (let&#42; ((var1 form1) (var2 form2) … (varn formn)) body-form&#42;) | (let ((var1 form1)) (let ((var2 form2)) … (let ((varn formn)) body-form&#42;)...))
@@ -3273,7 +3273,7 @@ An error shall be signaled if any _x_ is not a number (error-id. _domain-error_)
 
 *div* and *mod* satisfy:
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 (= z1 (&#43; (&#42; (div z~1~ z~2~) z~2~) (mod z~1~ z~2~)))
 ----
@@ -3470,9 +3470,9 @@ Returns t if obj is an open stream; otherwise, returns nil.
 
 
 
-*or* is the sequential logical \"or\" (or \"∨\"). _forms_ are evaluated from left to right until either one of them evaluates to a non-nil value or else none are left. If one of them evaluates to a non-nil value, then this non-nil value is returned, otherwise *nil* is returned. The form *or* is equivalent to the following:
+*or* is the sequential logical "or" (or "∨"). _forms_ are evaluated from left to right until either one of them evaluates to a non-nil value or else none are left. If one of them evaluates to a non-nil value, then this non-nil value is returned, otherwise *nil* is returned. The form *or* is equivalent to the following:
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 (or) = 'nil
 (or _form_) = _form_
@@ -3677,7 +3677,7 @@ The function *quotient*, given two arguments _dividend_ and _divisor_, returns t
 
 Given more than two arguments, *quotient* operates iteratively on each of the _divisor~1~_ … _divisor~n~_ as in _dividend_ / _divisor~1~_ / … / _divisor~n~_. The type of the result follows from the two-argument case because the three-or-more-argument quotient can be defined as follows:
 
-[subs=\"+quotes,+replacements\"]
+[subs="+quotes,+replacements"]
 ----
 (quotient _dividend_ _divisor~1~_ _divisor~2~_ …) = (quotient (quotient _dividend_ _divisor~1~_) _divisor~2~_ …)
 ----
@@ -3982,7 +3982,7 @@ This macro is used for generalized assignment.
 
 *setf* takes a _place_ and stores in this place the result of the evaluation of the form _form_. The _place_ form is not evaluated as a whole entity, but subforms of _place_ are evaluated sequentially from left to right to determine a place to be assigned a value. When _place_ is denoted by an identifier, *setf* behaves exactly as *setq*. The returned value is the result of the evaluation of _form_. The valid places for the *setf* special form are as follows:
 
-[cols=\"1,1\"]
+[cols="1,1"]
 |===
 | variables | var
 | dynamic bindings | (dynamic var)
@@ -4028,7 +4028,7 @@ Invokes the condition handling system on _condition_.
 
 If _continuable_ is *nil*, the results of attempting to “continue” (see *continue-condition*) are not defined except that the call to *signal-condition* will not return normally.
 
-If _continuable_ is not *nil*, it will be possible to return from the call to *signal-condition* (see *continue-condition*). In this case, the specific value of continuable may be a string indicating the effect of continuing, or it may be the symbol *t*, indicating that an implementation-defined string such as \"Continue with no special action.\" is to be used.
+If _continuable_ is not *nil*, it will be possible to return from the call to *signal-condition* (see *continue-condition*). In this case, the specific value of continuable may be a string indicating the effect of continuing, or it may be the symbol *t*, indicating that an implementation-defined string such as "Continue with no special action." is to be used.
 
 == +simple-error-format-arguments+
 
@@ -4179,7 +4179,7 @@ Returns *t* if _obj_ is a stream (instance of class *<stream>*); otherwise, retu
 
 
 
-Returns a single string containing a sequence of characters that results from appending the sequences of characters of each of the _strings_, or \"\" if given no _strings_. An error shall be signaled if any _string_ is not a string (error-id. _domain-error_).
+Returns a single string containing a sequence of characters that results from appending the sequences of characters of each of the _strings_, or "" if given no _strings_. An error shall be signaled if any _string_ is not a string (error-id. _domain-error_).
 
 This function does not modify its arguments. It is implementation defined whether and when the result shares structure with its _string_ arguments.
 
@@ -4475,7 +4475,7 @@ An error shall be signaled if there is no outstanding catcher for a _T~1~_ (erro
 
 
 
-\"print\" debugging helper. Outputs expr and it's evaluated result to stdout. Returns evaluated result.
+"print" debugging helper. Outputs expr and it's evaluated result to stdout. Returns evaluated result.
 
 == +truncate+
 

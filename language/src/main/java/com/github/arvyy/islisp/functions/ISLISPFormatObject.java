@@ -84,9 +84,9 @@ public abstract class ISLISPFormatObject extends RootNode {
         if (value instanceof String s) {
             if (escape) {
                 stream.write("\"");
+                s = s.replace("\\", "\\\\");
+                s = s.replace("\"", "\\\"");
             }
-            s = s.replace("\\", "\\\\");
-            s = s.replace("\"", "\\\"");
             stream.write(s);
             if (escape) {
                 stream.write("\"");
