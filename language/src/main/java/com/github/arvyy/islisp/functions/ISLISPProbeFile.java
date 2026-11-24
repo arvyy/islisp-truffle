@@ -62,7 +62,8 @@ public abstract class ISLISPProbeFile extends RootNode {
 
     @Fallback
     Object doFallback(Object obj) {
-        return errorSignalerNode.signalWrongType(obj, ISLISPContext.get(this).lookupClass("<string>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(obj, r.getRootModule().lookupClass(r.namedSymbol("<string>")));
     }
 
     /**

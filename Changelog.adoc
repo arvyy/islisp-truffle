@@ -6,6 +6,7 @@ Afterwards the version will match truffle version followed by a date, eg. `24.0.
 
 == Unreleased
 
+* Redesign module system.
 * Add feature to list scope content in interactive debugger.
 * Fix module lookup failure during interactive debugger repl state.
 * Use escaped presentation for truffle values, fix missing escapes for strings.

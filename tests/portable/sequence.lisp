@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 ;; other sequence ops tested in list.lisp, vector.lis, string.lisp.
 

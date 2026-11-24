@@ -6,7 +6,6 @@ import com.github.arvyy.islisp.parser.Parser;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.DirectCallNode;
-import com.oracle.truffle.api.nodes.ExplodeLoop;
 
 /**
  * Helper node for deferring full parsing (which requires running user code) until runtime.
@@ -33,13 +32,7 @@ public class ISLISPModuleNode extends ISLISPExpressionNode {
         this.source = moduleSource;
     }
 
-    /**
-     * Triggers load of this modules dependencies, if necessary.
-     * Initializes (= executes) module's definitions.
-     * Prepares a call node wrapping non-definition top level expressions.
-     */
-    public void initialize() {
-        CompilerDirectives.transferToInterpreterAndInvalidate();
+    void initialize() {
         parser.ensureRequiresLoaded(source.requires());
         var ctx = ISLISPContext.get(this);
         if (ctx.getModule(source.name()) == null) {
@@ -52,9 +45,9 @@ public class ISLISPModuleNode extends ISLISPExpressionNode {
     }
 
     @Override
-    @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
         if (!initialized) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             initialized = true;
             initialize();
         }
@@ -62,4 +55,5 @@ public class ISLISPModuleNode extends ISLISPExpressionNode {
         ctx.setCurrentModule(ctx.getModule(source.name()));
         return nonDefinitionExecutionNode.call();
     }
+
 }

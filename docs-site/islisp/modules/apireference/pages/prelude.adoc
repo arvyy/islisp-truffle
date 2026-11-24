@@ -408,6 +408,32 @@ Integer objects correspond to mathematical integers.
 
 The _<list>_ class represents singly-linked sequence lists. It is partitioned into two subclasses _<cons>_ and _<null>_.
 
+== +<no-matching-primary-methods-error>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <program-error>
+
+.Slots
+* name
+* arguments
+
+
+
+Condition raised generic method is called with arguments for which no matching method exists. _name_ is a symbol naming the generic method, _arguments_ is a vector of classes with which it was called.
+
+== +<no-next-method-error>+
+
+[.islisp-kind]_class_
+
+.Superclasses
+* <program-error>
+
+
+
+Condition raised when next-method is called by no next method exists.
+
 == +<null>+
 
 [.islisp-kind]_class_
@@ -448,6 +474,7 @@ Root class
 
 .Slots
 * string
+* message
 * expected-class
 
 
@@ -3254,6 +3281,37 @@ That is, the evaluation of the above form always return *t*.
 
 An error shall be signaled if either _z~1~_ or _z~2~_ is not an integer (error-id. _domain-error_).
 
+== +module+
+
+[.islisp-kind]_syntax_
+
+[subs="+quotes"]
+----
+(module name (provides symbol ...) (requires symbol ...))
+----
+
+
+
+Defines module: its name, public definitions, and requires imports.
+
+The _name_ is a symbol, whose value must match file's relative position from sourcepath root as follows:
+* Replace each path segment with `.`;
+* Remove the `.lisp` extension.
+
+NOTE: For example; a module file at relative path `foo/bar/baz.lisp` should have declared _name_ `foo.bar.baz`.
+
+The _provides_ list names the set of identifiers that are visible by the users of the module.
+
+The _requires_ list (optional) specifies set of modules, whose identifiers this module imports. 
+
+Source path roots are specified using `islisp.Sourcepath` truffle option (i.e., `--islisp.Sourcepath=...` if using islisp launcher).
+The value must be a set of paths, separated by `:`.
+If not given, defaults to working directory.
+
+For entrypoint application files, a simplified form of just `(requires _symbol_ ...)` can be used.
+
+IMPORTANT: Module declarations are read very early into load process. It is not possible for a _module_ or _requires_ form to be a result of a macro expansion and still work.
+
 == +next-method-p+
 
 [.islisp-kind]_local-function_
@@ -3281,6 +3339,32 @@ nil => <null>
 
 
 *nil* is a named constant whose value is the symbol *nil* itself.
+
+== +no-matching-primary-methods-error-arguments+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
+----
+(no-matching-primary-methods-error-arguments no-matching-primary-methods-error) => <general-vector>
+----
+
+
+
+Returns the _arguments_ vector of classes supplied as data when creating the _no-matching-primary-methods-error_.
+
+== +no-matching-primary-methods-error-name+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
+----
+(no-matching-primary-methods-error-name no-matching-primary-methods-error) => <symbol>
+----
+
+
+
+Returns the _name_ supplied as data when creating the _no-matching-primary-methods-error_.
 
 == +not+
 
@@ -3450,7 +3534,20 @@ Returns *t* if _obj_ is a stream that can handle output operations; otherwise, r
 
 
 
-Returns the _expected-class_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class ** (error-id. _domain-error_).
+Returns the _expected-class_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class *<parse-error>* (error-id. _domain-error_).
+
+== +parse-error-message+
+
+[.islisp-kind]_function_
+
+[subs="+quotes"]
+----
+(parse-error-message parse-error) => <string>
+----
+
+
+
+Returns the _message_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class *<parse-error>* (error-id. _domain-error_).
 
 == +parse-error-string+
 
@@ -3463,7 +3560,7 @@ Returns the _expected-class_ supplied as data when creating the _parse-error_. A
 
 
 
-Returns the _string_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class ** (error-id. _domain-error_).
+Returns the _string_ supplied as data when creating the _parse-error_. An error shall be signaled if _parse-error_ is not a condition of class *<parse-error>* (error-id. _domain-error_).
 
 == +parse-number+
 
@@ -3565,19 +3662,6 @@ An error shall be signaled if either symbol or property-name is not a symbol (er
 Causes _obj_ to be the new value of the property named _property-name_ asssociated with the symbol _symbol_. If the property named _property-name_ already exists, its corresponding property value is replaced; otherwise, a new property is created. _obj_ is returned.
 
 An error shall be signaled if either symbol or property-name is not a symbol (error-id. _domain-error_). obj may be any ISLISP object
-
-== +provides+
-
-[.islisp-kind]_syntax_
-
-[subs="+quotes"]
-----
-(provides symbol*)
-----
-
-
-
-Exports functions / macros / values bound to _symbol_ to be visible in other modules that *requires* this module.
 
 == +quote+
 
@@ -3729,7 +3813,7 @@ Presents a natural language description of _condition_ to _stream_. This generic
 
 
 
-Imports module from _path_ (which must be a string). _path_ is resolved relative set of active source roots.
+Imports module from _path_ (which must be a symbol). See _module_ for details.
 
 == +return-from+
 

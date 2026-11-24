@@ -52,7 +52,10 @@ public abstract class ISLISPLength extends RootNode {
             return 0;
         } else {
             var ctx = ISLISPContext.get(this);
-            return islispErrorSignalerNode.signalDomainError("Not a sequence", s, ctx.lookupClass("<list>"));
+            return islispErrorSignalerNode.signalDomainError(
+                    "Not a sequence",
+                    s,
+                    ctx.getRootModule().lookupClass(ctx.namedSymbol("<list>")));
         }
     }
 

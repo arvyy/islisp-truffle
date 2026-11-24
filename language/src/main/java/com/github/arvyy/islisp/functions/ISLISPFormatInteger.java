@@ -49,17 +49,20 @@ public abstract class ISLISPFormatInteger extends RootNode {
 
     @Specialization
     Object doFallbackBadStream(Object stream, LispBigInteger integer, LispBigInteger radix) {
-        return errorSignalerNode.signalWrongType(stream, ISLISPContext.get(this).lookupClass("<stream>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(stream, r.getRootModule().lookupClass(r.namedSymbol("<stream>")));
     }
 
     @Specialization
     Object doFallbackBadInteger(Object stream, Object integer, LispBigInteger radix) {
-        return errorSignalerNode.signalWrongType(integer, ISLISPContext.get(this).lookupClass("<integer>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(integer, r.getRootModule().lookupClass(r.namedSymbol("<integer>")));
     }
 
     @Specialization
     Object doFallbackBadRadix(Object stream, Object integer, Object radix) {
-        return errorSignalerNode.signalWrongType(radix, ISLISPContext.get(this).lookupClass("<integer>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(radix, r.getRootModule().lookupClass(r.namedSymbol("<integer>")));
     }
 
 

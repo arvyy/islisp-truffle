@@ -1,4 +1,4 @@
-(requires "builtin/truffle.lisp")
+(requires builtin.truffle)
 
 (defun print (str)
     (format-object (standard-output) str nil)

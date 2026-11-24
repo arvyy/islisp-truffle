@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (defun foo1 (a) a)
 (test-equal (foo1 "OK1") "OK1")

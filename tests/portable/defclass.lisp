@@ -1,5 +1,5 @@
 ;; TODO rename testsuite to be about "class" more generally
-(requires "testing.lisp")
+(requires testing)
 
 (defclass <foo> ()
     ((bar :reader get-bar :writer set-bar :accessor bar :initarg bar :boundp bar-boundp)))

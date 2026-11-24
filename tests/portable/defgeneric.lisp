@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (defun test-print (int)
     (format-integer (standard-output) int 10)

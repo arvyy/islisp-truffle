@@ -47,9 +47,9 @@ public class ISLISPAssureNode extends ISLISPExpressionNode {
         var ctx = ISLISPContext.get(this);
         if (lispClass == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            lispClass = ctx.lookupClass(className);
+            lispClass = ctx.getRootModule().lookupClass(className);
             instancepCall = insert(DirectCallNode.create(
-                ctx.lookupFunction("ROOT", ctx.namedSymbol("instancep"))
+                ctx.getRootModule().lookupFunction(ctx.namedSymbol("instancep"))
                     .callTarget()));
         }
         var obj = expressionNode.executeGeneric(frame);

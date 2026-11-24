@@ -1,3 +1,5 @@
+(module builtin.truffle)
+
 (setf (documentation 'class '<truffle-object>)
     '((kind . class)
       (superclasses . (<object>))

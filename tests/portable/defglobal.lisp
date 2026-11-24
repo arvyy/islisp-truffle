@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (defglobal foo "OK1")
 (test-equal foo "OK1")

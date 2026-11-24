@@ -74,7 +74,7 @@ public abstract class ISLISPRoundingFunctions extends RootNode {
     @Fallback
     Object fallback(Object o) {
         var ctx = ISLISPContext.get(this);
-        return errorSignalerNode.signalWrongType(o, ctx.lookupClass("<number>"));
+        return errorSignalerNode.signalWrongType(o, ctx.getRootModule().lookupClass(ctx.namedSymbol("<number>")));
     }
 
     interface RoundingFunction {

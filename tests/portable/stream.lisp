@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (test-equal (streamp (create-string-input-stream "foo")) t)
 (test-equal (streamp (create-string-output-stream)) t)

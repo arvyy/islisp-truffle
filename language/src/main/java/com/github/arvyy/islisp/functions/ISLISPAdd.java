@@ -154,7 +154,7 @@ public abstract class ISLISPAdd extends ISLISPBuiltinFunctionRootNode {
 
     Object signalError(Object value) {
         var ctx = ISLISPContext.get(this);
-        var numberClass = ctx.lookupClass("<number>");
+        var numberClass = ctx.getRootModule().lookupClass(ctx.namedSymbol("<number>"));
         return errorSignalerNode.signalWrongType(value, numberClass);
     }
 

@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class ISLISPDefClassNode extends ISLISPExpressionNode {
 
-    private final String module;
+    private final Symbol module;
     private final Symbol name;
     private final List<Symbol> superclassName;
     private final List<SlotDefinition> slots;
@@ -47,7 +47,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
      */
     public ISLISPDefClassNode(
             TruffleLanguage<?> language,
-            String module,
+            Symbol module,
             Symbol name,
             List<Symbol> superclassName,
             List<SlotDefinition> slots,
@@ -148,7 +148,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
         var superclasses = new ArrayList<LispClass>();
         // collect inherited slots from parent classes
         for (var superclass: superclassName) {
-            var clazz = ctx.lookupClass(module, superclass);
+            var clazz = ctx.getModule(module).lookupClass(superclass);
             if (clazz == null) {
                 errorSignalerNode.signalUndefinedClass(superclass);
             }
@@ -205,7 +205,7 @@ public class ISLISPDefClassNode extends ISLISPExpressionNode {
                 isAbstract,
                 getSourceSection()
         );
-        ctx.registerClass(module, name, newClass);
+        ctx.getModule(module).registerClass(name, newClass);
     }
 
     @Override

@@ -49,10 +49,11 @@ public abstract class ISLISPSetFilePosition extends RootNode {
                 return errorSignalerNode.signalIOError(e);
             }
         }
+        ISLISPContext r = ISLISPContext.get(this);
         return errorSignalerNode.signalDomainError(
             "set-file-position called on non-file stream",
             stream,
-            ISLISPContext.get(this).lookupClass("<stream>"));
+            r.getRootModule().lookupClass(r.namedSymbol("<stream>")));
     }
 
     @Specialization
@@ -66,18 +67,25 @@ public abstract class ISLISPSetFilePosition extends RootNode {
                 return errorSignalerNode.signalIOError(e);
             }
         }
+        ISLISPContext r = ISLISPContext.get(this);
         return errorSignalerNode.signalDomainError(
             "set-file-position called on non-file stream",
             stream,
-            ISLISPContext.get(this).lookupClass("<stream>"));
+            r.getRootModule().lookupClass(r.namedSymbol("<stream>")));
     }
 
     @Fallback
     Object doFallback(Object stream, Object position) {
         if (stream instanceof LispStream) {
-            return errorSignalerNode.signalWrongType(position, ISLISPContext.get(this).lookupClass("<integer>"));
+            ISLISPContext r = ISLISPContext.get(this);
+            return errorSignalerNode.signalWrongType(
+                    position,
+                    r.getRootModule().lookupClass(r.namedSymbol("<integer>")));
         } else {
-            return errorSignalerNode.signalWrongType(stream, ISLISPContext.get(this).lookupClass("<stream>"));
+            ISLISPContext r = ISLISPContext.get(this);
+            return errorSignalerNode.signalWrongType(
+                    stream,
+                    r.getRootModule().lookupClass(r.namedSymbol("<stream>")));
         }
     }
 

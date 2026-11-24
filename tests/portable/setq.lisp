@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (let ((foo 1))
     (setq foo 2)

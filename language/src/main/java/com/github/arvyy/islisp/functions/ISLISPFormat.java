@@ -67,13 +67,17 @@ public class ISLISPFormat extends RootNode {
         if (frame.getArguments()[2] instanceof String s) {
             formatString = s;
         } else {
-            return errorSignalerNode.signalWrongType(frame.getArguments()[2], ctx.lookupClass("<string>"));
+            return errorSignalerNode.signalWrongType(
+                    frame.getArguments()[2],
+                    ctx.getRootModule().lookupClass(ctx.namedSymbol("<string>")));
         }
         LispStream os;
         if (frame.getArguments()[1] instanceof LispStream out) {
             os = out;
         } else {
-            return errorSignalerNode.signalWrongType(frame.getArguments()[1], ctx.lookupClass("<stream>"));
+            return errorSignalerNode.signalWrongType(
+                    frame.getArguments()[1],
+                    ctx.getRootModule().lookupClass(ctx.namedSymbol("<stream>")));
         }
         var args = new Object[frame.getArguments().length];
         System.arraycopy(frame.getArguments(), 0, args, 0, frame.getArguments().length);
@@ -138,12 +142,16 @@ public class ISLISPFormat extends RootNode {
         }
     }
 
+    private DirectCallNode getFn(String fn) {
+        var ctx = ISLISPContext.get(this);
+        var fun = ctx.getRootModule().lookupFunction(ctx.namedSymbol(fn));
+        return DirectCallNode.create(fun.callTarget());
+    }
+
     DirectCallNode formatChar() {
         if (formatChar == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            var ctx = ISLISPContext.get(this);
-            var fun = ctx.lookupFunction("ROOT", ctx.namedSymbol("format-char"));
-            formatChar = this.insert(DirectCallNode.create(fun.callTarget()));
+            formatChar = this.insert(getFn("format-char"));
         }
         return formatChar;
     }
@@ -151,9 +159,7 @@ public class ISLISPFormat extends RootNode {
     DirectCallNode formatInt() {
         if (formatInt == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            var ctx = ISLISPContext.get(this);
-            var fun = ctx.lookupFunction("ROOT", ctx.namedSymbol("format-integer"));
-            formatInt = this.insert(DirectCallNode.create(fun.callTarget()));
+            formatInt = this.insert(getFn("format-integer"));
         }
         return formatInt;
     }
@@ -161,9 +167,7 @@ public class ISLISPFormat extends RootNode {
     DirectCallNode formatFloat() {
         if (formatFloat == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            var ctx = ISLISPContext.get(this);
-            var fun = ctx.lookupFunction("ROOT", ctx.namedSymbol("format-float"));
-            formatFloat = this.insert(DirectCallNode.create(fun.callTarget()));
+            formatFloat = this.insert(getFn("format-float"));
         }
         return formatFloat;
     }
@@ -171,9 +175,7 @@ public class ISLISPFormat extends RootNode {
     DirectCallNode formatObject() {
         if (formatObject == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            var ctx = ISLISPContext.get(this);
-            var fun = ctx.lookupFunction("ROOT", ctx.namedSymbol("format-object"));
-            formatObject = this.insert(DirectCallNode.create(fun.callTarget()));
+            formatObject = this.insert(getFn("format-object"));
         }
         return formatObject;
     }
@@ -181,9 +183,7 @@ public class ISLISPFormat extends RootNode {
     DirectCallNode formatFreshLine() {
         if (formatFreshLine == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            var ctx = ISLISPContext.get(this);
-            var fun = ctx.lookupFunction("ROOT", ctx.namedSymbol("format-fresh-line"));
-            formatFreshLine = this.insert(DirectCallNode.create(fun.callTarget()));
+            formatFreshLine = this.insert(getFn("format-fresh-line"));
         }
         return formatFreshLine;
     }

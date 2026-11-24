@@ -15,7 +15,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
 
-    private final String module;
+    private final Symbol module;
     private final Symbol name;
     private final boolean setf;
 
@@ -41,7 +41,7 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
      * @param sourceSection corresponding source section to this node
      */
     public ISLISPGlobalFunctionCallNode(
-        String module,
+        Symbol module,
         Symbol name,
         boolean setf,
         ISLISPExpressionNode[] arguments,
@@ -62,8 +62,7 @@ public class ISLISPGlobalFunctionCallNode extends ISLISPExpressionNode {
     public Object executeGeneric(VirtualFrame frame) {
         if (function == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            function = ISLISPContext.get(this).lookupFunction(
-                module, name, setf);
+            function = ISLISPContext.get(this).getModule(module).lookupFunction(name, setf);
             if (function == null) {
                 return errorSignalerNode.signalUndefinedFunction(name);
             }

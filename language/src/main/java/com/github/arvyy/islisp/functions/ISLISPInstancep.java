@@ -40,12 +40,12 @@ public abstract class ISLISPInstancep extends RootNode {
 
     CallTarget getClassOfCallTarget() {
         var ctx =  ISLISPContext.get(this);
-        return ctx.lookupFunction("ROOT", ctx.namedSymbol("class-of")).callTarget();
+        return ctx.getRootModule().lookupFunction(ctx.namedSymbol("class-of")).callTarget();
     }
 
     CallTarget getSubclasspCallTarget() {
         var ctx =  ISLISPContext.get(this);
-        return ctx.lookupFunction("ROOT", ctx.namedSymbol("subclassp")).callTarget();
+        return ctx.getRootModule().lookupFunction(ctx.namedSymbol("subclassp")).callTarget();
     }
 
     /**

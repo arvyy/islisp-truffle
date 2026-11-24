@@ -14,7 +14,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
 
-    private final String module;
+    private final Symbol module;
     @CompilerDirectives.CompilationFinal(dimensions = 1)
     private ValueReference[] vars;
     private final Symbol[] symbols;
@@ -35,7 +35,7 @@ public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
      * @param sourceSection corresponding source section to this node
      */
     public ISLISPDynamicLetNode(
-            String module,
+            Symbol module,
             Symbol[] symbols,
             ISLISPExpressionNode[] initializers,
             ISLISPExpressionNode[] body,
@@ -55,12 +55,12 @@ public class ISLISPDynamicLetNode extends ISLISPExpressionNode {
         if (vars == null) {
             vars = new ValueReference[symbols.length];
             for (int i = 0; i < vars.length; i++) {
-                var existing = ctx.lookupDynamicVar(module, symbols[i]);
+                var existing = ctx.getModule(module).lookupDynamicVar(symbols[i]);
                 if (existing == null) {
                     // TODO granulize source section
                     vars[i] = new ValueReference(getSourceSection());
                     vars[i].setValue(null);
-                    ctx.registerDynamicVar(module, symbols[i], vars[i]);
+                    ctx.getModule(module).registerDynamicVar(symbols[i], vars[i]);
                 } else {
                     vars[i] = existing;
                 }

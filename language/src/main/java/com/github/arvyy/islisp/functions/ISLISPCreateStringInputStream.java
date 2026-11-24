@@ -33,7 +33,7 @@ public class ISLISPCreateStringInputStream extends ISLISPBuiltinFunctionRootNode
             value = s;
         } else {
             var ctx = ISLISPContext.get(this);
-            return errorSignalerNode.signalWrongType(arg, ctx.lookupClass("<string>"));
+            return errorSignalerNode.signalWrongType(arg, ctx.getRootModule().lookupClass(ctx.namedSymbol("<string>")));
         }
         return executeBoundary(value);
     }

@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 ;;TODO dream up a sane non-flaky way to test this
 ;;(let* ((lib (load-native-library "libm.so.6"))

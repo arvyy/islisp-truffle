@@ -30,7 +30,9 @@ public abstract class ISLISPAref extends ISLISPBuiltinFunctionRootNode {
                 lookup[i] = bigintValue((LispBigInteger) arg);
             } else {
                 var ctx = ISLISPContext.get(this);
-                return errorSignalerNode.signalWrongType(arg, ctx.lookupClass("<integer>"));
+                return errorSignalerNode.signalWrongType(
+                        arg,
+                        ctx.getRootModule().lookupClass(ctx.namedSymbol("<integer>")));
             }
         }
         return executeGeneric(frame.getArguments()[1], lookup);
@@ -98,16 +100,19 @@ public abstract class ISLISPAref extends ISLISPBuiltinFunctionRootNode {
 
     @CompilerDirectives.TruffleBoundary
     Object signalWrongDimension(Object obj, int expected, int actual) {
+        ISLISPContext r = ISLISPContext.get(this);
         return errorSignalerNode.signalDomainError(
             "Expected dimension size " + expected + "; received " + actual,
             obj,
-            ISLISPContext.get(this).lookupClass("<basic-array>"));
+            r.getRootModule().lookupClass(r.namedSymbol("<basic-array>")));
     }
 
     @Fallback
     Object fallback(Object arr, int[] lookup) {
         var ctx = ISLISPContext.get(this);
-        return errorSignalerNode.signalWrongType(arr, ctx.lookupClass("<basic-array>"));
+        return errorSignalerNode.signalWrongType(
+                arr,
+                ctx.getRootModule().lookupClass(ctx.namedSymbol("<basic-array>")));
     }
 
 }

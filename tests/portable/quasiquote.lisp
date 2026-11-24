@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (test-equal `(1 2) (list 1 2))
 (test-equal `(1 ,2) (list 1 2))

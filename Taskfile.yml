@@ -27,6 +27,11 @@ tasks:
     cmds:
       - 'bash launcher/islisp.sh {{.CLI_ARGS}}'
 
+  docs:regenerate:
+    desc: 'Regenerate .adoc files for api reference pages'
+    cmds:
+      - 'cd docs-site/islisp; bash generateadoc.sh'
+
   lint:
     desc: 'Lint java'
     cmds:

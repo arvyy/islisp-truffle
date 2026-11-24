@@ -36,7 +36,7 @@ public abstract class ISLISPCreateArray extends ISLISPBuiltinFunctionRootNode {
             var ctx = ISLISPContext.get(this);
             createVectorNode = this.insert(
                 DirectCallNode.create(
-                    ctx.lookupFunction("ROOT", ctx.namedSymbol("create-vector"))
+                    ctx.getRootModule().lookupFunction(ctx.namedSymbol("create-vector"))
                         .callTarget()));
         }
         return createVectorNode;
@@ -48,7 +48,7 @@ public abstract class ISLISPCreateArray extends ISLISPBuiltinFunctionRootNode {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             lengthNode = this.insert(
                 DirectCallNode.create(
-                    ctx.lookupFunction("ROOT", ctx.namedSymbol("length"))
+                    ctx.getRootModule().lookupFunction(ctx.namedSymbol("length"))
                         .callTarget()));
         }
         return lengthNode;
@@ -81,14 +81,16 @@ public abstract class ISLISPCreateArray extends ISLISPBuiltinFunctionRootNode {
                     dimensionsArr[i] = bigIntValue(biginteger);
                 } else {
                     var ctx = ISLISPContext.get(this);
-                    return errorSignalerNode.signalWrongType(dimensions.car(), ctx.lookupClass("<integer>"));
+                    return errorSignalerNode.signalWrongType(
+                            dimensions.car(),
+                            ctx.getRootModule().lookupClass(ctx.namedSymbol("<integer>")));
                 }
                 if (dimensionsArr[i] < 0) {
                     var ctx = ISLISPContext.get(this);
                     return errorSignalerNode.signalDomainError(
                         "Given dimensions aren't a list of non-negative integers",
                         dimensions,
-                        ctx.lookupClass("<list>"));
+                        ctx.getRootModule().lookupClass(ctx.namedSymbol("<list>")));
                 }
                 if (dimensions.cdr() instanceof Pair p) {
                     dimensions = p;
@@ -118,7 +120,9 @@ public abstract class ISLISPCreateArray extends ISLISPBuiltinFunctionRootNode {
     @Fallback
     Object fallback(Object dimensions, Object initValue) {
         var ctx = ISLISPContext.get(this);
-        return errorSignalerNode.signalWrongType(dimensions, ctx.lookupClass("<list>"));
+        return errorSignalerNode.signalWrongType(
+                dimensions,
+                ctx.getRootModule().lookupClass(ctx.namedSymbol("<list>")));
     }
 
 }

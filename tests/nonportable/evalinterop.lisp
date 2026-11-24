@@ -1,5 +1,5 @@
-(requires "testing.lisp")
-(requires "builtin/truffle.lisp")
+(requires testing)
+(requires builtin.truffle)
 
 (let ((fun (eval "js" "(function(arg) { return 1 + arg; })")))
   (test-equal (funcall fun 2) 3))

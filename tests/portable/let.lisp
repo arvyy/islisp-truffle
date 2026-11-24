@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (defun foo (a)
     (let ((a (+ 1 2))

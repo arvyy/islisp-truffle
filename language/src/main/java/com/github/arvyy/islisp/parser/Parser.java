@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  */
 public class Parser {
 
-    private final Set<String> moduleLoadInProgress;
+    private final Set<Symbol> moduleLoadInProgress;
 
     /**
      * Create parser.
@@ -42,16 +42,16 @@ public class Parser {
      * Handles installing base condition handler.
      *
      * @param language language reference
-     * @param module the 'main' module name that will entrypoint
      * @param source source for the module. If source is marked as interactive,
      *               in case of unexpected error do not exit with status code
      * @return root node
      */
     //TODO rename
-    public ISLISPRootNode createMainModuleNode(ISLISPTruffleLanguage language, String module, Source source) {
+    public ISLISPRootNode createMainModuleNode(ISLISPTruffleLanguage language, Source source) {
+        var moduleSource = parseModuleSource(source);
         var topLevelConditionHandler = new ISLISPWithHandlerNode(
             new ISLISPLiteralNode(ISLISPDefaultHandler.makeLispFunction(language, source.isInteractive()), null),
-            new ISLISPExpressionNode[]{new ISLISPModuleNode(this, parseModuleSource(module, source))},
+            new ISLISPExpressionNode[]{new ISLISPModuleNode(this, moduleSource)},
             null
         );
         var root = new ISLISPRootNode(
@@ -59,7 +59,7 @@ public class Parser {
                 new ISLISPExpressionNode[]{topLevelConditionHandler},
                 null
         );
-        root.setName(module);
+        root.setName(moduleSource.name().name());
         return root;
     }
 
@@ -88,32 +88,58 @@ public class Parser {
     }
 
     @CompilerDirectives.TruffleBoundary
-    ModuleSource parseModuleSource(String name, Source source) {
+    ModuleSource parseModuleSource(Source source) {
+        Symbol moduleName = null;
         var reader = new Reader(source);
         var content = reader.readAll();
         var rest = new ArrayList<SyntaxObject>(content.size());
-        var requires = new ArrayList<String>();
+        var requires = new ArrayList<Symbol>();
         var provides = new ArrayList<Symbol>();
+        var moduleDeclSeen = false;
         for (var obj: content) {
             if (obj.value() instanceof Pair p && p.car() instanceof SyntaxObject so && so.value() instanceof Symbol s) {
-                if ("requires".equals(s.name())) {
-                    var requireList = requireList(obj, -1, -1);
-                    for (var req: requireList.subList(1, requireList.size())) {
-                        requires.add(downcast(req, String.class));
+                /*
+                 * (module <symbol>
+                 *      (requires <symbol> ...)
+                 *      (provides <symbol> ...))
+                 */
+                if ("module".equals(s.name())) {
+                    if (moduleDeclSeen) {
+                        throw new ParsingException(obj.source(), "Duplicate module declaration");
+                    }
+                    moduleDeclSeen = true;
+                    var moduleList = requireList(obj, 2, 4);
+                    moduleName =  downcast(moduleList.get(1), Symbol.class);
+                    for (var i = 2; i < moduleList.size(); i++) {
+                        var reqOrProvideLst = requireList(moduleList.get(i), 1, -1);
+                        var head = downcast(reqOrProvideLst.get(0), Symbol.class);
+                        List<Symbol> l = switch (head.name()) {
+                            case "requires" -> requires;
+                            case "provides" -> provides;
+                            default -> throw new ParsingException(
+                                    obj.source(),
+                                    "Unrecognized `module` form part: " + head.name());
+                        };
+                        for (var e: reqOrProvideLst.subList(1, reqOrProvideLst.size())) {
+                            l.add(downcast(e, Symbol.class));
+                        }
                     }
                     continue;
                 }
-                if ("provides".equals(s.name())) {
-                    var provideList = requireList(obj, -1, -1);
-                    for (var provide: provideList.subList(1, provideList.size())) {
-                        provides.add(downcast(provide, Symbol.class));
+                if ("requires".equals(s.name())) {
+                    var reqList = requireList(obj, 1, -1);
+                    for (var e: reqList.subList(1, reqList.size())) {
+                        requires.add(downcast(e, Symbol.class));
                     }
                     continue;
                 }
             }
             rest.add(obj);
         }
-        return new ModuleSource(name, source.createSection(0, source.getLength()), requires, provides, rest);
+        if (moduleName == null) {
+            moduleName = ISLISPContext.get(null).namedSymbol(source.getPath());
+        }
+        return new ModuleSource(moduleName, source.createSection(0, source.getLength()), requires, provides, rest);
     }
 
     SourceSection span(SourceSection a, SourceSection b) {
@@ -139,7 +165,7 @@ public class Parser {
      * @param sexprs source code as a list of sexprs
      * @return root node containing parsed expressions which weren't definitions
      */
-    public ISLISPRootNode expandAndExecuteDefinitions(String module, List<SyntaxObject> sexprs) {
+    public ISLISPRootNode expandAndExecuteDefinitions(Symbol module, List<SyntaxObject> sexprs) {
         var parserContext = new ParserContext(module);
         var nonDefinitionExprs = new ArrayList<ISLISPExpressionNode>();
         for (var v: sexprs) {
@@ -308,8 +334,8 @@ public class Parser {
                 }
                 var placeList = requireList(place, 1, -1);
                 var setfDispatchSymbol = downcast(placeList.get(0), Symbol.class);
-                var setfDispatch = ISLISPContext.get(null)
-                        .lookupSetfTransformer(parserContext.module, setfDispatchSymbol);
+                var setfDispatch = ISLISPContext.get(null).getModule(parserContext.module)
+                        .lookupSetfTransformer(setfDispatchSymbol);
                 if (setfDispatch == null) {
                     return parseDirectSetfFunctionCall(parserContext, sexpr, placeList, value);
                 }
@@ -398,7 +424,7 @@ public class Parser {
         var args = requireList(sexpr, 2, -1);
         return parseCaseHelper(
             parserContext,
-            new ISLISPFunctionRefNode("ROOT", ctx.namedSymbol("eql"), null),
+            new ISLISPFunctionRefNode(ctx.namedSymbol("ROOT"), ctx.namedSymbol("eql"), null),
             parseExpressionNode(parserContext, args.get(1)),
             args.subList(2, args.size()),
             sexpr.source()
@@ -659,7 +685,7 @@ public class Parser {
         }
     }
 
-    SyntaxObject macroExpand(String module, SyntaxObject form, boolean single) {
+    SyntaxObject macroExpand(Symbol module, SyntaxObject form, boolean single) {
         var maybePair = tryDowncast(form, Pair.class);
         macro:
         if (maybePair.isPresent()) {
@@ -669,7 +695,7 @@ public class Parser {
                 break macro;
             }
             var symbol = maybeSymbol.get();
-            var maybeMacro = ISLISPContext.get(null).lookupMacro(module, symbol);
+            var maybeMacro = ISLISPContext.get(null).getModule(module).lookupMacro(symbol);
             if (maybeMacro != null) {
                 var args = new ArrayList<Object>();
                 args.add(null); // closure param
@@ -1507,7 +1533,7 @@ public class Parser {
      *
      * @param requires list of modules to load
      */
-    public void ensureRequiresLoaded(List<String> requires) {
+    public void ensureRequiresLoaded(List<Symbol> requires) {
         var ctx = ISLISPContext.get(null);
         for (var req: requires) {
             if (ctx.getModule(req) == null) {
@@ -1521,15 +1547,20 @@ public class Parser {
         }
     }
 
-    void loadModule(String module) {
+    void loadModule(Symbol module) {
         try {
             var ctx = ISLISPContext.get(null);
             var file = locateModuleSourceFile(module);
             var source = Source.newBuilder("islisp", file).build();
-            var moduleSource = parseModuleSource(module, source);
+            var moduleSource = parseModuleSource(source);
             ensureRequiresLoaded(moduleSource.requires());
-            ctx.createModule(module, moduleSource.requires(), moduleSource.provides());
-            new ISLISPModuleNode(this, moduleSource).initialize();
+            ctx.createModule(moduleSource.name(), moduleSource.requires(), moduleSource.provides());
+            var root = new ISLISPRootNode(
+                    ctx.getLanguage(),
+                    new ISLISPExpressionNode[]{new ISLISPModuleNode(this, moduleSource)},
+                    null
+            );
+            root.getCallTarget().call();
         } catch (IOException e) {
             throw new ParsingException(
                 null,
@@ -1537,11 +1568,12 @@ public class Parser {
         }
     }
 
-    TruffleFile locateModuleSourceFile(String module) {
+    TruffleFile locateModuleSourceFile(Symbol module) {
+        var relativeFileName = module.name().replace('.', '/') + ".lisp";
         var env = ISLISPContext.get(null).getEnv();
         for (var rootPath: env.getOptions().get(ISLISPTruffleLanguage.Sourcepath).split(":")) {
             var root = env.getPublicTruffleFile(rootPath);
-            var resolved = root.resolve(module);
+            var resolved = root.resolve(relativeFileName);
             if (resolved.exists()) {
                 return resolved;
             }

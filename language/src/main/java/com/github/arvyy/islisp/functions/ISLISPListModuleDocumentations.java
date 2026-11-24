@@ -29,7 +29,7 @@ public class ISLISPListModuleDocumentations extends ISLISPBuiltinFunctionRootNod
         } else {
             return errorSignalerNode.signalWrongType(
                 arg,
-                c.lookupClass("string"));
+                c.getRootModule().lookupClass(c.namedSymbol("string")));
         }
     }
 

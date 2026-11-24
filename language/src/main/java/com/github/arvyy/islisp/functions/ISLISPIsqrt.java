@@ -50,7 +50,7 @@ public abstract class ISLISPIsqrt extends RootNode {
     Object doBigInt(LispBigInteger a) {
         if (a.data().compareTo(BigInteger.ZERO) < 0) {
             var ctx = ISLISPContext.get(this);
-            var integerClass = ctx.lookupClass("<integer>");
+            var integerClass = ctx.getRootModule().lookupClass(ctx.namedSymbol("<integer>"));
             return errorSignalerNode.signalDomainError("negative value passed to isqrt", a, integerClass);
         }
         var value = a.data().sqrt();
@@ -64,7 +64,7 @@ public abstract class ISLISPIsqrt extends RootNode {
     @Fallback
     Object fallback(Object a) {
         var ctx = ISLISPContext.get(this);
-        var integerClass = ctx.lookupClass("<integer>");
+        var integerClass = ctx.getRootModule().lookupClass(ctx.namedSymbol("<integer>"));
         return errorSignalerNode.signalWrongType(a, integerClass);
     }
 

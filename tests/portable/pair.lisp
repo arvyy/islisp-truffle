@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (let ((p (cons 1 2)))
     (test-equal (car p) 1)

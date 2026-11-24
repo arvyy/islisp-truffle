@@ -21,7 +21,7 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
     private final int frameIndex;
     private final int frameSlot;
 
-    private final String module;
+    private final Symbol module;
     private final Symbol name;
 
     @CompilerDirectives.CompilationFinal
@@ -44,7 +44,7 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
      * @param expression value expression
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPSetqNode(String module, Symbol name, ISLISPExpressionNode expression, SourceSection sourceSection) {
+    public ISLISPSetqNode(Symbol module, Symbol name, ISLISPExpressionNode expression, SourceSection sourceSection) {
         super(sourceSection);
         errorSignalerNode = new ISLISPErrorSignalerNode(this);
         this.module = module;
@@ -64,7 +64,7 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
      * @param sourceSection corresponding source section to this node
      */
     public ISLISPSetqNode(
-        String module,
+        Symbol module,
         int frameIndex,
         int frameSlot,
         ISLISPExpressionNode expression,
@@ -92,7 +92,7 @@ public class ISLISPSetqNode extends ISLISPExpressionNode {
         } else {
             if (valueReference == null) {
                 CompilerDirectives.transferToInterpreterAndInvalidate();
-                valueReference = ISLISPContext.get(this).lookupGlobalVar(module, name);
+                valueReference = ISLISPContext.get(this).getModule(module).lookupGlobalVar(name);
             }
             if (valueReference.isReadOnly()) {
                 return errorSignalerNode.signalImmutableBindingError(name);

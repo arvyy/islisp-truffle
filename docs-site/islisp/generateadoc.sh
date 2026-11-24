@@ -11,5 +11,5 @@ process() {
 }
 
 process "prelude" "ROOT"
-process "introspection" "builtin/introspection.lisp"
-process "truffle" "builtin/truffle.lisp"
+process "introspection" "builtin.introspection"
+process "truffle" "builtin.truffle"

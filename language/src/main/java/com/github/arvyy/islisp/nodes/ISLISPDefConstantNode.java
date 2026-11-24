@@ -10,7 +10,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPDefConstantNode extends ISLISPExpressionNode {
 
-    private final String module;
+    private final Symbol module;
     private final Symbol name;
     @Child
     private ISLISPExpressionNode expression;
@@ -24,7 +24,7 @@ public class ISLISPDefConstantNode extends ISLISPExpressionNode {
      * @param sourceSection corresponding source section to this node
      */
     public ISLISPDefConstantNode(
-        String module,
+        Symbol module,
         Symbol name,
         ISLISPExpressionNode expression,
         SourceSection sourceSection
@@ -37,8 +37,8 @@ public class ISLISPDefConstantNode extends ISLISPExpressionNode {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        ISLISPContext.get(this).registerGlobalVar(
-            module, name, expression.executeGeneric(frame), true, getSourceSection());
+        ISLISPContext.get(this).getModule(module)
+            .registerGlobalVar(name, expression.executeGeneric(frame), true, getSourceSection());
         return name;
     }
 }

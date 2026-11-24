@@ -44,7 +44,7 @@ public class ISLISPTextDocumentService implements TextDocumentService {
 
     void buildCompletionItems() {
         server.withLang((ctx, lang) -> {
-            var root = ctx.getModule("ROOT");
+            var root = ctx.getModule(ctx.namedSymbol("ROOT"));
             var docs = root.getModuleDocumentations();
             items = docs.stream()
                 .map(this::docToCompletionItem)

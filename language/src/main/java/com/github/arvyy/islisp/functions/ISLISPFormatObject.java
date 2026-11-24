@@ -37,10 +37,10 @@ public abstract class ISLISPFormatObject extends RootNode {
 
     @Specialization
     Object doProper(LispStream stream, Object obj, Object escape) {
-        var nil = ISLISPContext.get(this).getNil();
+        var ctx = ISLISPContext.get(this);
         try {
-            doPrint(stream, obj, escape != nil);
-            return nil;
+            doPrint(stream, obj, !Utils.isNil(this, escape));
+            return ctx.getNil();
         } catch (IOException e) {
             return errorSignalerNode.signalIOError(e);
         }
@@ -48,7 +48,10 @@ public abstract class ISLISPFormatObject extends RootNode {
 
     @Fallback
     Object doFallback(Object stream, Object obj, Object escape) {
-        return errorSignalerNode.signalWrongType(stream, ISLISPContext.get(this).lookupClass("<output-stream>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(
+                stream,
+                r.getRootModule().lookupClass(r.namedSymbol("<output-stream>")));
     }
 
     /**
@@ -81,9 +84,9 @@ public abstract class ISLISPFormatObject extends RootNode {
         if (value instanceof String s) {
             if (escape) {
                 stream.write("\"");
+                s = s.replace("\\", "\\\\");
+                s = s.replace("\"", "\\\"");
             }
-            s = s.replace("\\", "\\\\");
-            s = s.replace("\"", "\\\"");
             stream.write(s);
             if (escape) {
                 stream.write("\"");

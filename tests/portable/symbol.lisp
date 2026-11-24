@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (test-equal (property 'foo 'bar "OK1") "OK1")
 

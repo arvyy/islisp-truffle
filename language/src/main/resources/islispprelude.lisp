@@ -1,3 +1,5 @@
+(module ROOT)
+
 (defdynamic *args* (vector))
 
 (defmacro trace (:rest args)

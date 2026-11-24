@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 (test-equal (assure <integer> (+ 1 9)) 10)
 (test-equal (assure <number> (+ 1 9)) 10)

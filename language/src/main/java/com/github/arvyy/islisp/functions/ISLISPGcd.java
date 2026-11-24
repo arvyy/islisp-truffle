@@ -60,7 +60,7 @@ public abstract class ISLISPGcd extends RootNode {
     @Fallback
     Object fallback(Object a, Object b) {
         var ctx = ISLISPContext.get(this);
-        var integerClass = ctx.lookupClass("<integer>");
+        var integerClass = ctx.getRootModule().lookupClass(ctx.namedSymbol("<integer>"));
         if (!ISLISPTypesGen.isImplicitLispBigInteger(a)) {
             return errorSignalerNode.signalWrongType(a, integerClass);
         }

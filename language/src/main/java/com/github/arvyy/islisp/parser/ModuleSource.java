@@ -15,9 +15,9 @@ import java.util.List;
  * @param content unparsed sexprs of module's content
  */
 public record ModuleSource(
-    String name,
+    Symbol name,
     SourceSection sourceSection,
-    List<String> requires,
+    List<Symbol> requires,
     List<Symbol> provides,
     List<SyntaxObject> content
 ) { }

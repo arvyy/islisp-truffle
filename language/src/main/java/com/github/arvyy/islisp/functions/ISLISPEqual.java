@@ -153,7 +153,7 @@ public abstract class ISLISPEqual extends RootNode {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
-                ctx.lookupFunction("ROOT", ctx.namedSymbol("eq"))
+                ctx.getRootModule().lookupFunction(ctx.namedSymbol("eq"))
                     .callTarget());
             eqCallNode = insert(callNode);
         }

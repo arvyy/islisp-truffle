@@ -61,7 +61,7 @@ public abstract class ISLISPFunctionDispatchNode extends Node {
             }
         } else {
             var ctx = ISLISPContext.get(this);
-            var functionClass = ctx.lookupClass("ROOT", ctx.namedSymbol("<function>"));
+            var functionClass = ctx.getModule(ctx.namedSymbol("ROOT")).lookupClass(ctx.namedSymbol("<function>"));
             return errorSignalerNode.signalWrongType(o, functionClass);
         }
     }

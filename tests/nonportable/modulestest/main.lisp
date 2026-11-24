@@ -1,6 +1,6 @@
 (requires
-    "testing.lisp"
-    "module1.lisp")
+    testing
+    module1)
 
 (test-equal (module1-public) "Hello from module2.lisp")
 

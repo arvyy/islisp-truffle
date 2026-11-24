@@ -63,7 +63,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
     @Override
     public CallTarget parse(ParsingRequest request) {
         var parser = new Parser();
-        var rootNode = parser.createMainModuleNode(this, request.getSource().getName(), request.getSource());
+        var rootNode = parser.createMainModuleNode(this, request.getSource());
         return rootNode.getCallTarget();
     }
 
@@ -83,9 +83,9 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
                 "islispprelude.lisp")
             .build();
         var parser = new Parser();
-        var rootNode = parser.createMainModuleNode(this, "ROOT", preludeSource);
+        var rootNode = parser.createMainModuleNode(this, preludeSource);
         rootNode.getCallTarget().call();
-        ISLISPContext.get(null).getModule("ROOT").exportAll();
+        context.getModule(context.namedSymbol("ROOT")).exportAll();
         var includeDocs = context.getEnv().getOptions().get(IncludeDocumentation);
         if (includeDocs) {
             Source docsSource;
@@ -97,7 +97,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
                     new InputStreamReader(ISLISPTruffleLanguage.class.getResourceAsStream("/islispprelude.docs.lisp")),
                     "islispprelude.docs.lisp")
                 .build();
-            docsRootNode = parser.createMainModuleNode(this, "ROOT", docsSource);
+            docsRootNode = parser.createMainModuleNode(this, docsSource);
             docsRootNode.getCallTarget().call();
 
             docsSource = Source
@@ -106,7 +106,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
                     new InputStreamReader(ISLISPTruffleLanguage.class.getResourceAsStream("/truffle.docs.lisp")),
                     "truffle.docs.lisp")
                 .build();
-            docsRootNode = parser.createMainModuleNode(this, "builtin/truffle.lisp", docsSource);
+            docsRootNode = parser.createMainModuleNode(this, docsSource);
             docsRootNode.getCallTarget().call();
 
             docsSource = Source
@@ -115,7 +115,7 @@ public class ISLISPTruffleLanguage extends TruffleLanguage<ISLISPContext> {
                     new InputStreamReader(ISLISPTruffleLanguage.class.getResourceAsStream("/introspection.docs.lisp")),
                     "introspection.docs.lisp")
                 .build();
-            docsRootNode = parser.createMainModuleNode(this, "builtin/introspection.lisp", docsSource);
+            docsRootNode = parser.createMainModuleNode(this, docsSource);
             docsRootNode.getCallTarget().call();
         }
     }

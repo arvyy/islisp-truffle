@@ -37,7 +37,7 @@ Attempted to change immutable binding shouldbeimmutable
     at stacktrace.lisp:1
 
 Error with value: test
-    at islispprelude.lisp:79
+    at islispprelude.lisp:81
     at stacktrace.lisp:116
     at stacktrace.lisp:1
 

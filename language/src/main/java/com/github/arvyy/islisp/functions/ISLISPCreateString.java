@@ -45,9 +45,13 @@ public abstract class ISLISPCreateString extends ISLISPBuiltinFunctionRootNode {
     Object fallback(Object count, Object lispChar) {
         var ctx = ISLISPContext.get(this);
         if (lispChar instanceof  LispChar) {
-            return errorSignalerNode.signalWrongType(count, ctx.lookupClass("<number>"));
+            return errorSignalerNode.signalWrongType(
+                    count,
+                    ctx.getRootModule().lookupClass(ctx.namedSymbol("<number>")));
         } else {
-            return errorSignalerNode.signalWrongType(lispChar, ctx.lookupClass("<character>"));
+            return errorSignalerNode.signalWrongType(
+                    lispChar,
+                    ctx.getRootModule().lookupClass(ctx.namedSymbol("<character>")));
         }
     }
 

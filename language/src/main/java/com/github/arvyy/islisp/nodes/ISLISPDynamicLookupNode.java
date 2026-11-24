@@ -12,7 +12,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPDynamicLookupNode extends ISLISPExpressionNode {
 
-    private final String module;
+    private final Symbol module;
     private final Symbol symbol;
 
     @CompilerDirectives.CompilationFinal
@@ -28,7 +28,7 @@ public class ISLISPDynamicLookupNode extends ISLISPExpressionNode {
      * @param symbol variable name
      * @param sourceSection corresponding source section to this node
      */
-    public ISLISPDynamicLookupNode(String module, Symbol symbol, SourceSection sourceSection) {
+    public ISLISPDynamicLookupNode(Symbol module, Symbol symbol, SourceSection sourceSection) {
         super(sourceSection);
         this.module = module;
         this.symbol = symbol;
@@ -38,7 +38,7 @@ public class ISLISPDynamicLookupNode extends ISLISPExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         if (valueReference == null) {
-            valueReference = ISLISPContext.get(this).lookupDynamicVar(module, symbol);
+            valueReference = ISLISPContext.get(this).getModule(module).lookupDynamicVar(symbol);
             if (valueReference == null) {
                 return errorSignalerNode.signalUnboundVariable(symbol);
             }

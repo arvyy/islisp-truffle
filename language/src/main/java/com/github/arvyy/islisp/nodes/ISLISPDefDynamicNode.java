@@ -11,7 +11,7 @@ import com.oracle.truffle.api.source.SourceSection;
  */
 public class ISLISPDefDynamicNode extends ISLISPExpressionNode {
 
-    private final String module;
+    private final Symbol module;
     private final Symbol name;
 
     @Child
@@ -26,7 +26,7 @@ public class ISLISPDefDynamicNode extends ISLISPExpressionNode {
      * @param sourceSection corresponding source section to this node
      */
     public ISLISPDefDynamicNode(
-        String module,
+        Symbol module,
         Symbol name,
         ISLISPExpressionNode initializer,
         SourceSection sourceSection
@@ -42,7 +42,7 @@ public class ISLISPDefDynamicNode extends ISLISPExpressionNode {
         var ctx = ISLISPContext.get(this);
         var dynamicVar = new ValueReference(getSourceSection());
         dynamicVar.setValue(initializer.executeGeneric(frame));
-        ctx.registerDynamicVar(module, name, dynamicVar);
+        ctx.getModule(module).registerDynamicVar(name, dynamicVar);
         return name;
     }
 }

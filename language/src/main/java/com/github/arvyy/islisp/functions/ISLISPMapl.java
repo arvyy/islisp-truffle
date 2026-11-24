@@ -63,7 +63,10 @@ public abstract class ISLISPMapl extends RootNode {
                     args[i] = p;
                     lists[i] = p.cdr();
                 } else {
-                    return errorSignalerNode.signalWrongType(arg, ISLISPContext.get(this).lookupClass("<list>"));
+                    ISLISPContext r = ISLISPContext.get(this);
+                    return errorSignalerNode.signalWrongType(
+                            arg,
+                            r.getRootModule().lookupClass(r.namedSymbol("<list>")));
                 }
             }
             fn.execute(o, args);

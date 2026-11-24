@@ -43,7 +43,8 @@ public abstract class ISLISPFormatFreshLine extends RootNode {
 
     @Fallback
     Object executeFallback(Object stream) {
-        return errorSignalerNode.signalWrongType(stream, ISLISPContext.get(this).lookupClass("<stream>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(stream, r.getRootModule().lookupClass(r.namedSymbol("<stream>")));
     }
 
 

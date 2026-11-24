@@ -34,7 +34,7 @@ public class ISLISPLoadNativeLibrary extends RootNode {
         if (name instanceof String nameString) {
             return executeBoundary(nameString);
         }
-        return errorSignalerNode.signalWrongType(name, ctx.lookupClass("<string>"));
+        return errorSignalerNode.signalWrongType(name, ctx.getRootModule().lookupClass(ctx.namedSymbol("<string>")));
     }
 
     @CompilerDirectives.TruffleBoundary

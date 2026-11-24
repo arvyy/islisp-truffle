@@ -41,12 +41,14 @@ public abstract class ISLISPFormatChar extends RootNode {
 
     @Specialization
     Object doFallbackNonStream(Object stream, LispChar c) {
-        return errorSignalerNode.signalWrongType(stream, ISLISPContext.get(this).lookupClass("<stream>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(stream, r.getRootModule().lookupClass(r.namedSymbol("<stream>")));
     }
 
     @Fallback
     Object doFallbackNonChar(Object stream, Object c) {
-        return errorSignalerNode.signalWrongType(c, ISLISPContext.get(this).lookupClass("<char>"));
+        ISLISPContext r = ISLISPContext.get(this);
+        return errorSignalerNode.signalWrongType(c, r.getRootModule().lookupClass(r.namedSymbol("<char>")));
     }
 
 

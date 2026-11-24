@@ -157,7 +157,7 @@ public class ISLISPInteractiveDebugger extends Node {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             var ctx = ISLISPContext.get(this);
             var callNode = DirectCallNode.create(
-                ctx.lookupFunction("ROOT", ctx.namedSymbol("continue-condition"))
+                ctx.getRootModule().lookupFunction(ctx.namedSymbol("continue-condition"))
                     .callTarget());
             continueCondition = insert(callNode);
         }

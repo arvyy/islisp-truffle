@@ -1,4 +1,4 @@
-(requires "testing.lisp")
+(requires testing)
 
 ;;reader
 (test-equal #b10 2)
