@@ -8,30 +8,34 @@ See xref:apireference:index.adoc[] for reference.
 
 == Module system
 
-Truffle ISLISP provides a very simple module system, somewhat inspired by Racket. A module is colloquial to a file that defines its source.
-
-Use `(requires _path-string_ ...)` to load modules; for example
+Modules are defined one per file, using a form:
 
 [source,lisp]
 ----
-(requires "lib/foo.lisp")
+(module _name_
+    (requires _symbol_ ...)
+    (provides _symbol_ ...))
 ----
 
-Use `(provides _symbol_ ...)` to define module's exports that will be used by modules that required it; for example
+The _name_ is a symbol, whose value must match file's relative position from sourcepath root as follows:
+* Replace each path segment with `.`;
+* Remove the `.lisp` extension.
 
-[source,lisp]
-----
-(provides public-function)
+NOTE: For example; a module file at relative path `foo/bar/baz.lisp` should have declared _name_ `foo.bar.baz`.
 
-(defun public-function () (internal-function)) ;; only this function will be exported
-(defun internal-function () "Hello world!")
-----
+The _provides_ list names the set of identifiers that are visible by the users of the module.
 
-The module paths are searched relative to sourcepath roots, which defaults to working directory.
-You can specify sourcepaths using `--islisp.Sourcepath` option.
-The value must be root paths separated by `:`.
+The _requires_ list (optional) specifies set of modules, whose identifiers this module imports. 
 
-For example; given the following files
+Source path roots are specified using `islisp.Sourcepath` truffle option (i.e., `--islisp.Sourcepath=...` if using islisp launcher).
+The value must be a set of paths, separated by `:`.
+If not given, defaults to working directory.
+
+For entrypoint application files, a simplified form of just `(requires _symbol_ ...)` can be used.
+
+IMPORTANT: Module declarations are read very early into load process. It is not possible for a _module_ or _requires_ form to be a result of a macro expansion and still work.
+
+Example; given the following files
 
 [source]
 ----
@@ -40,11 +44,23 @@ root2/bar/module2.lisp
 main.lisp
 ----
 
-Where main.lisp starts with
+where files start as follows:
 
 [source,lisp]
 ----
-(requires "module1.lisp" "bar/module2.lisp")
+; main.lisp
+(requires module1 bar.module2)
+...
+
+; root1/module1.lisp
+(moduel module1
+    (provides foo))
+...
+
+; root2/bar/module2.lisp
+(module bar.module2
+    (provides bar))
+...
 ----
 
 The correct invocation is `islisp --islisp.SourcePath root1:root2 main.lisp`.

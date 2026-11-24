@@ -34,15 +34,33 @@
       (value-type . "<general-vector>")
       (desc . "Holds command-line arguments, as a vector of strings.")))
       
-(setf (documentation 'syntax 'provides)
-    '((kind . syntax)
-      (syntax . "(provides symbol*)")
-      (desc . "Exports functions / macros / values bound to _symbol_ to be visible in other modules that *requires* this module.")))
-      
 (setf (documentation 'syntax 'requires)
     '((kind . syntax)
       (syntax . "(require path)")
-      (desc . "Imports module from _path_ (which must be a string). _path_ is resolved relative set of active source roots.")))
+      (desc . "Imports module from _path_ (which must be a symbol). See _module_ for details.")))
+
+(setf (documentation 'syntax 'module)
+    '((kind . syntax)
+      (syntax . "(module name (provides symbol ...) (requires symbol ...))")
+      (desc . "Defines module: its name, public definitions, and requires imports.
+
+The _name_ is a symbol, whose value must match file's relative position from sourcepath root as follows:
+* Replace each path segment with `.`;
+* Remove the `.lisp` extension.
+
+NOTE: For example; a module file at relative path `foo/bar/baz.lisp` should have declared _name_ `foo.bar.baz`.
+
+The _provides_ list names the set of identifiers that are visible by the users of the module.
+
+The _requires_ list (optional) specifies set of modules, whose identifiers this module imports. 
+
+Source path roots are specified using `islisp.Sourcepath` truffle option (i.e., `--islisp.Sourcepath=...` if using islisp launcher).
+The value must be a set of paths, separated by `:`.
+If not given, defaults to working directory.
+
+For entrypoint application files, a simplified form of just `(requires _symbol_ ...)` can be used.
+
+IMPORTANT: Module declarations are read very early into load process. It is not possible for a _module_ or _requires_ form to be a result of a macro expansion and still work.")))
       
 (setf (documentation 'function 'documentation)
     '((kind . function)
